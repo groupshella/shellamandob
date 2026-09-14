@@ -1,0 +1,183 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
+/* =========================
+   Local properties
+========================= */
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '168'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '3.8.12'
+
+/* =========================
+   Keystore + Secure tokens
+========================= */
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+// MyFatoorah tokens (priority: key.properties -> local.properties -> ENV)
+def myFatoorahLiveToken = keystoreProperties.getProperty('MYFATOORAH_LIVE_TOKEN', '')
+if (!myFatoorahLiveToken) {
+    myFatoorahLiveToken = localProperties.getProperty('MYFATOORAH_LIVE_TOKEN', '')
+}
+if (!myFatoorahLiveToken) {
+    myFatoorahLiveToken = System.getenv('MYFATOORAH_LIVE_TOKEN') ?: ''
+}
+
+def myFatoorahTestToken = keystoreProperties.getProperty('MYFATOORAH_TEST_TOKEN', '')
+if (!myFatoorahTestToken) {
+    myFatoorahTestToken = localProperties.getProperty('MYFATOORAH_TEST_TOKEN', '')
+}
+if (!myFatoorahTestToken) {
+    myFatoorahTestToken = System.getenv('MYFATOORAH_TEST_TOKEN') ?: ''
+}
+
+android {
+    namespace "com.food.shala"
+    compileSdk 36
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    // Standalone marketer build: `APP_MODE=marketer flutter build apk ...` flips
+    // only the visible app name to "شله المسوّق". Same package id (com.food.shala)
+    // so Firebase/google-services stays valid; the normal customer build (no env
+    // var) keeps the label "شله" and is completely unaffected.
+    def isMarketerBuild = (System.getenv('APP_MODE') ?: '') == 'marketer'
+
+    defaultConfig {
+        applicationId "com.food.shala"
+        // Marketer build gets a distinct package so it installs alongside the
+        // customer app. A matching client for com.food.shala.marketer was added
+        // to google-services.json so the Google-services plugin accepts it.
+        if (isMarketerBuild) {
+            applicationIdSuffix ".marketer"
+        }
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+
+        // ✅ حل مشكلة applicationName + تعطيل Crashlytics
+        manifestPlaceholders = [
+            applicationName: "android.app.Application",
+            firebaseCrashlyticsCollectionEnabled: "false",
+            appLabel: isMarketerBuild ? "مسوق شله" : "شله"
+        ]
+
+        buildConfigField "String", "MYFATOORAH_LIVE_TOKEN", "\"$myFatoorahLiveToken\""
+        buildConfigField "String", "MYFATOORAH_TEST_TOKEN", "\"$myFatoorahTestToken\""
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    // 🔴 ما بدنا keystore – APK تجريبي
+    signingConfigs {
+        debug {
+            // default debug signing
+        }
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // Use release keystore when configured; otherwise fall back to debug signing for local builds.
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
+
+            // #3 Play Console: enable R8 code shrinking + resource shrinking.
+            // proguardFiles MUST be wired here or the custom keep rules in
+            // proguard-rules.pro are ignored and R8 strips classes used via
+            // reflection (Firebase / MyFatoorah / plugins) → runtime crashes.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    // ✅ حل مشاكل lint + ويندوز
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    packagingOptions {
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libflutter.so'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+
+    implementation "com.google.firebase:firebase-messaging:23.4.1"
+    implementation 'com.facebook.android:facebook-android-sdk:16.3.0'
+
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.activity:activity-ktx:1.9.2'
+}
+
+// #2 Play Console: SafetyNet is discontinued by Google. Firebase Auth verifies
+// phone numbers via reCAPTCHA + Play Integrity (both already on the classpath),
+// and App Check is not activated with the SafetyNet provider — so the deprecated
+// SafetyNet artifacts are dead weight. Strip them so they no longer ship.
+configurations.all {
+    exclude group: 'com.google.android.gms', module: 'play-services-safetynet'
+    exclude group: 'com.google.firebase', module: 'firebase-appcheck-safetynet'
+}

@@ -1,0 +1,113 @@
+# ─── بيئة التطوير والـ IDE ───
+.idea/
+*.iml
+*.ipr
+*.iws
+.atom/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+.history/
+.svn/
+
+# ─── Flutter / Dart ───
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/doc/api/
+**/ios/Flutter/.last_build_id
+/build/
+
+# ─── أرشيفات ومخرجات مؤقتة ───
+*.class
+*.log
+*.pyc
+changes.tar
+changes.zip
+changed_files.zip
+app.*.symbols
+app.*.map.json
+
+# ─── Android ───
+/android/app/debug
+/android/app/profile
+/android/app/release
+android/local.properties
+
+# مفاتيح وتوقيع (لا ترفع أبداً)
+android/key.properties
+android/app/key.properties
+*.jks
+*.keystore
+
+# ─── iOS ───
+ios/Podfile.lock
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# ─── مجلدات مؤقتة للمشروع ───
+delete/
+2025/
+
+# ─── توثيق مؤقت (يُحتفظ بـ README.md) ───
+API_*.md
+BACKEND_*.md
+ECOMMERCE_*.md
+FIREBASE_*.md
+FLUTTER_*.md
+FOOD_*.md
+MODULE_*.md
+NOTIFICATION_*.md
+PHARMACY_*.md
+PRICING_*.md
+RELEASE_*.md
+RUN_*.md
+STORE_*.md
+URGENT_*.md
+test_*.md
+foodmodule.md
+Module*.md
+apis/
+app screens/
+notifications/
+
+# ─── سكربتات مؤقتة (اختياري: أزل السطر لو تريد رفع سكربتات) ───
+get_changed_files.sh
+get_valid_ids.sh
+check_*.ps1
+build_production.bat
+
+# ─── بيانات مؤقتة وتجارب ───
+module6_categories_*.json
+module6_categories_summary.txt
+modules_response*.json
+WhatsApp Image*.jpg
+
+# ─── Firebase (إن احتوى على بيانات حساسة) ───
+# firebase.json
+
+# ─── ملفات اختبار مؤقتة ───
+test_*.dart
+fetch_*.dart
+
+# Local API keys (Google Maps, Facebook, MyFatoorah)
+env.json
+
+# Firebase credential files — contain live API keys, must not be committed
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/helper/firebase/firebase_options.dart
+
+# Local Claude Code config
+.claude/
+
+# Vendored JDK / tools — download locally, never track
+/tools/
+# iOS build output
+/ios/build/
+.gstack/
