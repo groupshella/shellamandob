@@ -106,7 +106,34 @@ class MarketerSuccessDialog extends StatelessWidget {
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+                Get.back();
+                onClose?.call();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF30913F),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'متابعة حالة الطلب',
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );

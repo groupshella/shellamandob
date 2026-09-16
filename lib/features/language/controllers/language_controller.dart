@@ -38,23 +38,26 @@ class LocalizationController extends GetxController implements GetxService {
       saveLanguage(_locale);
     }
 
-    if (AddressHelper.getUserAddressFromSharedPref() != null &&
-        !fromBottomSheet) {
-      HomeScreen.loadData(context, true);
-    } else if (Get.context != null && ResponsiveHelper.isDesktop(Get.context!) &&
-        AddressHelper.getUserAddressFromSharedPref() == null) {
-      Get.find<SplashController>().getLandingPageData();
-    }
+    if (!AppConstants.isMarketerApp) {
+      if (AddressHelper.getUserAddressFromSharedPref() != null &&
+          !fromBottomSheet) {
+        HomeScreen.loadData(context, true);
+      } else if (Get.context != null && ResponsiveHelper.isDesktop(Get.context!) &&
+          AddressHelper.getUserAddressFromSharedPref() == null) {
+        Get.find<SplashController>().getLandingPageData();
+      }
 
-    if (Get.find<SplashController>().moduleList == null) {
-      Get.find<SplashController>().getModules(headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        AppConstants.localizationKey:
-            Get.find<LocalizationController>().locale.languageCode
-      });
+      if (Get.find<SplashController>().moduleList == null) {
+        Get.find<SplashController>().getModules(headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          AppConstants.localizationKey:
+              Get.find<LocalizationController>().locale.languageCode
+        });
+      }
     }
 
     update();
+    update(['app_locale']);
   }
 
   void loadCurrentLanguage() async {

@@ -253,9 +253,14 @@ Future<void> _initializeHeavyServices() async {
       if (kDebugMode) debugPrint('⚠️ Background handler registration note: $e');
     }
     // STAGE 2: Stagger heavy service init to reduce frame drops on splash/onboarding
-    await CacheManager().initialize();
-    await HiveHomeCacheService().initialize();
-    if (kDebugMode) debugPrint('✅ Core cache services initialized (Stage 2)');
+    // 🎯 MARKETER: Skip customer-specific home cache — not needed for marketer app
+    if (!AppConstants.isMarketerApp) {
+      await CacheManager().initialize();
+      await HiveHomeCacheService().initialize();
+      if (kDebugMode) debugPrint('✅ Core cache services initialized (Stage 2)');
+    } else {
+      if (kDebugMode) debugPrint('⚡ [MARKETER] Skipped customer home cache (Stage 2)');
+    }
 
     unawaited(NotificationService().initialize());
     if (kDebugMode) {
@@ -305,15 +310,18 @@ void _initializeNonCriticalServices() {
     }
   });
 
-  Future.microtask(() async {
-    try {
-      // Hive migration (non-blocking)
-      await HiveMigrationService.migrateFromSharedPreferences();
-      if (kDebugMode) debugPrint('✅ Hive migration completed');
-    } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ Migration failed: $e');
-    }
-  });
+  // 🎯 MARKETER: Skip Hive migration — only relevant for customer module cache
+  if (!AppConstants.isMarketerApp) {
+    Future.microtask(() async {
+      try {
+        // Hive migration (non-blocking)
+        await HiveMigrationService.migrateFromSharedPreferences();
+        if (kDebugMode) debugPrint('✅ Hive migration completed');
+      } catch (e) {
+        if (kDebugMode) debugPrint('⚠️ Migration failed: $e');
+      }
+    });
+  }
 
   Future.microtask(() async {
     try {
@@ -434,7 +442,6 @@ class _MyAppState extends State<MyApp> {
       builder: (themeController) {
         // ⚡ Locale changes only rebuild locale-dependent widgets
         return GetBuilder<LocalizationController>(
-          id: 'app_locale', // Specific ID for locale rebuilds
           builder: (localizeController) {
             // ⚡ Config changes only rebuild config-dependent widgets
             return GetBuilder<SplashController>(
@@ -562,8 +569,10 @@ class _MyAppState extends State<MyApp> {
       defaultTransition: Transition.topLevel,
       transitionDuration: const Duration(milliseconds: 500),
       navigatorObservers: <NavigatorObserver>[
-        stickyCartNavigatorObserver,
-        cartRouteObserverForStickyOverlay,
+        if (!AppConstants.isMarketerApp) ...[
+          stickyCartNavigatorObserver,
+          cartRouteObserverForStickyOverlay,
+        ],
       ],
       // Navigator + global overlays must live inside this builder (not outside
       // GetMaterialApp) so they share the same element tree, MediaQuery, and theme.
@@ -583,25 +592,24 @@ class _MyAppState extends State<MyApp> {
                 clipBehavior: Clip.none,
                 children: <Widget>[
                   Positioned.fill(child: navigatorChild),
-                  // PERFORMANCE: Cookies view uses specific ID to avoid rebuilding
-                  // when other splash data changes
-                  GetBuilder<SplashController>(
-                    id: 'cookies_status',
-                    builder: (splashController) {
-                      final showCookies = !splashController.savedCookiesData &&
-                          !splashController.getAcceptCookiesStatus(
-                              splashController.configModel?.cookiesText ?? '');
+                  if (!AppConstants.isMarketerApp)
+                    GetBuilder<SplashController>(
+                      id: 'cookies_status',
+                      builder: (splashController) {
+                        final showCookies = !splashController.savedCookiesData &&
+                            !splashController.getAcceptCookiesStatus(
+                                splashController.configModel?.cookiesText ?? '');
 
-                      if (showCookies && ResponsiveHelper.isWeb()) {
-                        return const Align(
-                          alignment: Alignment.bottomCenter,
-                          child: CookiesView(),
-                        );
-                      }
+                        if (showCookies && ResponsiveHelper.isWeb()) {
+                          return const Align(
+                            alignment: Alignment.bottomCenter,
+                            child: CookiesView(),
+                          );
+                        }
 
-                      return const SizedBox();
-                    },
-                  ),
+                        return const SizedBox();
+                      },
+                    ),
                   // 🎨 REDESIGN: floating cart button removed — the cart count
                   // now shows as a badge on the bottom nav bar.
                 ],

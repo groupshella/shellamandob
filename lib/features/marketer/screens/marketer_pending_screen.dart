@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
+import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/util/images.dart';
 
 class MarketerPendingScreen extends StatelessWidget {
   const MarketerPendingScreen({super.key});
@@ -33,13 +36,39 @@ class MarketerPendingScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            MarketerHeader(title: 'join_as_marketer'.tr),
+            MarketerHeader(
+              title: 'join_as_marketer'.tr,
+              showBackButton: false,
+              trailing: IconButton(
+                icon: const Icon(IconlyLight.logout, size: 22, color: Color(0xFFE53935)),
+                tooltip: 'logout'.tr,
+                onPressed: () {
+                  Get.dialog(
+                    ConfirmationDialog(
+                      icon: Images.support,
+                      description: 'are_you_sure_to_logout'.tr,
+                      isLogOut: true,
+                      onYesPressed: () async {
+                        Get.back();
+                        await Get.find<AuthController>().clearSharedData();
+                        Get.find<MarketerController>().reset();
+                        Get.offAllNamed(RouteHelper.getWelcomeRoute());
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
             Expanded(
               child: GetBuilder<MarketerController>(
                 builder: (controller) {
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                    child: Column(
+                  return RefreshIndicator(
+                    onRefresh: () => controller.loadDashboard(),
+                    color: const Color(0xFF30913F),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -103,8 +132,9 @@ class MarketerPendingScreen extends StatelessWidget {
                         const SizedBox(height: 30),
                       ],
                     ),
-                  );
-                },
+                  ),
+                );
+              },
               ),
             ),
 

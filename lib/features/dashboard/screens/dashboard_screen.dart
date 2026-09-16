@@ -76,6 +76,10 @@ class DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
 
+    if (AppConstants.isMarketerApp) {
+      return;
+    }
+
     debugPrint('\x1B[32m     //////////////////////     \x1B[0m');
 
     // ⚡ TITAN BOARD: Skip splash animation if skipSplash flag is set

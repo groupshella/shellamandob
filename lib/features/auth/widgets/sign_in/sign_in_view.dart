@@ -30,6 +30,7 @@ import 'package:sixam_mart/common/cache/comprehensive_home_cache_manager.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 
 class SignInView extends StatefulWidget {
   final bool exitFromApp;
@@ -458,15 +459,16 @@ class _SignInViewState extends State<SignInView> {
           Get.back();
         }
       } else {
-        debugPrint('\x1B[32m  99999999  \x1B[0m');
-        debugPrint(
-            '📱 SignInView: Navigating to location screen (or home if address exists)');
-        // Navigate to location screen (or home if address already exists)
-        // navigateToLocationScreen handles navigation - no need for redundant Get.offAllNamed
-        // If user has address, it navigates directly to home
-        // If user doesn't have address, it navigates to location screen which will navigate to home after selection
-        Get.find<LocationController>()
-            .navigateToLocationScreen(context, 'sign-in', offNamed: true);
+        if (AppConstants.isMarketerApp) {
+          debugPrint('📱 SignInView: Marketer App - Navigating directly to initial (Dashboard/Marketer)');
+          Get.offAllNamed(RouteHelper.getInitialRoute());
+        } else {
+          debugPrint('\x1B[32m  99999999  \x1B[0m');
+          debugPrint(
+              '📱 SignInView: Navigating to location screen (or home if address exists)');
+          Get.find<LocationController>()
+              .navigateToLocationScreen(context, 'sign-in', offNamed: true);
+        }
       }
       debugPrint(
           '✅ SignInView: Navigation completed - menu screen should render immediately');

@@ -13,7 +13,8 @@ import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MarketerDashboardScreen extends StatelessWidget {
-  const MarketerDashboardScreen({super.key});
+  final bool isRoot;
+  const MarketerDashboardScreen({super.key, this.isRoot = false});
 
   static const Color _primaryGreen = Color(0xFF30913F);
   static const Color _darkText = Color(0xFF111B18);
@@ -27,7 +28,10 @@ class MarketerDashboardScreen extends StatelessWidget {
           children: [
             Column(
               children: [
-                MarketerHeader(title: 'voucher_marketer'.tr),
+                MarketerHeader(
+                  title: 'voucher_marketer'.tr,
+                  showBackButton: !isRoot,
+                ),
                 Expanded(
                   child: GetBuilder<MarketerController>(
                     builder: (c) {
@@ -620,17 +624,17 @@ class MarketerDashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'successfully_acquired_customers'.tr,
+                'العملاء الدافعون (أتموا الشراء)',
                 style: const TextStyle(
                   color: Color(0xFF6A7282),
-                  fontSize: 16,
+                  fontSize: 15,
                   fontFamily: 'Tajawal',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                '${c.acquiredCustomers} ${'customers'.tr}',
+                '${c.payingCustomers} ${'customers'.tr}',
                 style: const TextStyle(
                   color: Color(0xFF1E2939),
                   fontSize: 24,
@@ -647,7 +651,7 @@ class MarketerDashboardScreen extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Card: إجمالي عمليات مسح الـ QR (Right in RTL)
+            // Card: إجمالي المسجلين بالكود (Right in RTL)
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -661,7 +665,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Badge + Icon Row (Figma: badge left, icon right → RTL: badge right, icon left)
+                    // Badge + Icon Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -692,39 +696,27 @@ class MarketerDashboardScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        // QR Code icon (green circle)
+                        // Users icon
                         Container(
                           width: 32,
                           height: 32,
                           decoration: ShapeDecoration(
-                            color: _primaryGreen,
+                            color: const Color(0xFF2563EB),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             ),
                           ),
-                          child: Center(
-                            child: SvgPicture.string(
-                              '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                                <rect x="2" y="2" width="6" height="6" rx="1" stroke="white" stroke-width="1.6"/>
-                                <rect x="12" y="2" width="6" height="6" rx="1" stroke="white" stroke-width="1.6"/>
-                                <rect x="2" y="12" width="6" height="6" rx="1" stroke="white" stroke-width="1.6"/>
-                                <rect x="3.5" y="3.5" width="3" height="3" fill="white"/>
-                                <rect x="13.5" y="3.5" width="3" height="3" fill="white"/>
-                                <rect x="3.5" y="13.5" width="3" height="3" fill="white"/>
-                                <path d="M12 12h3M15 12v3M12 15h3M15 15h3M18 12v3M18 15v3" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                              </svg>''',
-                              width: 20,
-                              height: 20,
-                            ),
+                          child: const Center(
+                            child: Icon(IconlyLight.profile, color: Colors.white, size: 18),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'total_qr_scans'.tr,
+                    const Text(
+                      'إجمالي المسجلين',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Color(0xFF6A7282),
                         fontSize: 13,
                         fontFamily: 'Tajawal',
@@ -733,7 +725,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${c.totalScans} ${'customers'.tr}',
+                      '${c.registeredCustomers} ${'customers'.tr}',
                       textAlign: TextAlign.right,
                       style: const TextStyle(
                         color: Color(0xFF1E2939),
@@ -748,7 +740,7 @@ class MarketerDashboardScreen extends StatelessWidget {
             ),
             const SizedBox(width: 16),
 
-            // Card: العملاء المترددون (Left in RTL)
+            // Card: لم يدفعوا بعد (Left in RTL)
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -767,11 +759,11 @@ class MarketerDashboardScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Decline badge (gray)
+                        // Pending badge
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: ShapeDecoration(
-                            color: const Color(0xFFF0F0F1),
+                            color: const Color(0xFFFFFBEB),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
                             ),
@@ -779,49 +771,41 @@ class MarketerDashboardScreen extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.south_west, size: 12, color: Color(0xFF555555)),
+                              const Icon(Icons.access_time, size: 12, color: Color(0xFFD97706)),
                               const SizedBox(width: 2),
-                              const Text(
-                                '12%',
-                                style: TextStyle(
-                                  color: Color(0xFF555555),
-                                  fontSize: 12,
+                              Text(
+                                '${c.hesitantCustomers}',
+                                style: const TextStyle(
+                                  color: Color(0xFFD97706),
+                                  fontSize: 11,
                                   fontFamily: 'Tajawal',
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // Person with X icon (gray circle)
+                        // Alert / Pending Icon
                         Container(
                           width: 32,
                           height: 32,
                           decoration: ShapeDecoration(
-                            color: const Color(0xFFC6C8CE),
+                            color: const Color(0xFFF59E0B),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             ),
                           ),
-                          child: Center(
-                            child: SvgPicture.string(
-                              '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                                <circle cx="8" cy="6" r="3" stroke="white" stroke-width="1.6"/>
-                                <path d="M2 17c0-3.314 2.686-6 6-6" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                                <path d="M14 13l4 4M18 13l-4 4" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                              </svg>''',
-                              width: 20,
-                              height: 20,
-                            ),
+                          child: const Center(
+                            child: Icon(IconlyLight.timeCircle, color: Colors.white, size: 18),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'hesitant_customers'.tr,
+                    const Text(
+                      'لم يدفعوا بعد',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Color(0xFF6A7282),
                         fontSize: 13,
                         fontFamily: 'Tajawal',
@@ -830,7 +814,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${c.hesitantCustomers} ${'customers'.tr}',
+                      '${c.hesitantCustomers} عميل',
                       textAlign: TextAlign.right,
                       style: const TextStyle(
                         color: Color(0xFF1E2939),

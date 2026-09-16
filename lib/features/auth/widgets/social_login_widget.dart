@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sixam_mart/common/models/response_model.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
@@ -33,8 +32,6 @@ class SocialLoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
     final bool canAppleLogin =
         Get.find<SplashController>().configModel!.appleLogin!.isNotEmpty &&
             Get.find<SplashController>().configModel!.appleLogin![0].status! &&
@@ -46,20 +43,6 @@ class SocialLoginWidget extends StatelessWidget {
             .isNotEmpty &&
         (Get.find<SplashController>().configModel!.socialLogin![0].status! ||
             Get.find<SplashController>().configModel!.socialLogin![1].status!);
-
-    // Google is hidden on iOS: GoogleService-Info.plist ships without a
-    // CLIENT_ID, so google_sign_in has no config and crashes on tap. Keep
-    // Google to Android only until a valid iOS OAuth client is provisioned.
-    final bool googleLoginActive = !GetPlatform.isIOS &&
-        Get.find<SplashController>().configModel!.socialLogin![0].status! &&
-            Get.find<SplashController>()
-                .configModel!
-                .centralizeLoginSetup!
-                .socialLoginStatus! &&
-            Get.find<SplashController>()
-                .configModel!
-                .centralizeLoginSetup!
-                .googleLoginStatus!;
 
     final bool facebookLoginActive =
         Get.find<SplashController>().configModel!.socialLogin![1].status! &&
@@ -85,46 +68,6 @@ class SocialLoginWidget extends StatelessWidget {
                               fontSize: Dimensions.fontSizeLarge))
                       : const SizedBox(),
                   const SizedBox(height: Dimensions.paddingSizeLarge),
-                  googleLoginActive
-                      ? Container(
-                          height: 50,
-                          padding: const EdgeInsets.all(1),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.all(
-                                Radius.circular(Dimensions.radiusDefault)),
-                            boxShadow: [
-                              BoxShadow(
-                                  color:
-                                      Colors.grey[Get.isDarkMode ? 700 : 300]!,
-                                  spreadRadius: 1,
-                                  blurRadius: 5,
-                                  offset: const Offset(2, 2))
-                            ],
-                          ),
-                          child: CustomInkWell(
-                            onTap: () => _googleLogin(context, googleSignIn),
-                            radius: Dimensions.radiusDefault,
-                            child: Padding(
-                              padding: const EdgeInsets.all(
-                                  Dimensions.paddingSizeSmall),
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(Images.google,
-                                        height: 20, width: 20),
-                                    const SizedBox(
-                                        width: Dimensions.paddingSizeSmall),
-                                    Text('continue_with_google'.tr,
-                                        style: robotoMedium.copyWith()),
-                                  ]),
-                            ),
-                          ),
-                        )
-                      : const SizedBox(),
-                  SizedBox(
-                      height:
-                          googleLoginActive ? Dimensions.paddingSizeLarge : 0),
                   facebookLoginActive
                       ? Container(
                           height: 50,
@@ -279,35 +222,6 @@ class SocialLoginWidget extends StatelessWidget {
             ),
             const SizedBox(height: Dimensions.paddingSizeSmall),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              googleLoginActive
-                  ? InkWell(
-                      onTap: () => _googleLogin(context, googleSignIn),
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        padding: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: const BorderRadius.all(
-                              Radius.circular(Dimensions.radiusDefault)),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey[Get.isDarkMode ? 700 : 300]!,
-                                spreadRadius: 1,
-                                blurRadius: 5,
-                                offset: const Offset(2, 2))
-                          ],
-                        ),
-                        child: CustomInkWell(
-                          radius: Dimensions.radiusDefault,
-                          padding:
-                              const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                          onTap: () => _googleLogin(context, googleSignIn),
-                          child: Image.asset(Images.google),
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
               facebookLoginActive
                   ? Padding(
                       padding: EdgeInsets.only(
@@ -381,34 +295,6 @@ class SocialLoginWidget extends StatelessWidget {
         : const SizedBox();
   }
 
-  void _googleLogin(BuildContext context, GoogleSignIn googleSignIn) async {
-    googleSignIn.signOut();
-    final GoogleSignInAccount googleAccount = (await googleSignIn.signIn())!;
-    final GoogleSignInAuthentication auth = await googleAccount.authentication;
-
-    final SocialLogInBody googleBodyModel = SocialLogInBody(
-      email: googleAccount.email,
-      token: auth.accessToken,
-      uniqueId: googleAccount.id,
-      medium: 'google',
-      accessToken: 1,
-      loginType: CentralizeLoginType.social.name,
-    );
-
-    Get.find<AuthController>()
-        .loginWithSocialMedia(googleBodyModel)
-        .then((response) {
-      if (response.isSuccess) {
-        if (!context.mounted) {
-          return;
-        }
-        _processSocialSuccessSetup(
-            context, response, googleBodyModel, null, null);
-      } else {
-        showCustomSnackBar(response.message);
-      }
-    });
-  }
 
   void _facebookLogin(BuildContext context) async {
     final LoginResult result = await FacebookAuth.instance

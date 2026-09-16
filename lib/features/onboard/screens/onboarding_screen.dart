@@ -11,6 +11,7 @@ import 'package:sixam_mart/features/onboard/widgets/onboarding_skip_button.dart'
 import 'package:sixam_mart/features/onboard/widgets/pop_illustration.dart';
 import 'package:sixam_mart/features/onboard/widgets/slide_illustration.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/common/widgets/no_data_screen.dart';
@@ -82,6 +83,82 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   /// out of a center image; page 3 slides boxes in. [currentIndex] decides
   /// which page is active so its animation plays.
   Widget _illustrationFor(int pageIndex, int currentIndex, String fallback) {
+    // 🎯 MARKETER: Use elegant vector icon illustrations instead of emojis or customer animations
+    if (AppConstants.isMarketerApp) {
+      final IconData icon;
+      switch (pageIndex) {
+        case 0:
+          icon = Icons.campaign_rounded;
+          break;
+        case 1:
+          icon = Icons.monetization_on_rounded;
+          break;
+        case 2:
+          icon = Icons.account_balance_rounded;
+          break;
+        default:
+          icon = Icons.stars_rounded;
+      }
+
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.32,
+        child: Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer soft glow ring
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF30913F).withValues(alpha: 0.08),
+                ),
+              ),
+              // Middle ring
+              Container(
+                width: 115,
+                height: 115,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF30913F).withValues(alpha: 0.15),
+                ),
+              ),
+              // Inner gradient circle with vector icon
+              Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF237A33),
+                      Color(0xFF30913F),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF30913F).withValues(alpha: 0.35),
+                      blurRadius: 18,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: 46,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     switch (pageIndex) {
       case 0:
         return PopIllustration(

@@ -1520,6 +1520,9 @@ class SplashController extends GetxController implements GetxService {
   /// Warm critical modules in background while splash/onboarding is active.
   /// Non-blocking by design: it should never delay routing flow.
   Future<void> preloadCoreModulesForFastSwitch() async {
+    if (AppConstants.isMarketerApp) {
+      return;
+    }
     if (_isStartupModulePreloadRunning) {
       return;
     }
@@ -2029,25 +2032,21 @@ class SplashController extends GetxController implements GetxService {
       }
     }
 
-    if (_cacheModule != null &&
-        _cacheModule!.moduleType.toString() == AppConstants.taxi) {
-      Get.find<TaxiCartController>().getCarCartList();
-    }
-
-    if (AuthHelper.isLoggedIn()) {
-      if (Get.find<SplashController>().module != null) {
-        // 🚫 REMOVED: getCashBackOfferList() - must load lazily in CashbackScreen only
-        // 🚫 REMOVED: getFavouriteList() - must load lazily in WishlistScreen only
-        // These calls were causing 118+ frame skips and 14s delays on home screens
-        // They have dedicated NavBar buttons and MUST load lazily when user navigates to those screens
-        if (module?.moduleType.toString() == AppConstants.taxi) {
-          // Taxi favourite list is OK to keep here as it's taxi-specific
-          Get.find<TaxiFavouriteController>().getFavouriteTaxiList();
-        }
-        // 🚫 REMOVED: FavouriteController.getFavouriteList() - lazy load in WishlistScreen only
-      } else if (_cacheModule != null &&
+    if (!AppConstants.isMarketerApp) {
+      if (_cacheModule != null &&
           _cacheModule!.moduleType.toString() == AppConstants.taxi) {
         Get.find<TaxiCartController>().getCarCartList();
+      }
+
+      if (AuthHelper.isLoggedIn()) {
+        if (Get.find<SplashController>().module != null) {
+          if (module?.moduleType.toString() == AppConstants.taxi) {
+            Get.find<TaxiFavouriteController>().getFavouriteTaxiList();
+          }
+        } else if (_cacheModule != null &&
+            _cacheModule!.moduleType.toString() == AppConstants.taxi) {
+          Get.find<TaxiCartController>().getCarCartList();
+        }
       }
     }
     // 🔒 Lock module after headers + storage + state are set

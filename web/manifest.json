@@ -1,11 +1,11 @@
 {
-    "name": "شله",
-    "short_name": "شله",
+    "name": "مسوق شله",
+    "short_name": "مسوق شله",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#2A9849",
     "theme_color": "#2A9849",
-    "description": "A Multi-vendor Food. Grocery, eCommerce, Pharmacy & Parcel service.",
+    "description": "تطبيق مسوق شله - مندوب تسويق قسائم الشراء",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -19,6 +19,7 @@ import 'package:sixam_mart/features/category/controllers/category_controller.dar
 import 'package:sixam_mart/features/brands/controllers/brands_controller.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/helper/splash_route_helper.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -166,12 +167,23 @@ class SplashScreenState extends State<SplashScreen> {
         return;
       }
 
+      final splashController = Get.find<SplashController>();
+
+      if (AppConstants.isMarketerApp) {
+        debugPrint('🚀 [Marketer] SplashScreen: Fast direct routing for Marketer App...');
+        splashController.markSplashFlowStopped();
+        splashController.markFirstNavigationReleased();
+        _hasNavigatedAway = true;
+        _safetyNetTimer?.cancel();
+        route(buildContext, body: widget.body);
+        return;
+      }
+
       // ⚡ PERF FIX: Yield to let GIF animation frames render after heavy cache loading
       await Future<void>.delayed(Duration.zero);
 
       // 🏗️ MODULE-FIRST ARCHITECTURE: Resolve initial module selection
       // This determines which module should be selected based on cache, single module, or user choice
-      final splashController = Get.find<SplashController>();
       final moduleList = splashController.moduleList;
       final moduleListLength = moduleList?.length ?? 0;
 

@@ -6,6 +6,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_success_dialog.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -219,9 +220,16 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
 
     if (ok && mounted) {
-      MarketerSuccessDialog.show(context, onClose: () {
-        Get.back(); // return to main marketer screen
-      });
+      bool navigated = false;
+      void navigateToMarketerScreen() {
+        if (!navigated) {
+          navigated = true;
+          Get.offAll(() => const MarketerScreen());
+        }
+      }
+
+      await MarketerSuccessDialog.show(context, onClose: navigateToMarketerScreen);
+      navigateToMarketerScreen();
     } else {
       Get.snackbar(
         'warning'.tr,

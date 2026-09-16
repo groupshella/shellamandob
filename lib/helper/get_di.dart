@@ -432,30 +432,33 @@ Future<Map<String, Map<String, String>>> init() async {
         networkInfo: Get.find<NetworkInfo>(),
       ));
 
-  final TaxiRepositoryInterface taxiRepositoryInterface =
-      TaxiRepository(apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => taxiRepositoryInterface);
+  // 🎯 MARKETER: Rental/Taxi module is not used in marketer app — skip all registration
+  if (!AppConstants.isMarketerApp) {
+    final TaxiRepositoryInterface taxiRepositoryInterface =
+        TaxiRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+    Get.lazyPut(() => taxiRepositoryInterface);
 
-  final TaxiHomeRepositoryInterface taxiHomeRepositoryInterface =
-      TaxiHomeRepository(apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => taxiHomeRepositoryInterface);
+    final TaxiHomeRepositoryInterface taxiHomeRepositoryInterface =
+        TaxiHomeRepository(apiClient: Get.find(), sharedPreferences: Get.find());
+    Get.lazyPut(() => taxiHomeRepositoryInterface);
 
-  final TaxiCartRepositoryInterface taxiCartRepositoryInterface =
-      TaxiCartRepository(apiClient: Get.find());
-  Get.lazyPut(() => taxiCartRepositoryInterface);
+    final TaxiCartRepositoryInterface taxiCartRepositoryInterface =
+        TaxiCartRepository(apiClient: Get.find());
+    Get.lazyPut(() => taxiCartRepositoryInterface);
 
-  final TaxiVendorRepositoryInterface taxiVendorRepositoryInterface =
-      TaxiVendorRepository(apiClient: Get.find());
-  Get.lazyPut(() => taxiVendorRepositoryInterface);
+    final TaxiVendorRepositoryInterface taxiVendorRepositoryInterface =
+        TaxiVendorRepository(apiClient: Get.find());
+    Get.lazyPut(() => taxiVendorRepositoryInterface);
 
-  final TaxiOrderRepositoryInterface taxiOrderRepositoryInterface =
-      TaxiOrderRepository(apiClient: Get.find());
-  Get.lazyPut(() => taxiOrderRepositoryInterface);
+    final TaxiOrderRepositoryInterface taxiOrderRepositoryInterface =
+        TaxiOrderRepository(apiClient: Get.find());
+    Get.lazyPut(() => taxiOrderRepositoryInterface);
 
-  final TaxiFavouriteRepositoryInterface taxiFavouriteRepositoryInterface =
-      TaxiFavouriteRepository(
-          apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => taxiFavouriteRepositoryInterface);
+    final TaxiFavouriteRepositoryInterface taxiFavouriteRepositoryInterface =
+        TaxiFavouriteRepository(
+            apiClient: Get.find(), sharedPreferences: Get.find());
+    Get.lazyPut(() => taxiFavouriteRepositoryInterface);
+  }
 
   /// Service Interface
   final CheckoutServiceInterface checkoutServiceInterface =
@@ -610,29 +613,32 @@ Future<Map<String, Map<String, String>>> init() async {
   // Analytics Service (using repository directly as service)
   // AnalyticsRepositoryInterface is already registered above
 
-  final TaxiLocationServiceInterface taxiLocationServiceInterface =
-      TaxiLocationService(taxiRepositoryInterface: Get.find());
-  Get.lazyPut(() => taxiLocationServiceInterface);
+  // 🎯 MARKETER: Rental/Taxi services — skipped (see repository guard above)
+  if (!AppConstants.isMarketerApp) {
+    final TaxiLocationServiceInterface taxiLocationServiceInterface =
+        TaxiLocationService(taxiRepositoryInterface: Get.find());
+    Get.lazyPut(() => taxiLocationServiceInterface);
 
-  final TaxiHomeServiceInterface taxiHomeServiceInterface =
-      TaxiHomeService(taxiHomeRepositoryInterface: Get.find());
-  Get.lazyPut(() => taxiHomeServiceInterface);
+    final TaxiHomeServiceInterface taxiHomeServiceInterface =
+        TaxiHomeService(taxiHomeRepositoryInterface: Get.find());
+    Get.lazyPut(() => taxiHomeServiceInterface);
 
-  final TaxiCartServiceInterface taxiCartServiceInterface =
-      TaxiCartService(taxiCartRepositoryInterface: Get.find());
-  Get.lazyPut(() => taxiCartServiceInterface);
+    final TaxiCartServiceInterface taxiCartServiceInterface =
+        TaxiCartService(taxiCartRepositoryInterface: Get.find());
+    Get.lazyPut(() => taxiCartServiceInterface);
 
-  final TaxiVendorServiceInterface taxiVendorServiceInterface =
-      TaxiVendorService(taxiVendorRepositoryInterface: Get.find());
-  Get.lazyPut(() => taxiVendorServiceInterface);
+    final TaxiVendorServiceInterface taxiVendorServiceInterface =
+        TaxiVendorService(taxiVendorRepositoryInterface: Get.find());
+    Get.lazyPut(() => taxiVendorServiceInterface);
 
-  final TaxiOrderServiceInterface taxiOrderServiceInterface =
-      TaxiOrderService(taxiOrderRepositoryInterface: Get.find());
-  Get.lazyPut(() => taxiOrderServiceInterface);
+    final TaxiOrderServiceInterface taxiOrderServiceInterface =
+        TaxiOrderService(taxiOrderRepositoryInterface: Get.find());
+    Get.lazyPut(() => taxiOrderServiceInterface);
 
-  final TaxiFavouriteServiceInterface taxiFavouriteServiceInterface =
-      TaxiFavouriteService(taxiFavouriteRepositoryInterface: Get.find());
-  Get.lazyPut(() => taxiFavouriteServiceInterface);
+    final TaxiFavouriteServiceInterface taxiFavouriteServiceInterface =
+        TaxiFavouriteService(taxiFavouriteRepositoryInterface: Get.find());
+    Get.lazyPut(() => taxiFavouriteServiceInterface);
+  }
 
   /// Controller
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
@@ -721,91 +727,82 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut<AnalyticsController>(
       () => AnalyticsController(repository: Get.find<AnalyticsRepository>()));
 
-  Get.lazyPut(
-      () => TaxiLocationController(taxiLocationServiceInterface: Get.find()));
-
-  Get.lazyPut(() => TaxiHomeController(taxiHomeServiceInterface: Get.find()));
-  Get.lazyPut(() => TaxiCartController(taxiCartServiceInterface: Get.find()));
-  Get.lazyPut(
-      () => TaxiVendorController(taxiVendorServiceInterface: Get.find()));
-  Get.lazyPut(() => TaxiOrderController(taxiOrderServiceInterface: Get.find()));
-  Get.lazyPut(
-      () => TaxiFavouriteController(taxiFavouriteServiceInterface: Get.find()));
+  // 🎯 MARKETER: Rental/Taxi controllers — skipped (see repository guard above)
+  if (!AppConstants.isMarketerApp) {
+    Get.lazyPut(
+        () => TaxiLocationController(taxiLocationServiceInterface: Get.find()));
+    Get.lazyPut(() => TaxiHomeController(taxiHomeServiceInterface: Get.find()));
+    Get.lazyPut(() => TaxiCartController(taxiCartServiceInterface: Get.find()));
+    Get.lazyPut(
+        () => TaxiVendorController(taxiVendorServiceInterface: Get.find()));
+    Get.lazyPut(() => TaxiOrderController(taxiOrderServiceInterface: Get.find()));
+    Get.lazyPut(
+        () => TaxiFavouriteController(taxiFavouriteServiceInterface: Get.find()));
+  }
 
   // -------
 
-  // تسجيل DelegateRepositoryInterface أولاً
-  Get.lazyPut<DelegateRepositoryInterface>(
-      () => DelegateRepository(apiClient: Get.find()));
+  if (!AppConstants.isMarketerApp) {
+    // تسجيل DelegateRepositoryInterface أولاً
+    Get.lazyPut<DelegateRepositoryInterface>(
+        () => DelegateRepository(apiClient: Get.find()));
 
-  // ثم تسجيل Delegate_ServiceInterface بناءً على الـ Repository المسجل
-  Get.lazyPut<Delegate_ServiceInterface>(
-      () => DelegateService(delegateRepositoryinterface: Get.find()));
+    // ثم تسجيل Delegate_ServiceInterface بناءً على الـ Repository المسجل
+    Get.lazyPut<Delegate_ServiceInterface>(
+        () => DelegateService(delegateRepositoryinterface: Get.find()));
 
-  // وأخيراً تسجيل Delegate_Controller
-  Get.lazyPut(() => Delegate_Controller(delegateServiceInterface: Get.find()));
+    // وأخيراً تسجيل Delegate_Controller
+    Get.lazyPut(() => Delegate_Controller(delegateServiceInterface: Get.find()));
 
-  // ======================================================================================================================
+    // ======================================================================================================================
 
-  // âڑ، FIX: Register the full Qidha (Kaidha) chain with fenix: true so it can be
-  // revived after Get.offAllNamed() flushes non-permanent dependencies during
-  // module switching. Without fenix, opening /checkout directly (cart â†’ checkout)
-  // threw "KaidhaSubscriptionController not found" because the registration had
-  // been flushed and could not be recreated. See also CheckoutController/Campaign.
-  // تسجيل KaidhaSubRepositoryInterface أولاً
-  Get.lazyPut<KaidhaSubRepositoryInterface>(
-      () => KaidhaSubRepository(apiClient: Get.find()),
-      fenix: true);
+    Get.lazyPut<KaidhaSubRepositoryInterface>(
+        () => KaidhaSubRepository(apiClient: Get.find()),
+        fenix: true);
 
-  // ثم تسجيل kaidhaSub_ServiceInterface بناءً على الـ Repository المسجل
-  Get.lazyPut<kaidhaSub_ServiceInterface>(
-      () => KaidhaSubService(
-          kaidhaSubRepositoryinterface:
-              Get.find<KaidhaSubRepositoryInterface>()),
-      fenix: true);
+    Get.lazyPut<kaidhaSub_ServiceInterface>(
+        () => KaidhaSubService(
+            kaidhaSubRepositoryinterface:
+                Get.find<KaidhaSubRepositoryInterface>()),
+        fenix: true);
 
-  // وأخيراً تسجيل KaidhaSubscriptionController
-  Get.lazyPut(
-      () => KaidhaSubscriptionController(kaidhaSubServiceInterface: Get.find()),
-      fenix: true);
+    Get.lazyPut(
+        () => KaidhaSubscriptionController(kaidhaSubServiceInterface: Get.find()),
+        fenix: true);
 
-  // محفظه قديمة
+    // محفظه قديمة
+    Get.lazyPut(() => WalletController(walletServiceInterface: Get.find()));
 
-  Get.lazyPut(() => WalletController(walletServiceInterface: Get.find()));
+    // Wallet Transfer (Peer-to-Peer)
+    Get.lazyPut<WalletTransferRepositoryInterface>(
+        () => WalletTransferRepository(apiClient: Get.find()));
+    Get.lazyPut<WalletTransferServiceInterface>(() =>
+        WalletTransferService(walletTransferRepositoryInterface: Get.find()));
+    Get.lazyPut(() =>
+        WalletTransferController(walletTransferServiceInterface: Get.find()));
 
-  // Wallet Transfer (Peer-to-Peer)
-  Get.lazyPut<WalletTransferRepositoryInterface>(
-      () => WalletTransferRepository(apiClient: Get.find()));
-  Get.lazyPut<WalletTransferServiceInterface>(() =>
-      WalletTransferService(walletTransferRepositoryInterface: Get.find()));
-  Get.lazyPut(() =>
-      WalletTransferController(walletTransferServiceInterface: Get.find()));
+    // Offers
+    Get.lazyPut<OffersRepositoryInterface>(
+        () => OffersRepository(apiClient: Get.find()));
 
-  // Offers  ======================================================================================================================
+    Get.lazyPut<Offers_ServiceInterface>(
+        () => OffersService(offersRepositoryinterface: Get.find()));
 
-  // تسجيل OffersRepositoryInterface أولاً
-  Get.lazyPut<OffersRepositoryInterface>(
-      () => OffersRepository(apiClient: Get.find()));
+    Get.lazyPut(() => OffersController(
+          offersServiceInterface: Get.find(),
+          itemRepository: Get.find(),
+        ));
 
-  // ثم تسجيل Offers_ServiceInterface بناءً على الـ Repository المسجل
-  Get.lazyPut<Offers_ServiceInterface>(
-      () => OffersService(offersRepositoryinterface: Get.find()));
+    // POS Customer Checkout
+    Get.lazyPut(() => PosCheckoutRepository(apiClient: Get.find()), fenix: true);
+    Get.lazyPut(
+        () => PosCheckoutController(
+            repository: Get.find(), sharedPreferences: Get.find()),
+        fenix: true);
 
-  // وأخيرًا تسجيل Offersscription_Controller
-  Get.lazyPut(() => OffersController(
-        offersServiceInterface: Get.find(),
-        itemRepository: Get.find(),
-      ));
-
-  // POS Customer Checkout
-  Get.lazyPut(() => PosCheckoutRepository(apiClient: Get.find()), fenix: true);
-  Get.lazyPut(
-      () => PosCheckoutController(
-          repository: Get.find(), sharedPreferences: Get.find()),
-      fenix: true);
-
-  // Dynamic Gift Campaign
-  Get.lazyPut(() => DynamicGiftController(apiClient: Get.find()), fenix: true);
+    // Dynamic Gift Campaign
+    Get.lazyPut(() => DynamicGiftController(apiClient: Get.find()), fenix: true);
+  }
 
   // Update Controller
   Get.lazyPut(() => ReferralController(apiClient: Get.find()));
@@ -832,6 +829,7 @@ Future<Map<String, Map<String, String>>> init() async {
       final String key =
           '${languageModel.languageCode}_${languageModel.countryCode}';
       languages[key] = json;
+      languages[languageModel.languageCode!] = json;
 
       if (kDebugMode) {
         appLogger.debug('🔍 Loaded ${json.length} translations for $key');
@@ -858,6 +856,7 @@ Future<Map<String, Map<String, String>>> init() async {
       final String key =
           '${fallbackLang.languageCode}_${fallbackLang.countryCode}';
       languages[key] = json;
+      languages[fallbackLang.languageCode!] = json;
       if (kDebugMode) {
         appLogger.debug('🔍 Loaded fallback language: $key');
       }

@@ -11,7 +11,7 @@ import FBSDKCoreKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
-    GMSServices.provideAPIKey("AIzaSyDnHKMq_CX3PGtjGbsixvmi-42xeBBr-Ug")
+    GMSServices.provideAPIKey("AIzaSyDwpl1O5yMBvB9JHtZz61I3P3uz_ClvXP8")
     if #available(iOS 10.0, *) {
       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
     }

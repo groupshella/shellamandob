@@ -62,16 +62,8 @@ android {
     // only the visible app name to "شله المسوّق". Same package id (com.food.shala)
     // so Firebase/google-services stays valid; the normal customer build (no env
     // var) keeps the label "شله" and is completely unaffected.
-    def isMarketerBuild = (System.getenv('APP_MODE') ?: '') == 'marketer'
-
     defaultConfig {
-        applicationId "com.food.shala"
-        // Marketer build gets a distinct package so it installs alongside the
-        // customer app. A matching client for com.food.shala.marketer was added
-        // to google-services.json so the Google-services plugin accepts it.
-        if (isMarketerBuild) {
-            applicationIdSuffix ".marketer"
-        }
+        applicationId "com.food.shala.marketer"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
@@ -82,7 +74,7 @@ android {
         manifestPlaceholders = [
             applicationName: "android.app.Application",
             firebaseCrashlyticsCollectionEnabled: "false",
-            appLabel: isMarketerBuild ? "مسوق شله" : "شله"
+            appLabel: "مسوق شله"
         ]
 
         buildConfigField "String", "MYFATOORAH_LIVE_TOKEN", "\"$myFatoorahLiveToken\""

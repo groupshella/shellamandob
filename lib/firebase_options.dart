@@ -53,31 +53,33 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDnnrJzlof502Ry1fSLmJCjLCkMXv-Ebg8',
-    appId: '1:659410143816:android:222abac6b1f78db9f8267d',
+    appId: '1:659410143816:android:61dc8b0f5037df4ef8267d',
     messagingSenderId: '659410143816',
     projectId: 'shella1',
     databaseURL: 'https://shella1-default-rtdb.firebaseio.com',
     storageBucket: 'shella1.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDioVSDEtk6UI7XXWIgIDrkwTXaJ6QQnHY',
-    appId: '1:659410143816:ios:ca90c2ac14616528f8267d',
+    appId: '1:659410143816:ios:a3aa3e1d5267a49cf8267d',
     messagingSenderId: '659410143816',
     projectId: 'shella1',
     databaseURL: 'https://shella1-default-rtdb.firebaseio.com',
     storageBucket: 'shella1.firebasestorage.app',
-    iosBundleId: 'com.food.shala',
+    androidClientId: '659410143816-9eufntkkp8t8680ono67a6vgaqiooegr.apps.googleusercontent.com',
+    iosClientId: '659410143816-tra98qivcdr1nakip61qef7q5ulsc2ej.apps.googleusercontent.com',
+    iosBundleId: 'com.food.shala.marketer',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDioVSDEtk6UI7XXWIgIDrkwTXaJ6QQnHY',
-    appId: '1:659410143816:ios:dc2aa81e9a32cee6f8267d',
+    appId: '1:659410143816:ios:a3aa3e1d5267a49cf8267d',
     messagingSenderId: '659410143816',
     projectId: 'shella1',
     databaseURL: 'https://shella1-default-rtdb.firebaseio.com',
     storageBucket: 'shella1.firebasestorage.app',
-    iosBundleId: 'com.example.akram',
+    androidClientId: '659410143816-9eufntkkp8t8680ono67a6vgaqiooegr.apps.googleusercontent.com',
+    iosClientId: '659410143816-tra98qivcdr1nakip61qef7q5ulsc2ej.apps.googleusercontent.com',
+    iosBundleId: 'com.food.shala.marketer',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

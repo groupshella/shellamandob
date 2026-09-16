@@ -14,8 +14,7 @@ class SocialAuthButtonsWidget extends StatelessWidget {
   //     REVERSED_CLIENT_ID, so google_sign_in has no usable configuration).
   //   * Apple is removed too; with no third-party social login remaining,
   //     App Store guideline 4.8 no longer requires Sign in with Apple.
-  // Google stays available on Android (complete google-services.json).
-  static bool get googleLoginActive => !GetPlatform.isIOS;
+  static bool get googleLoginActive => false;
 
   static bool get appleLoginActive => false;
 

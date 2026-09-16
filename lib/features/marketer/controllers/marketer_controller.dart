@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/api/api_client.dart';
+import 'package:sixam_mart/features/auth/domain/reposotories/auth_repository_interface.dart';
 import 'package:sixam_mart/util/environment_config.dart';
 
 /// Controller for the in-app "Coupon Marketer" feature.
@@ -21,6 +22,13 @@ class MarketerController extends GetxController implements GetxService {
   Map<String, dynamic>? _data;
   Map<String, dynamic>? get data => _data;
 
+  void reset() {
+    _data = null;
+    _isLoading = false;
+    _isSubmitting = false;
+    update();
+  }
+
   /// none | pending | approved | rejected | suspended
   String get status => (_data?['marketer_status'] ?? 'none').toString();
 
@@ -37,6 +45,8 @@ class MarketerController extends GetxController implements GetxService {
 
   int get todayReferred => int.tryParse('${_data?['today_referred'] ?? 0}') ?? 0;
   int get acquiredCustomers => int.tryParse('${_data?['acquired_customers'] ?? _data?['today_referred'] ?? 0}') ?? 0;
+  int get registeredCustomers => int.tryParse('${_data?['registered_customers'] ?? _data?['acquired_customers'] ?? 0}') ?? 0;
+  int get payingCustomers => int.tryParse('${_data?['paying_customers'] ?? 0}') ?? 0;
   int get totalScans => int.tryParse('${_data?['total_scans'] ?? 0}') ?? 0;
   int get hesitantCustomers => int.tryParse('${_data?['hesitant_customers'] ?? 0}') ?? 0;
   int get kpiGrowthPct => int.tryParse('${_data?['kpi_growth_pct'] ?? 12}') ?? 12;
@@ -118,16 +128,30 @@ class MarketerController extends GetxController implements GetxService {
           '/api/v1/customer/marketer/apply',
           body,
           [MultipartBody('id_image', documentFile)],
+          handleError: false,
         );
       } else {
         response = await apiClient.postData(
           '/api/v1/customer/marketer/apply',
           body,
+          handleError: false,
         );
       }
 
       if (response.statusCode == 200) {
         ok = true;
+        if (response.body != null && response.body is Map) {
+          final resData = response.body as Map<String, dynamic>;
+          final dynamic token = resData['token'];
+          if (token != null && token.toString().isNotEmpty) {
+            if (Get.isRegistered<AuthRepositoryInterface>()) {
+              await Get.find<AuthRepositoryInterface>().saveUserToken(token.toString());
+            }
+          }
+          if (resData['data'] != null && resData['data'] is Map) {
+            _data = Map<String, dynamic>.from(resData['data'] as Map);
+          }
+        }
         await loadDashboard();
       }
     } catch (e) {

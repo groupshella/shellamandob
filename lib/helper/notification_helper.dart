@@ -90,8 +90,10 @@ class NotificationHelper {
                 RouteHelper.getLoyaltyRoute(fromNotification: true)),
             NotificationType.general: () => Get.toNamed(
                 RouteHelper.getNotificationRoute(fromNotification: true)),
-            NotificationType.trip: () => Get.to(() => TaxiOrderDetailsScreen(
-                tripId: int.parse(payload.orderId.toString()))),
+            NotificationType.trip: () => AppConstants.isMarketerApp
+                ? null
+                : Get.to(() => TaxiOrderDetailsScreen(
+                    tripId: int.parse(payload.orderId.toString()))),
             NotificationType.coupon: () =>
                 Get.toNamed(RouteHelper.getCouponRoute()),
           };
@@ -151,7 +153,8 @@ class NotificationHelper {
         NotificationHelper.showNotification(
             message, flutterLocalNotificationsPlugin);
       } else if (message.data['type'] == 'demo_reset') {
-      } else if (message.data['type'] == 'trip_status' &&
+      } else if (!AppConstants.isMarketerApp &&
+          message.data['type'] == 'trip_status' &&
           message.data['status'] == 'completed' &&
           message.data['order_id'] != '' &&
           message.data['order_id'] != null) {
@@ -178,13 +181,14 @@ class NotificationHelper {
         NotificationHelper.showNotification(
             message, flutterLocalNotificationsPlugin);
         if (AuthHelper.isLoggedIn()) {
-          if (message.data['type'] != 'trip_status') {
+          if (message.data['type'] != 'trip_status' && !AppConstants.isMarketerApp) {
             Get.find<OrderController>().getRunningOrders(1);
             Get.find<OrderController>().getHistoryOrders(1);
           }
 
           Get.find<NotificationController>().getNotificationList(true);
-          if (message.data['type'] == 'trip_status' &&
+          if (!AppConstants.isMarketerApp &&
+              message.data['type'] == 'trip_status' &&
               message.data['order_id'] != '' &&
               message.data['order_id'] != null) {
             if (Get.isBottomSheetOpen!) {
@@ -198,7 +202,8 @@ class NotificationHelper {
             Get.find<TaxiOrderController>().getTripList(1);
             Get.find<TaxiOrderController>().getTripList(1, isRunning: false);
           }
-        } else if (message.data['type'] == 'trip_status' &&
+        } else if (!AppConstants.isMarketerApp &&
+            message.data['type'] == 'trip_status' &&
             message.data['order_id'] != '' &&
             message.data['order_id'] != null) {
           if (Get.isBottomSheetOpen!) {
@@ -265,8 +270,10 @@ class NotificationHelper {
                 RouteHelper.getLoyaltyRoute(fromNotification: true)),
             NotificationType.general: () => Get.toNamed(
                 RouteHelper.getNotificationRoute(fromNotification: true)),
-            NotificationType.trip: () => Get.to(() => TaxiOrderDetailsScreen(
-                tripId: int.parse(message.data['order_id']?.toString() ?? ''))),
+            NotificationType.trip: () => AppConstants.isMarketerApp
+                ? null
+                : Get.to(() => TaxiOrderDetailsScreen(
+                    tripId: int.parse(message.data['order_id']?.toString() ?? ''))),
           };
 
           notificationActions[notificationBody.notificationType]?.call();

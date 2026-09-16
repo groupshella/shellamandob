@@ -1,6 +1,7 @@
 import 'package:sixam_mart/features/onboard/domain/models/onboarding_model.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/onboard/domain/service/onboard_service_interface.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 
 class OnBoardingController extends GetxController implements GetxService {
   final OnboardServiceInterface onboardServiceInterface;
@@ -18,6 +19,14 @@ class OnBoardingController extends GetxController implements GetxService {
   }
 
   Future<void> getOnBoardingList() async {
+    // 🎯 MARKETER: Use embedded onboarding pages tailored for coupon marketers
+    // Avoids backend dependency on first launch — works offline too
+    if (AppConstants.isMarketerApp) {
+      _onBoardingList = _marketerOnboardingPages();
+      update();
+      return;
+    }
+
     final Response<dynamic> response =
         await onboardServiceInterface.getOnBoardingList();
     if (response.statusCode == 200) {
@@ -43,4 +52,23 @@ class OnBoardingController extends GetxController implements GetxService {
     }
     update();
   }
+
+  /// 🎯 Marketer-specific onboarding pages (embedded, no backend required)
+  List<OnBoardingModel> _marketerOnboardingPages() => [
+        OnBoardingModel(
+          '',
+          'onboard_marketer_title_1'.tr,
+          'onboard_marketer_desc_1'.tr,
+        ),
+        OnBoardingModel(
+          '',
+          'onboard_marketer_title_2'.tr,
+          'onboard_marketer_desc_2'.tr,
+        ),
+        OnBoardingModel(
+          '',
+          'onboard_marketer_title_3'.tr,
+          'onboard_marketer_desc_3'.tr,
+        ),
+      ];
 }

@@ -63,7 +63,7 @@ class AppConstants {
   // dead-code-eliminated — the customer app carries zero extra weight. Both
   // builds talk to the SAME backend (shellafood.com) / same dashboard.
   static const String appMode =
-      String.fromEnvironment('APP_MODE', defaultValue: 'customer');
+      String.fromEnvironment('APP_MODE', defaultValue: 'marketer');
   static const bool isMarketerApp = appMode == 'marketer';
 
   // Master switch that shows Apple Pay in the digital-payment sheet. Enabled now
@@ -300,7 +300,7 @@ class AppConstants {
   // Google Maps API Key - provide via --dart-define=GOOGLE_MAPS_KEY=your_key
   // Note: Set your production Google Maps API key via --dart-define or environment config
   static const String googleMapsApiKey =
-      String.fromEnvironment('GOOGLE_MAPS_KEY', defaultValue: '');
+      String.fromEnvironment('GOOGLE_MAPS_KEY', defaultValue: 'AIzaSyDwpl1O5yMBvB9JHtZz61I3P3uz_ClvXP8');
 
   //
 

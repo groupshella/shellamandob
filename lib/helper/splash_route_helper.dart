@@ -313,6 +313,12 @@ Future<void> _forLoggedInUserRouteProcess(
 }) async {
   Get.find<AuthController>().updateToken();
 
+  if (AppConstants.isMarketerApp) {
+    _splashRouteFinalized = true;
+    Get.offAllNamed<void>(RouteHelper.getInitialRoute());
+    return;
+  }
+
   // ⚡ OPTIMIZATION: Allow home screen to render from cache even without GPS fix
   // Check if we have valid cache - if so, render home screen and update location in background
   final hasAddress = AddressHelper.getUserAddressFromSharedPref() != null;
@@ -489,6 +495,23 @@ Future<void> _handleUserRouting(
 
   appLogger.info(
       'User routing - isLoggedIn: ${AuthHelper.isLoggedIn()}, showIntro: $showIntro, isGuestLoggedIn: ${AuthHelper.isGuestLoggedIn()}');
+
+  if (AppConstants.isMarketerApp) {
+    _splashRouteFinalized = true;
+    if (AuthHelper.isLoggedIn()) {
+      appLogger.info('Marketer App: Logged-in user routing to initial (Dashboard/Marketer)');
+      Get.offAllNamed<void>(RouteHelper.getInitialRoute());
+      return;
+    } else if (showIntro == true) {
+      appLogger.info('Marketer App: First launch, routing to onboarding');
+      _newlyRegisteredRouteProcess();
+      return;
+    } else {
+      appLogger.info('Marketer App: Not logged in, routing to welcome/login');
+      Get.offAllNamed<void>(RouteHelper.getWelcomeRoute());
+      return;
+    }
+  }
 
   // 🔧 FIX: Check GuestID/Token BEFORE checking showIntro
   // If GuestID or Token exists, never route to onboarding, even if address is missing
