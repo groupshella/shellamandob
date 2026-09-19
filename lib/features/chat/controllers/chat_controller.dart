@@ -106,9 +106,9 @@ class ChatController extends GetxController implements GetxService {
       if (isSuccess) {
         _conversationModel!.conversations!.removeWhere((element) => element?.id == conversationId);
         update();
-        showCustomSnackBar('تمت أرشفة المحادثة بنجاح', isError: false);
+        showCustomSnackBar('conversation_archived_success'.tr, isError: false);
       } else {
-        showCustomSnackBar('فشل في أرشفة المحادثة', isError: true);
+        showCustomSnackBar('conversation_archive_failed'.tr, isError: true);
       }
     }
   }

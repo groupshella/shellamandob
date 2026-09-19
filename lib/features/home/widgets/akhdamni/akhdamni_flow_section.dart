@@ -194,7 +194,7 @@ class _PeopleServicesStep extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = AkhdamniFlowController.peopleServices[index];
               return AkhdamniServiceGridItem(
-                label: item.label,
+                label: item.label.tr,
                 icon: item.icon,
                 assetFileName: item.assetFileName ?? '${item.id}.png',
                 isSelected: controller.selectedPeopleServiceId == item.id,
@@ -239,7 +239,7 @@ class _CompanyServicesStep extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = AkhdamniFlowController.companyServices[index];
               return AkhdamniServiceGridItem(
-                label: item.label,
+                label: item.label.tr,
                 icon: item.icon,
                 assetFileName: item.assetFileName ?? '${item.id}.png',
                 isSelected: controller.selectedCompanyServiceId == item.id,

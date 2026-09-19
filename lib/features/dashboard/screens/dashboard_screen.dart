@@ -185,7 +185,7 @@ class DashboardScreenState extends State<DashboardScreen> {
     await preferences.setInt(
         _runningOrdersHiddenUntilKey, hideUntil.millisecondsSinceEpoch);
     await preferences.setString(_runningOrdersHiddenSignatureKey, signature);
-    showCustomSnackBar('تم إخفاء شريط الطلبات مؤقتًا', isError: false);
+    showCustomSnackBar('orders_bar_hidden_temp'.tr, isError: false);
   }
 
   Future<void> _clearRunningOrdersBarHiddenState() async {

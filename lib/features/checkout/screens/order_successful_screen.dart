@@ -327,7 +327,7 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                 onTap: () {
                   Clipboard.setData(
                       ClipboardData(text: order.id?.toString() ?? orderId ?? ''));
-                  showCustomSnackBar('تم نسخ رقم الطلب', isError: false);
+                  showCustomSnackBar('order_number_copied'.tr, isError: false);
                 },
                 child: Container(
                   padding:
@@ -559,7 +559,7 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
       children: [
         // Primary Button: Back to Home
         CustomButton(
-          buttonText: 'العودة للرئيسية',
+          buttonText: 'back_to_home'.tr,
           onPressed: () {
             if (AuthHelper.isLoggedIn()) {
               Get.find<AuthController>()

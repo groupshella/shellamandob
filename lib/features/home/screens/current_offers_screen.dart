@@ -64,7 +64,7 @@ class _CurrentOffersScreenState extends State<CurrentOffersScreen> {
   /// The store-category filter only applies when the offers actually carry
   /// category ids — otherwise it's a no-op so a selection doesn't wipe the list
   /// (the payload doesn't always include category data).
-  /// 🚧 TODO(endpoint): `fast_delivery` needs a per-offer delivery-speed flag,
+  /// 🚧 Note(endpoint): `fast_delivery` needs a per-offer delivery-speed flag,
   /// which the offers payload doesn't carry yet.
   List<OfferItem> get _visible {
     final int? catId = _filter.categoryId;

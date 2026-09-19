@@ -224,7 +224,7 @@ class OffersController extends GetxController implements GetxService {
 
         // Only set empty if we had no existing data
         offersMode = OffersModel(
-            success: false, data: [], message: 'No module selected');
+            success: false, data: [], message: 'no_module_selected'.tr);
         update();
         return offersMode;
       }
@@ -253,7 +253,7 @@ class OffersController extends GetxController implements GetxService {
         onTimeout: () {
           debugPrint('⏰ Offers loading timed out after 10 seconds');
           return OffersModel(
-              success: false, data: [], message: 'Request timed out');
+              success: false, data: [], message: 'request_timed_out'.tr);
         },
       );
       // 🔒 PROTECTION: Validate API response before updating state
@@ -322,7 +322,7 @@ class OffersController extends GetxController implements GetxService {
 
       // Only set empty offers if we had no existing data
       offersMode = OffersModel(
-          success: false, data: [], message: 'Failed to load offers');
+          success: false, data: [], message: 'failed_to_load_offers'.tr);
       update();
     }
     return offersMode;

@@ -86,7 +86,7 @@ class _ChatSearchScreenState extends State<ChatSearchScreen> {
                         Get.find<ChatController>().searchConversation(text);
                       },
                       decoration: InputDecoration(
-                        hintText: 'البحث',
+                        hintText: 'search_label'.tr,
                         hintStyle: const TextStyle(
                           color: Color(0xFF707784),
                           fontSize: 16,
@@ -252,9 +252,9 @@ class _ChatSearchScreenState extends State<ChatSearchScreen> {
         if (storeModel != null &&
             storeModel.stores != null &&
             storeModel.stores!.isEmpty) {
-          return const Center(
-              child: Text('لا توجد نتائج',
-                  style: TextStyle(color: Color(0xFF707784))));
+          return Center(
+              child: Text('no_results'.tr,
+                  style: const TextStyle(color: Color(0xFF707784))));
         }
 
         return ListView.builder(

@@ -1,7 +1,8 @@
-// Driver-tip selector ("مكافأة سائق التوصيل"): a row of amount chips with an
+// Driver-tip selector ('delivery_tip_label'.tr): a row of amount chips with an
 // optional "الأكثر شعبية" badge and an "أخرى" (custom) chip.
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/features/payment/presentation/keeta_pay_style.dart';
 
 class TipOption {
@@ -31,7 +32,7 @@ class TipSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('مكافأة سائق التوصيل', style: s.t(16, weight: FontWeight.w800)),
+        Text('delivery_tip_label'.tr, style: s.t(16, weight: FontWeight.w800)),
         const SizedBox(height: 3),
         Text(
           'يستلم سائق التوصيل مبلغ الإكرامية بالكامل. ولا نقتطع أي جزء منه.',

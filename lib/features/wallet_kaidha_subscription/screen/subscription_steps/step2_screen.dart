@@ -129,7 +129,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                     const SizedBox(height: 14),
 
                     // Employer Name
-                    _requiredLabel(context, 'اسم جهة العمل'),
+                    _requiredLabel(context, 'employer_name'.tr),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: controller.name_of_employer,
@@ -137,7 +137,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       cursorColor: _green,
                       decoration: _inputDecoration(
                         controller.isEmployerEmpty,
-                        hintText: 'اسم جهة العمل',
+                        hintText: 'employer_name_label'.tr,
                       ),
                       onChanged: (_) {
                         if (controller.isEmployerEmpty) {
@@ -201,7 +201,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: _inputDecoration(
                         controller.isMonthlyIncomeEmpty,
-                        hintText: 'ادخل رقم',
+                        hintText: 'enter_number_hint'.tr,
                         prefixIcon: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           child: Text(
@@ -290,7 +290,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       children: [
                         Expanded(
                           child: _buildRadioPill(
-                            label: 'نعم',
+                            label: 'yes_label'.tr,
                             isSelected: controller.Installments == 'yes',
                             onTap: () {
                               controller.Installments = 'yes';
@@ -326,7 +326,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         decoration: _inputDecoration(
                           false,
-                          hintText: 'ادخل رقم',
+                          hintText: 'enter_number_hint'.tr,
                           prefixIcon: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             child: Text(

@@ -182,7 +182,7 @@ class _DeliveryManRegistrationScreenState
     }
 
     if (response == null) {
-      showCustomSnackBar('تعذر التحقق من حالة التسجيل، حاول مرة أخرى');
+      showCustomSnackBar('failed_to_verify_reg_status'.tr);
       return false;
     }
 
@@ -724,7 +724,7 @@ class _DeliveryManRegistrationScreenState
                                                                       .hintColor),
                                                               const SizedBox(
                                                                   width: 15),
-                                                              Text('رقم الهاتف',
+                                                              Text('phone_number'.tr,
                                                                   textAlign:
                                                                       TextAlign
                                                                           .center,
@@ -1108,7 +1108,7 @@ class _DeliveryManRegistrationScreenState
                                                   ),
                                                   items: identityTypeList,
                                                   child:
-                                                      const Text('نوع الهوية'),
+                                                      Text('id_type'.tr),
                                                 ),
                                               ),
 
@@ -1272,7 +1272,7 @@ class _DeliveryManRegistrationScreenState
 
             buildUploadSection(
               context,
-              title: 'الهوية الشخصية',
+              title: 'personal_id'.tr,
               images: deliverymanRegiController.identityImages,
               onAdd: () {
                 debugPrint('[DM-REG-SCREEN] Upload identity image TAP');
@@ -1289,7 +1289,7 @@ class _DeliveryManRegistrationScreenState
             deliverymanRegiController.vehicleIndex != 0 //  ليس مشاه
                 ? buildUploadSection(
                     context,
-                    title: 'رخصة السائق',
+                    title: 'driver_license'.tr,
                     images: deliverymanRegiController.driverLicenseImages,
                     onAdd: () {
                       debugPrint('[DM-REG-SCREEN] Upload driver license image TAP');
@@ -1305,7 +1305,7 @@ class _DeliveryManRegistrationScreenState
             deliverymanRegiController.vehicleIndex != 0 //  ليس مشاه
                 ? buildUploadSection(
                     context,
-                    title: 'رخصة القيادة',
+                    title: 'driving_license'.tr,
                     images: deliverymanRegiController.vehicleLicenseImages,
                     onAdd: () {
                       debugPrint('[DM-REG-SCREEN] Upload vehicle license image TAP');
@@ -2180,11 +2180,11 @@ class _DeliveryManRegistrationScreenState
         } else if (deliverymanRegiController.vehicleLicenseImages.isEmpty &&
             deliverymanRegiController.vehicleIndex != 0) {
           debugPrint('[DM-REG-SCREEN] VALIDATION FAIL: vehicle license images empty (vehicleIndex=${deliverymanRegiController.vehicleIndex})');
-          showCustomSnackBar('يرجي تحميل صوره الرخصه القيادة');
+          showCustomSnackBar('please_upload_driving_license'.tr);
         } else if (deliverymanRegiController.driverLicenseImages.isEmpty &&
             deliverymanRegiController.vehicleIndex != 0) {
           debugPrint('[DM-REG-SCREEN] VALIDATION FAIL: driver license images empty (vehicleIndex=${deliverymanRegiController.vehicleIndex})');
-          showCustomSnackBar('يرجي تحميل صوره الرخصه السائق');
+          showCustomSnackBar('please_upload_driver_license'.tr);
         } else {
           debugPrint('[DM-REG-SCREEN] VALIDATION PASSED => calling registerDeliveryMan()');
 

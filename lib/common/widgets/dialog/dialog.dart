@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_textfield_2.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 
@@ -41,12 +42,12 @@ class _CouponInputDialogState extends State<CouponInputDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Custom_Text(context, text: 'اضف رمز القسيمة الجديدة', style: font14Black400W(context)),
+              Custom_Text(context, text: 'add_new_coupon_code'.tr, style: font14Black400W(context)),
               const SizedBox(height: 10),
-              Custom_Text(context, text: 'رمز القسمية', style: font14Black400W(context)),
+              Custom_Text(context, text: 'coupon_code_label'.tr, style: font14Black400W(context)),
               const SizedBox(height: 10),
-              const CustomAppTextField(
-                labelText: 'رمز القسيمة',
+              CustomAppTextField(
+                labelText: 'coupon_code_label'.tr,
               ),
               const SizedBox(height: 16),
               Row(
@@ -54,14 +55,14 @@ class _CouponInputDialogState extends State<CouponInputDialog> {
                 children: [
                   Expanded(
                     child: custom_Button(context,
-                        title: 'إضافة', onPressed: () {}, buttoncolor: AppColors.greenColor, h: 40, style: font13White400W(context)),
+                        title: 'add'.tr, onPressed: () {}, buttoncolor: AppColors.greenColor, h: 40, style: font13White400W(context)),
                   ),
                   const SizedBox(
                     width: 20,
                   ),
                   Expanded(
                     child: custom_Button(context,
-                        title: 'إلغاء', onPressed: () {}, buttoncolor: AppColors.wtColor, h: 40, style: font13Black400W(context)),
+                        title: 'cancel'.tr, onPressed: () {}, buttoncolor: AppColors.wtColor, h: 40, style: font13Black400W(context)),
                   ),
                 ],
               ),

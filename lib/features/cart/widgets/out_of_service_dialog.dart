@@ -107,7 +107,7 @@ class _OutOfServiceDialogState extends State<OutOfServiceDialog> {
           showCustomSnackBar('location_selected_successfully'.tr, isError: false);
         } else {
           debugPrint('❌ Cannot navigate to checkout - storeId is null');
-          showCustomSnackBar('Unable to proceed to checkout. Please try again.'.tr);
+          showCustomSnackBar('unable_to_proceed_checkout'.tr);
         }
       } else {
         // 🔥 BUG FIX: Use SnackbarSafe to safely close any open snackbars before showing new one

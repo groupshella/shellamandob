@@ -65,7 +65,7 @@ class KaidhaSubRepository implements KaidhaSubRepositoryInterface {
     final bool hasToken =
         apiClient.token != null && apiClient.token!.isNotEmpty;
     if (!hasToken && userId == null) {
-      showCustomSnackBar('لا يمكن تنفيذ طلب نفاذ بدون user_id عند غياب التوكن');
+      showCustomSnackBar('cannot_exec_nafath_without_user_id'.tr);
       return null;
     }
 
@@ -233,13 +233,13 @@ class KaidhaSubRepository implements KaidhaSubRepositoryInterface {
           showCustomSnackBar(firstError);
           return false;
         } else {
-          showCustomSnackBar('الرجاء أعد المحاوله في وقت أخر');
+          showCustomSnackBar('please_try_again_later'.tr);
           return false;
         }
       } catch (e) {
         debugPrint('❌ Error parsing server response: $e');
         debugPrint('📋 Raw response: ${dioResponse.data}');
-        showCustomSnackBar('خطأ في استجابة الخادم: ${dioResponse.statusCode}');
+        showCustomSnackBar('${'server_response_error'.tr}: ${dioResponse.statusCode}');
         return false;
       }
     }
@@ -613,7 +613,7 @@ class KaidhaSubRepository implements KaidhaSubRepositoryInterface {
           response.body as Map<String, dynamic>?;
       showCustomSnackBar("${bodyMap?["message"]}", isError: false);
     } else {
-      showCustomSnackBar('فشل شحن المبلغ');
+      showCustomSnackBar('failed_to_top_up_amount'.tr);
     }
 
     return response;
@@ -643,7 +643,7 @@ class KaidhaSubRepository implements KaidhaSubRepositoryInterface {
 
       return false;
     } else {
-      showCustomSnackBar('فشل الشراء ');
+      showCustomSnackBar('purchase_failed'.tr);
       return false;
     }
   }
@@ -705,7 +705,7 @@ class KaidhaSubRepository implements KaidhaSubRepositoryInterface {
       if (nationalId.length != 10 ||
           // ignore: deprecated_member_use
           !RegExp(r'^\d{10}$').hasMatch(nationalId)) {
-        showCustomSnackBar('رقم الهوية غير صالح');
+        showCustomSnackBar('invalid_id_number'.tr);
         return null;
       }
 
@@ -797,7 +797,7 @@ class KaidhaSubRepository implements KaidhaSubRepositoryInterface {
     try {
       if (nationalId.length != 10 ||
           !RegExp(r'^\d{10}$').hasMatch(nationalId)) {
-        showCustomSnackBar('رقم الهوية غير صالح');
+        showCustomSnackBar('invalid_id_number'.tr);
         return null;
       }
 

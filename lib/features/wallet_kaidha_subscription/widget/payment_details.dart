@@ -156,12 +156,12 @@ class PaymentDetails extends StatelessWidget {
                     child: Column(
                       children: [
                         _CardInfoRow(
-                          label: 'رقم البطاقة',
+                          label: 'card_number_label'.tr,
                           value: wallet.serialNumber?.toString() ?? '—',
                         ),
                         const Divider(color: Colors.white24, height: 12),
                         _CardInfoRow(
-                          label: 'تاريخ انتهاء الشهر',
+                          label: 'expiry_month'.tr,
                           value: wallet.lockDay?.toString() ?? '—',
                         ),
                       ],
@@ -333,7 +333,7 @@ class _ContractButton extends StatelessWidget {
                 children: [
                   const CircularProgressIndicator(),
                   const SizedBox(height: 16),
-                  Text('جاري تحميل العقد...',
+                  Text('loading_contract'.tr,
                       style: _tajawal(14, FontWeight.w500,
                           color: const Color(0xFF2D3633))),
                 ],
@@ -371,7 +371,7 @@ class _ContractButton extends StatelessWidget {
             const Icon(Icons.description_outlined,
                 color: Colors.white, size: 15),
             const SizedBox(width: 4),
-            Text('عرض العقد', style: _tajawal(11, FontWeight.w600)),
+            Text('view_contract'.tr, style: _tajawal(11, FontWeight.w600)),
           ],
         ),
       ),

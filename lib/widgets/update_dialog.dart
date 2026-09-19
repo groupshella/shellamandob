@@ -338,7 +338,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open store: $e'),
+            content: Text('${'could_not_open_store'.tr}: $e'),
             backgroundColor: Colors.red,
           ),
         );

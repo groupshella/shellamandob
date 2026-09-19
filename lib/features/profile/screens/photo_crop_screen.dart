@@ -75,7 +75,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
       await file.writeAsBytes(bytes);
       Get.back<XFile>(result: XFile(file.path));
     } catch (e) {
-      showCustomSnackBar('تعذّر حفظ الصورة، حاول مرة أخرى.');
+      showCustomSnackBar('failed_to_save_image_try_again'.tr);
       if (mounted) {
         setState(() => _saving = false);
       }
@@ -93,8 +93,8 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
         scrolledUnderElevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'صورة الملف الشخصي',
+        title: Text(
+          'profile_photo_title'.tr,
           style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 17,
@@ -164,8 +164,8 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
                               child: CircularProgressIndicator(
                                   strokeWidth: 2, color: AppColors.wtColor),
                             )
-                          : const Text(
-                              'حفظ',
+                          : Text(
+                              'save'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 15,
@@ -248,8 +248,8 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text(
-            'يرجى التأكد من أن الصورة:',
+          Text(
+            'please_ensure_photo'.tr,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 15,
@@ -258,8 +258,8 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          _bullet('لا توجد بالصورة أي ضبابية والإضاءة بها جيدة'),
-          _bullet('دون نظارات أو قبعات أو أي اكسسوارات أخرى'),
+          _bullet('photo_no_blur_good_lighting'.tr),
+          _bullet('photo_no_glasses_or_accessories'.tr),
         ],
       ),
     );

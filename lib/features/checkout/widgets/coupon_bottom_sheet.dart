@@ -167,7 +167,7 @@ class _CouponCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('خصم',
+                Text('discount_label'.tr,
                     style: tajawalMedium.copyWith(
                         fontSize: 12, color: Colors.white)),
                 const SizedBox(height: 2),
@@ -214,7 +214,7 @@ class _CouponCard extends StatelessWidget {
                   ],
                   if (expiry.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    Text('صالح حتى: $expiry',
+                    Text('${'valid_until'.tr}: $expiry',
                         style: tajawalRegular.copyWith(
                             fontSize: 11, color: const Color(0xFF8A8F99))),
                   ],
@@ -235,7 +235,7 @@ class _CouponCard extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text('استخدام',
+              child: Text('use_label'.tr,
                   style: tajawalBold.copyWith(
                       fontSize: 13, color: Colors.white)),
             ),

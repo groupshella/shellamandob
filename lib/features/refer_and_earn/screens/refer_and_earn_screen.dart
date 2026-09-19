@@ -195,7 +195,7 @@ class _InviteLinkTab extends StatelessWidget {
       showCustomSnackBar('referral_code_copied'.tr, isError: false);
     } else {
       onRefresh();
-      showCustomSnackBar('Referral code is not available yet');
+      showCustomSnackBar('referral_code_not_available_yet'.tr);
     }
   }
 

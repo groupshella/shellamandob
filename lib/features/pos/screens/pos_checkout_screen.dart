@@ -286,7 +286,7 @@ class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
             ),
             const SizedBox(height: 28),
             CustomButton(
-              buttonText: 'تسجيل الدخول / إنشاء حساب',
+              buttonText: 'login_or_create_account'.tr,
               onPressed: () {
                 Get.toNamed(RouteHelper.getSignInRoute(
                     RouteHelper.getPosCheckoutRoute(widget.token)));
@@ -463,7 +463,7 @@ class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
                         if (order.orderId != null) {
                           Clipboard.setData(
                               ClipboardData(text: order.orderId!));
-                          showCustomSnackBar('تم نسخ رقم الطلب',
+                          showCustomSnackBar('order_number_copied'.tr,
                               isError: false);
                         }
                       },
@@ -740,8 +740,8 @@ class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
 
           // 1. Digital Payment (Apple Pay, Mada, Cards)
           _buildPaymentCard(
-            title: 'دفع إلكتروني (Apple Pay / مدى / فيزا)',
-            subtitle: 'دفع فوري وآمن بالبطاقات البنكية',
+            title: 'electronic_payment_options'.tr,
+            subtitle: 'fast_secure_payment'.tr,
             icon: Icons.credit_card_rounded,
             value: 'digital_payment',
             groupValue: controller.selectedPaymentMethod,
@@ -751,15 +751,15 @@ class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
 
           // 2. Shella Wallet
           _buildPaymentCard(
-            title: 'محفظة شلة',
+            title: 'shella_wallet'.tr,
             subtitle:
-                'الرصيد المتاح: ${PriceConverter.convertPrice(walletBalance)}',
+                '${'available_balance'.tr}: ${PriceConverter.convertPrice(walletBalance)}',
             icon: Icons.account_balance_wallet_rounded,
             value: 'wallet',
             groupValue: controller.selectedPaymentMethod,
             badge: canPayWithWallet
-                ? 'رصيد كافٍ'
-                : 'رصيد غير كافٍ',
+                ? 'sufficient_balance'.tr
+                : 'insufficient_balance'.tr,
             badgeColor: canPayWithWallet
                 ? const Color(0xFF22A45D)
                 : const Color(0xFFE53935),
@@ -946,7 +946,7 @@ class _PosCheckoutScreenState extends State<PosCheckoutScreen> {
             const SizedBox(width: 16),
             Expanded(
               child: CustomButton(
-                buttonText: 'تأكيد ودفع الطلب',
+                buttonText: 'confirm_and_pay_order'.tr,
                 isLoading: controller.isPaying,
                 onPressed: () {
                   controller.initiatePayment(widget.token);

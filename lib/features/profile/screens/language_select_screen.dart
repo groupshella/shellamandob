@@ -32,7 +32,13 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
       return 'العربية';
     }
     if (code == 'en') {
-      return 'English (US)';
+      return 'English';
+    }
+    if (code == 'bn') {
+      return 'বাংলা (Bengali)';
+    }
+    if (code == 'es') {
+      return 'Español (Spanish)';
     }
     return AppConstants.languages[index].languageName ?? '';
   }
@@ -45,6 +51,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
     controller.setLanguage(context, locale);
     controller.setSelectLanguageIndex(index);
     controller.saveCacheLanguage(locale);
+    Get.updateLocale(locale);
   }
 
   @override
@@ -58,20 +65,20 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: Text(
-          'اللغة',
+          'choose_language'.tr,
           style: TextStyle(
             fontFamily: 'Tajawal',
-            fontSize: 17.r(context),
+            fontSize: 16.r(context),
             fontWeight: FontWeight.w700,
             color: _titleColor,
           ),
         ),
-        leading: GestureDetector(
-          onTap: () => Get.back<void>(),
-          behavior: HitTestBehavior.opaque,
-          child: Center(
-            child: Icon(Icons.arrow_back_ios_new,
-                size: 18.r(context), color: _titleColor),
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            size: 20.r(context),
+            color: _titleColor,
           ),
         ),
       ),
@@ -89,12 +96,25 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
               ),
               itemBuilder: (BuildContext context, int index) {
                 final bool selected = controller.selectedLanguageIndex == index;
+                final imageUrl = AppConstants.languages[index].imageUrl;
                 return InkWell(
                   onTap: () => _selectLanguage(controller, index),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 16.r(context)),
                     child: Row(
                       children: <Widget>[
+                        if (imageUrl != null && imageUrl.isNotEmpty) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.asset(
+                              imageUrl,
+                              width: 26.r(context),
+                              height: 18.r(context),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 12.r(context)),
+                        ],
                         Expanded(
                           child: Text(
                             _displayName(index),

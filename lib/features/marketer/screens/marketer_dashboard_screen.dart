@@ -9,6 +9,10 @@ import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dar
 import 'package:sixam_mart/features/marketer/screens/marketer_commissions_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
+import 'package:sixam_mart/features/employee/screens/employee_settings_screen.dart';
+import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_image.dart';
+import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,8 +33,24 @@ class MarketerDashboardScreen extends StatelessWidget {
             Column(
               children: [
                 MarketerHeader(
-                  title: 'voucher_marketer'.tr,
+                  title: isRoot ? 'my_account_and_marketer'.tr : 'voucher_marketer'.tr,
                   showBackButton: !isRoot,
+                  trailing: GestureDetector(
+                    onTap: () => Get.to(() => const EmployeeSettingsScreen()),
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF6F5F8),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        IconlyLight.setting,
+                        size: 20,
+                        color: Color(0xFF111B18),
+                      ),
+                    ),
+                  ),
                 ),
                 Expanded(
                   child: GetBuilder<MarketerController>(
@@ -43,6 +63,12 @@ class MarketerDashboardScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
+                              // 0. Profile Summary Bar (when in root tab)
+                              if (isRoot) ...[
+                                _buildProfileSummaryBar(),
+                                const SizedBox(height: 14),
+                              ],
+
                               // 1. Hero Gradient Balance Card
                               _buildHeroBalanceCard(c),
                               const SizedBox(height: 16),
@@ -57,6 +83,10 @@ class MarketerDashboardScreen extends StatelessWidget {
 
                               // 4. Recent Commissions Card
                               _buildRecentCommissionsCard(c),
+                              const SizedBox(height: 16),
+
+                              // 5. Settings Quick Card
+                              _buildSettingsQuickCard(),
                               const SizedBox(height: 70),
                             ],
                           ),
@@ -283,7 +313,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                       Text(
                         c.pendingBalance > 0
                             ? '${'remaining_days'.tr} ${c.pendingDays} ${'days'.tr}'
-                            : 'لا يوجد رصيد معلق',
+                            : 'no_pending_balance'.tr,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Color(0xFF555555),
@@ -1031,6 +1061,163 @@ class MarketerDashboardScreen extends StatelessWidget {
                 );
               },
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileSummaryBar() {
+    return GetBuilder<ProfileController>(
+      builder: (profileCtrl) {
+        final userInfo = profileCtrl.userInfoModel;
+        final name = userInfo != null
+            ? '${userInfo.fName ?? ''} ${userInfo.lName ?? ''}'.trim()
+            : 'certified_marketer'.tr;
+        final phone = userInfo?.phone ?? '';
+        final imageUrl = userInfo?.imageFullUrl ?? '';
+
+        return InkWell(
+          onTap: () => Get.to(() => const EmployeeSettingsScreen()),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FAFB),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: Row(
+              children: [
+                ClipOval(
+                  child: imageUrl.isNotEmpty
+                      ? CustomImage(
+                          image: imageUrl,
+                          height: 44,
+                          width: 44,
+                          placeholder: Images.guestIcon,
+                        )
+                      : Container(
+                          height: 44,
+                          width: 44,
+                          decoration: BoxDecoration(
+                            color: _primaryGreen.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            IconlyBold.profile,
+                            size: 22,
+                            color: _primaryGreen,
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name.isNotEmpty ? name : 'shella_agent'.tr,
+                        style: const TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: _darkText,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        phone.isNotEmpty ? phone : 'certified_marketer'.tr,
+                        style: const TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(IconlyLight.setting, size: 16, color: _primaryGreen),
+                      const SizedBox(width: 4),
+                      Text(
+                        'settings'.tr,
+                        style: const TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _darkText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSettingsQuickCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'app_and_account_settings'.tr,
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: _darkText,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'app_and_account_settings_desc'.tr,
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 12,
+              color: Color(0xFF6B7280),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: () => Get.to(() => const EmployeeSettingsScreen()),
+            icon: const Icon(IconlyLight.setting, size: 18),
+            label: Text(
+              'open_settings'.tr,
+              style: const TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: _primaryGreen,
+              elevation: 0,
+              side: const BorderSide(color: Color(0xFFE5E7EB)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
         ],
       ),
     );

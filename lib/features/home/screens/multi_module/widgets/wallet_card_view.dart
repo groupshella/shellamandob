@@ -120,12 +120,12 @@ class WalletCardView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('الرصيد المتاح', style: robotoRegular.copyWith(color: Colors.white70)),
+                Text('available_balance'.tr, style: robotoRegular.copyWith(color: Colors.white70)),
                 Row(
                   children: [
                     PriceConverter.convertPrice2(availableBalance, textStyle: robotoBold.copyWith(fontSize: 24, color: Colors.white)),
                     const Spacer(),
-                    Text('من ${PriceConverter.convertPrice(creditLimit)}', style: robotoRegular.copyWith(color: Colors.white70)),
+                    Text('${'from'.tr} ${PriceConverter.convertPrice(creditLimit)}', style: robotoRegular.copyWith(color: Colors.white70)),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -156,15 +156,15 @@ class WalletCardView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Buy Now, Pay Later', style: robotoBold.copyWith(color: Colors.white, fontSize: 16)),
-                  Text('With Qidha wallet', style: robotoRegular.copyWith(color: Colors.white70, fontSize: 12)),
+                  Text('buy_now_pay_later'.tr, style: robotoBold.copyWith(color: Colors.white, fontSize: 16)),
+                  Text('with_qidha_wallet'.tr, style: robotoRegular.copyWith(color: Colors.white70, fontSize: 12)),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              child: Text('Activate'.tr, style: robotoBold.copyWith(color: AppColors.primaryColor)),
+              child: Text('activate'.tr, style: robotoBold.copyWith(color: AppColors.primaryColor)),
             ),
           ],
         ),
@@ -190,15 +190,15 @@ class WalletCardView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Tap to refresh', style: robotoBold.copyWith(color: Colors.white, fontSize: 16)),
-                  Text('Wallet data unavailable', style: robotoRegular.copyWith(color: Colors.white70, fontSize: 12)),
+                  Text('tap_to_refresh'.tr, style: robotoBold.copyWith(color: Colors.white, fontSize: 16)),
+                  Text('wallet_data_unavailable'.tr, style: robotoRegular.copyWith(color: Colors.white70, fontSize: 12)),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              child: Text('Refresh'.tr, style: robotoBold.copyWith(color: AppColors.primaryColor)),
+              child: Text('refresh'.tr, style: robotoBold.copyWith(color: AppColors.primaryColor)),
             ),
           ],
         ),
@@ -225,15 +225,15 @@ class WalletCardView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Register Wallet', style: robotoBold.copyWith(color: Colors.white, fontSize: 16)),
-                  Text('Create your Qidha wallet', style: robotoRegular.copyWith(color: Colors.white70, fontSize: 12)),
+                  Text('register_wallet'.tr, style: robotoBold.copyWith(color: Colors.white, fontSize: 16)),
+                  Text('create_your_qidha_wallet'.tr, style: robotoRegular.copyWith(color: Colors.white70, fontSize: 12)),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              child: Text('Register'.tr, style: robotoBold.copyWith(color: AppColors.primaryColor)),
+              child: Text('register'.tr, style: robotoBold.copyWith(color: AppColors.primaryColor)),
             ),
           ],
         ),

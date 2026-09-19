@@ -53,7 +53,7 @@ class _Add_DelegateScreenState extends State<Add_DelegateScreen> {
       backgroundColor: Theme.of(context).cardColor,
       appBar: custom_AppBar(
         context,
-        title: 'المندوب',
+        title: 'delegate'.tr,
         icon: Icons.arrow_back_sharp,
         img_icon: Images.shippingPolicy,
         onPressed: () {
@@ -71,7 +71,7 @@ class _Add_DelegateScreenState extends State<Add_DelegateScreen> {
                 : Column(
                     children: [
                       SizedBox(height: 30),
-                      Text('معلومات المندوب',
+                      Text('delegate_information'.tr,
                           textAlign: TextAlign.center, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                       SizedBox(height: 30),
                       _customText(mycontroller: delegateController.f_name_Controller, text: 'الاسم الأول', context: context),
@@ -140,7 +140,7 @@ class _Add_DelegateScreenState extends State<Add_DelegateScreen> {
                         width: 1170,
                         padding: EdgeInsets.all(Dimensions.fontSizeDefault),
                         child: CustomButton(
-                          buttonText: 'إرسال',
+                          buttonText: 'send'.tr,
                           onPressed: () async {
                             final int? userId = profileController.userInfoModel?.id;
                             final String phone = profilePhone ?? delegateController.mobile_Controller.text.trim();

@@ -1,0 +1,272 @@
+{
+  "ar_": {
+    "en": "",
+    "ar": "المندوب",
+    "bn": "",
+    "es": ""
+  },
+  "cart_mock": {
+    "en": "Cart Mock",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "ar_30": {
+    "en": "",
+    "ar": "نسكافيه 30 ظرف",
+    "bn": "",
+    "es": ""
+  },
+  "ar_30_5": {
+    "en": "",
+    "ar": "عرض 30 ظرف 5+ هدية",
+    "bn": "",
+    "es": ""
+  },
+  "ar_35_5": {
+    "en": "",
+    "ar": "عرض 35 ظرف 5+ هدية",
+    "bn": "",
+    "es": ""
+  },
+  "pct": {
+    "en": "-$pct%",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "orderid": {
+    "en": "#${order.id}",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "ar_expiry": {
+    "en": "",
+    "ar": "صالح حتى: $expiry",
+    "bn": "",
+    "es": ""
+  },
+  "ar_qr": {
+    "en": "",
+    "ar": "مسح رمز QR",
+    "bn": "",
+    "es": ""
+  },
+  "ar_priceconverterconvertpricecreditlimit": {
+    "en": "",
+    "ar": "من ${PriceConverter.convertPrice(creditLimit)}",
+    "bn": "",
+    "es": ""
+  },
+  "itemratingcount": {
+    "en": "(${item.ratingCount})",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "storeratingcount": {
+    "en": "(${store.ratingCount})",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "debug_popup_panel": {
+    "en": "Debug Popup Panel",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "notificationicon_named_route_stack": {
+    "en": "[NotificationIcon] named route stack",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "advertisementreviewscommentscount": {
+    "en": "(${advertisement.reviewsCommentsCount})",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "storelistindexratingcounttostring": {
+    "en": "(${storeList[index].ratingCount.toString()})",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "recommenditemsindexratingcount": {
+    "en": "(${recommendItems[index].ratingCount})",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "no_module_selected": {
+    "en": "No module selected",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "request_timed_out": {
+    "en": "Request timed out",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "failed_to_load_offers": {
+    "en": "Failed to load offers",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "etag_clear_cooldown_active": {
+    "en": "ETag clear cooldown active",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "invalid_response_format": {
+    "en": "Invalid response format",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "failed_to_parse_offers_data": {
+    "en": "Failed to parse offers data",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "ar_n": {
+    "en": "",
+    "ar": "ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.",
+    "bn": "",
+    "es": ""
+  },
+  "ordercontrollertrackmodelid": {
+    "en": " #${orderController.trackModel?.id}",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "paymentstatus": {
+    "en": "[ $paymentStatus ]",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "orderdmtips": {
+    "en": "(+) ${order.dmTips}",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "parcelnotificationicon_named_route_stack": {
+    "en": "[ParcelNotificationIcon] named route stack",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "apple_pay": {
+    "en": "Apple Pay",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "ar_fmtwidgetwalletbalance_widgetcurrency": {
+    "en": "",
+    "ar": "المجموع ${_fmt(widget.walletBalance)} ${widget.currency}",
+    "bn": "",
+    "es": ""
+  },
+  "ar_apple_pay": {
+    "en": "",
+    "ar": "دفع إلكتروني (Apple Pay / مدى / فيزا)",
+    "bn": "",
+    "es": ""
+  },
+  "rewardtostringasfixed0": {
+    "en": "+ ${reward.toStringAsFixed(0)}",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "high_grocery_spending": {
+    "en": "High Grocery Spending",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "your_grocery_spending_is_25_higher_than_last_month_consider_": {
+    "en": "Your grocery spending is 25% higher than last month. Consider buying in bulk for better savings.",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "weekly_budget_alert": {
+    "en": "Weekly Budget Alert",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "you": {
+    "en": "You\\",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "try_new_categories": {
+    "en": "Try New Categories",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "you_haven": {
+    "en": "You haven\\",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "connection_timeout": {
+    "en": "Connection Timeout",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "please_check_your_connection_and_try_again": {
+    "en": "Please check your connection and try again",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "out_of_coverage": {
+    "en": "Out of Coverage",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "this_store_is_not_available_in_your_area": {
+    "en": "This store is not available in your area",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "wallet_loaded_from_login": {
+    "en": "Wallet loaded from login",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  },
+  "ar_1xxxxxxxxx": {
+    "en": "",
+    "ar": "١٠ أرقام (مثال: 1XXXXXXXXX)",
+    "bn": "",
+    "es": ""
+  },
+  "9665xxxxxxxx": {
+    "en": "+9665XXXXXXXX",
+    "ar": "",
+    "bn": "",
+    "es": ""
+  }
+}

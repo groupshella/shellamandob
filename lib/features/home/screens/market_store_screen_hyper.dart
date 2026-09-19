@@ -291,11 +291,11 @@ class _HyperPicksRailState extends State<_HyperPicksRail> {
   // 5 designed cards. catId set = tap opens that (sub)category; null = the
   // curated filters (الأعلى مبيعاً / وصل حديثاً / الجمعات) are wired later.
   static const List<({String asset, String? catId, String title})> _cards = [
-    (asset: 'pick_01', catId: '59659', title: 'خالية من اللاكتوز'),
-    (asset: 'pick_02', catId: '59686', title: 'الأعلى مبيعاً'),
-    (asset: 'pick_03', catId: '59719', title: 'وصل حديثاً'),
-    (asset: 'pick_04', catId: '59746', title: 'الجمعات'),
-    (asset: 'pick_05', catId: '59656', title: 'خالية من الجلوتين'),
+    (asset: 'pick_01', catId: '59659', title: 'lactose_free'),
+    (asset: 'pick_02', catId: '59686', title: 'best_selling'),
+    (asset: 'pick_03', catId: '59719', title: 'newly_arrived'),
+    (asset: 'pick_04', catId: '59746', title: 'bulk_items'),
+    (asset: 'pick_05', catId: '59656', title: 'gluten_free'),
   ];
 
   @override
@@ -348,7 +348,7 @@ class _HyperPicksRailState extends State<_HyperPicksRail> {
                   return GestureDetector(
                     onTap: () => Get.to<void>(
                       () => MarketOffersScreen(
-                        title: card.title,
+                        title: card.title.tr,
                         storeId: widget.storeId,
                         moduleId: widget.moduleId,
                         categoryId: card.catId,
@@ -406,23 +406,23 @@ class _HyperDesignedCategoriesGridState
   // (cat_06) and "مياه" (cat_10) are intentionally left out — no matching
   // department yet (their products are coming later).
   static const List<({String asset, String catId, String title})> _cards = [
-    (asset: 'cat_01', catId: '59601', title: 'العناية الشخصية'),
-    (asset: 'cat_02', catId: '59616', title: 'مستلزمات الطبخ'),
-    (asset: 'cat_03', catId: '59609', title: 'العناية بالطفل'),
-    (asset: 'cat_04', catId: '59662', title: 'المجمدات'),
-    (asset: 'cat_05', catId: '59588', title: 'منتجات طازجة'),
-    (asset: 'cat_07', catId: '59631', title: 'العناية بالمنزل'),
-    (asset: 'cat_08', catId: '59626', title: 'الأطعمة الأساسية'),
+    (asset: 'cat_01', catId: '59601', title: 'personal_care'),
+    (asset: 'cat_02', catId: '59616', title: 'cooking_supplies'),
+    (asset: 'cat_03', catId: '59609', title: 'baby_care'),
+    (asset: 'cat_04', catId: '59662', title: 'frozen_items'),
+    (asset: 'cat_05', catId: '59588', title: 'fresh_products'),
+    (asset: 'cat_07', catId: '59631', title: 'home_care'),
+    (asset: 'cat_08', catId: '59626', title: 'basic_foods'),
     // NOTE: the source images cat_09..cat_15 are mirror-swapped vs their file
     // names (cat_09 actually shows الجمال, cat_15 shows الإلكترونيات, etc.), so
     // each entry uses the asset whose PICTURE matches its department.
-    (asset: 'cat_15', catId: '59576', title: 'الإلكترونيات'),
-    (asset: 'cat_13', catId: '59670', title: 'وجبات خفيفة'),
-    (asset: 'cat_12', catId: '59596', title: 'العناية بالحيوانات الأليفة'),
-    (asset: 'cat_11', catId: '59648', title: 'المخبوزات'),
-    (asset: 'cat_10', catId: '59581', title: 'المشروبات'),
-    (asset: 'cat_14', catId: '59684', title: 'مياه'),
-    (asset: 'cat_09', catId: '59601', title: 'الجمال'),
+    (asset: 'cat_15', catId: '59576', title: 'electronics_label'),
+    (asset: 'cat_13', catId: '59670', title: 'snacks_label'),
+    (asset: 'cat_12', catId: '59596', title: 'pet_care'),
+    (asset: 'cat_11', catId: '59648', title: 'bakery_label'),
+    (asset: 'cat_10', catId: '59581', title: 'beverages_label'),
+    (asset: 'cat_14', catId: '59684', title: 'water_label'),
+    (asset: 'cat_09', catId: '59601', title: 'beauty_label'),
   ];
 
   @override
@@ -463,7 +463,7 @@ class _HyperDesignedCategoriesGridState
               return GestureDetector(
                 onTap: () => Get.to<void>(
                   () => MarketOffersScreen(
-                    title: card.title,
+                    title: card.title.tr,
                     storeId: widget.storeId,
                     moduleId: widget.moduleId,
                     categoryId: card.catId,

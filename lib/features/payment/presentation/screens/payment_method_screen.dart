@@ -83,7 +83,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(
-                child: Text('المزيد',
+                child: Text('more'.tr,
                     overflow: TextOverflow.clip,
                     softWrap: false,
                     style: s.t(13.5, weight: FontWeight.w700, color: s.green)),
@@ -92,7 +92,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             ],
           ),
         ),
-        title: Text('طريقة الدفع', style: s.t(18, weight: FontWeight.w800)),
+        title: Text('payment_method'.tr, style: s.t(18, weight: FontWeight.w800)),
         actions: [Icon(Icons.chevron_right, color: s.muted, size: 22), const SizedBox(width: 12)],
       ),
       body: SafeArea(
@@ -139,7 +139,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           Divider(height: 1, color: s.border, indent: 15, endIndent: 15),
           PaymentOptionTile(
             leading: Icon(Icons.credit_card, color: s.ink, size: 21),
-            title: 'إضافة بطاقة جديدة',
+            title: 'add_new_card'.tr,
             brands: const [
               KeetaBrandChip('mada', KeetaBrandChip.mada),
               KeetaBrandChip('VISA', KeetaBrandChip.visa),
@@ -157,8 +157,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           PaymentOptionTile(
             leading: Icon(Icons.account_balance_wallet_outlined,
                 color: s.amber, size: 21),
-            title: 'المحفظة',
-            subtitle: 'المجموع ${_fmt(widget.walletBalance)} ${widget.currency}',
+            title: 'wallet'.tr,
+            subtitle: '${'total'.tr} ${_fmt(widget.walletBalance)} ${widget.currency}',
             trailing: KeetaSwitch(
               value: _useWallet,
               onChanged: (v) => setState(() => _useWallet = v),
@@ -185,7 +185,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('الإجمالي',
+              Text('total'.tr,
                   style: s.t(11.5, weight: FontWeight.w600, color: s.muted)),
               Text('${_fmt(widget.total)} ${widget.currency}',
                   style: s.t(18, weight: FontWeight.w800)),
@@ -220,7 +220,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('مبلغ آخر للإكرامية',
+            Text('other_tip_amount'.tr,
                 textAlign: TextAlign.center,
                 style: s.t(16, weight: FontWeight.w800)),
             const SizedBox(height: 14),
@@ -254,7 +254,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   Get.back<void>();
                   if (v != null && v > 0) setState(() => _tip = v);
                 },
-                child: Text('تأكيد',
+                child: Text('confirm'.tr,
                     style:
                         s.t(15, weight: FontWeight.w800, color: Colors.white)),
               ),

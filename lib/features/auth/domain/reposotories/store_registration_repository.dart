@@ -23,7 +23,7 @@ class StoreRegistrationRepository
       if (kDebugMode) {
         appLogger.warning('⚠️ لا يوجد توكن.');
       }
-      showCustomSnackBar('الرجاء تسجيل الدخول أولاً');
+      showCustomSnackBar('please_login_first'.tr);
       return const Response(
           statusCode: 401, statusText: 'Unauthorized: Missing token');
     }
@@ -110,17 +110,17 @@ class StoreRegistrationRepository
       if ((dioResponse.statusCode == 200 || dioResponse.statusCode == 201) &&
           !hasErrors) {
         Get.back();
-        showCustomSnackBar('✅ تم إرسال الطلب بنجاح', isError: false);
+        showCustomSnackBar('request_sent_successfully'.tr, isError: false);
       } else if (dioResponse.statusCode == 500) {
         final String message = jsonResponse['message']?.toString().trim() ?? '';
         if (message.isNotEmpty) {
           showCustomSnackBar(message);
         } else {
-          showCustomSnackBar('حدث خطأ داخلي من الخادم، الرجاء المحاولة لاحقًا');
+          showCustomSnackBar('internal_server_error_try_later'.tr);
         }
       } else if (jsonResponse.containsKey('message') &&
           jsonResponse['message'].toString().contains('Duplicate entry')) {
-        showCustomSnackBar('  رقم الهاتف او البريد الاكتروني تم الحفظ مسبقا ');
+        showCustomSnackBar('phone_or_email_already_saved'.tr);
       } else if (jsonResponse.containsKey('errors')) {
         // عرض كل الأخطاء بالعربية
         String errorMessages = '';
@@ -152,7 +152,7 @@ class StoreRegistrationRepository
         if (userMessage.isNotEmpty) {
           showCustomSnackBar(userMessage);
         } else {
-          showCustomSnackBar('قم بمراجعه البيانات ');
+          showCustomSnackBar('please_review_data'.tr);
         }
 
         debugPrint(
@@ -163,7 +163,7 @@ class StoreRegistrationRepository
         if (message.isNotEmpty) {
           showCustomSnackBar(message);
         } else {
-          showCustomSnackBar('قم بمراجعه البيانات ');
+          showCustomSnackBar('please_review_data'.tr);
         }
         debugPrint('\x1B[32m  ////////////  \x1B[0m');
       }
@@ -174,7 +174,7 @@ class StoreRegistrationRepository
         statusText: dioResponse.statusMessage,
       );
     } catch (e) {
-      showCustomSnackBar('❌ حدث خطأ أثناء الاتصال بالخادم');
+      showCustomSnackBar('connection_error_with_server'.tr);
       if (kDebugMode) {
         appLogger.error('❌ Exception occurred: $e', e);
       }

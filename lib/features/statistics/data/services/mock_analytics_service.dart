@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:get/get.dart';
 import '../../domain/models/analytics_summary.dart';
 import '../../domain/models/spending_trend.dart';
 import '../../domain/models/category_breakdown.dart';
@@ -202,27 +203,27 @@ class MockAnalyticsService {
     await Future.delayed(const Duration(milliseconds: 1000));
 
     final insights = [
-      const Insight(
+      Insight(
         type: 'spending',
-        title: 'High Grocery Spending',
-        message: 'Your grocery spending is 25% higher than last month. Consider buying in bulk for better savings.',
+        title: 'high_grocery_spending'.tr,
+        message: 'grocery_spending_higher_tip'.tr,
         severity: 'warning',
         description: 'Your grocery spending is 25% higher than last month. Consider buying in bulk for better savings.',
         priority: 'high',
         metadata: {'category': 'Grocery', 'increase_percentage': 25.0},
       ),
-      const Insight(
+      Insight(
         type: 'savings',
-        title: 'Weekly Budget Alert',
+        title: 'weekly_budget_alert'.tr,
         message: 'You\'ve spent 80% of your weekly budget. Consider reducing non-essential purchases.',
         severity: 'warning',
         description: 'You\'ve spent 80% of your weekly budget. Consider reducing non-essential purchases.',
         priority: 'medium',
         metadata: {'budget_used': 80.0, 'remaining': 20.0},
       ),
-      const Insight(
+      Insight(
         type: 'recommendation',
-        title: 'Try New Categories',
+        title: 'try_new_categories'.tr,
         message: 'You haven\'t purchased from Electronics in 2 weeks. Check out our latest deals!',
         severity: 'info',
         description: 'You haven\'t purchased from Electronics in 2 weeks. Check out our latest deals!',

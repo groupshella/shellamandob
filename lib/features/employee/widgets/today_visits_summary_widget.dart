@@ -1,0 +1,192 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:get/get.dart';
+import '../controllers/employee_shift_controller.dart';
+
+class TodayVisitsSummaryWidget extends StatelessWidget {
+  final VoidCallback? onStartNextVisit;
+
+  const TodayVisitsSummaryWidget({super.key, this.onStartNextVisit});
+
+  static const Color _darkText = Color(0xFF111B18);
+  static const Color _subText = Color(0xFF6B7280);
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<EmployeeShiftController>(
+      builder: (controller) {
+        final model = controller.shiftModel;
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+              width: 1,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0A000000),
+                blurRadius: 10,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Title: today_visits
+              Text(
+                'today_visits'.tr,
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: _darkText,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Row 1: مكتملة (Right in RTL) & إجمالي الزيارات (Left in RTL)
+              Row(
+                children: [
+                  // مكتملة (Child 0 -> Far right in RTL)
+                  Expanded(
+                    child: _buildCounterCard(
+                      label: 'completed'.tr,
+                      count: model.completedVisits,
+                      badgeColor: const Color(0x1722C55E), // rgba(34, 197, 94, 0.09)
+                      textColor: const Color(0xFF22C55E),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  // إجمالي الزيارات (Child 1 -> Far left in RTL)
+                  Expanded(
+                    child: _buildCounterCard(
+                      label: 'total_visits'.tr,
+                      count: model.totalVisits,
+                      badgeColor: const Color(0x173B82F6), // rgba(59, 130, 246, 0.09)
+                      textColor: const Color(0xFF3B82F6),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Row 2: قادمة (Right in RTL) & تحتاج متابعة (Left in RTL)
+              Row(
+                children: [
+                  // قادمة (Child 0 -> Far right in RTL)
+                  Expanded(
+                    child: _buildCounterCard(
+                      label: 'upcoming'.tr,
+                      count: model.upcomingVisits,
+                      badgeColor: const Color(0x17F59E0B), // rgba(245, 158, 11, 0.09)
+                      textColor: const Color(0xFFF59E0B),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  // تحتاج متابعة (Child 1 -> Far left in RTL)
+                  Expanded(
+                    child: _buildCounterCard(
+                      label: 'needs_follow_up'.tr,
+                      count: model.followUpVisits,
+                      badgeColor: const Color(0x177861A6), // rgba(120, 97, 166, 0.09)
+                      textColor: const Color(0xFF7861A6),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Button: بدء الزيارة التالية (matching Figma #F6F6F6, #43474F)
+              SizedBox(
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: onStartNextVisit,
+                  icon: const Icon(
+                    IconlyLight.location,
+                    size: 20,
+                    color: Color(0xFF43474F),
+                  ),
+                  label: Text(
+                    'start_next_visit'.tr,
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF43474F),
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF6F6F6),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCounterCard({
+    required String label,
+    required int count,
+    required Color badgeColor,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAF9FB),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFF0F0F2)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Label (Right in RTL)
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: _subText,
+              ),
+            ),
+          ),
+
+          // Badge (Left in RTL)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: badgeColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '$count',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

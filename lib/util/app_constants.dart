@@ -218,8 +218,21 @@ class AppConstants {
   static const String addAddressUri = '/api/v1/customer/address/add';
   static const String updateAddressUri = '/api/v1/customer/address/update/';
   static const String cartMergeUri = '/cart/merge';
-  static const String setMenuUri = '/api/v1/items/set-menu';
   static const String customerInfoUri = '/api/v1/customer/info';
+
+  // Marketer & Field Employee Shift & Zone Endpoints (Contract 17 Sept 2026)
+  static const String marketerZonesUri = '/api/v1/customer/marketer/zones';
+  static const String marketerZoneLockUri = '/api/v1/customer/marketer/zone/lock';
+  static const String marketerZoneChangeRequestUri = '/api/v1/customer/marketer/zone/change-request';
+  static const String marketerZoneChangeRequestStatusUri = '/api/v1/customer/marketer/zone/change-request/status';
+  static const String marketerShiftStartUri = '/api/v1/customer/marketer/shift/start';
+  static const String marketerShiftBreakUri = '/api/v1/customer/marketer/shift/break';
+  static const String marketerShiftResumeUri = '/api/v1/customer/marketer/shift/resume';
+  static const String marketerShiftEndUri = '/api/v1/customer/marketer/shift/end';
+  static const String marketerShiftCurrentUri = '/api/v1/customer/marketer/shift/current';
+  static const String marketerShiftHistoryUri = '/api/v1/customer/marketer/shift/history';
+  static const String marketerDashboardUri = '/api/v1/customer/marketer/dashboard';
+  static const String marketerApplyUri = '/api/v1/customer/marketer/apply';
 
   /// Authenticated My Coupons list (user-specific e.g. is_used). Use headers + auth.
   static const String couponUri = '/api/v1/coupon/list';
@@ -655,7 +668,7 @@ class AppConstants {
   static List<LanguageModel> languages = [
     LanguageModel(
         imageUrl: Images.arabic,
-        languageName: 'عربى',
+        languageName: 'عربي',
         countryCode: 'SA',
         languageCode: 'ar'),
     LanguageModel(
@@ -663,6 +676,16 @@ class AppConstants {
         languageName: 'English',
         countryCode: 'US',
         languageCode: 'en'),
+    LanguageModel(
+        imageUrl: Images.bangla,
+        languageName: 'বাংলা',
+        countryCode: 'BD',
+        languageCode: 'bn'),
+    LanguageModel(
+        imageUrl: Images.spanish,
+        languageName: 'Español',
+        countryCode: 'ES',
+        languageCode: 'es'),
   ];
 
   static List<String> joinDropdown = [

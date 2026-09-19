@@ -1,8 +1,8 @@
-﻿// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, camel_case_types
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, camel_case_types
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/features/add_delegate/controllers/delegate_controller.dart';
 import 'package:sixam_mart/features/wallet_kaidha_subscription/domain/models/NamedFile.dart';
 import 'package:sixam_mart/util/app_colors.dart';
@@ -32,7 +32,7 @@ class _Delegate_FileUploadWidgetState extends State<Delegate_FileUploadWidget> {
               cursorColor: AppColors.bgColor,
               controller: delegate_Controller.imgName_Controller,
               decoration: InputDecoration(
-                hintText: 'اسم الملف',
+                hintText: 'file_name'.tr,
                 hintStyle: font10Grey500W(context, size: size_14(context)),
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
@@ -53,7 +53,7 @@ class _Delegate_FileUploadWidgetState extends State<Delegate_FileUploadWidget> {
                 delegate_Controller.pickFileWithName(context);
               },
               icon: const Icon(Icons.add_photo_alternate),
-              label: const Text('اختر ملفًا وأضفه'),
+              label: Text('select_file'.tr),
             ),
             const SizedBox(height: 20),
             if (delegate_Controller.All_files.isNotEmpty)

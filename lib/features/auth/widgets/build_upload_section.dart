@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:get/get.dart';
 
 Widget buildUploadSection(
   BuildContext context, {
@@ -62,7 +63,7 @@ Widget buildUploadSection(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.camera_alt, color: Theme.of(context).disabledColor, size: 38),
-                    Text('رفع صورة', style: TextStyle(color: Theme.of(context).disabledColor)),
+                    Text('upload_photo'.tr, style: TextStyle(color: Theme.of(context).disabledColor)),
                   ],
                 ),
               ),

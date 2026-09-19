@@ -258,7 +258,7 @@ class FigmaStoreView extends StatelessWidget {
                             children: [
                               _buildDeliveryBadge(
                                 icon: Icons.delivery_dining_rounded,
-                                label: 'توصيل مجاني',
+                                label: 'free_delivery'.tr,
                                 iconColor: const Color(0xFF1B8A3C),
                               ),
                               const SizedBox(width: 6),

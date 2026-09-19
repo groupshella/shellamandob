@@ -86,47 +86,47 @@ class AkhdamniFlowController extends GetxController {
   static const List<AkhdamniPeopleServiceItem> peopleServices = [
     AkhdamniPeopleServiceItem(
       id: 'shop_for_me',
-      label: 'تسوقني',
+      label: 'service_shopping',
       icon: Icons.shopping_bag_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'delivery',
-      label: 'خدمة توصيل',
+      label: 'service_delivery',
       icon: Icons.local_shipping_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'childcare',
-      label: 'اصطحاب الأطفال',
+      label: 'service_kids_pickup',
       icon: Icons.child_care_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'furniture',
-      label: 'نقل العفش',
+      label: 'service_moving',
       icon: Icons.weekend_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'daily_commute',
-      label: 'التنقلات اليومية',
+      label: 'service_daily_commute',
       icon: Icons.commute_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'travel',
-      label: 'سفر',
+      label: 'service_travel',
       icon: Icons.flight_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'documents',
-      label: 'نقل مستندات',
+      label: 'service_document_transfer',
       icon: Icons.description_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'home_services',
-      label: 'خدمات منزلية',
+      label: 'service_home_services',
       icon: Icons.home_outlined,
     ),
     AkhdamniPeopleServiceItem(
       id: 'custom_route',
-      label: 'تحديد مسار',
+      label: 'service_set_route',
       icon: Icons.route_outlined,
     ),
   ];
@@ -134,22 +134,22 @@ class AkhdamniFlowController extends GetxController {
   static const List<AkhdamniCompanyServiceItem> companyServices = [
     AkhdamniCompanyServiceItem(
       id: 'large_flatbed',
-      label: 'سطحة كبيرة',
+      label: 'service_large_tow',
       icon: Icons.local_shipping_outlined,
     ),
     AkhdamniCompanyServiceItem(
       id: 'hydraulic_flatbed',
-      label: 'سطحة هيدروليك',
+      label: 'service_hydraulic_tow',
       icon: Icons.precision_manufacturing_outlined,
     ),
     AkhdamniCompanyServiceItem(
       id: 'standard_flatbed',
-      label: 'سطحة عادية',
+      label: 'service_normal_tow',
       icon: Icons.directions_car_outlined,
     ),
     AkhdamniCompanyServiceItem(
       id: 'electric_winch',
-      label: 'ونش كهربائي',
+      label: 'service_electric_winch',
       icon: Icons.electric_bolt_outlined,
     ),
   ];

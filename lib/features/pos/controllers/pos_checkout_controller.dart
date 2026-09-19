@@ -119,7 +119,7 @@ class PosCheckoutController extends GetxController implements GetxService {
         if (_selectedPaymentMethod == 'wallet') {
           // Wallet payment successful!
           await storage.clearToken();
-          showCustomSnackBar('تم دفع الطلب بنجاح من رصيد المحفظة', isError: false);
+          showCustomSnackBar('order_paid_success_from_wallet'.tr, isError: false);
           
           // Refresh user wallet balance
           if (Get.isRegistered<ProfileController>()) {
@@ -149,7 +149,7 @@ class PosCheckoutController extends GetxController implements GetxService {
         showCustomSnackBar(msg);
       }
     } catch (e) {
-      showCustomSnackBar('حدث خطأ غير متوقع أثناء معالجة الدفع');
+      showCustomSnackBar('unexpected_payment_error'.tr);
       debugPrint('[POS_PAYMENT_ERROR] $e');
     } finally {
       _isPaying = false;

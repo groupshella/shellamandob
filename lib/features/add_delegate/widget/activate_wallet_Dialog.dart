@@ -48,7 +48,7 @@ Widget buildWalletDialogContent(BuildContext context) {
             width: 200,
             padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
             child: CustomButton(
-              buttonText: 'تم',
+              buttonText: 'done'.tr,
               onPressed: () {
                 Get.offAllNamed(RouteHelper.getMainRoute('menu'));
               },

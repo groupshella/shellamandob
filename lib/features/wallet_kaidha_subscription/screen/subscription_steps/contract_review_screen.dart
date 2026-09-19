@@ -1,4 +1,4 @@
-﻿// ignore_for_file: prefer_const_literals_to_create_immutables, non_constant_identifier_names, camel_case_types
+// ignore_for_file: prefer_const_literals_to_create_immutables, non_constant_identifier_names, camel_case_types
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -84,7 +84,7 @@ class _Contract_ReviewScreenState extends State<Contract_ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Center(child: Text('عرض العقد'))),
+      appBar: AppBar(title: Center(child: Text('view_contract'.tr))),
       body: _buildBody(),
       floatingActionButton: _buildPageControls(),
     );
@@ -108,7 +108,7 @@ class _Contract_ReviewScreenState extends State<Contract_ReviewScreen> {
                   const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _loadContractPdf,
-                  child: const Text('إعادة المحاولة'),
+                  child: Text('retry_label'.tr),
                 ),
               ],
             ),
@@ -118,7 +118,7 @@ class _Contract_ReviewScreenState extends State<Contract_ReviewScreen> {
     }
 
     if (_pdfModel == null) {
-      return const Center(child: Text('لا يوجد عقد متاح'));
+      return Center(child: Text('no_contract_available'.tr));
     }
 
     return SfPdfViewer.file(

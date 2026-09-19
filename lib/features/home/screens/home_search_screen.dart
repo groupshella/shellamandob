@@ -887,7 +887,7 @@ class _HomeSearchScreenState extends State<HomeSearchScreen> {
                   suffixIcon: _controller.text.isEmpty
                       ? IconButton(
                           onPressed: () => Get.toNamed(RouteHelper.getQr_screen()),
-                          tooltip: 'مسح رمز QR',
+                          tooltip: 'scan_qr_code'.tr,
                           icon: const Icon(
                             Icons.qr_code_scanner_rounded,
                             size: 22,

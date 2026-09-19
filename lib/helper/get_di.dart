@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
+import 'package:sixam_mart/features/employee/services/marketer_shift_service.dart';
 import 'package:sixam_mart/features/refer_and_earn/controllers/referral_controller.dart';
 import 'package:sixam_mart/features/support/controllers/support_controller.dart';
 import 'package:sixam_mart/features/support/domain/repositories/support_repository.dart';
@@ -807,6 +808,7 @@ Future<Map<String, Map<String, String>>> init() async {
   // Update Controller
   Get.lazyPut(() => ReferralController(apiClient: Get.find()));
   Get.lazyPut(() => MarketerController(apiClient: Get.find()));
+  Get.lazyPut(() => MarketerShiftService(apiClient: Get.find()));
   Get.lazyPut(() => UpdateController());
 
   // ======================================================================================================================

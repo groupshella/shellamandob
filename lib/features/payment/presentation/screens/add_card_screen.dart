@@ -22,7 +22,7 @@ class AddCardScreen extends StatelessWidget {
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
         iconTheme: IconThemeData(color: s.ink),
-        title: Text('إضافة بطاقة جديدة', style: s.t(18, weight: FontWeight.w800)),
+        title: Text('add_new_card'.tr, style: s.t(18, weight: FontWeight.w800)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -42,7 +42,7 @@ class AddCardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14)),
             ),
             onPressed: onConfirm ?? () => Get.back<void>(),
-            child: Text('تأكيد',
+            child: Text('confirm'.tr,
                 style: s.t(16, weight: FontWeight.w800, color: Colors.white)),
           ),
         ),

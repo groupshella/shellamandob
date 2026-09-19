@@ -102,7 +102,7 @@ class _SearchFilterState extends State<SearchFilter> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SectionTitle(title: 'البحث حسب'),
+                        SectionTitle(title: 'search_by'.tr),
 
                         const SizedBox(height: 10),
                         ChoiceChipsRow(
@@ -123,7 +123,7 @@ class _SearchFilterState extends State<SearchFilter> {
 
                         //  Stores  ========================================================================
 
-                        const Text('المتاجر',
+                        Text('stores_label'.tr,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),
 
@@ -148,7 +148,7 @@ class _SearchFilterState extends State<SearchFilter> {
 
                         const SizedBox(height: 20),
 
-                        const SectionTitle(title: 'اسم المنتج'),
+                        SectionTitle(title: 'product_name'.tr),
 
                         const SizedBox(height: 10),
 
@@ -157,7 +157,7 @@ class _SearchFilterState extends State<SearchFilter> {
 
                         const SizedBox(height: 10),
 
-                        const SectionTitle(title: 'نطاق السعر'),
+                        SectionTitle(title: 'price_range'.tr),
 
                         ChoiceChipsRow(
                           options: priceRanges
@@ -188,7 +188,7 @@ class _SearchFilterState extends State<SearchFilter> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10)),
                                 ),
-                                child: Text('إعادة تعيين',
+                                child: Text('reset_label'.tr,
                                     style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black)),
                               ),
                             ),
@@ -200,8 +200,8 @@ class _SearchFilterState extends State<SearchFilter> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10)),
                                 ),
-                                child: const Text('تطبيق',
-                                    style: TextStyle(color: Colors.white)),
+                                child: Text('apply_label'.tr,
+                                    style: const TextStyle(color: Colors.white)),
                                 onPressed: () async {
                                   //
 

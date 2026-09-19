@@ -1,0 +1,2276 @@
+{
+  "firebase_options.dart": {
+    "files_scanned": 1,
+    "ui_issues": []
+  },
+  "main.dart": {
+    "files_scanned": 1,
+    "ui_issues": []
+  },
+  "api": {
+    "files_scanned": 3,
+    "ui_issues": []
+  },
+  "common": {
+    "files_scanned": 151,
+    "ui_issues": [
+      {
+        "file": "common/cache/cache_debug_screen.dart",
+        "line": 53,
+        "kind": "Text",
+        "value": "Cache Debug",
+        "is_arabic": false,
+        "context": "title: const Text('Cache Debug'),"
+      },
+      {
+        "file": "common/cache/cache_debug_screen.dart",
+        "line": 64,
+        "kind": "Text",
+        "value": "No cache info available",
+        "is_arabic": false,
+        "context": "? const Center(child: Text('No cache info available'))"
+      },
+      {
+        "file": "common/cache/cache_debug_screen.dart",
+        "line": 84,
+        "kind": "Text",
+        "value": "Has Cache: ${cacheInfo!['hasCache']}",
+        "is_arabic": false,
+        "context": "Text('Has Cache: ${cacheInfo!['hasCache']}'),"
+      },
+      {
+        "file": "common/cache/cache_debug_screen.dart",
+        "line": 87,
+        "kind": "Text",
+        "value": "Is Valid: ${cacheInfo!['isValid']}",
+        "is_arabic": false,
+        "context": "Text('Is Valid: ${cacheInfo!['isValid']}'),"
+      },
+      {
+        "file": "common/cache/cache_debug_screen.dart",
+        "line": 136,
+        "kind": "Text",
+        "value": "Clear Cache & Refresh",
+        "is_arabic": false,
+        "context": "child: const Text('Clear Cache & Refresh'),"
+      },
+      {
+        "file": "common/cache/cache_debug_screen.dart",
+        "line": 141,
+        "kind": "Text",
+        "value": "Refresh Info",
+        "is_arabic": false,
+        "context": "child: const Text('Refresh Info'),"
+      },
+      {
+        "file": "common/widgets/debug_popup_panel.dart",
+        "line": 325,
+        "kind": "title/subtitle Prop",
+        "value": "Payment Successful",
+        "is_arabic": false,
+        "context": "title: 'Payment Successful',"
+      },
+      {
+        "file": "common/widgets/debug_popup_panel.dart",
+        "line": 425,
+        "kind": "Text",
+        "value": "Close",
+        "is_arabic": false,
+        "context": "child: const Text('Close'),"
+      },
+      {
+        "file": "common/widgets/debug_popup_panel.dart",
+        "line": 438,
+        "kind": "title/subtitle Prop",
+        "value": "Order Status Update",
+        "is_arabic": false,
+        "context": "title: 'Order Status Update',"
+      },
+      {
+        "file": "common/widgets/debug_popup_panel.dart",
+        "line": 448,
+        "kind": "title/subtitle Prop",
+        "value": "New Message",
+        "is_arabic": false,
+        "context": "title: 'New Message',"
+      },
+      {
+        "file": "common/widgets/debug_popup_panel.dart",
+        "line": 457,
+        "kind": "title/subtitle Prop",
+        "value": "Payment Successful",
+        "is_arabic": false,
+        "context": "title: 'Payment Successful',"
+      },
+      {
+        "file": "common/widgets/debug_popup_panel.dart",
+        "line": 466,
+        "kind": "title/subtitle Prop",
+        "value": "Delivery Update",
+        "is_arabic": false,
+        "context": "title: 'Delivery Update',"
+      },
+      {
+        "file": "common/widgets/rating_bar.dart",
+        "line": 42,
+        "kind": "Text",
+        "value": "($ratingCount)",
+        "is_arabic": false,
+        "context": "child: Text('($ratingCount)', style: robotoRegular.copyWith(fontSize: size*0.8, color: Theme.of(context).disabledColor), textDirection: TextDirection.ltr),"
+      },
+      {
+        "file": "common/widgets/card_design/item_card.dart",
+        "line": 173,
+        "kind": "Text",
+        "value": "(${item.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${item.ratingCount})',"
+      },
+      {
+        "file": "common/widgets/card_design/item_card.dart",
+        "line": 190,
+        "kind": "Text",
+        "value": "(${item.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${item.ratingCount})',"
+      },
+      {
+        "file": "common/widgets/card_design/store_card_with_distance.dart",
+        "line": 616,
+        "kind": "Text",
+        "value": "${store.avgRating}",
+        "is_arabic": false,
+        "context": "Text('${store.avgRating}',"
+      },
+      {
+        "file": "common/widgets/card_design/store_card_with_distance.dart",
+        "line": 623,
+        "kind": "Text",
+        "value": "(${store.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${store.ratingCount})',"
+      },
+      {
+        "file": "common/widgets/card_design/store_card_with_distance.dart",
+        "line": 631,
+        "kind": "Text",
+        "value": "${store.itemCount} ${'items'.tr}",
+        "is_arabic": false,
+        "context": "Text('${store.itemCount} ${'items'.tr}',"
+      },
+      {
+        "file": "common/widgets/card_design/visit_again_card.dart",
+        "line": 62,
+        "kind": "Text",
+        "value": "(${store.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${store.ratingCount})', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "common/widgets/dialog/dialog.dart",
+        "line": 44,
+        "kind": "Custom_Text",
+        "value": "اضف رمز القسيمة الجديدة",
+        "is_arabic": true,
+        "context": "Custom_Text(context, text: 'اضف رمز القسيمة الجديدة', style: font14Black400W(context)),"
+      },
+      {
+        "file": "common/widgets/dialog/dialog.dart",
+        "line": 46,
+        "kind": "Custom_Text",
+        "value": "رمز القسمية",
+        "is_arabic": true,
+        "context": "Custom_Text(context, text: 'رمز القسمية', style: font14Black400W(context)),"
+      },
+      {
+        "file": "common/widgets/dialog/dialog.dart",
+        "line": 49,
+        "kind": "Input/Button Prop",
+        "value": "رمز القسيمة",
+        "is_arabic": true,
+        "context": "labelText: 'رمز القسيمة',"
+      },
+      {
+        "file": "common/widgets/dialog/dialog.dart",
+        "line": 57,
+        "kind": "title/subtitle Prop",
+        "value": "إضافة",
+        "is_arabic": true,
+        "context": "title: 'إضافة', onPressed: () {}, buttoncolor: AppColors.greenColor, h: 40, style: font13White400W(context)),"
+      },
+      {
+        "file": "common/widgets/dialog/dialog.dart",
+        "line": 64,
+        "kind": "title/subtitle Prop",
+        "value": "إلغاء",
+        "is_arabic": true,
+        "context": "title: 'إلغاء', onPressed: () {}, buttoncolor: AppColors.wtColor, h: 40, style: font13Black400W(context)),"
+      }
+    ]
+  },
+  "core": {
+    "files_scanned": 29,
+    "ui_issues": []
+  },
+  "address": {
+    "files_scanned": 15,
+    "ui_issues": []
+  },
+  "add_delegate": {
+    "files_scanned": 10,
+    "ui_issues": [
+      {
+        "file": "features/add_delegate/controllers/delegate_controller.dart",
+        "line": 30,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى إدخال الاسم",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى إدخال الاسم');"
+      },
+      {
+        "file": "features/add_delegate/controllers/delegate_controller.dart",
+        "line": 68,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى تعبئة جميع الحقول",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى تعبئة جميع الحقول');"
+      },
+      {
+        "file": "features/add_delegate/controllers/delegate_controller.dart",
+        "line": 73,
+        "kind": "showCustomSnackBar",
+        "value": "لم يتم حفظ أي مستند",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لم يتم حفظ أي مستند');"
+      },
+      {
+        "file": "features/add_delegate/domain/reposotories/delegate_repository.dart",
+        "line": 103,
+        "kind": "showCustomSnackBar",
+        "value": "تعذر قراءة الملف المرفق. اختر ملفًا آخر.",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تعذر قراءة الملف المرفق. اختر ملفًا آخر.');"
+      },
+      {
+        "file": "features/add_delegate/domain/reposotories/delegate_repository.dart",
+        "line": 109,
+        "kind": "showCustomSnackBar",
+        "value": "الرجاء إرفاق صورة الهوية",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('الرجاء إرفاق صورة الهوية');"
+      },
+      {
+        "file": "features/add_delegate/domain/reposotories/delegate_repository.dart",
+        "line": 130,
+        "kind": "showCustomSnackBar",
+        "value": "تم الإرسال بنجاح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم الإرسال بنجاح', isError: false);"
+      },
+      {
+        "file": "features/add_delegate/domain/reposotories/delegate_repository.dart",
+        "line": 138,
+        "kind": "showCustomSnackBar",
+        "value": "الخدمة غير متاحة حالياً: مسار إرسال المندوب غير موجود على الخادم (404).",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('الخدمة غير متاحة حالياً: مسار إرسال المندوب غير موجود على الخادم (404).');"
+      },
+      {
+        "file": "features/add_delegate/domain/reposotories/delegate_repository.dart",
+        "line": 149,
+        "kind": "showCustomSnackBar",
+        "value": "فشل في الإرسال، حاول مرة أخرى في وقت لاحق",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل في الإرسال، حاول مرة أخرى في وقت لاحق');"
+      },
+      {
+        "file": "features/add_delegate/domain/reposotories/delegate_repository.dart",
+        "line": 153,
+        "kind": "showCustomSnackBar",
+        "value": "فشل في الإرسال، حاول مرة أخرى في وقت لاحق",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل في الإرسال، حاول مرة أخرى في وقت لاحق');"
+      },
+      {
+        "file": "features/add_delegate/screens/add_delegate_screen.dart",
+        "line": 56,
+        "kind": "title/subtitle Prop",
+        "value": "المندوب",
+        "is_arabic": true,
+        "context": "title: 'المندوب',"
+      },
+      {
+        "file": "features/add_delegate/screens/add_delegate_screen.dart",
+        "line": 74,
+        "kind": "Text",
+        "value": "معلومات المندوب",
+        "is_arabic": true,
+        "context": "Text('معلومات المندوب',"
+      },
+      {
+        "file": "features/add_delegate/screens/add_delegate_screen.dart",
+        "line": 103,
+        "kind": "Input/Button Prop",
+        "value": "05xxxxxxxx",
+        "is_arabic": false,
+        "context": "hintText: '05xxxxxxxx',"
+      },
+      {
+        "file": "features/add_delegate/screens/add_delegate_screen.dart",
+        "line": 143,
+        "kind": "Input/Button Prop",
+        "value": "إرسال",
+        "is_arabic": true,
+        "context": "buttonText: 'إرسال',"
+      },
+      {
+        "file": "features/add_delegate/widget/activate_wallet_Dialog.dart",
+        "line": 51,
+        "kind": "Input/Button Prop",
+        "value": "تم",
+        "is_arabic": true,
+        "context": "buttonText: 'تم',"
+      },
+      {
+        "file": "features/add_delegate/widget/file_upload_widget.dart",
+        "line": 35,
+        "kind": "Input/Button Prop",
+        "value": "اسم الملف",
+        "is_arabic": true,
+        "context": "hintText: 'اسم الملف',"
+      },
+      {
+        "file": "features/add_delegate/widget/success_dialog.dart",
+        "line": 22,
+        "kind": "Custom_Text",
+        "value": "طلبك قيد المراجعة بمحفظة قيدها",
+        "is_arabic": true,
+        "context": "Custom_Text(context, text: 'طلبك قيد المراجعة بمحفظة قيدها', style: font10Black600W(context, size: size_14(context))),"
+      },
+      {
+        "file": "features/add_delegate/widget/success_dialog.dart",
+        "line": 33,
+        "kind": "title/subtitle Prop",
+        "value": "تم",
+        "is_arabic": true,
+        "context": "title: 'تم',"
+      }
+    ]
+  },
+  "auth": {
+    "files_scanned": 61,
+    "ui_issues": [
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 26,
+        "kind": "showCustomSnackBar",
+        "value": "الرجاء تسجيل الدخول أولاً",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('الرجاء تسجيل الدخول أولاً');"
+      },
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 113,
+        "kind": "showCustomSnackBar",
+        "value": "✅ تم إرسال الطلب بنجاح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('✅ تم إرسال الطلب بنجاح', isError: false);"
+      },
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 119,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ داخلي من الخادم، الرجاء المحاولة لاحقًا",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('حدث خطأ داخلي من الخادم، الرجاء المحاولة لاحقًا');"
+      },
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 123,
+        "kind": "showCustomSnackBar",
+        "value": "رقم الهاتف او البريد الاكتروني تم الحفظ مسبقا",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('  رقم الهاتف او البريد الاكتروني تم الحفظ مسبقا ');"
+      },
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 155,
+        "kind": "showCustomSnackBar",
+        "value": "قم بمراجعه البيانات",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('قم بمراجعه البيانات ');"
+      },
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 166,
+        "kind": "showCustomSnackBar",
+        "value": "قم بمراجعه البيانات",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('قم بمراجعه البيانات ');"
+      },
+      {
+        "file": "features/auth/domain/reposotories/store_registration_repository.dart",
+        "line": 177,
+        "kind": "showCustomSnackBar",
+        "value": "❌ حدث خطأ أثناء الاتصال بالخادم",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('❌ حدث خطأ أثناء الاتصال بالخادم');"
+      },
+      {
+        "file": "features/auth/screens/delivery_man_registration_screen.dart",
+        "line": 185,
+        "kind": "showCustomSnackBar",
+        "value": "تعذر التحقق من حالة التسجيل، حاول مرة أخرى",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تعذر التحقق من حالة التسجيل، حاول مرة أخرى');"
+      },
+      {
+        "file": "features/auth/screens/delivery_man_registration_screen.dart",
+        "line": 2183,
+        "kind": "showCustomSnackBar",
+        "value": "يرجي تحميل صوره الرخصه القيادة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجي تحميل صوره الرخصه القيادة');"
+      },
+      {
+        "file": "features/auth/screens/delivery_man_registration_screen.dart",
+        "line": 2187,
+        "kind": "showCustomSnackBar",
+        "value": "يرجي تحميل صوره الرخصه السائق",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجي تحميل صوره الرخصه السائق');"
+      },
+      {
+        "file": "features/auth/screens/welcome_screen.dart",
+        "line": 102,
+        "kind": "Input/Button Prop",
+        "value": "طلب الانضمام كمسوق قسائم جديد",
+        "is_arabic": true,
+        "context": "buttonText: 'طلب الانضمام كمسوق قسائم جديد',"
+      },
+      {
+        "file": "features/auth/widgets/Map_searchInRiyadh_Zone.dart",
+        "line": 495,
+        "kind": "Input/Button Prop",
+        "value": "بحث",
+        "is_arabic": true,
+        "context": "buttonText: 'بحث',"
+      },
+      {
+        "file": "features/auth/widgets/module_view_widget.dart",
+        "line": 30,
+        "kind": "Text",
+        "value": "${modules[index].moduleName}",
+        "is_arabic": false,
+        "context": "child: Text('${modules[index].moduleName}'),"
+      },
+      {
+        "file": "features/auth/widgets/social_login_widget.dart",
+        "line": 66,
+        "kind": "Text",
+        "value": "${'welcome_to'.tr} ${AppConstants.appName}",
+        "is_arabic": false,
+        "context": "? Text('${'welcome_to'.tr} ${AppConstants.appName}',"
+      },
+      {
+        "file": "features/auth/widgets/sign_in/manual_login_widget.dart",
+        "line": 111,
+        "kind": "Text",
+        "value": "${'forgot_password'.tr}?",
+        "is_arabic": false,
+        "context": "child: Text('${'forgot_password'.tr}?', style: robotoRegular.copyWith(color: Theme.of(context).primaryColor)),"
+      },
+      {
+        "file": "features/auth/widgets/sign_in/manual_login_widget.dart",
+        "line": 270,
+        "kind": "Text",
+        "value": "${'forgot_password'.tr}?",
+        "is_arabic": false,
+        "context": "child: Text('${'forgot_password'.tr}?',"
+      },
+      {
+        "file": "features/auth/widgets/sign_in/sign_in_view.dart",
+        "line": 359,
+        "kind": "showCustomSnackBar",
+        "value": "تأكد من الرقم او كلمة المرور",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تأكد من الرقم او كلمة المرور');"
+      }
+    ]
+  },
+  "banner": {
+    "files_scanned": 8,
+    "ui_issues": []
+  },
+  "brands": {
+    "files_scanned": 9,
+    "ui_issues": []
+  },
+  "business": {
+    "files_scanned": 17,
+    "ui_issues": [
+      {
+        "file": "features/business/screens/subscription_payment_screen.dart",
+        "line": 134,
+        "kind": "Text",
+        "value": "${'pay_via_online'.tr}",
+        "is_arabic": false,
+        "context": "Text('${'pay_via_online'.tr} ',"
+      },
+      {
+        "file": "features/business/widgets/package_card_widget.dart",
+        "line": 77,
+        "kind": "title/subtitle Prop",
+        "value": "${isRental ?",
+        "is_arabic": false,
+        "context": "title: '${isRental ? 'max_trip'.tr : 'max_order'.tr} (${packages.maxOrder})', isSelect: canSelect ? true : false),"
+      },
+      {
+        "file": "features/business/widgets/package_card_widget.dart",
+        "line": 79,
+        "kind": "title/subtitle Prop",
+        "value": "${isRental ?",
+        "is_arabic": false,
+        "context": "title: '${isRental ? 'max_vehicle'.tr : 'max_product'.tr} (${packages.maxProduct})',"
+      }
+    ]
+  },
+  "call": {
+    "files_scanned": 6,
+    "ui_issues": []
+  },
+  "campaign": {
+    "files_scanned": 10,
+    "ui_issues": []
+  },
+  "cart": {
+    "files_scanned": 17,
+    "ui_issues": [
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 14,
+        "kind": "title/subtitle Prop",
+        "value": "Cart Mock",
+        "is_arabic": false,
+        "context": "title: 'Cart Mock',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 117,
+        "kind": "title/subtitle Prop",
+        "value": "نسكافيه 30 ظرف",
+        "is_arabic": true,
+        "context": "title: 'نسكافيه 30 ظرف',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 118,
+        "kind": "title/subtitle Prop",
+        "value": "عرض 30 ظرف 5+ هدية",
+        "is_arabic": true,
+        "context": "subtitle: 'عرض 30 ظرف 5+ هدية',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 126,
+        "kind": "title/subtitle Prop",
+        "value": "شاي ليبتون",
+        "is_arabic": true,
+        "context": "title: 'شاي ليبتون',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 127,
+        "kind": "title/subtitle Prop",
+        "value": "عرض 35 ظرف 5+ هدية",
+        "is_arabic": true,
+        "context": "subtitle: 'عرض 35 ظرف 5+ هدية',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 135,
+        "kind": "title/subtitle Prop",
+        "value": "شاي الوزة",
+        "is_arabic": true,
+        "context": "title: 'شاي الوزة',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 136,
+        "kind": "title/subtitle Prop",
+        "value": "50 غرام مجانًا",
+        "is_arabic": true,
+        "context": "subtitle: '50 غرام مجانًا',"
+      },
+      {
+        "file": "features/cart/screens/touese.dart",
+        "line": 467,
+        "kind": "Input/Button Prop",
+        "value": "برومو كود",
+        "is_arabic": true,
+        "context": "hintText: 'برومو كود',"
+      },
+      {
+        "file": "features/cart/widgets/delivery_option_button_widget.dart",
+        "line": 56,
+        "kind": "showCustomSnackBar",
+        "value": "هذه الخدمة ستتوفر قريباً",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('هذه الخدمة ستتوفر قريباً');"
+      }
+    ]
+  },
+  "category": {
+    "files_scanned": 17,
+    "ui_issues": [
+      {
+        "file": "features/category/widgets/grocery_category/grocery_product_grid.dart",
+        "line": 83,
+        "kind": "Text",
+        "value": "-$pct%",
+        "is_arabic": false,
+        "context": "child: Text('-$pct%',"
+      }
+    ]
+  },
+  "chat": {
+    "files_scanned": 23,
+    "ui_issues": [
+      {
+        "file": "features/chat/controllers/chat_controller.dart",
+        "line": 109,
+        "kind": "showCustomSnackBar",
+        "value": "تمت أرشفة المحادثة بنجاح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تمت أرشفة المحادثة بنجاح', isError: false);"
+      },
+      {
+        "file": "features/chat/controllers/chat_controller.dart",
+        "line": 111,
+        "kind": "showCustomSnackBar",
+        "value": "فشل في أرشفة المحادثة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل في أرشفة المحادثة', isError: true);"
+      },
+      {
+        "file": "features/chat/widgets/message_bubble_widget.dart",
+        "line": 197,
+        "kind": "Text",
+        "value": "${'order_id'.tr}",
+        "is_arabic": false,
+        "context": "Text('${'order_id'.tr} ', style: robotoMedium),"
+      },
+      {
+        "file": "features/chat/widgets/message_bubble_widget.dart",
+        "line": 198,
+        "kind": "Text",
+        "value": "#${order.id}",
+        "is_arabic": false,
+        "context": "Text('#${order.id}', style: robotoBold),"
+      },
+      {
+        "file": "features/chat/widgets/web_conversation_list_view_widget.dart",
+        "line": 143,
+        "kind": "Text",
+        "value": "${type?.tr ?? ''} ${'deleted'.tr}",
+        "is_arabic": false,
+        "context": ") : Text('${type?.tr ?? ''} ${'deleted'.tr}', style: robotoMedium),"
+      }
+    ]
+  },
+  "checkout": {
+    "files_scanned": 47,
+    "ui_issues": [
+      {
+        "file": "features/checkout/controllers/checkout_controller.dart",
+        "line": 1643,
+        "kind": "showCustomSnackBar",
+        "value": "فشلت عملية الدفع: ${_mfReadableErrorMessage(error)}",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشلت عملية الدفع: ${_mfReadableErrorMessage(error)}');"
+      },
+      {
+        "file": "features/checkout/controllers/checkout_controller.dart",
+        "line": 1811,
+        "kind": "showCustomSnackBar",
+        "value": "فشلت عملية الدفع: ${_mfReadableErrorMessage(error)}",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشلت عملية الدفع: ${_mfReadableErrorMessage(error)}');"
+      },
+      {
+        "file": "features/checkout/controllers/checkout_controller.dart",
+        "line": 1845,
+        "kind": "showCustomSnackBar",
+        "value": "خطأ في عرض نافذة الدفع: ${error.toString()}",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('خطأ في عرض نافذة الدفع: ${error.toString()}');"
+      },
+      {
+        "file": "features/checkout/controllers/checkout_controller.dart",
+        "line": 2983,
+        "kind": "showCustomSnackBar",
+        "value": "Qidha wallet is not available right now.",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Qidha wallet is not available right now.');"
+      },
+      {
+        "file": "features/checkout/controllers/checkout_controller.dart",
+        "line": 3066,
+        "kind": "showCustomSnackBar",
+        "value": "Qidha payment error. Please try again later.",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Qidha payment error. Please try again later.');"
+      },
+      {
+        "file": "features/checkout/controllers/checkout_controller.dart",
+        "line": 3130,
+        "kind": "showCustomSnackBar",
+        "value": "Wallet payment error. Please try again later.",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Wallet payment error. Please try again later.');"
+      },
+      {
+        "file": "features/checkout/screens/order_successful_screen.dart",
+        "line": 330,
+        "kind": "showCustomSnackBar",
+        "value": "تم نسخ رقم الطلب",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم نسخ رقم الطلب', isError: false);"
+      },
+      {
+        "file": "features/checkout/screens/order_successful_screen.dart",
+        "line": 562,
+        "kind": "Input/Button Prop",
+        "value": "العودة للرئيسية",
+        "is_arabic": true,
+        "context": "buttonText: 'العودة للرئيسية',"
+      },
+      {
+        "file": "features/checkout/widgets/coupon_bottom_sheet.dart",
+        "line": 217,
+        "kind": "Text",
+        "value": "صالح حتى: $expiry",
+        "is_arabic": true,
+        "context": "Text('صالح حتى: $expiry',"
+      },
+      {
+        "file": "features/checkout/widgets/guest_delivery_address.dart",
+        "line": 165,
+        "kind": "Text",
+        "value": "$key:",
+        "is_arabic": false,
+        "context": "Text('$key: ', style: robotoRegular.copyWith(color: Theme.of(Get.context!).disabledColor)),"
+      },
+      {
+        "file": "features/checkout/widgets/offline_success_dialog.dart",
+        "line": 40,
+        "kind": "TextSpan",
+        "value": "#$orderId",
+        "is_arabic": false,
+        "context": "TextSpan(text: ' #$orderId ', style: robotoBold.copyWith(color: Theme.of(context).primaryColor)),"
+      },
+      {
+        "file": "features/checkout/widgets/offline_success_dialog.dart",
+        "line": 64,
+        "kind": "Text",
+        "value": "${data.userInput.toString().replaceAll('_",
+        "is_arabic": false,
+        "context": "Text('${data.userInput.toString().replaceAll('_', ' ')}: ', style: robotoMedium),"
+      }
+    ]
+  },
+  "dashboard": {
+    "files_scanned": 7,
+    "ui_issues": [
+      {
+        "file": "features/dashboard/screens/dashboard_screen.dart",
+        "line": 188,
+        "kind": "showCustomSnackBar",
+        "value": "تم إخفاء شريط الطلبات مؤقتًا",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم إخفاء شريط الطلبات مؤقتًا', isError: false);"
+      },
+      {
+        "file": "features/dashboard/widgets/address_bottom_sheet_widget.dart",
+        "line": 70,
+        "kind": "Text",
+        "value": "${'hey_welcome_back'.tr}\\n${'which_location_do_you_want_to_select'.tr}",
+        "is_arabic": false,
+        "context": "Text('${'hey_welcome_back'.tr}\\n${'which_location_do_you_want_to_select'.tr}',"
+      },
+      {
+        "file": "features/dashboard/widgets/store_registration_success_bottom_sheet.dart",
+        "line": 54,
+        "kind": "Text",
+        "value": "${'welcome_to'.tr} ${AppConstants.appName}!",
+        "is_arabic": false,
+        "context": "Text('${'welcome_to'.tr} ${AppConstants.appName}!', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),"
+      }
+    ]
+  },
+  "discount": {
+    "files_scanned": 5,
+    "ui_issues": []
+  },
+  "employee": {
+    "files_scanned": 30,
+    "ui_issues": [
+      {
+        "file": "features/employee/alerts/controllers/anti_fraud_alerts_controller.dart",
+        "line": 149,
+        "kind": "Text",
+        "value": "resume_field_work'.tr, style: const TextStyle(fontFamily: 'Tajawal",
+        "is_arabic": false,
+        "context": "child: Text('resume_field_work'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.bold)),"
+      },
+      {
+        "file": "features/employee/models/employee_shift_model.dart",
+        "line": 39,
+        "kind": "title/subtitle Prop",
+        "value": "تأخير في تسليم تقرير الزيارة",
+        "is_arabic": true,
+        "context": "title: 'تأخير في تسليم تقرير الزيارة',"
+      },
+      {
+        "file": "features/employee/models/employee_shift_model.dart",
+        "line": 44,
+        "kind": "title/subtitle Prop",
+        "value": "مغادرة منطقة العمل بدون إذن",
+        "is_arabic": true,
+        "context": "title: 'مغادرة منطقة العمل بدون إذن',"
+      },
+      {
+        "file": "features/employee/visits/screens/follow_up_task_screen.dart",
+        "line": 264,
+        "kind": "Input/Button Prop",
+        "value": "مثال: إحضار عرض تسعير مخصص، مقابلة المالك المباشر...",
+        "is_arabic": true,
+        "context": "hintText: 'مثال: إحضار عرض تسعير مخصص، مقابلة المالك المباشر...',"
+      },
+      {
+        "file": "features/employee/visits/screens/store_visit_detail_screen.dart",
+        "line": 767,
+        "kind": "Text",
+        "value": "documented_badge'.tr, style: const TextStyle(fontFamily: 'Tajawal",
+        "is_arabic": false,
+        "context": "Text('documented_badge'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontSize: 10, color: Colors.white)),"
+      }
+    ]
+  },
+  "favourite": {
+    "files_scanned": 8,
+    "ui_issues": [
+      {
+        "file": "features/favourite/widgets/fav_order_view_widget.dart",
+        "line": 354,
+        "kind": "Text",
+        "value": "${'order_date'.tr} ${_time()}",
+        "is_arabic": false,
+        "context": "Text('${'order_date'.tr} ${_time()}', style: base),"
+      },
+      {
+        "file": "features/favourite/widgets/fav_order_view_widget.dart",
+        "line": 360,
+        "kind": "Text",
+        "value": "${'total_cost'.tr}",
+        "is_arabic": false,
+        "context": "Text('${'total_cost'.tr} ', style: base),"
+      }
+    ]
+  },
+  "flash_sale": {
+    "files_scanned": 12,
+    "ui_issues": [
+      {
+        "file": "features/flash_sale/widgets/flash_product_card_widget.dart",
+        "line": 155,
+        "kind": "Text",
+        "value": "${'available'.tr} :",
+        "is_arabic": false,
+        "context": "Text('${'available'.tr} : ', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/flash_sale/widgets/flash_product_card_widget.dart",
+        "line": 156,
+        "kind": "Text",
+        "value": "$remaining ${'item'.tr}",
+        "is_arabic": false,
+        "context": "Text('$remaining ${'item'.tr}', style: robotoRegular.copyWith(color: Theme.of(context).primaryColor)),"
+      },
+      {
+        "file": "features/flash_sale/widgets/flash_sale_view_widget.dart",
+        "line": 79,
+        "kind": "Text",
+        "value": "${item!.name}",
+        "is_arabic": false,
+        "context": "child: Text('${item!.name}',"
+      }
+    ]
+  },
+  "home": {
+    "files_scanned": 183,
+    "ui_issues": [
+      {
+        "file": "features/home/screens/market_store_screen_options.dart",
+        "line": 489,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى اختيار الخيارات المطلوبة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى اختيار الخيارات المطلوبة', isError: true);"
+      },
+      {
+        "file": "features/home/screens/multi_module/widgets/wallet_card_view.dart",
+        "line": 128,
+        "kind": "Text",
+        "value": "من ${PriceConverter.convertPrice(creditLimit)}",
+        "is_arabic": true,
+        "context": "Text('من ${PriceConverter.convertPrice(creditLimit)}', style: robotoRegular.copyWith(color: Colors.white70)),"
+      },
+      {
+        "file": "features/home/widgets/highlight_widget.dart",
+        "line": 169,
+        "kind": "Text",
+        "value": "${advertisement.averageRating?.toStringAsFixed(1)}",
+        "is_arabic": false,
+        "context": "? Text('${advertisement.averageRating?.toStringAsFixed(1)}',"
+      },
+      {
+        "file": "features/home/widgets/highlight_widget.dart",
+        "line": 174,
+        "kind": "Text",
+        "value": "(${advertisement.reviewsCommentsCount})",
+        "is_arabic": false,
+        "context": "? Text('(${advertisement.reviewsCommentsCount})',"
+      },
+      {
+        "file": "features/home/widgets/home_current_offers_section.dart",
+        "line": 747,
+        "kind": "Text",
+        "value": "cancel'.tr, style: const TextStyle(fontFamily: 'Tajawal",
+        "is_arabic": false,
+        "context": "Text('cancel'.tr, style: const TextStyle(fontFamily: 'Tajawal')),"
+      },
+      {
+        "file": "features/home/widgets/refer_bottom_sheet_widget.dart",
+        "line": 62,
+        "kind": "Text",
+        "value": "${'welcome_to'.tr} ${AppConstants.appName}!",
+        "is_arabic": false,
+        "context": "Text('${'welcome_to'.tr} ${AppConstants.appName}!', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),"
+      },
+      {
+        "file": "features/home/widgets/components/item_that_you_love_card_widget.dart",
+        "line": 128,
+        "kind": "Text",
+        "value": "(${item.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${item.ratingCount})',"
+      },
+      {
+        "file": "features/home/widgets/components/popular_store_card_widget.dart",
+        "line": 134,
+        "kind": "Text",
+        "value": "(${store.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${store.ratingCount})',"
+      },
+      {
+        "file": "features/home/widgets/components/review_item_card_widget.dart",
+        "line": 146,
+        "kind": "Text",
+        "value": "(${item!.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${item!.ratingCount})',"
+      },
+      {
+        "file": "features/home/widgets/views/best_store_nearby_view.dart",
+        "line": 339,
+        "kind": "Text",
+        "value": "(${storeList[index].ratingCount.toString()})",
+        "is_arabic": false,
+        "context": "Text('(${storeList[index].ratingCount.toString()})', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/home/widgets/views/best_store_nearby_view.dart",
+        "line": 449,
+        "kind": "Text",
+        "value": "${distance > 10 ? '10+' : distance.toStringAsFixed(1)} ${'km'.tr}",
+        "is_arabic": false,
+        "context": "Text('${distance > 10 ? '10+' : distance.toStringAsFixed(1)} ${'km'.tr}',"
+      },
+      {
+        "file": "features/home/widgets/views/featured_categories_view.dart",
+        "line": 67,
+        "kind": "Text",
+        "value": "${categoryList[index].name}",
+        "is_arabic": false,
+        "context": "child: Text('${categoryList[index].name}', style: robotoMedium.copyWith(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/home/widgets/views/product_with_categories_view.dart",
+        "line": 78,
+        "kind": "Text",
+        "value": "${categories[index].name}",
+        "is_arabic": false,
+        "context": "child: Text('${categories[index].name}', style: robotoMedium.copyWith(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/home/widgets/web/web_basic_medicine_nearby_view_widget.dart",
+        "line": 110,
+        "kind": "Text",
+        "value": "${categories[index].name}",
+        "is_arabic": false,
+        "context": "child: Text('${categories[index].name}', style: robotoMedium.copyWith(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/home/widgets/web/web_best_store_nearby_view_widget.dart",
+        "line": 371,
+        "kind": "Text",
+        "value": "(${storeList[index].ratingCount.toString()})",
+        "is_arabic": false,
+        "context": "Text('(${storeList[index].ratingCount.toString()})',"
+      },
+      {
+        "file": "features/home/widgets/web/web_best_store_nearby_view_widget.dart",
+        "line": 391,
+        "kind": "Text",
+        "value": "${distance > 10 ? '10+' : distance.toStringAsFixed(1)} ${'km'.tr}",
+        "is_arabic": false,
+        "context": "Text('${distance > 10 ? '10+' : distance.toStringAsFixed(1)} ${'km'.tr}', style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall)),"
+      },
+      {
+        "file": "features/home/widgets/web/web_featured_categories_view_widget.dart",
+        "line": 111,
+        "kind": "Text",
+        "value": "${categoryList[index].name}",
+        "is_arabic": false,
+        "context": "child: Text('${categoryList[index].name}', style: robotoMedium.copyWith(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/home/widgets/web/web_flash_sale_view_widget.dart",
+        "line": 124,
+        "kind": "Text",
+        "value": "${'available'.tr} :",
+        "is_arabic": false,
+        "context": "Text('${'available'.tr} : ', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),"
+      },
+      {
+        "file": "features/home/widgets/web/web_flash_sale_view_widget.dart",
+        "line": 125,
+        "kind": "Text",
+        "value": "$remaining ${'item'.tr}",
+        "is_arabic": false,
+        "context": "Text('$remaining ${'item'.tr}', style: robotoRegular.copyWith(color: Theme.of(context).primaryColor)),"
+      },
+      {
+        "file": "features/home/widgets/web/web_item_that_you_love_view_widget.dart",
+        "line": 147,
+        "kind": "Text",
+        "value": "(${recommendItems[index].ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${recommendItems[index].ratingCount})',"
+      },
+      {
+        "file": "features/home/widgets/web/web_item_that_you_love_view_widget.dart",
+        "line": 364,
+        "kind": "Text",
+        "value": "(${recommendItems[index].ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${recommendItems[index].ratingCount})',"
+      },
+      {
+        "file": "features/home/widgets/web/web_top_offers_near_me.dart",
+        "line": 276,
+        "kind": "Text",
+        "value": "${store.avgRating}",
+        "is_arabic": false,
+        "context": "Text('${store.avgRating}',"
+      },
+      {
+        "file": "features/home/widgets/web/web_top_offers_near_me.dart",
+        "line": 283,
+        "kind": "Text",
+        "value": "(${store.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${store.ratingCount})',"
+      },
+      {
+        "file": "features/home/widgets/web/widgets/medicine_item_card.dart",
+        "line": 131,
+        "kind": "Text",
+        "value": "(${item.ratingCount})",
+        "is_arabic": false,
+        "context": "Text('(${item.ratingCount})',"
+      }
+    ]
+  },
+  "html": {
+    "files_scanned": 6,
+    "ui_issues": []
+  },
+  "interest": {
+    "files_scanned": 1,
+    "ui_issues": []
+  },
+  "item": {
+    "files_scanned": 35,
+    "ui_issues": [
+      {
+        "file": "features/item/widgets/details_web_view_widget.dart",
+        "line": 597,
+        "kind": "Text",
+        "value": "${'total_amount'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'total_amount'.tr}:',"
+      }
+    ]
+  },
+  "language": {
+    "files_scanned": 10,
+    "ui_issues": []
+  },
+  "location": {
+    "files_scanned": 28,
+    "ui_issues": []
+  },
+  "loyalty": {
+    "files_scanned": 9,
+    "ui_issues": [
+      {
+        "file": "features/loyalty/widgets/loyalty_bottom_sheet_widget.dart",
+        "line": 237,
+        "kind": "Input/Button Prop",
+        "value": "تحويل نقاط الآن",
+        "is_arabic": true,
+        "context": "buttonText: 'تحويل نقاط الآن',"
+      }
+    ]
+  },
+  "marketer": {
+    "files_scanned": 14,
+    "ui_issues": [
+      {
+        "file": "features/marketer/screens/marketer_apply_screen.dart",
+        "line": 503,
+        "kind": "Input/Button Prop",
+        "value": "5XXXXXXXX",
+        "is_arabic": false,
+        "context": "hintText: '5XXXXXXXX',"
+      },
+      {
+        "file": "features/marketer/screens/marketer_profile_screen.dart",
+        "line": 340,
+        "kind": "Text",
+        "value": "close'.tr, style: const TextStyle(fontFamily: 'Tajawal",
+        "is_arabic": false,
+        "context": "child: Text('close'.tr, style: const TextStyle(fontFamily: 'Tajawal', color: _primaryGreen)),"
+      },
+      {
+        "file": "features/marketer/screens/marketer_profile_screen.dart",
+        "line": 372,
+        "kind": "Text",
+        "value": "cancel'.tr, style: const TextStyle(fontFamily: 'Tajawal",
+        "is_arabic": false,
+        "context": "child: Text('cancel'.tr, style: const TextStyle(fontFamily: 'Tajawal', color: Color(0xFF6B7280))),"
+      }
+    ]
+  },
+  "menu": {
+    "files_scanned": 5,
+    "ui_issues": []
+  },
+  "my_coupon": {
+    "files_scanned": 13,
+    "ui_issues": [
+      {
+        "file": "features/my_coupon/controllers/my_coupon_controller.dart",
+        "line": 275,
+        "kind": "showCustomSnackBar",
+        "value": "تم إزالة الكوبون لأنه لم يعد صالحًا",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم إزالة الكوبون لأنه لم يعد صالحًا');"
+      },
+      {
+        "file": "features/my_coupon/widgets/coupon_widget.dart",
+        "line": 119,
+        "kind": "showCustomSnackBar",
+        "value": "كود القسيمة غير متاح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('كود القسيمة غير متاح');"
+      },
+      {
+        "file": "features/my_coupon/widgets/coupon_widget.dart",
+        "line": 123,
+        "kind": "showCustomSnackBar",
+        "value": "تم نسخ الكود، استخدمه عند إتمام الطلب",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم نسخ الكود، استخدمه عند إتمام الطلب', isError: false);"
+      }
+    ]
+  },
+  "notification": {
+    "files_scanned": 14,
+    "ui_issues": []
+  },
+  "offers": {
+    "files_scanned": 14,
+    "ui_issues": [
+      {
+        "file": "features/offers/screens/offers_item_screen.dart",
+        "line": 287,
+        "kind": "Input/Button Prop",
+        "value": "ابحث في العروض...",
+        "is_arabic": true,
+        "context": "hintText: 'ابحث في العروض...',"
+      }
+    ]
+  },
+  "onboard": {
+    "files_scanned": 14,
+    "ui_issues": []
+  },
+  "online_payment": {
+    "files_scanned": 5,
+    "ui_issues": []
+  },
+  "order": {
+    "files_scanned": 37,
+    "ui_issues": [
+      {
+        "file": "features/order/screens/guest_track_order_screen.dart",
+        "line": 71,
+        "kind": "Text",
+        "value": "#${orderController.trackModel?.id}",
+        "is_arabic": false,
+        "context": "Text(' #${orderController.trackModel?.id}',"
+      },
+      {
+        "file": "features/order/widgets/address_details_widget.dart",
+        "line": 21,
+        "kind": "Text",
+        "value": "${'street_number'.tr}: ${addressDetails!.streetNumber!}",
+        "is_arabic": false,
+        "context": "(addressDetails!.streetNumber != null && addressDetails!.streetNumber!.isNotEmpty) ? Text('${'street_number'.tr}: ${addressDetails!.streetNumber!}',"
+      },
+      {
+        "file": "features/order/widgets/address_details_widget.dart",
+        "line": 25,
+        "kind": "Text",
+        "value": "${addressDetails!.streetNumber != null ?",
+        "is_arabic": false,
+        "context": "(addressDetails!.house != null && addressDetails!.house!.isNotEmpty) ? Text('${addressDetails!.streetNumber != null ? ', ' : ''}${'house'.tr}: ${addressDetails!.house!}',"
+      },
+      {
+        "file": "features/order/widgets/address_details_widget.dart",
+        "line": 29,
+        "kind": "Text",
+        "value": "${(addressDetails!.streetNumber != null || addressDetails!.house != null) ?",
+        "is_arabic": false,
+        "context": "(addressDetails!.floor != null && addressDetails!.floor!.isNotEmpty) ? Text('${(addressDetails!.streetNumber != null || addressDetails!.house != null) ? ', ' : ''}${'floor'.tr}: ${addressDetails!.floor!}' ,"
+      },
+      {
+        "file": "features/order/widgets/invoice_bottom_sheet.dart",
+        "line": 247,
+        "kind": "Text",
+        "value": "[ $paymentStatus ]",
+        "is_arabic": false,
+        "context": "child: Text('[ $paymentStatus ]',"
+      },
+      {
+        "file": "features/order/widgets/invoice_bottom_sheet.dart",
+        "line": 426,
+        "kind": "Text",
+        "value": "${_formatPrice(savings)} $currency",
+        "is_arabic": false,
+        "context": "Text('${_formatPrice(savings)} $currency',"
+      },
+      {
+        "file": "features/order/widgets/invoice_bottom_sheet.dart",
+        "line": 454,
+        "kind": "Text",
+        "value": "${_formatPrice(total)} $currency",
+        "is_arabic": false,
+        "context": "Text('${_formatPrice(total)} $currency',"
+      },
+      {
+        "file": "features/order/widgets/order_calcuation_widget.dart",
+        "line": 229,
+        "kind": "Text",
+        "value": "(+) ${order.dmTips}",
+        "is_arabic": false,
+        "context": "Text('(+) ${order.dmTips}',"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 153,
+        "kind": "Text",
+        "value": "#${order.id}",
+        "is_arabic": false,
+        "context": "Text('#${order.id}', style: robotoBold),"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 180,
+        "kind": "Text",
+        "value": "${'scheduled_at'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'scheduled_at'.tr}:', style: robotoRegular),"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 199,
+        "kind": "Text",
+        "value": "${'delivery_verification_code'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'delivery_verification_code'.tr}:',"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 238,
+        "kind": "Text",
+        "value": "${parcel ? 'charge_pay_by'.tr : 'item'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${parcel ? 'charge_pay_by'.tr : 'item'.tr}:',"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 281,
+        "kind": "Text",
+        "value": "${'cutlery'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'cutlery'.tr}: ', style: robotoRegular),"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 299,
+        "kind": "Text",
+        "value": "${'unavailable_item_note'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'unavailable_item_note'.tr}: ',"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 354,
+        "kind": "Text",
+        "value": "${'cancellation_note'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'cancellation_note'.tr}:',"
+      },
+      {
+        "file": "features/order/widgets/order_info_widget.dart",
+        "line": 469,
+        "kind": "Text",
+        "value": "${'refund_cancellation_note'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'refund_cancellation_note'.tr}:',"
+      },
+      {
+        "file": "features/order/widgets/order_item_widget.dart",
+        "line": 150,
+        "kind": "Text",
+        "value": "${'quantity'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'quantity'.tr}:',"
+      },
+      {
+        "file": "features/order/widgets/order_item_widget.dart",
+        "line": 234,
+        "kind": "Text",
+        "value": "${'addons'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'addons'.tr}: ',"
+      },
+      {
+        "file": "features/order/widgets/order_item_widget.dart",
+        "line": 252,
+        "kind": "Text",
+        "value": "${'variations'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'variations'.tr}: ',"
+      }
+    ]
+  },
+  "parcel": {
+    "files_scanned": 24,
+    "ui_issues": [
+      {
+        "file": "features/parcel/widgets/receiver_details_botton_sheet_widget.dart",
+        "line": 96,
+        "kind": "Input/Button Prop",
+        "value": "${'street_number'.tr} (${'optional'.tr})",
+        "is_arabic": false,
+        "context": "hintText: \"${'street_number'.tr} (${'optional'.tr})\","
+      },
+      {
+        "file": "features/parcel/widgets/receiver_details_botton_sheet_widget.dart",
+        "line": 105,
+        "kind": "Input/Button Prop",
+        "value": "${'house'.tr} (${'optional'.tr})",
+        "is_arabic": false,
+        "context": "hintText: \"${'house'.tr} (${'optional'.tr})\","
+      },
+      {
+        "file": "features/parcel/widgets/receiver_details_botton_sheet_widget.dart",
+        "line": 113,
+        "kind": "Input/Button Prop",
+        "value": "${'floor'.tr} (${'optional'.tr})",
+        "is_arabic": false,
+        "context": "hintText: \"${'floor'.tr} (${'optional'.tr})\","
+      },
+      {
+        "file": "features/parcel/widgets/receiver_view_widget.dart",
+        "line": 170,
+        "kind": "Input/Button Prop",
+        "value": "${'street_number'.tr} (${'optional'.tr})",
+        "is_arabic": false,
+        "context": "hintText: \"${'street_number'.tr} (${'optional'.tr})\","
+      },
+      {
+        "file": "features/parcel/widgets/receiver_view_widget.dart",
+        "line": 183,
+        "kind": "Input/Button Prop",
+        "value": "${'house'.tr} (${'optional'.tr})",
+        "is_arabic": false,
+        "context": "hintText: \"${'house'.tr} (${'optional'.tr})\","
+      },
+      {
+        "file": "features/parcel/widgets/receiver_view_widget.dart",
+        "line": 195,
+        "kind": "Input/Button Prop",
+        "value": "${'floor'.tr} (${'optional'.tr})",
+        "is_arabic": false,
+        "context": "hintText: \"${'floor'.tr} (${'optional'.tr})\","
+      }
+    ]
+  },
+  "payment": {
+    "files_scanned": 23,
+    "ui_issues": [
+      {
+        "file": "features/payment/presentation/screens/add_card_screen.dart",
+        "line": 25,
+        "kind": "Text",
+        "value": "إضافة بطاقة جديدة",
+        "is_arabic": true,
+        "context": "title: Text('إضافة بطاقة جديدة', style: s.t(18, weight: FontWeight.w800)),"
+      },
+      {
+        "file": "features/payment/presentation/screens/add_card_screen.dart",
+        "line": 45,
+        "kind": "Text",
+        "value": "تأكيد",
+        "is_arabic": true,
+        "context": "child: Text('تأكيد',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 86,
+        "kind": "Text",
+        "value": "المزيد",
+        "is_arabic": true,
+        "context": "child: Text('المزيد',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 95,
+        "kind": "Text",
+        "value": "طريقة الدفع",
+        "is_arabic": true,
+        "context": "title: Text('طريقة الدفع', style: s.t(18, weight: FontWeight.w800)),"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 135,
+        "kind": "title/subtitle Prop",
+        "value": "Apple Pay",
+        "is_arabic": false,
+        "context": "title: 'Apple Pay',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 142,
+        "kind": "title/subtitle Prop",
+        "value": "إضافة بطاقة جديدة",
+        "is_arabic": true,
+        "context": "title: 'إضافة بطاقة جديدة',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 160,
+        "kind": "title/subtitle Prop",
+        "value": "المحفظة",
+        "is_arabic": true,
+        "context": "title: 'المحفظة',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 161,
+        "kind": "title/subtitle Prop",
+        "value": "المجموع ${_fmt(widget.walletBalance)} ${widget.currency}",
+        "is_arabic": true,
+        "context": "subtitle: 'المجموع ${_fmt(widget.walletBalance)} ${widget.currency}',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 188,
+        "kind": "Text",
+        "value": "الإجمالي",
+        "is_arabic": true,
+        "context": "Text('الإجمالي',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 190,
+        "kind": "Text",
+        "value": "${_fmt(widget.total)} ${widget.currency}",
+        "is_arabic": false,
+        "context": "Text('${_fmt(widget.total)} ${widget.currency}',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 223,
+        "kind": "Text",
+        "value": "مبلغ آخر للإكرامية",
+        "is_arabic": true,
+        "context": "Text('مبلغ آخر للإكرامية',"
+      },
+      {
+        "file": "features/payment/presentation/screens/payment_method_screen.dart",
+        "line": 257,
+        "kind": "Text",
+        "value": "تأكيد",
+        "is_arabic": true,
+        "context": "child: Text('تأكيد',"
+      }
+    ]
+  },
+  "pos": {
+    "files_scanned": 6,
+    "ui_issues": [
+      {
+        "file": "features/pos/controllers/pos_checkout_controller.dart",
+        "line": 122,
+        "kind": "showCustomSnackBar",
+        "value": "تم دفع الطلب بنجاح من رصيد المحفظة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم دفع الطلب بنجاح من رصيد المحفظة', isError: false);"
+      },
+      {
+        "file": "features/pos/controllers/pos_checkout_controller.dart",
+        "line": 152,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ غير متوقع أثناء معالجة الدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('حدث خطأ غير متوقع أثناء معالجة الدفع');"
+      },
+      {
+        "file": "features/pos/screens/pos_checkout_screen.dart",
+        "line": 289,
+        "kind": "Input/Button Prop",
+        "value": "تسجيل الدخول / إنشاء حساب",
+        "is_arabic": true,
+        "context": "buttonText: 'تسجيل الدخول / إنشاء حساب',"
+      },
+      {
+        "file": "features/pos/screens/pos_checkout_screen.dart",
+        "line": 466,
+        "kind": "showCustomSnackBar",
+        "value": "تم نسخ رقم الطلب",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم نسخ رقم الطلب',"
+      },
+      {
+        "file": "features/pos/screens/pos_checkout_screen.dart",
+        "line": 949,
+        "kind": "Input/Button Prop",
+        "value": "تأكيد ودفع الطلب",
+        "is_arabic": true,
+        "context": "buttonText: 'تأكيد ودفع الطلب',"
+      }
+    ]
+  },
+  "profile": {
+    "files_scanned": 20,
+    "ui_issues": [
+      {
+        "file": "features/profile/screens/photo_crop_screen.dart",
+        "line": 78,
+        "kind": "showCustomSnackBar",
+        "value": "تعذّر حفظ الصورة، حاول مرة أخرى.",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تعذّر حفظ الصورة، حاول مرة أخرى.');"
+      },
+      {
+        "file": "features/profile/screens/profile_screen.dart",
+        "line": 489,
+        "kind": "Text",
+        "value": "${'version'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'version'.tr}:', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),"
+      }
+    ]
+  },
+  "refer_and_earn": {
+    "files_scanned": 4,
+    "ui_issues": [
+      {
+        "file": "features/refer_and_earn/screens/refer_and_earn_screen.dart",
+        "line": 198,
+        "kind": "showCustomSnackBar",
+        "value": "Referral code is not available yet",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Referral code is not available yet');"
+      },
+      {
+        "file": "features/refer_and_earn/screens/refer_and_earn_screen.dart",
+        "line": 688,
+        "kind": "Text",
+        "value": "+ ${reward.toStringAsFixed(0)}",
+        "is_arabic": false,
+        "context": "Text('+ ${reward.toStringAsFixed(0)}',"
+      },
+      {
+        "file": "features/refer_and_earn/widgets/bottom_sheet_view_widget.dart",
+        "line": 56,
+        "kind": "Text",
+        "value": "${index+1}",
+        "is_arabic": false,
+        "context": "child: Text('${index+1}'),"
+      }
+    ]
+  },
+  "rental_module": {
+    "files_scanned": 44,
+    "ui_issues": []
+  },
+  "restaurant": {
+    "files_scanned": 4,
+    "ui_issues": []
+  },
+  "review": {
+    "files_scanned": 19,
+    "ui_issues": [
+      {
+        "file": "features/review/widgets/rating_progress_widget.dart",
+        "line": 35,
+        "kind": "Text",
+        "value": "${ratingPercent.toStringAsFixed(0)}%",
+        "is_arabic": false,
+        "context": "child: Text('${ratingPercent.toStringAsFixed(0)}%', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color?.withValues(alpha: 0.5))),"
+      },
+      {
+        "file": "features/review/widgets/total_rating_review_view_widget.dart",
+        "line": 22,
+        "kind": "Text",
+        "value": "$totalNumber ${isRating ? 'ratings'.tr : 'reviews'.tr}",
+        "is_arabic": false,
+        "context": "child: Text('$totalNumber ${isRating ? 'ratings'.tr : 'reviews'.tr}', textAlign: TextAlign.center,"
+      }
+    ]
+  },
+  "search": {
+    "files_scanned": 22,
+    "ui_issues": []
+  },
+  "splash": {
+    "files_scanned": 9,
+    "ui_issues": []
+  },
+  "statistics": {
+    "files_scanned": 39,
+    "ui_issues": []
+  },
+  "store": {
+    "files_scanned": 39,
+    "ui_issues": [
+      {
+        "file": "features/store/screens/campaign_screen.dart",
+        "line": 90,
+        "kind": "Text",
+        "value": "${'campaign_schedule'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'campaign_schedule'.tr}:',"
+      },
+      {
+        "file": "features/store/screens/campaign_screen.dart",
+        "line": 110,
+        "kind": "Text",
+        "value": "${'daily_time'.tr}:",
+        "is_arabic": false,
+        "context": "Text('${'daily_time'.tr}:',"
+      },
+      {
+        "file": "features/store/screens/food_restaurant_detail_screen.dart",
+        "line": 1173,
+        "kind": "Text",
+        "value": "Retry",
+        "is_arabic": false,
+        "context": "label: const Text('Retry'),"
+      },
+      {
+        "file": "features/store/screens/food_restaurant_detail_screen.dart",
+        "line": 1234,
+        "kind": "Text",
+        "value": "Please check your connection and try again",
+        "is_arabic": false,
+        "context": "Text('Please check your connection and try again', style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor),),"
+      },
+      {
+        "file": "features/store/screens/food_restaurant_detail_screen.dart",
+        "line": 1246,
+        "kind": "Text",
+        "value": "Retry",
+        "is_arabic": false,
+        "context": "label: const Text('Retry'),"
+      },
+      {
+        "file": "features/store/widgets/bottom_cart_widget.dart",
+        "line": 37,
+        "kind": "Text",
+        "value": "${'item'.tr}: ${cartController.cartList.length}",
+        "is_arabic": false,
+        "context": "Text('${'item'.tr}: ${cartController.cartList.length}',"
+      }
+    ]
+  },
+  "support": {
+    "files_scanned": 9,
+    "ui_issues": []
+  },
+  "update": {
+    "files_scanned": 2,
+    "ui_issues": []
+  },
+  "verification": {
+    "files_scanned": 10,
+    "ui_issues": [
+      {
+        "file": "features/verification/screens/verification_screen.dart",
+        "line": 338,
+        "kind": "showCustomSnackBar",
+        "value": "Invalid code",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Invalid code');"
+      },
+      {
+        "file": "features/verification/screens/verification_screen.dart",
+        "line": 352,
+        "kind": "showCustomSnackBar",
+        "value": "Invalid code",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Invalid code');"
+      },
+      {
+        "file": "features/verification/screens/verification_screen.dart",
+        "line": 368,
+        "kind": "showCustomSnackBar",
+        "value": "Login not completed",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Login not completed');"
+      },
+      {
+        "file": "features/verification/screens/verification_screen.dart",
+        "line": 397,
+        "kind": "showCustomSnackBar",
+        "value": "Send a new code",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('Send a new code');"
+      }
+    ]
+  },
+  "wallet": {
+    "files_scanned": 16,
+    "ui_issues": [
+      {
+        "file": "features/wallet/widgets/convert_money_bottomSheet.dart",
+        "line": 79,
+        "kind": "Input/Button Prop",
+        "value": "اكتب المبلغ الذي تريد تحويلو",
+        "is_arabic": true,
+        "context": "titleText: 'اكتب المبلغ الذي تريد تحويلو',"
+      },
+      {
+        "file": "features/wallet/widgets/convert_money_bottomSheet.dart",
+        "line": 88,
+        "kind": "Input/Button Prop",
+        "value": "الكود الخاص بك",
+        "is_arabic": true,
+        "context": "titleText: 'الكود الخاص بك',"
+      },
+      {
+        "file": "features/wallet/widgets/convert_money_bottomSheet.dart",
+        "line": 97,
+        "kind": "Input/Button Prop",
+        "value": "الكود الخاص بالحساب المحول له",
+        "is_arabic": true,
+        "context": "titleText: 'الكود الخاص بالحساب المحول له',"
+      },
+      {
+        "file": "features/wallet/widgets/convert_money_bottomSheet.dart",
+        "line": 117,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى إدخال مبلغ صحيح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى إدخال مبلغ صحيح',"
+      }
+    ]
+  },
+  "wallet_kaidha_subscription": {
+    "files_scanned": 46,
+    "ui_issues": [
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 178,
+        "kind": "showCustomSnackBar",
+        "value": "File ${file.name} exceeds 5MB limit.",
+        "is_arabic": false,
+        "context": "showCustomSnackBar('File ${file.name} exceeds 5MB limit.', isError: true);"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 469,
+        "kind": "showCustomSnackBar",
+        "value": "لا يوجد مبلغ مستحق للدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لا يوجد مبلغ مستحق للدفع');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 594,
+        "kind": "showCustomSnackBar",
+        "value": "لقد تم تحقق المصادقة بنجاح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لقد تم تحقق المصادقة بنجاح', isError: false);"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 638,
+        "kind": "showCustomSnackBar",
+        "value": "تم رفض طلب التحقق من نفاذ.",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم رفض طلب التحقق من نفاذ.');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 654,
+        "kind": "showCustomSnackBar",
+        "value": "انتهت صلاحية طلب نفاذ.",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('انتهت صلاحية طلب نفاذ.');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 687,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى إكمال التحقق في تطبيق نفاذ",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى إكمال التحقق في تطبيق نفاذ');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 694,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ أثناء التحقق من المصادقة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('حدث خطأ أثناء التحقق من المصادقة');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 904,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى إدخال الاسم",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى إدخال الاسم');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1650,
+        "kind": "showCustomSnackBar",
+        "value": "خطأ في تحميل طرق الدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('خطأ في تحميل طرق الدفع');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1655,
+        "kind": "showCustomSnackBar",
+        "value": "خطأ في تحميل طرق الدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('خطأ في تحميل طرق الدفع');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1748,
+        "kind": "showCustomSnackBar",
+        "value": "رقم الهاتف مطلوب لبدء الدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('رقم الهاتف مطلوب لبدء الدفع');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1763,
+        "kind": "showCustomSnackBar",
+        "value": "طريقة الدفع غير مدعومة حالياً",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('طريقة الدفع غير مدعومة حالياً');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1803,
+        "kind": "showCustomSnackBar",
+        "value": "فشل بدء الدفع - لم يتم استلام رابط الدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل بدء الدفع - لم يتم استلام رابط الدفع');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1835,
+        "kind": "showCustomSnackBar",
+        "value": "فشلت عملية الدفع: ${error.toString()}",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشلت عملية الدفع: ${error.toString()}');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1844,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى اختيار طريقة الدفع أولاً",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى اختيار طريقة الدفع أولاً');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1865,
+        "kind": "showCustomSnackBar",
+        "value": "لا توجد طرق دفع متاحة للمبلغ المختار",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لا توجد طرق دفع متاحة للمبلغ المختار');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1880,
+        "kind": "showCustomSnackBar",
+        "value": "طريقة الدفع المختارة غير متاحة لهذا المبلغ",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('طريقة الدفع المختارة غير متاحة لهذا المبلغ');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1944,
+        "kind": "showCustomSnackBar",
+        "value": "تم إلغاء عملية الدفع",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم إلغاء عملية الدفع', isError: false);"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 1946,
+        "kind": "showCustomSnackBar",
+        "value": "فشلت عملية الدفع، حاول مرة أخرى",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشلت عملية الدفع، حاول مرة أخرى');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2443,
+        "kind": "showCustomSnackBar",
+        "value": "لم يتم حفظ اي مستند",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لم يتم حفظ اي مستند');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2448,
+        "kind": "showCustomSnackBar",
+        "value": "يمكن رفع 5 مستندات كحد أقصى",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يمكن رفع 5 مستندات كحد أقصى');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2465,
+        "kind": "showCustomSnackBar",
+        "value": "يرجى إدخال اسم لكل مستند",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('يرجى إدخال اسم لكل مستند');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2539,
+        "kind": "showCustomSnackBar",
+        "value": "فشل في إنشاء المحفظة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل في إنشاء المحفظة');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2879,
+        "kind": "showCustomSnackBar",
+        "value": "فشل في إنشاء المحفظة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar(\"فشل في إنشاء المحفظة\");"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2883,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ في إنشاء المحفظة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar(\"حدث خطأ في إنشاء المحفظة\");"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2913,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ في تحديث حالة توقيع المحفظة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('حدث خطأ في تحديث حالة توقيع المحفظة');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 2939,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ في تحديث حالة المحفظة",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('حدث خطأ في تحديث حالة المحفظة');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 3134,
+        "kind": "showCustomSnackBar",
+        "value": "تم إرسال رمز جديد عبر نفاذ",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم إرسال رمز جديد عبر نفاذ', isError: false);"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 3159,
+        "kind": "showCustomSnackBar",
+        "value": "تم إلغاء طلب نفاذ",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('تم إلغاء طلب نفاذ', isError: false);"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+        "line": 3614,
+        "kind": "showCustomSnackBar",
+        "value": "حدث خطأ أثناء إرسال طلب التعاقد",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('حدث خطأ أثناء إرسال طلب التعاقد');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 68,
+        "kind": "showCustomSnackBar",
+        "value": "لا يمكن تنفيذ طلب نفاذ بدون user_id عند غياب التوكن",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لا يمكن تنفيذ طلب نفاذ بدون user_id عند غياب التوكن');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 236,
+        "kind": "showCustomSnackBar",
+        "value": "الرجاء أعد المحاوله في وقت أخر",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('الرجاء أعد المحاوله في وقت أخر');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 242,
+        "kind": "showCustomSnackBar",
+        "value": "خطأ في استجابة الخادم: ${dioResponse.statusCode}",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('خطأ في استجابة الخادم: ${dioResponse.statusCode}');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 614,
+        "kind": "showCustomSnackBar",
+        "value": "${bodyMap?[",
+        "is_arabic": false,
+        "context": "showCustomSnackBar(\"${bodyMap?[\"message\"]}\", isError: false);"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 616,
+        "kind": "showCustomSnackBar",
+        "value": "فشل شحن المبلغ",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل شحن المبلغ');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 646,
+        "kind": "showCustomSnackBar",
+        "value": "فشل الشراء",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('فشل الشراء ');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 708,
+        "kind": "showCustomSnackBar",
+        "value": "رقم الهوية غير صالح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('رقم الهوية غير صالح');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/domain/reposotories/kaidhaSub_repository.dart",
+        "line": 800,
+        "kind": "showCustomSnackBar",
+        "value": "رقم الهوية غير صالح",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('رقم الهوية غير صالح');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/screen/qr_screen.dart",
+        "line": 258,
+        "kind": "Input/Button Prop",
+        "value": "متابعة الطلب",
+        "is_arabic": true,
+        "context": "buttonText: 'متابعة الطلب',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/screen/show_pdf_screen.dart",
+        "line": 105,
+        "kind": "Input/Button Prop",
+        "value": "استعراض العقد",
+        "is_arabic": true,
+        "context": "buttonText: 'استعراض العقد',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/screen/wallet_kaidha_screen.dart",
+        "line": 171,
+        "kind": "showCustomSnackBar",
+        "value": "لا توجد محفظة. الرجاء الاشتراك أولاً.",
+        "is_arabic": true,
+        "context": "showCustomSnackBar('لا توجد محفظة. الرجاء الاشتراك أولاً.');"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+        "line": 140,
+        "kind": "Input/Button Prop",
+        "value": "اسم جهة العمل",
+        "is_arabic": true,
+        "context": "hintText: 'اسم جهة العمل',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+        "line": 329,
+        "kind": "Input/Button Prop",
+        "value": "ادخل رقم",
+        "is_arabic": true,
+        "context": "hintText: 'ادخل رقم',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/screen/subscription_steps/step3_screen.dart",
+        "line": 400,
+        "kind": "Input/Button Prop",
+        "value": "استعراض العقد قبل التوقيع",
+        "is_arabic": true,
+        "context": "buttonText: 'استعراض العقد قبل التوقيع',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+        "line": 239,
+        "kind": "Input/Button Prop",
+        "value": "الموافقة والمتابعة",
+        "is_arabic": true,
+        "context": "buttonText: 'الموافقة والمتابعة',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/dialog_credit.dart",
+        "line": 24,
+        "kind": "Custom_Text",
+        "value": "طلبك قيد المراجعة بمحفظة قيدها",
+        "is_arabic": true,
+        "context": "Custom_Text(context, text: 'طلبك قيد المراجعة بمحفظة قيدها', style: font10Black600W(context, size: size_14(context))),"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/dialog_credit.dart",
+        "line": 35,
+        "kind": "title/subtitle Prop",
+        "value": "تم",
+        "is_arabic": true,
+        "context": "title: 'تم',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/personal_information.dart",
+        "line": 352,
+        "kind": "Input/Button Prop",
+        "value": "١٠ أرقام (مثال: 1XXXXXXXXX)",
+        "is_arabic": true,
+        "context": "hintText: '١٠ أرقام (مثال: 1XXXXXXXXX)',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/dialog.dart/activate_wallet_Dialog.dart",
+        "line": 34,
+        "kind": "Input/Button Prop",
+        "value": "تم",
+        "is_arabic": true,
+        "context": "buttonText: 'تم',"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/dialog.dart/success_dialog.dart",
+        "line": 22,
+        "kind": "Custom_Text",
+        "value": "طلبك قيد المراجعة بمحفظة قيدها",
+        "is_arabic": true,
+        "context": "Custom_Text(context, text: 'طلبك قيد المراجعة بمحفظة قيدها', style: font10Black600W(context, size: size_14(context))),"
+      },
+      {
+        "file": "features/wallet_kaidha_subscription/widget/dialog.dart/success_dialog.dart",
+        "line": 33,
+        "kind": "title/subtitle Prop",
+        "value": "تم",
+        "is_arabic": true,
+        "context": "title: 'تم',"
+      }
+    ]
+  },
+  "wallet_transfer": {
+    "files_scanned": 25,
+    "ui_issues": []
+  },
+  "helper": {
+    "files_scanned": 29,
+    "ui_issues": []
+  },
+  "helpers": {
+    "files_scanned": 1,
+    "ui_issues": []
+  },
+  "interfaces": {
+    "files_scanned": 1,
+    "ui_issues": []
+  },
+  "local": {
+    "files_scanned": 1,
+    "ui_issues": []
+  },
+  "services": {
+    "files_scanned": 5,
+    "ui_issues": []
+  },
+  "theme": {
+    "files_scanned": 3,
+    "ui_issues": []
+  },
+  "util": {
+    "files_scanned": 11,
+    "ui_issues": []
+  },
+  "widgets": {
+    "files_scanned": 2,
+    "ui_issues": [
+      {
+        "file": "widgets/update_dialog.dart",
+        "line": 341,
+        "kind": "Text",
+        "value": "Could not open store: $e",
+        "is_arabic": false,
+        "context": "content: Text('Could not open store: $e'),"
+      }
+    ]
+  }
+}

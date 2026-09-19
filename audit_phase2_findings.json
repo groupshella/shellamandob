@@ -1,0 +1,1759 @@
+{
+  "add_delegate": [
+    {
+      "file": "lib/features/add_delegate/screens/add_delegate_screen.dart",
+      "findings": [
+        {
+          "line": 56,
+          "text": "المندوب",
+          "existingKey": null,
+          "lineContent": "title: 'المندوب',"
+        },
+        {
+          "line": 74,
+          "text": "معلومات المندوب",
+          "existingKey": null,
+          "lineContent": "Text('معلومات المندوب',"
+        },
+        {
+          "line": 149,
+          "text": "تعذر جلب بيانات المستخدم، حاول مرة أخرى",
+          "existingKey": null,
+          "lineContent": "message: 'تعذر جلب بيانات المستخدم، حاول مرة أخرى',"
+        },
+        {
+          "line": 156,
+          "text": "رجاء إدخال رقم الهاتف",
+          "existingKey": null,
+          "lineContent": "message: 'رجاء إدخال رقم الهاتف',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/add_delegate/widget/file_upload_widget.dart",
+      "findings": [
+        {
+          "line": 35,
+          "text": "اسم الملف",
+          "existingKey": null,
+          "lineContent": "hintText: 'اسم الملف',"
+        },
+        {
+          "line": 56,
+          "text": "اختر ملفًا وأضفه",
+          "existingKey": null,
+          "lineContent": "label: const Text('اختر ملفًا وأضفه'),"
+        }
+      ]
+    }
+  ],
+  "auth": [
+    {
+      "file": "lib/features/auth/screens/delivery_man_registration_screen.dart",
+      "findings": [
+        {
+          "line": 727,
+          "text": "رقم الهاتف",
+          "existingKey": null,
+          "lineContent": "Text('رقم الهاتف',"
+        },
+        {
+          "line": 1111,
+          "text": "نوع الهوية",
+          "existingKey": null,
+          "lineContent": "const Text('نوع الهوية'),"
+        },
+        {
+          "line": 1275,
+          "text": "الهوية الشخصية",
+          "existingKey": null,
+          "lineContent": "title: 'الهوية الشخصية',"
+        },
+        {
+          "line": 1292,
+          "text": "رخصة السائق",
+          "existingKey": null,
+          "lineContent": "title: 'رخصة السائق',"
+        },
+        {
+          "line": 1308,
+          "text": "رخصة القيادة",
+          "existingKey": null,
+          "lineContent": "title: 'رخصة القيادة',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/auth/screens/succsessflyCreated.dart",
+      "findings": [
+        {
+          "line": 63,
+          "text": "قم بتسجيل الدخول",
+          "existingKey": null,
+          "lineContent": "Text('قم بتسجيل الدخول', style: font14White600W(context)),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/auth/widgets/build_upload_section.dart",
+      "findings": [
+        {
+          "line": 65,
+          "text": "رفع صورة",
+          "existingKey": null,
+          "lineContent": "Text('رفع صورة', style: TextStyle(color: Theme.of(context).disabledColor)),"
+        }
+      ]
+    }
+  ],
+  "campaign": [
+    {
+      "file": "lib/features/campaign/widgets/figma_store_view.dart",
+      "findings": [
+        {
+          "line": 261,
+          "text": "توصيل مجاني",
+          "existingKey": null,
+          "lineContent": "label: 'توصيل مجاني',"
+        }
+      ]
+    }
+  ],
+  "cart": [
+    {
+      "file": "lib/features/cart/screens/touese.dart",
+      "findings": [
+        {
+          "line": 14,
+          "text": "Cart Mock",
+          "existingKey": null,
+          "lineContent": "title: 'Cart Mock',"
+        },
+        {
+          "line": 98,
+          "text": "رجوع",
+          "existingKey": null,
+          "lineContent": "tooltip: 'رجوع',"
+        },
+        {
+          "line": 117,
+          "text": "نسكافيه 30 ظرف",
+          "existingKey": null,
+          "lineContent": "title: 'نسكافيه 30 ظرف',"
+        },
+        {
+          "line": 118,
+          "text": "عرض 30 ظرف 5+ هدية",
+          "existingKey": null,
+          "lineContent": "subtitle: 'عرض 30 ظرف 5+ هدية',"
+        },
+        {
+          "line": 126,
+          "text": "شاي ليبتون",
+          "existingKey": null,
+          "lineContent": "title: 'شاي ليبتون',"
+        },
+        {
+          "line": 127,
+          "text": "عرض 35 ظرف 5+ هدية",
+          "existingKey": null,
+          "lineContent": "subtitle: 'عرض 35 ظرف 5+ هدية',"
+        },
+        {
+          "line": 135,
+          "text": "شاي الوزة",
+          "existingKey": null,
+          "lineContent": "title: 'شاي الوزة',"
+        },
+        {
+          "line": 171,
+          "text": "المجموع الفرعي",
+          "existingKey": null,
+          "lineContent": "_SummaryRow(label: 'المجموع الفرعي', value: 'ريال $_subtotal'),"
+        },
+        {
+          "line": 173,
+          "text": "الضرائب والرسوم",
+          "existingKey": null,
+          "lineContent": "_SummaryRow(label: 'الضرائب والرسوم', value: 'ريال $_fees'),"
+        },
+        {
+          "line": 175,
+          "text": "التوصيل",
+          "existingKey": null,
+          "lineContent": "_SummaryRow(label: 'التوصيل', value: 'ريال $_delivery'),"
+        },
+        {
+          "line": 178,
+          "text": "الإجمالي",
+          "existingKey": null,
+          "lineContent": "label: 'الإجمالي',"
+        },
+        {
+          "line": 467,
+          "text": "برومو كود",
+          "existingKey": null,
+          "lineContent": "hintText: 'برومو كود',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/cart/widgets/delivery_option_button_widget.dart",
+      "findings": [
+        {
+          "line": 138,
+          "text": "قريباً",
+          "existingKey": null,
+          "lineContent": "child: Text('قريباً',"
+        }
+      ]
+    }
+  ],
+  "category": [
+    {
+      "file": "lib/features/category/widgets/grocery_category/grocery_product_grid.dart",
+      "findings": [
+        {
+          "line": 83,
+          "text": "-$pct%",
+          "existingKey": null,
+          "lineContent": "child: Text('-$pct%',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/category/widgets/search_filter.dart",
+      "findings": [
+        {
+          "line": 105,
+          "text": "البحث حسب",
+          "existingKey": null,
+          "lineContent": "const SectionTitle(title: 'البحث حسب'),"
+        },
+        {
+          "line": 126,
+          "text": "المتاجر",
+          "existingKey": null,
+          "lineContent": "const Text('المتاجر',"
+        },
+        {
+          "line": 151,
+          "text": "اسم المنتج",
+          "existingKey": null,
+          "lineContent": "const SectionTitle(title: 'اسم المنتج'),"
+        },
+        {
+          "line": 160,
+          "text": "نطاق السعر",
+          "existingKey": null,
+          "lineContent": "const SectionTitle(title: 'نطاق السعر'),"
+        },
+        {
+          "line": 191,
+          "text": "إعادة تعيين",
+          "existingKey": null,
+          "lineContent": "child: Text('إعادة تعيين',"
+        },
+        {
+          "line": 203,
+          "text": "تطبيق",
+          "existingKey": null,
+          "lineContent": "child: const Text('تطبيق',"
+        }
+      ]
+    }
+  ],
+  "chat": [
+    {
+      "file": "lib/features/chat/screens/chat_screen.dart",
+      "findings": [
+        {
+          "line": 505,
+          "text": "يتم الكتابة...",
+          "existingKey": null,
+          "lineContent": "Text('يتم الكتابة...', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSm"
+        },
+        {
+          "line": 974,
+          "text": "المتجر يكتب...",
+          "existingKey": null,
+          "lineContent": "child: Text('المتجر يكتب...', style: TextStyle(fontSize: 12, color: Colors.grey)),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/chat/screens/chat_search_screen.dart",
+      "findings": [
+        {
+          "line": 89,
+          "text": "البحث",
+          "existingKey": null,
+          "lineContent": "hintText: 'البحث',"
+        },
+        {
+          "line": 256,
+          "text": "لا توجد نتائج",
+          "existingKey": null,
+          "lineContent": "child: Text('لا توجد نتائج',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/chat/widgets/message_bubble_widget.dart",
+      "findings": [
+        {
+          "line": 198,
+          "text": "#${order.id}",
+          "existingKey": null,
+          "lineContent": "Text('#${order.id}', style: robotoBold),"
+        }
+      ]
+    }
+  ],
+  "checkout": [
+    {
+      "file": "lib/features/checkout/widgets/coupon_bottom_sheet.dart",
+      "findings": [
+        {
+          "line": 170,
+          "text": "خصم",
+          "existingKey": null,
+          "lineContent": "Text('خصم',"
+        },
+        {
+          "line": 217,
+          "text": "صالح حتى: $expiry",
+          "existingKey": null,
+          "lineContent": "Text('صالح حتى: $expiry',"
+        },
+        {
+          "line": 238,
+          "text": "استخدام",
+          "existingKey": null,
+          "lineContent": "child: Text('استخدام',"
+        }
+      ]
+    }
+  ],
+  "employee": [
+    {
+      "file": "lib/features/employee/alerts/controllers/anti_fraud_alerts_controller.dart",
+      "findings": [
+        {
+          "line": 43,
+          "text": "تنبيه حركة ميدانية (الإنذار الأول)",
+          "existingKey": null,
+          "lineContent": "_showGentleSnackbar(title: 'تنبيه حركة ميدانية (الإنذار الأول)', message: _currentAlertMessage!, color: const Color(0xFF"
+        },
+        {
+          "line": 48,
+          "text": "تنبيه خمول (الإنذار الثاني)",
+          "existingKey": null,
+          "lineContent": "_showGentleSnackbar(title: 'تنبيه خمول (الإنذار الثاني)', message: _currentAlertMessage!, color: const Color(0xFFF59E0B)"
+        },
+        {
+          "line": 149,
+          "text": "أنا نشط - استئناف العمل الميداني",
+          "existingKey": null,
+          "lineContent": "child: const Text('أنا نشط - استئناف العمل الميداني', style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.bol"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/employee/alerts/screens/critical_alert_screen.dart",
+      "findings": [
+        {
+          "line": 171,
+          "text": "اذكر سبب التوقف أو الخمول (مثال: عطل في المركبة، انتظار التاجر...)",
+          "existingKey": null,
+          "lineContent": "hintText: 'اذكر سبب التوقف أو الخمول (مثال: عطل في المركبة، انتظار التاجر...)',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/employee/attendance/screens/attendance_stepper_screen.dart",
+      "findings": [
+        {
+          "line": 28,
+          "text": "تأكيد الحضور",
+          "existingKey": null,
+          "lineContent": "MarketerHeader(title: 'تأكيد الحضور'),"
+        },
+        {
+          "line": 58,
+          "text": "تأكيد",
+          "existingKey": null,
+          "lineContent": "title: 'تأكيد',"
+        },
+        {
+          "line": 68,
+          "text": "الصورة",
+          "existingKey": null,
+          "lineContent": "title: 'الصورة',"
+        },
+        {
+          "line": 78,
+          "text": "الموقع",
+          "existingKey": null,
+          "lineContent": "title: 'الموقع',"
+        },
+        {
+          "line": 814,
+          "text": "أضف تفاصيل إن لزم...",
+          "existingKey": null,
+          "lineContent": "hintText: 'أضف تفاصيل إن لزم...',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/employee/attendance/screens/select_work_zone_screen.dart",
+      "findings": [
+        {
+          "line": 26,
+          "text": "اختر منطقة عملك",
+          "existingKey": null,
+          "lineContent": "MarketerHeader(title: 'اختر منطقة عملك'),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/employee/models/employee_shift_model.dart",
+      "findings": [
+        {
+          "line": 39,
+          "text": "تأخير في تسليم تقرير الزيارة",
+          "existingKey": null,
+          "lineContent": "title: 'تأخير في تسليم تقرير الزيارة',"
+        },
+        {
+          "line": 44,
+          "text": "مغادرة منطقة العمل بدون إذن",
+          "existingKey": null,
+          "lineContent": "title: 'مغادرة منطقة العمل بدون إذن',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/employee/visits/screens/follow_up_task_screen.dart",
+      "findings": [
+        {
+          "line": 264,
+          "text": "مثال: إحضار عرض تسعير مخصص، مقابلة المالك المباشر...",
+          "existingKey": null,
+          "lineContent": "hintText: 'مثال: إحضار عرض تسعير مخصص، مقابلة المالك المباشر...',"
+        }
+      ]
+    }
+  ],
+  "home": [
+    {
+      "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+      "findings": [
+        {
+          "line": 89,
+          "text": "تسوقني",
+          "existingKey": null,
+          "lineContent": "label: 'تسوقني',"
+        },
+        {
+          "line": 94,
+          "text": "خدمة توصيل",
+          "existingKey": null,
+          "lineContent": "label: 'خدمة توصيل',"
+        },
+        {
+          "line": 99,
+          "text": "اصطحاب الأطفال",
+          "existingKey": null,
+          "lineContent": "label: 'اصطحاب الأطفال',"
+        },
+        {
+          "line": 104,
+          "text": "نقل العفش",
+          "existingKey": null,
+          "lineContent": "label: 'نقل العفش',"
+        },
+        {
+          "line": 109,
+          "text": "التنقلات اليومية",
+          "existingKey": null,
+          "lineContent": "label: 'التنقلات اليومية',"
+        },
+        {
+          "line": 114,
+          "text": "سفر",
+          "existingKey": null,
+          "lineContent": "label: 'سفر',"
+        },
+        {
+          "line": 119,
+          "text": "نقل مستندات",
+          "existingKey": null,
+          "lineContent": "label: 'نقل مستندات',"
+        },
+        {
+          "line": 124,
+          "text": "خدمات منزلية",
+          "existingKey": null,
+          "lineContent": "label: 'خدمات منزلية',"
+        },
+        {
+          "line": 129,
+          "text": "تحديد مسار",
+          "existingKey": null,
+          "lineContent": "label: 'تحديد مسار',"
+        },
+        {
+          "line": 137,
+          "text": "سطحة كبيرة",
+          "existingKey": null,
+          "lineContent": "label: 'سطحة كبيرة',"
+        },
+        {
+          "line": 142,
+          "text": "سطحة هيدروليك",
+          "existingKey": null,
+          "lineContent": "label: 'سطحة هيدروليك',"
+        },
+        {
+          "line": 147,
+          "text": "سطحة عادية",
+          "existingKey": null,
+          "lineContent": "label: 'سطحة عادية',"
+        },
+        {
+          "line": 152,
+          "text": "ونش كهربائي",
+          "existingKey": null,
+          "lineContent": "label: 'ونش كهربائي',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/screens/home_search_screen.dart",
+      "findings": [
+        {
+          "line": 890,
+          "text": "مسح رمز QR",
+          "existingKey": null,
+          "lineContent": "tooltip: 'مسح رمز QR',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+      "findings": [
+        {
+          "line": 294,
+          "text": "خالية من اللاكتوز",
+          "existingKey": null,
+          "lineContent": "(asset: 'pick_01', catId: '59659', title: 'خالية من اللاكتوز'),"
+        },
+        {
+          "line": 295,
+          "text": "الأعلى مبيعاً",
+          "existingKey": null,
+          "lineContent": "(asset: 'pick_02', catId: '59686', title: 'الأعلى مبيعاً'),"
+        },
+        {
+          "line": 296,
+          "text": "وصل حديثاً",
+          "existingKey": null,
+          "lineContent": "(asset: 'pick_03', catId: '59719', title: 'وصل حديثاً'),"
+        },
+        {
+          "line": 297,
+          "text": "الجمعات",
+          "existingKey": null,
+          "lineContent": "(asset: 'pick_04', catId: '59746', title: 'الجمعات'),"
+        },
+        {
+          "line": 298,
+          "text": "خالية من الجلوتين",
+          "existingKey": null,
+          "lineContent": "(asset: 'pick_05', catId: '59656', title: 'خالية من الجلوتين'),"
+        },
+        {
+          "line": 409,
+          "text": "العناية الشخصية",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_01', catId: '59601', title: 'العناية الشخصية'),"
+        },
+        {
+          "line": 410,
+          "text": "مستلزمات الطبخ",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_02', catId: '59616', title: 'مستلزمات الطبخ'),"
+        },
+        {
+          "line": 411,
+          "text": "العناية بالطفل",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_03', catId: '59609', title: 'العناية بالطفل'),"
+        },
+        {
+          "line": 412,
+          "text": "المجمدات",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_04', catId: '59662', title: 'المجمدات'),"
+        },
+        {
+          "line": 413,
+          "text": "منتجات طازجة",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_05', catId: '59588', title: 'منتجات طازجة'),"
+        },
+        {
+          "line": 414,
+          "text": "العناية بالمنزل",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_07', catId: '59631', title: 'العناية بالمنزل'),"
+        },
+        {
+          "line": 415,
+          "text": "الأطعمة الأساسية",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_08', catId: '59626', title: 'الأطعمة الأساسية'),"
+        },
+        {
+          "line": 419,
+          "text": "الإلكترونيات",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_15', catId: '59576', title: 'الإلكترونيات'),"
+        },
+        {
+          "line": 420,
+          "text": "وجبات خفيفة",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_13', catId: '59670', title: 'وجبات خفيفة'),"
+        },
+        {
+          "line": 421,
+          "text": "العناية بالحيوانات الأليفة",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_12', catId: '59596', title: 'العناية بالحيوانات الأليفة'),"
+        },
+        {
+          "line": 422,
+          "text": "المخبوزات",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_11', catId: '59648', title: 'المخبوزات'),"
+        },
+        {
+          "line": 423,
+          "text": "المشروبات",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_10', catId: '59581', title: 'المشروبات'),"
+        },
+        {
+          "line": 424,
+          "text": "مياه",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_14', catId: '59684', title: 'مياه'),"
+        },
+        {
+          "line": 425,
+          "text": "الجمال",
+          "existingKey": null,
+          "lineContent": "(asset: 'cat_09', catId: '59601', title: 'الجمال'),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/screens/market_store_screen_products.dart",
+      "findings": [
+        {
+          "line": 334,
+          "text": "لا توجد منتجات",
+          "existingKey": null,
+          "lineContent": "child: Text('لا توجد منتجات',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/screens/multi_module/widgets/wallet_card_view.dart",
+      "findings": [
+        {
+          "line": 123,
+          "text": "الرصيد المتاح",
+          "existingKey": null,
+          "lineContent": "Text('الرصيد المتاح', style: robotoRegular.copyWith(color: Colors.white70)),"
+        },
+        {
+          "line": 128,
+          "text": "من ${PriceConverter.convertPrice(creditLimit)}",
+          "existingKey": null,
+          "lineContent": "Text('من ${PriceConverter.convertPrice(creditLimit)}', style: robotoRegular.copyWith(color: Colors.white70)),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/components/item_that_you_love_card_widget.dart",
+      "findings": [
+        {
+          "line": 128,
+          "text": "(${item.ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${item.ratingCount})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/components/popular_store_card_widget.dart",
+      "findings": [
+        {
+          "line": 134,
+          "text": "(${store.ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${store.ratingCount})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/components/review_item_card_widget.dart",
+      "findings": [
+        {
+          "line": 146,
+          "text": "(${item!.ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${item!.ratingCount})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/custom_appBar_widget.dart",
+      "findings": [
+        {
+          "line": 105,
+          "text": "Debug Popup Panel",
+          "existingKey": null,
+          "lineContent": "tooltip: 'Debug Popup Panel',"
+        },
+        {
+          "line": 272,
+          "text": "[NotificationIcon] named route stack",
+          "existingKey": null,
+          "lineContent": "label: '[NotificationIcon] named route stack', stackTrace: stackTrace);"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/highlight_widget.dart",
+      "findings": [
+        {
+          "line": 174,
+          "text": "(${advertisement.reviewsCommentsCount})",
+          "existingKey": null,
+          "lineContent": "? Text('(${advertisement.reviewsCommentsCount})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/views/best_store_nearby_view.dart",
+      "findings": [
+        {
+          "line": 339,
+          "text": "(${storeList[index].ratingCount.toString()})",
+          "existingKey": null,
+          "lineContent": "Text('(${storeList[index].ratingCount.toString()})', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, c"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/web/web_best_store_nearby_view_widget.dart",
+      "findings": [
+        {
+          "line": 371,
+          "text": "(${storeList[index].ratingCount.toString()})",
+          "existingKey": null,
+          "lineContent": "Text('(${storeList[index].ratingCount.toString()})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/web/web_item_that_you_love_view_widget.dart",
+      "findings": [
+        {
+          "line": 147,
+          "text": "(${recommendItems[index].ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${recommendItems[index].ratingCount})',"
+        },
+        {
+          "line": 364,
+          "text": "(${recommendItems[index].ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${recommendItems[index].ratingCount})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/web/web_top_offers_near_me.dart",
+      "findings": [
+        {
+          "line": 283,
+          "text": "(${store.ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${store.ratingCount})',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/home/widgets/web/widgets/medicine_item_card.dart",
+      "findings": [
+        {
+          "line": 131,
+          "text": "(${item.ratingCount})",
+          "existingKey": null,
+          "lineContent": "Text('(${item.ratingCount})',"
+        }
+      ]
+    }
+  ],
+  "loyalty": [
+    {
+      "file": "lib/features/loyalty/widgets/loyalty_bottom_sheet_widget.dart",
+      "findings": [
+        {
+          "line": 166,
+          "text": "النقاط للتحويل",
+          "existingKey": null,
+          "lineContent": "label: 'النقاط للتحويل',"
+        },
+        {
+          "line": 197,
+          "text": "المبلغ المحول",
+          "existingKey": null,
+          "lineContent": "label: 'المبلغ المحول',"
+        }
+      ]
+    }
+  ],
+  "my_coupon": [
+    {
+      "file": "lib/features/my_coupon/widgets/expired_coupon_widget.dart",
+      "findings": [
+        {
+          "line": 20,
+          "text": "لا يوجد كوبونات منتهية الصلاحية",
+          "existingKey": null,
+          "lineContent": "message: 'لا يوجد كوبونات منتهية الصلاحية',"
+        }
+      ]
+    }
+  ],
+  "offers": [
+    {
+      "file": "lib/features/offers/controllers/offers_controller.dart",
+      "findings": [
+        {
+          "line": 227,
+          "text": "No module selected",
+          "existingKey": null,
+          "lineContent": "success: false, data: [], message: 'No module selected');"
+        },
+        {
+          "line": 256,
+          "text": "Request timed out",
+          "existingKey": null,
+          "lineContent": "success: false, data: [], message: 'Request timed out');"
+        },
+        {
+          "line": 325,
+          "text": "Failed to load offers",
+          "existingKey": null,
+          "lineContent": "success: false, data: [], message: 'Failed to load offers');"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/offers/domain/reposotories/offers_repository.dart",
+      "findings": [
+        {
+          "line": 133,
+          "text": "ETag clear cooldown active",
+          "existingKey": null,
+          "lineContent": "message: 'ETag clear cooldown active',"
+        },
+        {
+          "line": 198,
+          "text": "Invalid response format",
+          "existingKey": null,
+          "lineContent": "success: false, data: [], message: 'Invalid response format');"
+        },
+        {
+          "line": 231,
+          "text": "Failed to parse offers data",
+          "existingKey": null,
+          "lineContent": "success: false, data: [], message: 'Failed to parse offers data');"
+        },
+        {
+          "line": 237,
+          "text": "Failed to load offers",
+          "existingKey": null,
+          "lineContent": "success: false, data: [], message: 'Failed to load offers');"
+        },
+        {
+          "line": 242,
+          "text": "Network error",
+          "existingKey": "network_error",
+          "lineContent": "return OffersModel(success: false, data: [], message: 'Network error');"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/offers/screens/offers_item_screen.dart",
+      "findings": [
+        {
+          "line": 287,
+          "text": "ابحث في العروض...",
+          "existingKey": null,
+          "lineContent": "hintText: 'ابحث في العروض...',"
+        },
+        {
+          "line": 438,
+          "text": "ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.",
+          "existingKey": null,
+          "lineContent": "message: 'ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.',"
+        },
+        {
+          "line": 456,
+          "text": "ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.",
+          "existingKey": null,
+          "lineContent": "message: 'ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.',"
+        }
+      ]
+    }
+  ],
+  "order": [
+    {
+      "file": "lib/features/order/screens/guest_track_order_screen.dart",
+      "findings": [
+        {
+          "line": 71,
+          "text": " #${orderController.trackModel?.id}",
+          "existingKey": null,
+          "lineContent": "Text(' #${orderController.trackModel?.id}',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/invoice_bottom_sheet.dart",
+      "findings": [
+        {
+          "line": 247,
+          "text": "[ $paymentStatus ]",
+          "existingKey": null,
+          "lineContent": "child: Text('[ $paymentStatus ]',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/order_calcuation_widget.dart",
+      "findings": [
+        {
+          "line": 229,
+          "text": "(+) ${order.dmTips}",
+          "existingKey": null,
+          "lineContent": "Text('(+) ${order.dmTips}',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/order/widgets/order_info_widget.dart",
+      "findings": [
+        {
+          "line": 153,
+          "text": "#${order.id}",
+          "existingKey": null,
+          "lineContent": "Text('#${order.id}', style: robotoBold),"
+        }
+      ]
+    }
+  ],
+  "parcel": [
+    {
+      "file": "lib/features/parcel/widgets/parcel_app_bar_widget.dart",
+      "findings": [
+        {
+          "line": 145,
+          "text": "[ParcelNotificationIcon] named route stack",
+          "existingKey": null,
+          "lineContent": "label: '[ParcelNotificationIcon] named route stack',"
+        }
+      ]
+    }
+  ],
+  "payment": [
+    {
+      "file": "lib/features/payment/presentation/screens/add_card_screen.dart",
+      "findings": [
+        {
+          "line": 25,
+          "text": "إضافة بطاقة جديدة",
+          "existingKey": null,
+          "lineContent": "title: Text('إضافة بطاقة جديدة', style: s.t(18, weight: FontWeight.w800)),"
+        },
+        {
+          "line": 45,
+          "text": "تأكيد",
+          "existingKey": null,
+          "lineContent": "child: Text('تأكيد',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+      "findings": [
+        {
+          "line": 86,
+          "text": "المزيد",
+          "existingKey": null,
+          "lineContent": "child: Text('المزيد',"
+        },
+        {
+          "line": 95,
+          "text": "طريقة الدفع",
+          "existingKey": null,
+          "lineContent": "title: Text('طريقة الدفع', style: s.t(18, weight: FontWeight.w800)),"
+        },
+        {
+          "line": 135,
+          "text": "Apple Pay",
+          "existingKey": null,
+          "lineContent": "title: 'Apple Pay',"
+        },
+        {
+          "line": 142,
+          "text": "إضافة بطاقة جديدة",
+          "existingKey": null,
+          "lineContent": "title: 'إضافة بطاقة جديدة',"
+        },
+        {
+          "line": 160,
+          "text": "المحفظة",
+          "existingKey": null,
+          "lineContent": "title: 'المحفظة',"
+        },
+        {
+          "line": 161,
+          "text": "المجموع ${_fmt(widget.walletBalance)} ${widget.currency}",
+          "existingKey": null,
+          "lineContent": "subtitle: 'المجموع ${_fmt(widget.walletBalance)} ${widget.currency}',"
+        },
+        {
+          "line": 188,
+          "text": "الإجمالي",
+          "existingKey": null,
+          "lineContent": "Text('الإجمالي',"
+        },
+        {
+          "line": 223,
+          "text": "مبلغ آخر للإكرامية",
+          "existingKey": null,
+          "lineContent": "Text('مبلغ آخر للإكرامية',"
+        },
+        {
+          "line": 257,
+          "text": "تأكيد",
+          "existingKey": null,
+          "lineContent": "child: Text('تأكيد',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/payment/presentation/widgets/additional_info_section.dart",
+      "findings": [
+        {
+          "line": 25,
+          "text": "معلومات إضافية",
+          "existingKey": null,
+          "lineContent": "Text('معلومات إضافية', style: s.t(16, weight: FontWeight.w800)),"
+        },
+        {
+          "line": 37,
+          "text": "أدوات المائدة",
+          "existingKey": null,
+          "lineContent": "title: 'أدوات المائدة',"
+        },
+        {
+          "line": 38,
+          "text": "ستضاف إذا وفرها المطعم",
+          "existingKey": null,
+          "lineContent": "subtitle: 'ستضاف إذا وفرها المطعم',"
+        },
+        {
+          "line": 48,
+          "text": "للأصناف غير المتوفرة",
+          "existingKey": null,
+          "lineContent": "title: 'للأصناف غير المتوفرة',"
+        },
+        {
+          "line": 49,
+          "text": "الاتصال بي",
+          "existingKey": null,
+          "lineContent": "subtitle: 'الاتصال بي',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/payment/presentation/widgets/card_form_widget.dart",
+      "findings": [
+        {
+          "line": 56,
+          "text": "رقم البطاقة لا يمكن أن يكون فارغًا",
+          "existingKey": null,
+          "lineContent": "child: Text('رقم البطاقة لا يمكن أن يكون فارغًا',"
+        },
+        {
+          "line": 86,
+          "text": "حفظ كطريقة الدفع الأساسية",
+          "existingKey": null,
+          "lineContent": "child: Text('حفظ كطريقة الدفع الأساسية', style: s.t(14.5))),"
+        },
+        {
+          "line": 162,
+          "text": "تحمي شله معلومات بطاقتك",
+          "existingKey": null,
+          "lineContent": "Text('تحمي شله معلومات بطاقتك',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/payment/presentation/widgets/tip_selector.dart",
+      "findings": [
+        {
+          "line": 34,
+          "text": "مكافأة سائق التوصيل",
+          "existingKey": null,
+          "lineContent": "Text('مكافأة سائق التوصيل', style: s.t(16, weight: FontWeight.w800)),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/payment/screens/myfatoorah_payment_webview_screen.dart",
+      "findings": [
+        {
+          "line": 84,
+          "text": "الدفع قيد المعالجة",
+          "existingKey": null,
+          "lineContent": "title: const Text('الدفع قيد المعالجة'),"
+        },
+        {
+          "line": 91,
+          "text": "متابعة الدفع",
+          "existingKey": null,
+          "lineContent": "child: const Text('متابعة الدفع'),"
+        },
+        {
+          "line": 95,
+          "text": "الذهاب إلى طلباتي",
+          "existingKey": null,
+          "lineContent": "child: const Text('الذهاب إلى طلباتي'),"
+        }
+      ]
+    }
+  ],
+  "pos": [
+    {
+      "file": "lib/features/pos/screens/pos_checkout_screen.dart",
+      "findings": [
+        {
+          "line": 743,
+          "text": "دفع إلكتروني (Apple Pay / مدى / فيزا)",
+          "existingKey": null,
+          "lineContent": "title: 'دفع إلكتروني (Apple Pay / مدى / فيزا)',"
+        },
+        {
+          "line": 744,
+          "text": "دفع فوري وآمن بالبطاقات البنكية",
+          "existingKey": null,
+          "lineContent": "subtitle: 'دفع فوري وآمن بالبطاقات البنكية',"
+        },
+        {
+          "line": 754,
+          "text": "محفظة شلة",
+          "existingKey": null,
+          "lineContent": "title: 'محفظة شلة',"
+        }
+      ]
+    }
+  ],
+  "refer_and_earn": [
+    {
+      "file": "lib/features/refer_and_earn/screens/refer_and_earn_screen.dart",
+      "findings": [
+        {
+          "line": 688,
+          "text": "+ ${reward.toStringAsFixed(0)}",
+          "existingKey": null,
+          "lineContent": "Text('+ ${reward.toStringAsFixed(0)}',"
+        }
+      ]
+    }
+  ],
+  "search": [
+    {
+      "file": "lib/features/search/screens/search_screen.builders.dart",
+      "findings": [
+        {
+          "line": 75,
+          "text": "قريبًا",
+          "existingKey": null,
+          "lineContent": "Get.rawSnackbar(message: 'قريبًا');"
+        }
+      ]
+    }
+  ],
+  "statistics": [
+    {
+      "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+      "findings": [
+        {
+          "line": 207,
+          "text": "High Grocery Spending",
+          "existingKey": null,
+          "lineContent": "title: 'High Grocery Spending',"
+        },
+        {
+          "line": 208,
+          "text": "Your grocery spending is 25% higher than last month. Consider buying in bulk for better savings.",
+          "existingKey": null,
+          "lineContent": "message: 'Your grocery spending is 25% higher than last month. Consider buying in bulk for better savings.',"
+        },
+        {
+          "line": 216,
+          "text": "Weekly Budget Alert",
+          "existingKey": null,
+          "lineContent": "title: 'Weekly Budget Alert',"
+        },
+        {
+          "line": 217,
+          "text": "You\\",
+          "existingKey": null,
+          "lineContent": "message: 'You\\'ve spent 80% of your weekly budget. Consider reducing non-essential purchases.',"
+        },
+        {
+          "line": 225,
+          "text": "Try New Categories",
+          "existingKey": null,
+          "lineContent": "title: 'Try New Categories',"
+        },
+        {
+          "line": 226,
+          "text": "You haven\\",
+          "existingKey": null,
+          "lineContent": "message: 'You haven\\'t purchased from Electronics in 2 weeks. Check out our latest deals!',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/statistics/widgets/enhanced_summary_cards.dart",
+      "findings": [
+        {
+          "line": 49,
+          "text": "الإنفاق الشهري",
+          "existingKey": null,
+          "lineContent": "title: 'الإنفاق الشهري',"
+        }
+      ]
+    }
+  ],
+  "store": [
+    {
+      "file": "lib/features/store/screens/food_restaurant_detail_screen.dart",
+      "findings": [
+        {
+          "line": 1232,
+          "text": "Connection Timeout",
+          "existingKey": null,
+          "lineContent": "Text('Connection Timeout', style: TextStyle(fontSize: 16, color: Theme.of(context).disabledColor),),"
+        },
+        {
+          "line": 1234,
+          "text": "Please check your connection and try again",
+          "existingKey": null,
+          "lineContent": "Text('Please check your connection and try again', style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor"
+        },
+        {
+          "line": 1281,
+          "text": "Out of Coverage",
+          "existingKey": null,
+          "lineContent": "Text('Out of Coverage', style: TextStyle(fontSize: 16, color: Theme.of(context).disabledColor),),"
+        },
+        {
+          "line": 1283,
+          "text": "This store is not available in your area",
+          "existingKey": null,
+          "lineContent": "Text('This store is not available in your area', style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/store/widgets/food_restaurant/food_restaurant_menu_item_card.dart",
+      "findings": [
+        {
+          "line": 297,
+          "text": "انتهت الكمية",
+          "existingKey": null,
+          "lineContent": "label: 'انتهت الكمية',"
+        },
+        {
+          "line": 494,
+          "text": "انتهت الكمية",
+          "existingKey": null,
+          "lineContent": "label: 'انتهت الكمية',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+      "findings": [
+        {
+          "line": 88,
+          "text": "البحث حسب",
+          "existingKey": null,
+          "lineContent": "const SectionTitle(title: 'البحث حسب'),"
+        },
+        {
+          "line": 103,
+          "text": "الفئة",
+          "existingKey": null,
+          "lineContent": "const Text('الفئة',"
+        },
+        {
+          "line": 115,
+          "text": "اسم المنتج",
+          "existingKey": null,
+          "lineContent": "const SectionTitle(title: 'اسم المنتج'),"
+        },
+        {
+          "line": 122,
+          "text": "هل تريد خصم؟",
+          "existingKey": null,
+          "lineContent": "const Text('هل تريد خصم؟',"
+        },
+        {
+          "line": 132,
+          "text": "نطاق السعر",
+          "existingKey": null,
+          "lineContent": "const SectionTitle(title: 'نطاق السعر'),"
+        },
+        {
+          "line": 174,
+          "text": "تطبيق",
+          "existingKey": null,
+          "lineContent": "child: Text('تطبيق',"
+        }
+      ]
+    }
+  ],
+  "wallet": [
+    {
+      "file": "lib/features/wallet/widgets/convert_money_bottomSheet.dart",
+      "findings": [
+        {
+          "line": 45,
+          "text": " اكتب رقم الهاتف مصحوب بكود البلد لصاحب الحساب الذي تريد التحويل له",
+          "existingKey": null,
+          "lineContent": "const Text(' اكتب رقم الهاتف مصحوب بكود البلد لصاحب الحساب الذي تريد التحويل له'),"
+        },
+        {
+          "line": 63,
+          "text": "طلب الكود",
+          "existingKey": null,
+          "lineContent": "child: const Text('طلب الكود'))),"
+        },
+        {
+          "line": 72,
+          "text": "سيصل الكود اليكم عن طريق الاشعارات",
+          "existingKey": null,
+          "lineContent": "const Text('سيصل الكود اليكم عن طريق الاشعارات'),"
+        },
+        {
+          "line": 129,
+          "text": "تحويل المبلغ",
+          "existingKey": null,
+          "lineContent": "child: const Text('تحويل المبلغ'))),"
+        }
+      ]
+    }
+  ],
+  "wallet_kaidha_subscription": [
+    {
+      "file": "lib/features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+      "findings": [
+        {
+          "line": 531,
+          "text": "هل قمت بالمصادقة داخل تطبيق نفاذ ؟",
+          "existingKey": null,
+          "lineContent": "title: 'هل قمت بالمصادقة داخل تطبيق نفاذ ؟',"
+        },
+        {
+          "line": 955,
+          "text": "Wallet loaded from login",
+          "existingKey": null,
+          "lineContent": "message: 'Wallet loaded from login',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/screen/show_pdf_screen.dart",
+      "findings": [
+        {
+          "line": 376,
+          "text": "هل لديك استفسار؟",
+          "existingKey": null,
+          "lineContent": "const Text('هل لديك استفسار؟', style: TextStyle(fontSize: 16)),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/contract_review_screen.dart",
+      "findings": [
+        {
+          "line": 87,
+          "text": "عرض العقد",
+          "existingKey": null,
+          "lineContent": "appBar: AppBar(title: const Center(child: Text('عرض العقد'))),"
+        },
+        {
+          "line": 111,
+          "text": "إعادة المحاولة",
+          "existingKey": null,
+          "lineContent": "child: const Text('إعادة المحاولة'),"
+        },
+        {
+          "line": 121,
+          "text": "لا يوجد عقد متاح",
+          "existingKey": null,
+          "lineContent": "return const Center(child: Text('لا يوجد عقد متاح'));"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+      "findings": [
+        {
+          "line": 140,
+          "text": "اسم جهة العمل",
+          "existingKey": null,
+          "lineContent": "hintText: 'اسم جهة العمل',"
+        },
+        {
+          "line": 204,
+          "text": "ادخل رقم",
+          "existingKey": null,
+          "lineContent": "hintText: 'ادخل رقم',"
+        },
+        {
+          "line": 293,
+          "text": "نعم",
+          "existingKey": null,
+          "lineContent": "label: 'نعم',"
+        },
+        {
+          "line": 329,
+          "text": "ادخل رقم",
+          "existingKey": null,
+          "lineContent": "hintText: 'ادخل رقم',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step3_screen.dart",
+      "findings": [
+        {
+          "line": 425,
+          "text": "تحقق من الحالة",
+          "existingKey": null,
+          "lineContent": "label: 'تحقق من الحالة',"
+        },
+        {
+          "line": 437,
+          "text": "التحقق من المصادقة",
+          "existingKey": null,
+          "lineContent": "label: 'التحقق من المصادقة',"
+        },
+        {
+          "line": 461,
+          "text": "تأكيد توقيع العقد",
+          "existingKey": null,
+          "lineContent": "title: 'تأكيد توقيع العقد',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/screen/wallet_kaidha_screen.dart",
+      "findings": [
+        {
+          "line": 335,
+          "text": "جاري تحميل طرق الدفع...",
+          "existingKey": null,
+          "lineContent": "Text('جاري تحميل طرق الدفع...'),"
+        },
+        {
+          "line": 358,
+          "text": "لا توجد طرق دفع متاحة",
+          "existingKey": null,
+          "lineContent": "Text('لا توجد طرق دفع متاحة',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/address_details_widget.dart",
+      "findings": [
+        {
+          "line": 42,
+          "text": "العنوان :  ",
+          "existingKey": null,
+          "lineContent": "Text('العنوان :  ', style: robotoMedium),"
+        },
+        {
+          "line": 55,
+          "text": "المنزل :  ",
+          "existingKey": null,
+          "lineContent": "Text('المنزل :  ', style: robotoMedium),"
+        },
+        {
+          "line": 68,
+          "text": "الشارع :  ",
+          "existingKey": null,
+          "lineContent": "Text('الشارع :  ', style: robotoMedium),"
+        },
+        {
+          "line": 82,
+          "text": "الوصف :  ",
+          "existingKey": null,
+          "lineContent": "Text('الوصف :  ', style: robotoMedium),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+      "findings": [
+        {
+          "line": 55,
+          "text": "أطراف الاتفاقية",
+          "existingKey": null,
+          "lineContent": "title: 'أطراف الاتفاقية',"
+        },
+        {
+          "line": 61,
+          "text": "الغرض من الاتفاقية",
+          "existingKey": null,
+          "lineContent": "title: 'الغرض من الاتفاقية',"
+        },
+        {
+          "line": 67,
+          "text": "بيانات الملف الائتماني",
+          "existingKey": null,
+          "lineContent": "title: 'بيانات الملف الائتماني',"
+        },
+        {
+          "line": 73,
+          "text": "معالجة البيانات والخصوصية",
+          "existingKey": null,
+          "lineContent": "title: 'معالجة البيانات والخصوصية',"
+        },
+        {
+          "line": 79,
+          "text": "التزامات المنصة",
+          "existingKey": null,
+          "lineContent": "title: 'التزامات المنصة',"
+        },
+        {
+          "line": 85,
+          "text": "مدة الاتفاقية وإنهاؤها",
+          "existingKey": null,
+          "lineContent": "title: 'مدة الاتفاقية وإنهاؤها',"
+        },
+        {
+          "line": 91,
+          "text": "أحكام عامة",
+          "existingKey": null,
+          "lineContent": "title: 'أحكام عامة',"
+        },
+        {
+          "line": 97,
+          "text": "التوقيع والمصادقة الإلكترونية",
+          "existingKey": null,
+          "lineContent": "title: 'التوقيع والمصادقة الإلكترونية',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/activate_wallet_Dialog.dart",
+      "findings": [
+        {
+          "line": 25,
+          "text": "في انتظار تفعيل محفظة قيدها",
+          "existingKey": null,
+          "lineContent": "Text('في انتظار تفعيل محفظة قيدها', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),"
+        },
+        {
+          "line": 27,
+          "text": "يمكنك الآن متابعة رصيدك وإجراء المعاملات بسهولة.",
+          "existingKey": null,
+          "lineContent": "Text('يمكنك الآن متابعة رصيدك وإجراء المعاملات بسهولة.',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/contract_confirmation_dialog.dart",
+      "findings": [
+        {
+          "line": 51,
+          "text": "موافق",
+          "existingKey": null,
+          "lineContent": "title: 'موافق',"
+        },
+        {
+          "line": 63,
+          "text": "إلغاء",
+          "existingKey": null,
+          "lineContent": "title: 'إلغاء',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/qidha_contract_request_dialog.dart",
+      "findings": [
+        {
+          "line": 334,
+          "text": "أدخل مبلغ التعاقد...",
+          "existingKey": null,
+          "lineContent": "hintText: 'أدخل مبلغ التعاقد...',"
+        },
+        {
+          "line": 382,
+          "text": "ملاحظة إضافية للمتجر (اختياري)...",
+          "existingKey": null,
+          "lineContent": "hintText: 'ملاحظة إضافية للمتجر (اختياري)...',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/success_celebration_dialog.dart",
+      "findings": [
+        {
+          "line": 50,
+          "text": "تم التسجيل بنجاح!",
+          "existingKey": null,
+          "lineContent": "ScaleAnimatedText('تم التسجيل بنجاح!'),"
+        },
+        {
+          "line": 136,
+          "text": "مبروك! لقد فزت معنا بقسيمة شرائية!",
+          "existingKey": null,
+          "lineContent": "ScaleAnimatedText('مبروك! لقد فزت معنا بقسيمة شرائية!'),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/dual_date_picker_field.dart",
+      "findings": [
+        {
+          "line": 550,
+          "text": "اليوم",
+          "existingKey": null,
+          "lineContent": "label: 'اليوم',"
+        },
+        {
+          "line": 565,
+          "text": "الشهر",
+          "existingKey": null,
+          "lineContent": "label: 'الشهر',"
+        },
+        {
+          "line": 580,
+          "text": "السنة",
+          "existingKey": null,
+          "lineContent": "label: 'السنة',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/payment_details.dart",
+      "findings": [
+        {
+          "line": 159,
+          "text": "رقم البطاقة",
+          "existingKey": null,
+          "lineContent": "label: 'رقم البطاقة',"
+        },
+        {
+          "line": 164,
+          "text": "تاريخ انتهاء الشهر",
+          "existingKey": null,
+          "lineContent": "label: 'تاريخ انتهاء الشهر',"
+        },
+        {
+          "line": 336,
+          "text": "جاري تحميل العقد...",
+          "existingKey": null,
+          "lineContent": "Text('جاري تحميل العقد...',"
+        },
+        {
+          "line": 374,
+          "text": "عرض العقد",
+          "existingKey": null,
+          "lineContent": "Text('عرض العقد', style: _tajawal(11, FontWeight.w600)),"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/personal_information.dart",
+      "findings": [
+        {
+          "line": 352,
+          "text": "١٠ أرقام (مثال: 1XXXXXXXXX)",
+          "existingKey": null,
+          "lineContent": "hintText: '١٠ أرقام (مثال: 1XXXXXXXXX)',"
+        }
+      ]
+    },
+    {
+      "file": "lib/features/wallet_kaidha_subscription/widget/qidha_stores_filter_bottom_sheet.dart",
+      "findings": [
+        {
+          "line": 192,
+          "text": "أعلى تقييم",
+          "existingKey": null,
+          "lineContent": "label: 'أعلى تقييم',"
+        },
+        {
+          "line": 204,
+          "text": "توصيل مجاني",
+          "existingKey": null,
+          "lineContent": "label: 'توصيل مجاني',"
+        },
+        {
+          "line": 216,
+          "text": "توصيل سريع",
+          "existingKey": null,
+          "lineContent": "label: 'توصيل سريع',"
+        }
+      ]
+    }
+  ],
+  "wallet_transfer": [
+    {
+      "file": "lib/features/wallet_transfer/screens/choose_receiver_screen.dart",
+      "findings": [
+        {
+          "line": 148,
+          "text": "+9665XXXXXXXX",
+          "existingKey": null,
+          "lineContent": "hintText: '+9665XXXXXXXX',"
+        },
+        {
+          "line": 249,
+          "text": "اختيار",
+          "existingKey": null,
+          "lineContent": "Text('اختيار', style: robotoMedium),"
+        }
+      ]
+    }
+  ]
+}

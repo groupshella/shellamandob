@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,7 +23,10 @@ class MarketerController extends GetxController implements GetxService {
   Map<String, dynamic>? _data;
   Map<String, dynamic>? get data => _data;
 
+  Timer? _pendingPollingTimer;
+
   void reset() {
+    _stopPendingPolling();
     _data = null;
     _isLoading = false;
     _isSubmitting = false;
@@ -89,6 +93,11 @@ class MarketerController extends GetxController implements GetxService {
       if (response.statusCode == 200 && response.body != null) {
         _data = Map<String, dynamic>.from(
             response.body['data'] ?? <String, dynamic>{'marketer_status': 'none'});
+        if (status == 'pending') {
+          _startPendingPolling();
+        } else {
+          _stopPendingPolling();
+        }
       } else {
         _data ??= {'marketer_status': 'none'};
       }
@@ -98,6 +107,28 @@ class MarketerController extends GetxController implements GetxService {
     }
     _isLoading = false;
     update();
+  }
+
+  void _startPendingPolling() {
+    if (_pendingPollingTimer != null && _pendingPollingTimer!.isActive) return;
+    _pendingPollingTimer = Timer.periodic(const Duration(seconds: 20), (timer) {
+      if (status == 'pending') {
+        loadDashboard(notify: true);
+      } else {
+        _stopPendingPolling();
+      }
+    });
+  }
+
+  void _stopPendingPolling() {
+    _pendingPollingTimer?.cancel();
+    _pendingPollingTimer = null;
+  }
+
+  @override
+  void onClose() {
+    _stopPendingPolling();
+    super.onClose();
   }
 
   Future<bool> apply({

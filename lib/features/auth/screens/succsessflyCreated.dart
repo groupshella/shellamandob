@@ -60,7 +60,7 @@ class Succsessflycreated extends StatelessWidget {
                   }
                 },
                 child:
-                    Text('قم بتسجيل الدخول', style: font14White600W(context)),
+                    Text('login_prompt'.tr, style: font14White600W(context)),
               ),
             ),
             SizedBox(height: size_18(context)),

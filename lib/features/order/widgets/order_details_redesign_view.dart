@@ -535,13 +535,13 @@ class OrderDetailsRedesignView extends StatelessWidget {
       } else {
         final String err = cart.lastAddToCartErrorCode ?? '';
         if (err == 'store_closed') {
-          showCustomSnackBar('المتجر مغلق حالياً ولا يمكن استقبال طلبات'.tr);
+          showCustomSnackBar('store_closed_cannot_accept_orders'.tr);
         } else {
-          showCustomSnackBar('تعذر إضافة المنتجات للسلة، يرجى المحاولة لاحقاً'.tr);
+          showCustomSnackBar('unable_to_add_items_to_cart_try_later'.tr);
         }
       }
     } catch (_) {
-      showCustomSnackBar('تعذر إضافة المنتجات للسلة'.tr);
+      showCustomSnackBar('unable_to_add_items_to_cart'.tr);
     }
   }
 

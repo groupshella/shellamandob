@@ -331,7 +331,7 @@ class _QidhaContractRequestDialogState
               color: Color(0xFF111B18),
             ),
             decoration: InputDecoration(
-              hintText: 'أدخل مبلغ التعاقد...',
+              hintText: 'contract_amount_hint'.tr,
               hintStyle: const TextStyle(
                 fontFamily: _fontTajawal,
                 fontSize: 13,
@@ -379,7 +379,7 @@ class _QidhaContractRequestDialogState
               color: Color(0xFF111B18),
             ),
             decoration: InputDecoration(
-              hintText: 'ملاحظة إضافية للمتجر (اختياري)...',
+              hintText: 'optional_store_note'.tr,
               hintStyle: const TextStyle(
                 fontFamily: _fontTajawal,
                 fontSize: 13,
@@ -490,7 +490,7 @@ class _QidhaContractRequestDialogState
         ),
         const SizedBox(height: 16),
         const Text(
-          'تم إرسال طلبك بنجاح! 🎉',
+          'تم إرسال طلبك بنجاح!',
           style: TextStyle(
             fontFamily: _fontTajawal,
             fontSize: 18,

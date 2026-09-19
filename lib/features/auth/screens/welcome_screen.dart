@@ -99,7 +99,7 @@ class WelcomeScreen extends StatelessWidget {
                 if (AppConstants.isMarketerApp) ...[
                   const SizedBox(height: Dimensions.paddingSizeDefault),
                   CustomButton(
-                    buttonText: 'طلب الانضمام كمسوق قسائم جديد',
+                    buttonText: 'join_as_new_coupon_marketer'.tr,
                     isBold: true,
                     fontFamily: 'Tajawal',
                     fontSize: 15,

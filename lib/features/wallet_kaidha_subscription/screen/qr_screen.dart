@@ -255,7 +255,7 @@ class _Qr_ScreenState extends State<Qr_Screen>
                           if (otpCode != null) ...[
                             const SizedBox(height: 16),
                             CustomButton(
-                              buttonText: 'متابعة الطلب',
+                              buttonText: 'continue_order'.tr,
                               onPressed: () {
                                 _handleCode(otpCode!);
                               },

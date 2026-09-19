@@ -16,9 +16,9 @@ class GenderSelectScreen extends StatefulWidget {
 
 class _GenderSelectScreenState extends State<GenderSelectScreen> {
   static const Color _titleColor = Color(0xFF111B18);
-  static const List<String> _options = <String>['ذكر', 'أنثى'];
+  static const List<String> _options = <String>['male', 'female'];
 
-  late String? _selected = widget.initial;
+  late String? _selected = (widget.initial == 'ذكر' ? 'male' : (widget.initial == 'أنثى' ? 'female' : widget.initial));
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +93,7 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: () => Get.back<String>(result: _selected),
+                    onTap: () => Get.back<String>(result: _selected == 'male' ? 'ذكر' : (_selected == 'female' ? 'أنثى' : _selected)),
                     child: Center(
                       child: Text(
                         'pf_save'.tr,
@@ -127,7 +127,7 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
             _radio(selected),
             SizedBox(width: 12.r(context)),
             Text(
-              option,
+              option.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 15.r(context),

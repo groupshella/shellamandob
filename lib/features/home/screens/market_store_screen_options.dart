@@ -486,7 +486,7 @@ class _ProductOptionsSheetState extends State<_ProductOptionsSheet> {
       setState(() => _invalid
         ..clear()
         ..addAll(miss));
-      showCustomSnackBar('يرجى اختيار الخيارات المطلوبة', isError: true);
+      showCustomSnackBar('please_select_required_options'.tr, isError: true);
       return;
     }
     if (!Get.isRegistered<CartController>()) return;

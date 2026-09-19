@@ -492,7 +492,7 @@ class _RiyadhMapSearchState extends State<RiyadhMapSearch> {
         const SizedBox(height: 16),
         CustomButton(
           width: 150,
-          buttonText: 'بحث',
+          buttonText: 'search'.tr,
           onPressed: () => _searchInRiyadh(_searchController.text),
         ),
         if (!_isInsideZone)

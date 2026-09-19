@@ -306,7 +306,7 @@ class _Step3ScreenState extends State<Step3Screen> {
           _bulletPoint('1. اضغط على "استعراض العقد" للاطلاع عليه بعناية قبل التوقيع.'),
           _bulletPoint('2. تأكد من الرقم الظاهر أعلاه في مؤشر نفاذ.'),
           _bulletPoint('3. افتح تطبيق "نفاذ" في هاتفك واختر الطلب الذي يحمل نفس الرقم.'),
-          _bulletPoint('4. أكمل إجراءات الموافقة، ثم اضغط "التحقق من المصادقة".'),
+          _bulletPoint('4. أكمل إجراءات الموافقة، ثم اضغط "${'verify_auth'.tr}".'),
         ],
       ),
     );
@@ -397,7 +397,7 @@ class _Step3ScreenState extends State<Step3Screen> {
                 radius: 12,
                 height: 48,
                 color: const Color(0xFF30913F),
-                buttonText: 'استعراض العقد قبل التوقيع',
+                buttonText: 'review_contract_before_signing'.tr,
                 onPressed: () async {
                   Get.to(
                     () => Befor_Pdf_Screen(
@@ -422,7 +422,7 @@ class _Step3ScreenState extends State<Step3Screen> {
               ),
               const SizedBox(height: 10),
               _secondaryActionButton(
-                label: 'تحقق من الحالة',
+                label: 'verify_status'.tr,
                 isLoading: KaidhaSubController.isLoading_Status,
                 onPressed: () async {
                   await KaidhaSubController.Nafath_send_checkStatus(
@@ -434,7 +434,7 @@ class _Step3ScreenState extends State<Step3Screen> {
               ),
               const SizedBox(height: 10),
               _secondaryActionButton(
-                label: 'التحقق من المصادقة',
+                label: 'verify_auth'.tr,
                 isLoading: KaidhaSubController.isLoading_OTP,
                 onPressed: () async {
                   await KaidhaSubController.Nafath_send_National_Id(
@@ -458,7 +458,7 @@ class _Step3ScreenState extends State<Step3Screen> {
                         barrierDismissible: false,
                         ConfirmationDialog(
                           icon: Images.warning,
-                          title: 'تأكيد توقيع العقد',
+                          title: 'confirm_contract_signing'.tr,
                           description:
                               'هل أنت متأكد من توقيع العقد وإرسال البيانات؟',
                           onYesPressed: () async {

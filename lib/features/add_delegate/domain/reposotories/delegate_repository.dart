@@ -1,6 +1,7 @@
 ﻿// ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously, depend_on_referenced_packages, annotate_overrides, unused_local_variable, empty_catches
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:path/path.dart' as p;
 import 'package:sixam_mart/common/security/certificate_pinning.dart';
@@ -100,13 +101,13 @@ class DelegateRepository implements DelegateRepositoryInterface {
           dio_pkg.MultipartFile.fromBytes(file.bytes!, filename: file.name),
         ));
       } else {
-        showCustomSnackBar('تعذر قراءة الملف المرفق. اختر ملفًا آخر.');
+        showCustomSnackBar('unable_to_read_attachment'.tr);
         return false;
       }
 
       formData.fields.add(MapEntry('id_photo_name', p.basename(file.name)));
     } else {
-      showCustomSnackBar('الرجاء إرفاق صورة الهوية');
+      showCustomSnackBar('please_attach_id_photo'.tr);
       return false;
     }
 
@@ -127,7 +128,7 @@ class DelegateRepository implements DelegateRepositoryInterface {
 
     if (dioResponse.statusCode == 200 || dioResponse.statusCode == 201) {
       debugPrint('✅ تم الإرسال بنجاح');
-      showCustomSnackBar('تم الإرسال بنجاح', isError: false);
+      showCustomSnackBar('request_sent_successfully'.tr, isError: false);
       return true;
     }
 
@@ -135,7 +136,7 @@ class DelegateRepository implements DelegateRepositoryInterface {
     debugPrint('${dioResponse.data}');
 
     if (dioResponse.statusCode == 404) {
-      showCustomSnackBar('الخدمة غير متاحة حالياً: مسار إرسال المندوب غير موجود على الخادم (404).');
+      showCustomSnackBar('service_unavailable_server_error'.tr);
       return false;
     }
 
@@ -146,11 +147,11 @@ class DelegateRepository implements DelegateRepositoryInterface {
       } else if (decoded is Map && decoded.containsKey('errors')) {
         showCustomSnackBar(decoded['errors'].toString());
       } else {
-        showCustomSnackBar('فشل في الإرسال، حاول مرة أخرى في وقت لاحق');
+        showCustomSnackBar('failed_to_send_try_later'.tr);
       }
     } catch (e) {
       debugPrint('❌ خطأ في فك الرد: $e');
-      showCustomSnackBar('فشل في الإرسال، حاول مرة أخرى في وقت لاحق');
+      showCustomSnackBar('failed_to_send_try_later'.tr);
     }
 
     return false;

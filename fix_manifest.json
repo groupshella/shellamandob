@@ -1,0 +1,1770 @@
+[
+  {
+    "file": "lib/features/add_delegate/screens/add_delegate_screen.dart",
+    "line": 56,
+    "original": "المندوب",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/add_delegate/screens/add_delegate_screen.dart",
+    "line": 74,
+    "original": "معلومات المندوب",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/add_delegate/screens/add_delegate_screen.dart",
+    "line": 149,
+    "original": "تعذر جلب بيانات المستخدم، حاول مرة أخرى",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/add_delegate/screens/add_delegate_screen.dart",
+    "line": 156,
+    "original": "رجاء إدخال رقم الهاتف",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/add_delegate/widget/file_upload_widget.dart",
+    "line": 35,
+    "original": "اسم الملف",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/add_delegate/widget/file_upload_widget.dart",
+    "line": 56,
+    "original": "اختر ملفًا وأضفه",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/screens/delivery_man_registration_screen.dart",
+    "line": 727,
+    "original": "رقم الهاتف",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/screens/delivery_man_registration_screen.dart",
+    "line": 1111,
+    "original": "نوع الهوية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/screens/delivery_man_registration_screen.dart",
+    "line": 1275,
+    "original": "الهوية الشخصية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/screens/delivery_man_registration_screen.dart",
+    "line": 1292,
+    "original": "رخصة السائق",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/screens/delivery_man_registration_screen.dart",
+    "line": 1308,
+    "original": "رخصة القيادة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/screens/succsessflyCreated.dart",
+    "line": 63,
+    "original": "قم بتسجيل الدخول",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/auth/widgets/build_upload_section.dart",
+    "line": 65,
+    "original": "رفع صورة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/campaign/widgets/figma_store_view.dart",
+    "line": 261,
+    "original": "توصيل مجاني",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 14,
+    "original": "Cart Mock",
+    "key": "cart_mock",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 98,
+    "original": "رجوع",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 117,
+    "original": "نسكافيه 30 ظرف",
+    "key": "ar_30",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 118,
+    "original": "عرض 30 ظرف 5+ هدية",
+    "key": "ar_30_5",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 126,
+    "original": "شاي ليبتون",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 127,
+    "original": "عرض 35 ظرف 5+ هدية",
+    "key": "ar_35_5",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 135,
+    "original": "شاي الوزة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 171,
+    "original": "المجموع الفرعي",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 173,
+    "original": "الضرائب والرسوم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 175,
+    "original": "التوصيل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 178,
+    "original": "الإجمالي",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/screens/touese.dart",
+    "line": 467,
+    "original": "برومو كود",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/cart/widgets/delivery_option_button_widget.dart",
+    "line": 138,
+    "original": "قريباً",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/category/widgets/grocery_category/grocery_product_grid.dart",
+    "line": 83,
+    "original": "-$pct%",
+    "key": "pct",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/category/widgets/search_filter.dart",
+    "line": 105,
+    "original": "البحث حسب",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/category/widgets/search_filter.dart",
+    "line": 126,
+    "original": "المتاجر",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/category/widgets/search_filter.dart",
+    "line": 151,
+    "original": "اسم المنتج",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/category/widgets/search_filter.dart",
+    "line": 160,
+    "original": "نطاق السعر",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/category/widgets/search_filter.dart",
+    "line": 191,
+    "original": "إعادة تعيين",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/category/widgets/search_filter.dart",
+    "line": 203,
+    "original": "تطبيق",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/chat/screens/chat_screen.dart",
+    "line": 505,
+    "original": "يتم الكتابة...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/chat/screens/chat_screen.dart",
+    "line": 974,
+    "original": "المتجر يكتب...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/chat/screens/chat_search_screen.dart",
+    "line": 89,
+    "original": "البحث",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/chat/screens/chat_search_screen.dart",
+    "line": 256,
+    "original": "لا توجد نتائج",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/chat/widgets/message_bubble_widget.dart",
+    "line": 198,
+    "original": "#${order.id}",
+    "key": "orderid",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/checkout/widgets/coupon_bottom_sheet.dart",
+    "line": 170,
+    "original": "خصم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/checkout/widgets/coupon_bottom_sheet.dart",
+    "line": 217,
+    "original": "صالح حتى: $expiry",
+    "key": "ar_expiry",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/checkout/widgets/coupon_bottom_sheet.dart",
+    "line": 238,
+    "original": "استخدام",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/alerts/controllers/anti_fraud_alerts_controller.dart",
+    "line": 43,
+    "original": "تنبيه حركة ميدانية (الإنذار الأول)",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/alerts/controllers/anti_fraud_alerts_controller.dart",
+    "line": 48,
+    "original": "تنبيه خمول (الإنذار الثاني)",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/alerts/controllers/anti_fraud_alerts_controller.dart",
+    "line": 149,
+    "original": "أنا نشط - استئناف العمل الميداني",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/alerts/screens/critical_alert_screen.dart",
+    "line": 171,
+    "original": "اذكر سبب التوقف أو الخمول (مثال: عطل في المركبة، انتظار التاجر...)",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/attendance/screens/attendance_stepper_screen.dart",
+    "line": 28,
+    "original": "تأكيد الحضور",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/attendance/screens/attendance_stepper_screen.dart",
+    "line": 58,
+    "original": "تأكيد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/attendance/screens/attendance_stepper_screen.dart",
+    "line": 68,
+    "original": "الصورة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/attendance/screens/attendance_stepper_screen.dart",
+    "line": 78,
+    "original": "الموقع",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/attendance/screens/attendance_stepper_screen.dart",
+    "line": 814,
+    "original": "أضف تفاصيل إن لزم...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/attendance/screens/select_work_zone_screen.dart",
+    "line": 26,
+    "original": "اختر منطقة عملك",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/models/employee_shift_model.dart",
+    "line": 39,
+    "original": "تأخير في تسليم تقرير الزيارة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/models/employee_shift_model.dart",
+    "line": 44,
+    "original": "مغادرة منطقة العمل بدون إذن",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/employee/visits/screens/follow_up_task_screen.dart",
+    "line": 264,
+    "original": "مثال: إحضار عرض تسعير مخصص، مقابلة المالك المباشر...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 89,
+    "original": "تسوقني",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 94,
+    "original": "خدمة توصيل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 99,
+    "original": "اصطحاب الأطفال",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 104,
+    "original": "نقل العفش",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 109,
+    "original": "التنقلات اليومية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 114,
+    "original": "سفر",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 119,
+    "original": "نقل مستندات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 124,
+    "original": "خدمات منزلية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 129,
+    "original": "تحديد مسار",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 137,
+    "original": "سطحة كبيرة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 142,
+    "original": "سطحة هيدروليك",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 147,
+    "original": "سطحة عادية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/controllers/akhdamni_flow_controller.dart",
+    "line": 152,
+    "original": "ونش كهربائي",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/home_search_screen.dart",
+    "line": 890,
+    "original": "مسح رمز QR",
+    "key": "ar_qr",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 294,
+    "original": "خالية من اللاكتوز",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 295,
+    "original": "الأعلى مبيعاً",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 296,
+    "original": "وصل حديثاً",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 297,
+    "original": "الجمعات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 298,
+    "original": "خالية من الجلوتين",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 409,
+    "original": "العناية الشخصية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 410,
+    "original": "مستلزمات الطبخ",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 411,
+    "original": "العناية بالطفل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 412,
+    "original": "المجمدات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 413,
+    "original": "منتجات طازجة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 414,
+    "original": "العناية بالمنزل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 415,
+    "original": "الأطعمة الأساسية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 419,
+    "original": "الإلكترونيات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 420,
+    "original": "وجبات خفيفة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 421,
+    "original": "العناية بالحيوانات الأليفة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 422,
+    "original": "المخبوزات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 423,
+    "original": "المشروبات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 424,
+    "original": "مياه",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_hyper.dart",
+    "line": 425,
+    "original": "الجمال",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/market_store_screen_products.dart",
+    "line": 334,
+    "original": "لا توجد منتجات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/multi_module/widgets/wallet_card_view.dart",
+    "line": 123,
+    "original": "الرصيد المتاح",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/screens/multi_module/widgets/wallet_card_view.dart",
+    "line": 128,
+    "original": "من ${PriceConverter.convertPrice(creditLimit)}",
+    "key": "ar_priceconverterconvertpricecreditlimit",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/home/widgets/components/item_that_you_love_card_widget.dart",
+    "line": 128,
+    "original": "(${item.ratingCount})",
+    "key": "itemratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/components/popular_store_card_widget.dart",
+    "line": 134,
+    "original": "(${store.ratingCount})",
+    "key": "storeratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/components/review_item_card_widget.dart",
+    "line": 146,
+    "original": "(${item!.ratingCount})",
+    "key": "itemratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/custom_appBar_widget.dart",
+    "line": 105,
+    "original": "Debug Popup Panel",
+    "key": "debug_popup_panel",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/custom_appBar_widget.dart",
+    "line": 272,
+    "original": "[NotificationIcon] named route stack",
+    "key": "notificationicon_named_route_stack",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/highlight_widget.dart",
+    "line": 174,
+    "original": "(${advertisement.reviewsCommentsCount})",
+    "key": "advertisementreviewscommentscount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/views/best_store_nearby_view.dart",
+    "line": 339,
+    "original": "(${storeList[index].ratingCount.toString()})",
+    "key": "storelistindexratingcounttostring",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/web/web_best_store_nearby_view_widget.dart",
+    "line": 371,
+    "original": "(${storeList[index].ratingCount.toString()})",
+    "key": "storelistindexratingcounttostring",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/web/web_item_that_you_love_view_widget.dart",
+    "line": 147,
+    "original": "(${recommendItems[index].ratingCount})",
+    "key": "recommenditemsindexratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/web/web_item_that_you_love_view_widget.dart",
+    "line": 364,
+    "original": "(${recommendItems[index].ratingCount})",
+    "key": "recommenditemsindexratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/web/web_top_offers_near_me.dart",
+    "line": 283,
+    "original": "(${store.ratingCount})",
+    "key": "storeratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/home/widgets/web/widgets/medicine_item_card.dart",
+    "line": 131,
+    "original": "(${item.ratingCount})",
+    "key": "itemratingcount",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/loyalty/widgets/loyalty_bottom_sheet_widget.dart",
+    "line": 166,
+    "original": "النقاط للتحويل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/loyalty/widgets/loyalty_bottom_sheet_widget.dart",
+    "line": 197,
+    "original": "المبلغ المحول",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/my_coupon/widgets/expired_coupon_widget.dart",
+    "line": 20,
+    "original": "لا يوجد كوبونات منتهية الصلاحية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/offers/controllers/offers_controller.dart",
+    "line": 227,
+    "original": "No module selected",
+    "key": "no_module_selected",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/controllers/offers_controller.dart",
+    "line": 256,
+    "original": "Request timed out",
+    "key": "request_timed_out",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/controllers/offers_controller.dart",
+    "line": 325,
+    "original": "Failed to load offers",
+    "key": "failed_to_load_offers",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/domain/reposotories/offers_repository.dart",
+    "line": 133,
+    "original": "ETag clear cooldown active",
+    "key": "etag_clear_cooldown_active",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/domain/reposotories/offers_repository.dart",
+    "line": 198,
+    "original": "Invalid response format",
+    "key": "invalid_response_format",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/domain/reposotories/offers_repository.dart",
+    "line": 231,
+    "original": "Failed to parse offers data",
+    "key": "failed_to_parse_offers_data",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/domain/reposotories/offers_repository.dart",
+    "line": 237,
+    "original": "Failed to load offers",
+    "key": "failed_to_load_offers",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/domain/reposotories/offers_repository.dart",
+    "line": 242,
+    "original": "Network error",
+    "key": "network_error",
+    "isExisting": true,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/offers/screens/offers_item_screen.dart",
+    "line": 287,
+    "original": "ابحث في العروض...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/offers/screens/offers_item_screen.dart",
+    "line": 438,
+    "original": "ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.",
+    "key": "ar_n",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/offers/screens/offers_item_screen.dart",
+    "line": 456,
+    "original": "ما في نتائج بهاي الفلاتر.\\nجرّب كلمة ثانية أو صفّر الفلتر.",
+    "key": "ar_n",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/order/screens/guest_track_order_screen.dart",
+    "line": 71,
+    "original": " #${orderController.trackModel?.id}",
+    "key": "ordercontrollertrackmodelid",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/order/widgets/invoice_bottom_sheet.dart",
+    "line": 247,
+    "original": "[ $paymentStatus ]",
+    "key": "paymentstatus",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/order/widgets/order_calcuation_widget.dart",
+    "line": 229,
+    "original": "(+) ${order.dmTips}",
+    "key": "orderdmtips",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/order/widgets/order_info_widget.dart",
+    "line": 153,
+    "original": "#${order.id}",
+    "key": "orderid",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/parcel/widgets/parcel_app_bar_widget.dart",
+    "line": 145,
+    "original": "[ParcelNotificationIcon] named route stack",
+    "key": "parcelnotificationicon_named_route_stack",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/add_card_screen.dart",
+    "line": 25,
+    "original": "إضافة بطاقة جديدة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/add_card_screen.dart",
+    "line": 45,
+    "original": "تأكيد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 86,
+    "original": "المزيد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 95,
+    "original": "طريقة الدفع",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 135,
+    "original": "Apple Pay",
+    "key": "apple_pay",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 142,
+    "original": "إضافة بطاقة جديدة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 160,
+    "original": "المحفظة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 161,
+    "original": "المجموع ${_fmt(widget.walletBalance)} ${widget.currency}",
+    "key": "ar_fmtwidgetwalletbalance_widgetcurrency",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 188,
+    "original": "الإجمالي",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 223,
+    "original": "مبلغ آخر للإكرامية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/screens/payment_method_screen.dart",
+    "line": 257,
+    "original": "تأكيد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/additional_info_section.dart",
+    "line": 25,
+    "original": "معلومات إضافية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/additional_info_section.dart",
+    "line": 37,
+    "original": "أدوات المائدة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/additional_info_section.dart",
+    "line": 38,
+    "original": "ستضاف إذا وفرها المطعم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/additional_info_section.dart",
+    "line": 48,
+    "original": "للأصناف غير المتوفرة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/additional_info_section.dart",
+    "line": 49,
+    "original": "الاتصال بي",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/card_form_widget.dart",
+    "line": 56,
+    "original": "رقم البطاقة لا يمكن أن يكون فارغًا",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/card_form_widget.dart",
+    "line": 86,
+    "original": "حفظ كطريقة الدفع الأساسية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/card_form_widget.dart",
+    "line": 162,
+    "original": "تحمي شله معلومات بطاقتك",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/presentation/widgets/tip_selector.dart",
+    "line": 34,
+    "original": "مكافأة سائق التوصيل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/screens/myfatoorah_payment_webview_screen.dart",
+    "line": 84,
+    "original": "الدفع قيد المعالجة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/screens/myfatoorah_payment_webview_screen.dart",
+    "line": 91,
+    "original": "متابعة الدفع",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/payment/screens/myfatoorah_payment_webview_screen.dart",
+    "line": 95,
+    "original": "الذهاب إلى طلباتي",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/pos/screens/pos_checkout_screen.dart",
+    "line": 743,
+    "original": "دفع إلكتروني (Apple Pay / مدى / فيزا)",
+    "key": "ar_apple_pay",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/pos/screens/pos_checkout_screen.dart",
+    "line": 744,
+    "original": "دفع فوري وآمن بالبطاقات البنكية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/pos/screens/pos_checkout_screen.dart",
+    "line": 754,
+    "original": "محفظة شلة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/refer_and_earn/screens/refer_and_earn_screen.dart",
+    "line": 688,
+    "original": "+ ${reward.toStringAsFixed(0)}",
+    "key": "rewardtostringasfixed0",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/search/screens/search_screen.builders.dart",
+    "line": 75,
+    "original": "قريبًا",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+    "line": 207,
+    "original": "High Grocery Spending",
+    "key": "high_grocery_spending",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+    "line": 208,
+    "original": "Your grocery spending is 25% higher than last month. Consider buying in bulk for better savings.",
+    "key": "your_grocery_spending_is_25_higher_than_last_month_consider_",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+    "line": 216,
+    "original": "Weekly Budget Alert",
+    "key": "weekly_budget_alert",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+    "line": 217,
+    "original": "You\\",
+    "key": "you",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+    "line": 225,
+    "original": "Try New Categories",
+    "key": "try_new_categories",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/statistics/data/services/mock_analytics_service.dart",
+    "line": 226,
+    "original": "You haven\\",
+    "key": "you_haven",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/statistics/widgets/enhanced_summary_cards.dart",
+    "line": 49,
+    "original": "الإنفاق الشهري",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/screens/food_restaurant_detail_screen.dart",
+    "line": 1232,
+    "original": "Connection Timeout",
+    "key": "connection_timeout",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/store/screens/food_restaurant_detail_screen.dart",
+    "line": 1234,
+    "original": "Please check your connection and try again",
+    "key": "please_check_your_connection_and_try_again",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/store/screens/food_restaurant_detail_screen.dart",
+    "line": 1281,
+    "original": "Out of Coverage",
+    "key": "out_of_coverage",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/store/screens/food_restaurant_detail_screen.dart",
+    "line": 1283,
+    "original": "This store is not available in your area",
+    "key": "this_store_is_not_available_in_your_area",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/store/widgets/food_restaurant/food_restaurant_menu_item_card.dart",
+    "line": 297,
+    "original": "انتهت الكمية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/food_restaurant/food_restaurant_menu_item_card.dart",
+    "line": 494,
+    "original": "انتهت الكمية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+    "line": 88,
+    "original": "البحث حسب",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+    "line": 103,
+    "original": "الفئة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+    "line": 115,
+    "original": "اسم المنتج",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+    "line": 122,
+    "original": "هل تريد خصم؟",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+    "line": 132,
+    "original": "نطاق السعر",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/store/widgets/store_search_Filter_widget.dart",
+    "line": 174,
+    "original": "تطبيق",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet/widgets/convert_money_bottomSheet.dart",
+    "line": 45,
+    "original": " اكتب رقم الهاتف مصحوب بكود البلد لصاحب الحساب الذي تريد التحويل له",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet/widgets/convert_money_bottomSheet.dart",
+    "line": 63,
+    "original": "طلب الكود",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet/widgets/convert_money_bottomSheet.dart",
+    "line": 72,
+    "original": "سيصل الكود اليكم عن طريق الاشعارات",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet/widgets/convert_money_bottomSheet.dart",
+    "line": 129,
+    "original": "تحويل المبلغ",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+    "line": 531,
+    "original": "هل قمت بالمصادقة داخل تطبيق نفاذ ؟",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart",
+    "line": 955,
+    "original": "Wallet loaded from login",
+    "key": "wallet_loaded_from_login",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/show_pdf_screen.dart",
+    "line": 376,
+    "original": "هل لديك استفسار؟",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/contract_review_screen.dart",
+    "line": 87,
+    "original": "عرض العقد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/contract_review_screen.dart",
+    "line": 111,
+    "original": "إعادة المحاولة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/contract_review_screen.dart",
+    "line": 121,
+    "original": "لا يوجد عقد متاح",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+    "line": 140,
+    "original": "اسم جهة العمل",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+    "line": 204,
+    "original": "ادخل رقم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+    "line": 293,
+    "original": "نعم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step2_screen.dart",
+    "line": 329,
+    "original": "ادخل رقم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step3_screen.dart",
+    "line": 425,
+    "original": "تحقق من الحالة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step3_screen.dart",
+    "line": 437,
+    "original": "التحقق من المصادقة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/subscription_steps/step3_screen.dart",
+    "line": 461,
+    "original": "تأكيد توقيع العقد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/wallet_kaidha_screen.dart",
+    "line": 335,
+    "original": "جاري تحميل طرق الدفع...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/screen/wallet_kaidha_screen.dart",
+    "line": 358,
+    "original": "لا توجد طرق دفع متاحة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/address_details_widget.dart",
+    "line": 42,
+    "original": "العنوان :  ",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/address_details_widget.dart",
+    "line": 55,
+    "original": "المنزل :  ",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/address_details_widget.dart",
+    "line": 68,
+    "original": "الشارع :  ",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/address_details_widget.dart",
+    "line": 82,
+    "original": "الوصف :  ",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 55,
+    "original": "أطراف الاتفاقية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 61,
+    "original": "الغرض من الاتفاقية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 67,
+    "original": "بيانات الملف الائتماني",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 73,
+    "original": "معالجة البيانات والخصوصية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 79,
+    "original": "التزامات المنصة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 85,
+    "original": "مدة الاتفاقية وإنهاؤها",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 91,
+    "original": "أحكام عامة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/before_Pdf.dart",
+    "line": 97,
+    "original": "التوقيع والمصادقة الإلكترونية",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/activate_wallet_Dialog.dart",
+    "line": 25,
+    "original": "في انتظار تفعيل محفظة قيدها",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/activate_wallet_Dialog.dart",
+    "line": 27,
+    "original": "يمكنك الآن متابعة رصيدك وإجراء المعاملات بسهولة.",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/contract_confirmation_dialog.dart",
+    "line": 51,
+    "original": "موافق",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/contract_confirmation_dialog.dart",
+    "line": 63,
+    "original": "إلغاء",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/qidha_contract_request_dialog.dart",
+    "line": 334,
+    "original": "أدخل مبلغ التعاقد...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/qidha_contract_request_dialog.dart",
+    "line": 382,
+    "original": "ملاحظة إضافية للمتجر (اختياري)...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/success_celebration_dialog.dart",
+    "line": 50,
+    "original": "تم التسجيل بنجاح!",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dialog.dart/success_celebration_dialog.dart",
+    "line": 136,
+    "original": "مبروك! لقد فزت معنا بقسيمة شرائية!",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dual_date_picker_field.dart",
+    "line": 550,
+    "original": "اليوم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dual_date_picker_field.dart",
+    "line": 565,
+    "original": "الشهر",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/dual_date_picker_field.dart",
+    "line": 580,
+    "original": "السنة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/payment_details.dart",
+    "line": 159,
+    "original": "رقم البطاقة",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/payment_details.dart",
+    "line": 164,
+    "original": "تاريخ انتهاء الشهر",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/payment_details.dart",
+    "line": 336,
+    "original": "جاري تحميل العقد...",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/payment_details.dart",
+    "line": 374,
+    "original": "عرض العقد",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/personal_information.dart",
+    "line": 352,
+    "original": "١٠ أرقام (مثال: 1XXXXXXXXX)",
+    "key": "ar_1xxxxxxxxx",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/qidha_stores_filter_bottom_sheet.dart",
+    "line": 192,
+    "original": "أعلى تقييم",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/qidha_stores_filter_bottom_sheet.dart",
+    "line": 204,
+    "original": "توصيل مجاني",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_kaidha_subscription/widget/qidha_stores_filter_bottom_sheet.dart",
+    "line": 216,
+    "original": "توصيل سريع",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  },
+  {
+    "file": "lib/features/wallet_transfer/screens/choose_receiver_screen.dart",
+    "line": 148,
+    "original": "+9665XXXXXXXX",
+    "key": "9665xxxxxxxx",
+    "isExisting": false,
+    "isAr": false
+  },
+  {
+    "file": "lib/features/wallet_transfer/screens/choose_receiver_screen.dart",
+    "line": 249,
+    "original": "اختيار",
+    "key": "ar_",
+    "isExisting": false,
+    "isAr": true
+  }
+]

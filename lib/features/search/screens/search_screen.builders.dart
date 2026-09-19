@@ -72,7 +72,7 @@ extension _SearchScreenBuilders on SearchScreenState {
                       if (isComingSoon) {
                         debugPrint(
                             '[Search][COMING_SOON_MODULE_TAP_BLOCKED] moduleId=${module.id ?? 'null'} name=${module.moduleName ?? ''}');
-                        Get.rawSnackbar(message: 'قريبًا');
+                        Get.rawSnackbar(message: 'coming_soon_search'.tr);
                         return;
                       }
                       if (!isActive) {

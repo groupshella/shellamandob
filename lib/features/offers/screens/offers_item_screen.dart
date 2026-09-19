@@ -284,7 +284,7 @@ class _OffersItemScreen extends State<OffersItemScreen> {
                         .performLiveSearch(value),
                     style: tajawalRegular.copyWith(fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: 'ابحث في العروض...',
+                      hintText: 'search_in_offers'.tr,
                       hintStyle: tajawalRegular.copyWith(
                         fontSize: 14,
                         color: Theme.of(context).hintColor,

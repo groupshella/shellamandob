@@ -175,7 +175,7 @@ class KaidhaSubscriptionController extends GetxController
               personalDocuments.add(NamedFile(name: file.name, file: file));
             }
           } else {
-            showCustomSnackBar('File ${file.name} exceeds 5MB limit.', isError: true);
+            showCustomSnackBar('${'file_exceeds_5mb'.tr}: ${file.name}', isError: true);
           }
         }
         update();
@@ -466,7 +466,7 @@ class KaidhaSubscriptionController extends GetxController
     if (fullDueAmount == 0) {
       if (enteredAmount > 0) {
         another_amount.text = '';
-        showCustomSnackBar('لا يوجد مبلغ مستحق للدفع');
+        showCustomSnackBar('no_amount_due'.tr);
       } else {
         another_amount.text = amount;
       }
@@ -528,7 +528,7 @@ class KaidhaSubscriptionController extends GetxController
       barrierDismissible: false,
       ConfirmationDialog(
         icon: Images.warning,
-        title: 'هل قمت بالمصادقة داخل تطبيق نفاذ ؟',
+        title: 'nafath_auth_question'.tr,
         description: 'هذه مرحه تحقق هل تم تأكيد الكود بنجاح أم لا ',
         onYesPressed: () async {
           //
@@ -591,7 +591,7 @@ class KaidhaSubscriptionController extends GetxController
 
         // Proceed to contract signing immediately after Nafath approval
         if (!silent && statusChanged) {
-          showCustomSnackBar('لقد تم تحقق المصادقة بنجاح', isError: false);
+          showCustomSnackBar('auth_verified_successfully'.tr, isError: false);
         }
 
         // The application is submitted once Nafath is approved, so go straight to
@@ -635,7 +635,7 @@ class KaidhaSubscriptionController extends GetxController
           return null;
         }
         if (!silent && statusChanged) {
-          showCustomSnackBar('تم رفض طلب التحقق من نفاذ.');
+          showCustomSnackBar('nafath_verification_rejected'.tr);
         }
       } else if (onValue.status == 'expired') {
         _nafath_checkStatus = NafathCheckStatusModel(
@@ -651,7 +651,7 @@ class KaidhaSubscriptionController extends GetxController
         _isShow = false;
         update();
         if (!silent && statusChanged) {
-          showCustomSnackBar('انتهت صلاحية طلب نفاذ.');
+          showCustomSnackBar('nafath_verification_expired'.tr);
         }
       } else if (onValue.status == 'cancelled' ||
           onValue.status == 'no_request') {
@@ -684,14 +684,14 @@ class KaidhaSubscriptionController extends GetxController
         _isShow = false;
         update();
         if (!silent && statusChanged) {
-          showCustomSnackBar('يرجى إكمال التحقق في تطبيق نفاذ');
+          showCustomSnackBar('please_complete_nafath_verification'.tr);
         }
       }
     } else {
       _isShow = false;
       update();
       if (!silent) {
-        showCustomSnackBar('حدث خطأ أثناء التحقق من المصادقة');
+        showCustomSnackBar('error_during_auth_verification'.tr);
       }
     }
 
@@ -901,7 +901,7 @@ class KaidhaSubscriptionController extends GetxController
 
   void pickFileWithName(BuildContext context) async {
     if (imgName_Controller.text.trim().isEmpty) {
-      showCustomSnackBar('يرجى إدخال الاسم');
+      showCustomSnackBar('please_enter_name'.tr);
 
       return;
     }
@@ -952,7 +952,7 @@ class KaidhaSubscriptionController extends GetxController
       // Create minimal wallet object with just the data needed for menu display
       // All fields are required by Wallet constructor, but we only need balance, status, and signatureStatus
       walletKaidhaModel = WalletKaidhaModel(
-        message: 'Wallet loaded from login',
+        message: 'wallet_loaded_from_login'.tr,
         hasWallet: true,
         wallet: Wallet(
           id: 0, // Placeholder - not used for menu display
@@ -1647,12 +1647,12 @@ class KaidhaSubscriptionController extends GetxController
               (errorData?['message'] as String?) ?? 'خطأ في البيانات المرسلة';
           showCustomSnackBar(errorMessage);
         } else {
-          showCustomSnackBar('خطأ في تحميل طرق الدفع');
+          showCustomSnackBar('payment_failed_try_again'.tr);
         }
       }
     } catch (error) {
       debugPrint('❌ Error loading Qidha payment methods from backend: $error');
-      showCustomSnackBar('خطأ في تحميل طرق الدفع');
+      showCustomSnackBar('payment_failed_try_again'.tr);
       qidhaPaymentMethods = [];
       qidhaPaymentMethodsSelected = [];
     } finally {
@@ -1745,7 +1745,7 @@ class KaidhaSubscriptionController extends GetxController
               : 'no-reply@shelafood.com';
 
       if (customerPhone.isEmpty) {
-        showCustomSnackBar('رقم الهاتف مطلوب لبدء الدفع');
+        showCustomSnackBar('phone_number_required_for_payment'.tr);
         return 'error';
       }
 
@@ -1760,7 +1760,7 @@ class KaidhaSubscriptionController extends GetxController
           '[QidhaPay][NoOrder] payload: methodCode=$backendMethodCode methodId=$backendMethodId amount=$amount');
       if ((backendMethodCode == null || backendMethodCode.isEmpty) &&
           backendMethodId == null) {
-        showCustomSnackBar('طريقة الدفع غير مدعومة حالياً');
+        showCustomSnackBar('payment_method_not_supported'.tr);
         return 'error';
       }
 
@@ -1800,7 +1800,7 @@ class KaidhaSubscriptionController extends GetxController
           data is Map<String, dynamic> ? data['payment_url']?.toString() : null;
 
       if (paymentUrl == null || paymentUrl.isEmpty) {
-        showCustomSnackBar('فشل بدء الدفع - لم يتم استلام رابط الدفع');
+        showCustomSnackBar('failed_start_payment_no_link'.tr);
         return 'error';
       }
 
@@ -1832,7 +1832,7 @@ class KaidhaSubscriptionController extends GetxController
     } catch (error, stackTrace) {
       debugPrint(
           '[QidhaPay][NoOrder][ERROR] $error ; stack=${stackTrace.toString().split('\n').take(5).join(' | ')}');
-      showCustomSnackBar('فشلت عملية الدفع: ${error.toString()}');
+      showCustomSnackBar('${'payment_failed'.tr}: ${error.toString()}');
       return 'error';
     }
   }
@@ -1841,7 +1841,7 @@ class KaidhaSubscriptionController extends GetxController
   Future Send_Pay_Credit(BuildContext context, double total) async {
     // Validate payment method selection
     if (selectedQidhaPaymentMethod == null) {
-      showCustomSnackBar('يرجى اختيار طريقة الدفع أولاً');
+      showCustomSnackBar('please_select_payment_method_first'.tr);
       return;
     }
 
@@ -1862,7 +1862,7 @@ class KaidhaSubscriptionController extends GetxController
     }
 
     if (checkoutController.paymentMethods.isEmpty) {
-      showCustomSnackBar('لا توجد طرق دفع متاحة للمبلغ المختار');
+      showCustomSnackBar('no_payment_methods_for_amount'.tr);
       _isLoading = false;
       update();
       return;
@@ -1877,7 +1877,7 @@ class KaidhaSubscriptionController extends GetxController
     );
 
     if (matchedIndex < 0) {
-      showCustomSnackBar('طريقة الدفع المختارة غير متاحة لهذا المبلغ');
+      showCustomSnackBar('payment_method_unavailable_for_amount'.tr);
       _isLoading = false;
       update();
       return;
@@ -1941,9 +1941,9 @@ class KaidhaSubscriptionController extends GetxController
 
     if (isPaymentSuccessful == false) {
       if (isPaymentCancelled) {
-        showCustomSnackBar('تم إلغاء عملية الدفع', isError: false);
+        showCustomSnackBar('payment_cancelled'.tr, isError: false);
       } else {
-        showCustomSnackBar('فشلت عملية الدفع، حاول مرة أخرى');
+        showCustomSnackBar('payment_failed_try_again'.tr);
       }
       _isLoading = false;
       update();
@@ -2440,12 +2440,12 @@ class KaidhaSubscriptionController extends GetxController
 
     // 2. Document Validation (max 5 files, JPG/PNG/PDF only, each with name/description)
     if (All_files.isEmpty) {
-      showCustomSnackBar('لم يتم حفظ اي مستند');
+      showCustomSnackBar('no_document_saved'.tr);
       return false;
     }
 
     if (All_files.length > 5) {
-      showCustomSnackBar('يمكن رفع 5 مستندات كحد أقصى');
+      showCustomSnackBar('max_5_documents_allowed'.tr);
       return false;
     }
 
@@ -2462,7 +2462,7 @@ class KaidhaSubscriptionController extends GetxController
       }
 
       if (file.name.trim().isEmpty) {
-        showCustomSnackBar('يرجى إدخال اسم لكل مستند');
+        showCustomSnackBar('please_enter_name_for_each_doc'.tr);
         return false;
       }
     }
@@ -2536,7 +2536,7 @@ class KaidhaSubscriptionController extends GetxController
     if (!walletCreated) {
       debugPrint('❌ Step 2 failed: Wallet creation failed');
       if (fieldErrors.isEmpty) {
-        showCustomSnackBar('فشل في إنشاء المحفظة');
+        showCustomSnackBar('failed_to_create_wallet'.tr);
       }
       return false;
     }
@@ -2876,11 +2876,11 @@ class KaidhaSubscriptionController extends GetxController
         await get_Wallet_Kaidh(forceRefresh: true);
       } else {
         debugPrint("❌ Failed to create wallet");
-        showCustomSnackBar("فشل في إنشاء المحفظة");
+        showCustomSnackBar('failed_to_create_wallet'.tr);
       }
     } catch (e) {
       debugPrint("❌ Error creating wallet: $e");
-      showCustomSnackBar("حدث خطأ في إنشاء المحفظة");
+      showCustomSnackBar('error_creating_wallet'.tr);
     }
   } */
 
@@ -2910,7 +2910,7 @@ class KaidhaSubscriptionController extends GetxController
       Get.toNamed(RouteHelper.getKiadaWalletSubscription());
     } catch (e) {
       debugPrint('❌ Error updating wallet signature status: $e');
-      showCustomSnackBar('حدث خطأ في تحديث حالة توقيع المحفظة');
+      showCustomSnackBar('error_updating_wallet_signature'.tr);
     }
   }
 
@@ -2936,7 +2936,7 @@ class KaidhaSubscriptionController extends GetxController
       await get_Wallet_Kaidh(forceRefresh: true);
     } catch (e) {
       debugPrint('❌ Error updating wallet status: $e');
-      showCustomSnackBar('حدث خطأ في تحديث حالة المحفظة');
+      showCustomSnackBar('error_updating_wallet_status'.tr);
     }
   }
 
@@ -3131,7 +3131,7 @@ class KaidhaSubscriptionController extends GetxController
         random: int.tryParse(model.code ?? ''),
       );
       await _saveNafathRequestToCache();
-      showCustomSnackBar('تم إرسال رمز جديد عبر نفاذ', isError: false);
+      showCustomSnackBar('new_code_sent_via_nafath'.tr, isError: false);
       return true;
     } finally {
       _isLoading_OTP = false;
@@ -3156,7 +3156,7 @@ class KaidhaSubscriptionController extends GetxController
           nationalId: nationalId,
         );
         _isShow = false;
-        showCustomSnackBar('تم إلغاء طلب نفاذ', isError: false);
+        showCustomSnackBar('nafath_request_cancelled'.tr, isError: false);
         update();
       }
       return ok;
@@ -3611,7 +3611,7 @@ class KaidhaSubscriptionController extends GetxController
       }
     } catch (e) {
       _isSendingContractRequest = false;
-      showCustomSnackBar('حدث خطأ أثناء إرسال طلب التعاقد');
+      showCustomSnackBar('error_sending_contract_request'.tr);
       update();
       return false;
     }

@@ -53,7 +53,7 @@ class _DeliveryOptionButtonWidgetState
           onTap: () {
             // Coming-soon option: keep it visible but non-selectable.
             if (widget.comingSoon) {
-              showCustomSnackBar('هذه الخدمة ستتوفر قريباً');
+              showCustomSnackBar('service_available_soon'.tr);
               return;
             }
             checkoutController.setOrderType(widget.value);
@@ -135,7 +135,7 @@ class _DeliveryOptionButtonWidgetState
                               color: const Color(0xFFFFE9B3),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text('قريباً',
+                            child: Text('coming_soon_label'.tr,
                                 style: tajawalBold.copyWith(
                                     fontSize: 10,
                                     letterSpacing: 0,

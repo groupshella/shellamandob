@@ -330,9 +330,9 @@ class _KeetaProductPanelState extends State<_KeetaProductPanel> {
       );
     }
     if (!_fetching && _products.isEmpty) {
-      return const Center(
-        child: Text('لا توجد منتجات',
-            style: TextStyle(
+      return Center(
+        child: Text('no_products'.tr,
+            style: const TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 14,
                 color: Color(0xFF9AA0A6))),

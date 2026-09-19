@@ -272,7 +272,7 @@ class CouponController extends GetxController implements GetxService {
         debugPrint('[Coupon][AUTO_REMOVED] code=$removedCode reason=$invalidReason');
       }
       update();
-      showCustomSnackBar('تم إزالة الكوبون لأنه لم يعد صالحًا');
+      showCustomSnackBar('coupon_removed_invalid'.tr);
       return CouponRevalidationResult.removed;
     }
 

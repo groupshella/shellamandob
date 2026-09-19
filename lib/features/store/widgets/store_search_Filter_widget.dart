@@ -85,7 +85,7 @@ class _StoreSearchFilterWidgetState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SectionTitle(title: 'البحث حسب'),
+                    SectionTitle(title: 'search_by'.tr),
                     const SizedBox(height: 10),
                     ChoiceChipsRow(
                       options: sortOptions.keys.toList(),
@@ -100,9 +100,9 @@ class _StoreSearchFilterWidgetState
                       },
                     ),
                     const SizedBox(height: 20),
-                    const Text('الفئة',
+                    Text('category'.tr,
                         style:
-                            TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 10),
                     ChoiceCategoryRow<CategoryModel>(
                       options: categoryList,
@@ -112,15 +112,15 @@ class _StoreSearchFilterWidgetState
                           setState(() => selectedCategory = value),
                     ),
                     const SizedBox(height: 20),
-                    const SectionTitle(title: 'اسم المنتج'),
+                    SectionTitle(title: 'product_name'.tr),
                     const SizedBox(height: 10),
                     CustomTextField(controller: nameController, hint: 'example'.tr),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('هل تريد خصم؟',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('want_a_discount'.tr,
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
                         Switch(
                           value: hasDiscount,
                           onChanged: (value) =>
@@ -129,7 +129,7 @@ class _StoreSearchFilterWidgetState
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const SectionTitle(title: 'نطاق السعر'),
+                    SectionTitle(title: 'price_range'.tr),
                     ChoiceChipsRow(
                       options:
                           priceRanges.map((e) => e['label'].toString()).toList(),
@@ -171,7 +171,7 @@ class _StoreSearchFilterWidgetState
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
                             ),
-                            child: Text('تطبيق',
+                            child: Text('apply_label'.tr,
                                 style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
                             onPressed: () async {
                               Get.find<StoreController>().applyFilters(

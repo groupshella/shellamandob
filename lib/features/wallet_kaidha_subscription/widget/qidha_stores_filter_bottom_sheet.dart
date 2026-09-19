@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -189,7 +190,7 @@ class _QidhaStoresFilterBottomSheetState
                         Expanded(
                           child: _buildSortChip(
                             key: 'rating',
-                            label: 'أعلى تقييم',
+                            label: 'highest_rating'.tr,
                             assetImage: Images.star_v2,
                             primaryColor: primaryColor,
                             textColor: textColor,
@@ -201,7 +202,7 @@ class _QidhaStoresFilterBottomSheetState
                         Expanded(
                           child: _buildSortChip(
                             key: 'free_delivery',
-                            label: 'توصيل مجاني',
+                            label: 'free_delivery'.tr,
                             assetImage: Images.truck_delivery_v2,
                             primaryColor: primaryColor,
                             textColor: textColor,
@@ -213,7 +214,7 @@ class _QidhaStoresFilterBottomSheetState
                         Expanded(
                           child: _buildSortChip(
                             key: 'fast_delivery',
-                            label: 'توصيل سريع',
+                            label: 'fast_delivery'.tr,
                             assetImage: Images.truck_delivery_v2,
                             primaryColor: primaryColor,
                             textColor: textColor,

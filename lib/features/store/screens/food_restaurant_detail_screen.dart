@@ -1157,8 +1157,8 @@ class _FoodRestaurantDetailScreenState
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                            'Please check your connection and try again'),
+                        Text(
+                            'check_connection_try_again'.tr),
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
                           onPressed: () {
@@ -1170,7 +1170,7 @@ class _FoodRestaurantDetailScreenState
                             );
                           },
                           icon: const Icon(Icons.refresh),
-                          label: const Text('Retry'),
+                          label: Text('retry'.tr),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 12),
@@ -1229,9 +1229,9 @@ class _FoodRestaurantDetailScreenState
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
-                            Text('Connection Timeout', style: TextStyle(fontSize: 16, color: Theme.of(context).disabledColor),),
+                            Text('connection_timeout'.tr, style: TextStyle(fontSize: 16, color: Theme.of(context).disabledColor),),
                             const SizedBox(height: 8),
-                            Text('Please check your connection and try again', style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor),),
+                            Text('check_connection_try_again'.tr, style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor),),
                             const SizedBox(height: 24),
                             ElevatedButton.icon(
                               onPressed: () {
@@ -1243,7 +1243,7 @@ class _FoodRestaurantDetailScreenState
                                 );
                               },
                               icon: const Icon(Icons.refresh),
-                              label: const Text('Retry'),
+                              label: Text('retry'.tr),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 24, vertical: 12),
@@ -1278,9 +1278,9 @@ class _FoodRestaurantDetailScreenState
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
-                            Text('Out of Coverage', style: TextStyle(fontSize: 16, color: Theme.of(context).disabledColor),),
+                            Text('out_of_coverage'.tr, style: TextStyle(fontSize: 16, color: Theme.of(context).disabledColor),),
                             const SizedBox(height: 8),
-                            Text('This store is not available in your area', style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor),),
+                            Text('store_not_in_your_area'.tr, style: TextStyle(fontSize: 14, color: Theme.of(context).disabledColor),),
                           ],
                         ),
                       ),

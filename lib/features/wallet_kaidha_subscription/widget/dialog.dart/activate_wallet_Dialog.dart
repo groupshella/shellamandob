@@ -22,16 +22,16 @@ Widget buildWalletDialogContent(context) {
         children: [
           Padding(padding: const EdgeInsets.all(8.0), child: Image.asset(Images.activate_wallet, height: 70, width: 70)),
           const SizedBox(height: 20),
-          Text('في انتظار تفعيل محفظة قيدها', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+          Text('waiting_wallet_activation'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
           const SizedBox(height: 7),
-          Text('يمكنك الآن متابعة رصيدك وإجراء المعاملات بسهولة.',
+          Text('wallet_activated_message'.tr,
               style: robotoBold.copyWith(color: Theme.of(context as BuildContext).disabledColor, fontSize: Dimensions.fontSizeSmall)),
           const SizedBox(height: 30),
           Container(
             width: 200,
             padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
             child: CustomButton(
-              buttonText: 'تم',
+              buttonText: 'done'.tr,
               onPressed: () async {
                 Get.offAllNamed(RouteHelper.getMainRoute('menu'));
               },

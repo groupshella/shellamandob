@@ -1266,7 +1266,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
             );
           } else {
             debugPrint('❌ Cannot navigate to checkout - storeId is null');
-            showCustomSnackBar('Unable to proceed to checkout. Please try again.'.tr);
+            showCustomSnackBar('unable_to_proceed_checkout'.tr);
           }
           return;
         }

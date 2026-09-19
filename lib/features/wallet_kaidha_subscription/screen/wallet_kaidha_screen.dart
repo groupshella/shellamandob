@@ -168,7 +168,7 @@ class _WalletKaidhaScreenState extends State<WalletKaidhaScreen> {
             debugPrint(
                 '💳 [WalletKaidhaScreen] No wallet - redirecting to subscription');
           }
-          showCustomSnackBar('لا توجد محفظة. الرجاء الاشتراك أولاً.');
+          showCustomSnackBar('no_wallet_subscribe_first'.tr);
           Get.offNamed(RouteHelper.getKiadaWalletSubscription());
           return;
         }
@@ -327,12 +327,12 @@ class _WalletKaidhaScreenState extends State<WalletKaidhaScreen> {
       return Container(
         height: 100,
         alignment: Alignment.center,
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 8),
-            Text('جاري تحميل طرق الدفع...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 8),
+            Text('loading_payment_methods'.tr),
           ],
         ),
       );
@@ -355,7 +355,7 @@ class _WalletKaidhaScreenState extends State<WalletKaidhaScreen> {
             Icon(Icons.payment,
                 size: 40, color: theme.colorScheme.onSurfaceVariant),
             SizedBox(height: 8),
-            Text('لا توجد طرق دفع متاحة',
+            Text('no_payment_methods'.tr,
                 style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
           ],
         ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
+import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_intro_screen.dart';
-import 'package:sixam_mart/features/marketer/screens/marketer_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_pending_screen.dart';
 
 /// In-app "Coupon Marketer" entry screen.
@@ -45,7 +45,7 @@ class _MarketerScreenState extends State<MarketerScreen> {
 
         switch (controller.status) {
           case 'approved':
-            return const MarketerMainScreen();
+            return const EmployeeMainScreen();
           case 'pending':
             return const MarketerPendingScreen();
           case 'none':

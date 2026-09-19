@@ -42,7 +42,7 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                 const SizedBox(
                   height: 20,
                 ),
-                const Text(' اكتب رقم الهاتف مصحوب بكود البلد لصاحب الحساب الذي تريد التحويل له'),
+                Text('wallet_transfer_phone_hint'.tr),
                 const SizedBox(
                   height: 20,
                 ),
@@ -60,7 +60,7 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                           });
                           Get.find<WalletController>().requestExchange(phoneNumber.text);
                         },
-                        child: const Text('طلب الكود'))),
+                        child: Text('request_code'.tr))),
               ],
             ),
           if (isRequested)
@@ -69,14 +69,14 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                 const SizedBox(
                   height: 20,
                 ),
-                const Text('سيصل الكود اليكم عن طريق الاشعارات'),
+                Text('code_via_notifications'.tr),
                 const SizedBox(
                   height: 20,
                 ),
                 CustomTextField(
                   controller: money,
                   showTitle: true,
-                  titleText: 'اكتب المبلغ الذي تريد تحويلو',
+                  titleText: 'enter_amount_to_transfer'.tr,
                   prefixIcon: Icons.monetization_on,
                 ),
                 const SizedBox(
@@ -85,7 +85,7 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                 CustomTextField(
                   controller: myOtp,
                   showTitle: true,
-                  titleText: 'الكود الخاص بك',
+                  titleText: 'your_code'.tr,
                   prefixIcon: Icons.qr_code,
                 ),
                 const SizedBox(
@@ -94,7 +94,7 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                 CustomTextField(
                   controller: otpUser,
                   showTitle: true,
-                  titleText: 'الكود الخاص بالحساب المحول له',
+                  titleText: 'recipient_code'.tr,
                   prefixIcon: Icons.qr_code,
                 ),
                 const SizedBox(
@@ -114,7 +114,7 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                                   0)
                               : 0;
                           if (amount == null || amount <= 0) {
-                            showCustomSnackBar('يرجى إدخال مبلغ صحيح',
+                            showCustomSnackBar('please_enter_valid_amount'.tr,
                                 isError: true);
                             return;
                           }
@@ -126,7 +126,7 @@ class _ConvertMoneyBottomsheetState extends State<ConvertMoneyBottomsheet> {
                           await Get.find<WalletController>().Exchange(phoneNumber.text, myOtp.text, otpUser.text, money.text);
                           Get.back();
                         },
-                        child: const Text('تحويل المبلغ'))),
+                        child: Text('transfer_amount'.tr))),
               ],
             )
         ],

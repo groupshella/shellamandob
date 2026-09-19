@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/features/payment/presentation/keeta_pay_style.dart';
 import 'package:sixam_mart/features/payment/presentation/widgets/payment_option_tile.dart';
 
@@ -53,7 +54,7 @@ class _CardFormWidgetState extends State<CardFormWidget> {
         if (widget.showError)
           Padding(
             padding: const EdgeInsets.only(top: 6, right: 4),
-            child: Text('رقم البطاقة لا يمكن أن يكون فارغًا',
+            child: Text('card_number_empty_error'.tr,
                 style: s.t(11.5, weight: FontWeight.w500, color: s.red)),
           ),
         const SizedBox(height: 11),
@@ -83,7 +84,7 @@ class _CardFormWidgetState extends State<CardFormWidget> {
           child: Row(
             children: [
               Expanded(
-                  child: Text('حفظ كطريقة الدفع الأساسية', style: s.t(14.5))),
+                  child: Text('save_as_primary_payment'.tr, style: s.t(14.5))),
               KeetaSwitch(
                   value: saveAsDefault,
                   onChanged: (v) => setState(() => saveAsDefault = v)),
@@ -159,7 +160,7 @@ class _CardFormWidgetState extends State<CardFormWidget> {
             children: [
               Icon(Icons.verified_user, color: s.green, size: 17),
               const SizedBox(width: 6),
-              Text('تحمي شله معلومات بطاقتك',
+              Text('app_protects_card_info'.tr,
                   style: s.t(13, weight: FontWeight.w800, color: s.green)),
             ],
           ),

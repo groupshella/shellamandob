@@ -19,7 +19,7 @@ class SuccessDialog extends StatelessWidget {
         children: [
           const Icon(Icons.check_circle, color: AppColors.greenColor, size: 45),
           const SizedBox(height: 10),
-          Custom_Text(context, text: 'طلبك قيد المراجعة بمحفظة قيدها', style: font10Black600W(context, size: size_14(context))),
+          Custom_Text(context, text: 'qidha_request_under_review'.tr, style: font10Black600W(context, size: size_14(context))),
           const SizedBox(height: 15),
           Custom_Text(context,
               text: 'شكرآ لك على ملئ البيانات المطلوبة\nسوف نتواصل معك قريبآ',
@@ -30,7 +30,7 @@ class SuccessDialog extends StatelessWidget {
             h: 50,
             w: 300,
             context,
-            title: 'تم',
+            title: 'done'.tr,
             style: font12White500W(context, size: size_12(context)),
             onPressed: () => Get.back(),
           )

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:sixam_mart/util/styles.dart';
 
@@ -547,7 +548,7 @@ class _DualDatePickerBottomSheetState extends State<_DualDatePickerBottomSheet> 
               Expanded(
                 flex: 2,
                 child: _buildDropdownItem<int>(
-                  label: 'اليوم',
+                  label: 'day_label'.tr,
                   value: currentHDay,
                   items: days,
                   itemLabel: (d) => '$d',
@@ -562,7 +563,7 @@ class _DualDatePickerBottomSheetState extends State<_DualDatePickerBottomSheet> 
               Expanded(
                 flex: 4,
                 child: _buildDropdownItem<int>(
-                  label: 'الشهر',
+                  label: 'month_label'.tr,
                   value: currentHMonth,
                   items: List.generate(12, (i) => i + 1),
                   itemLabel: (m) => '$m - ${_hijriMonthNamesAr[m - 1]}',
@@ -577,7 +578,7 @@ class _DualDatePickerBottomSheetState extends State<_DualDatePickerBottomSheet> 
               Expanded(
                 flex: 3,
                 child: _buildDropdownItem<int>(
-                  label: 'السنة',
+                  label: 'year_label'.tr,
                   value: currentHYear,
                   items: years,
                   itemLabel: (y) => '$y هـ',

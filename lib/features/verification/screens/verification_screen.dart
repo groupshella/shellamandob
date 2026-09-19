@@ -335,7 +335,7 @@ class VerificationScreenState extends State<VerificationScreen> {
                                     if (value.isSuccess) {
                                       _navigateAfterLoginOtpSuccess();
                                     } else {
-                                      showCustomSnackBar('Invalid code');
+                                      showCustomSnackBar('invalid_code'.tr);
                                     }
                                   });
                                 } else {
@@ -349,7 +349,7 @@ class VerificationScreenState extends State<VerificationScreen> {
                                       _handleVerifyResponse(
                                           value, _number, _email);
                                     } else {
-                                      showCustomSnackBar('Invalid code');
+                                      showCustomSnackBar('invalid_code'.tr);
                                     }
                                   });
                                 }
@@ -365,7 +365,7 @@ class VerificationScreenState extends State<VerificationScreen> {
                                   if (value.isSuccess && token.isNotEmpty) {
                                     _navigateAfterLoginOtpSuccess();
                                   } else {
-                                    showCustomSnackBar('Login not completed');
+                                    showCustomSnackBar('login_not_completed'.tr);
                                   }
                                 });
                               } else {
@@ -394,7 +394,7 @@ class VerificationScreenState extends State<VerificationScreen> {
                                               'reset-password'));
                                     }
                                   } else {
-                                    showCustomSnackBar('Send a new code');
+                                    showCustomSnackBar('send_new_code'.tr);
                                   }
                                 });
                               }

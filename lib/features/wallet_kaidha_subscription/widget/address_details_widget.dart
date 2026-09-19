@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -39,7 +40,7 @@ class AddressDetailsWidget extends StatelessWidget {
               address_model.address != '' || address_model.address!.isNotEmpty
                   ? Row(
                       children: [
-                        Text('العنوان :  ', style: robotoMedium),
+                        Text('address_label'.tr, style: robotoMedium),
                         Text(
                           address_model.address!,
                           maxLines: 1,
@@ -52,7 +53,7 @@ class AddressDetailsWidget extends StatelessWidget {
               address_model.house != '' || address_model.house!.isNotEmpty
                   ? Row(
                       children: [
-                        Text('المنزل :  ', style: robotoMedium),
+                        Text('home_label'.tr, style: robotoMedium),
                         Text(
                           ' ${address_model.house}  ',
                           maxLines: 1,
@@ -65,7 +66,7 @@ class AddressDetailsWidget extends StatelessWidget {
               address_model.streetNumber != '' || address_model.streetNumber!.isNotEmpty
                   ? Row(
                       children: [
-                        Text('الشارع :  ', style: robotoMedium),
+                        Text('street_label'.tr, style: robotoMedium),
                         Text(
                           ' ${address_model.streetNumber}',
                           maxLines: 1,
@@ -79,7 +80,7 @@ class AddressDetailsWidget extends StatelessWidget {
               address_model.streetNumber != '' || address_model.streetNumber!.isNotEmpty
                   ? Row(
                       children: [
-                        Text('الوصف :  ', style: robotoMedium),
+                        Text('description_label'.tr, style: robotoMedium),
                         Text(
                           '${address_model.floor} ',
                           maxLines: 1,

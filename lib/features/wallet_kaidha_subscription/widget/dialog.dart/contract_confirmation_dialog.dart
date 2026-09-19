@@ -25,7 +25,7 @@ class Contract_Confirmation_Dialog extends StatelessWidget {
             const SizedBox(height: 10),
             Custom_Text(
               context,
-              text: ' الاطلاع علي العقد',
+              text: 'view_contract'.tr,
               style: font10Black600W(context, size: size_14(context)),
             ),
             const SizedBox(height: 15),
@@ -48,7 +48,7 @@ class Contract_Confirmation_Dialog extends StatelessWidget {
                   child: custom_Button(
                     h: 40,
                     context,
-                    title: 'موافق',
+                    title: 'agree_label'.tr,
                     style: font12White500W(context, size: size_12(context)),
                     onPressed: () {
                       //
@@ -60,7 +60,7 @@ class Contract_Confirmation_Dialog extends StatelessWidget {
                   child: custom_Button(
                     h: 40,
                     context,
-                    title: 'إلغاء',
+                    title: 'cancel_label'.tr,
                     style: font12White500W(context, size: size_12(context)),
                     onPressed: () {
                       Get.back(); // إغلاق النافذة

@@ -81,18 +81,18 @@ class _MyFatoorahPaymentWebViewScreenState
     debugPrint('[PaymentRecovery][BACK_DIALOG] shown');
     final String? choice = await Get.dialog<String>(
       AlertDialog(
-        title: const Text('الدفع قيد المعالجة'),
+        title: Text('payment_processing'.tr),
         content: const Text(
           'الرجوع الآن قد يترك الطلب غير مكتمل. يمكنك متابعة الحالة من طلباتي.',
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: 'stay'),
-            child: const Text('متابعة الدفع'),
+            child: Text('continue_payment'.tr),
           ),
           TextButton(
             onPressed: () => Get.back(result: 'orders'),
-            child: const Text('الذهاب إلى طلباتي'),
+            child: Text('go_to_my_orders'.tr),
           ),
         ],
       ),
@@ -105,7 +105,7 @@ class _MyFatoorahPaymentWebViewScreenState
       Get.back(result: 'go_to_orders');
     } else {
       // 'stay' (or dismissed) → remain in the WebView to continue paying.
-      // Only "متابعة الدفع" continues the MyFatoorah flow.
+      // Only 'continue_payment'.tr continues the MyFatoorah flow.
       debugPrint('[PaymentRecovery][BACK_DIALOG] choice=stay');
       debugPrint('[QidhaRepayDialog] action=continue_payment');
     }

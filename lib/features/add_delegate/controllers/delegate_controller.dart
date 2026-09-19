@@ -27,7 +27,7 @@ class Delegate_Controller extends GetxController implements GetxService {
 
   void pickFileWithName(BuildContext context) async {
     if (imgName_Controller.text.trim().isEmpty) {
-      showCustomSnackBar('يرجى إدخال الاسم');
+      showCustomSnackBar('please_enter_name'.tr);
       return;
     }
 
@@ -65,12 +65,12 @@ class Delegate_Controller extends GetxController implements GetxService {
     if (f_name_Controller.text.isEmpty ||
         l_name_Controller.text.isEmpty ||
         mobile.isEmpty) {
-      showCustomSnackBar('يرجى تعبئة جميع الحقول');
+      showCustomSnackBar('please_fill_all_fields'.tr);
       return;
     }
 
     if (All_files.isEmpty) {
-      showCustomSnackBar('لم يتم حفظ أي مستند');
+      showCustomSnackBar('no_document_saved'.tr);
       return;
     }
 

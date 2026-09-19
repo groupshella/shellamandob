@@ -161,7 +161,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       _supportRow(
                         image: Images.messages_v2,
                         title: 'live_chat'.tr,
-                        value: 'المساعدة والدعم',
+                        value: 'help_and_support'.tr,
                         showChevron: true,
                         onTap: _openLiveChat,
                       ),

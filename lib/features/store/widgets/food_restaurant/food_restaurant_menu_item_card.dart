@@ -294,7 +294,7 @@ class FoodRestaurantMenuItemCard extends StatelessWidget {
                   _buildOutOfStockOverlay(
                     context: context,
                     borderRadius: BorderRadius.circular(24),
-                    label: 'انتهت الكمية',
+                    label: 'out_of_stock_label'.tr,
                   ),
               ],
             ),
@@ -491,7 +491,7 @@ class FoodRestaurantMenuItemCard extends StatelessWidget {
                   _buildOutOfStockOverlay(
                     context: context,
                     borderRadius: BorderRadius.circular(22),
-                    label: 'انتهت الكمية',
+                    label: 'out_of_stock_label'.tr,
                     bottomSpacing: Dimensions.paddingSizeSmall,
                   ),
               ],

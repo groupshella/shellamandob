@@ -46,7 +46,7 @@ class EnhancedSummaryCards extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _card(
-                title: 'الإنفاق الشهري',
+                title: 'monthly_spending'.tr,
                 value: summary.monthlySpending,
                 change: summary.spendingTrend.monthlyChange,
               ),

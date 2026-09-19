@@ -109,7 +109,9 @@ class ErrorHandler {
     
     // Unknown error
     return UnknownFailure(
-      message: '${contextPrefix}something_went_wrong'.tr,
+      message: contextPrefix.isNotEmpty
+          ? '$contextPrefix${'something_went_wrong'.tr}'
+          : 'something_went_wrong'.tr,
       code: 'UNKNOWN',
       originalError: exception,
     );

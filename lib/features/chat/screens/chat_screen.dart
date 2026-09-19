@@ -502,7 +502,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                         child: CircularProgressIndicator(strokeWidth: 2),
                                                       ),
                                                       const SizedBox(width: Dimensions.paddingSizeSmall),
-                                                      Text('يتم الكتابة...', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
+                                                      Text('is_typing'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
                                                     ],
                                                   ),
                                                 );
@@ -971,7 +971,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                                 child: Align(
                                   alignment: Alignment.centerLeft,
-                                  child: Text('المتجر يكتب...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                  child: Text('store_is_typing'.tr, style: TextStyle(fontSize: 12, color: Colors.grey)),
                                 ),
                               ),
                             (chatController.messageModel != null &&

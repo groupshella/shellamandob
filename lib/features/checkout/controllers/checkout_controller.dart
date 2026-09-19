@@ -1640,7 +1640,7 @@ class CheckoutController extends GetxController implements GetxService {
         method: paymentMethod,
         amount: amount,
       );
-      showCustomSnackBar('فشلت عملية الدفع: ${_mfReadableErrorMessage(error)}');
+      showCustomSnackBar('${'payment_failed'.tr}: ${_mfReadableErrorMessage(error)}');
       return false;
     }
   }
@@ -1808,7 +1808,7 @@ class CheckoutController extends GetxController implements GetxService {
         method: paymentMethod,
         amount: amount,
       );
-      showCustomSnackBar('فشلت عملية الدفع: ${_mfReadableErrorMessage(error)}');
+      showCustomSnackBar('${'payment_failed'.tr}: ${_mfReadableErrorMessage(error)}');
       return false;
     }
   }
@@ -1842,7 +1842,7 @@ class CheckoutController extends GetxController implements GetxService {
       );
     } catch (error) {
       debugPrint('Error showing in-app payment modal: $error');
-      showCustomSnackBar('خطأ في عرض نافذة الدفع: ${error.toString()}');
+      showCustomSnackBar('${'payment_window_display_error'.tr}: ${error.toString()}');
     }
   }
 
@@ -2980,7 +2980,7 @@ class CheckoutController extends GetxController implements GetxService {
           _isLoading = false;
           update();
           debugPrint('[Payment][Qidha] blocked: wallet is null');
-          showCustomSnackBar('Qidha wallet is not available right now.');
+          showCustomSnackBar('qidha_wallet_unavailable'.tr);
           return '';
         }
 
@@ -3063,7 +3063,7 @@ class CheckoutController extends GetxController implements GetxService {
           _isLoading = false;
           update();
           debugPrint('[Payment][Qidha] exception: $e');
-          showCustomSnackBar('Qidha payment error. Please try again later.');
+          showCustomSnackBar('qidha_payment_error_try_later'.tr);
           return '';
         }
       } else if (_paymentMethodIndex == 1 && isMy_Pay == true) {
@@ -3127,7 +3127,7 @@ class CheckoutController extends GetxController implements GetxService {
           _isLoading = false;
           update();
           debugPrint('[Payment][Wallet] exception: $e');
-          showCustomSnackBar('Wallet payment error. Please try again later.');
+          showCustomSnackBar('wallet_payment_error_try_later'.tr);
           return '';
         }
       } else {

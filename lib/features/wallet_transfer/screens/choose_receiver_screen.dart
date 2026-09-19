@@ -145,7 +145,7 @@ class _ChooseReceiverScreenState extends State<ChooseReceiverScreen> {
                 keyboardType: TextInputType.phone,
                 textAlign: TextAlign.left,
                 decoration: InputDecoration(
-                  hintText: '+9665XXXXXXXX',
+                  hintText: 'phone_placeholder'.tr,
                   suffixIcon: controller.isValidating
                       ? const Padding(
                           padding: EdgeInsets.all(12),
@@ -246,7 +246,7 @@ class _ChooseReceiverScreenState extends State<ChooseReceiverScreen> {
                 ],
               ),
             ),
-            Text('اختيار', style: robotoMedium),
+            Text('choose_label'.tr, style: robotoMedium),
           ],
         ),
       ),

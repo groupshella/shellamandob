@@ -234,7 +234,7 @@ class _LoyaltyBottomSheetWidgetState extends State<LoyaltyBottomSheetWidget> {
                 return CustomButton(
                   width: double.infinity,
                   isBold: false,
-                  buttonText: 'تحويل نقاط الآن',
+                  buttonText: 'convert_points_now'.tr,
                   radius: 14,
                   isLoading: controller.isLoading,
                   onPressed: () => _onConvert(controller),

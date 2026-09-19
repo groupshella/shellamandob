@@ -102,7 +102,7 @@ class _ShowPdfScreenState extends State<ShowPdfScreen> {
                 CustomButton(
                   color: _green,
                   radius: 12,
-                  buttonText: 'استعراض العقد',
+                  buttonText: 'view_contract'.tr,
                   onPressed: () async {
                     Get.toNamed(RouteHelper.getContract_ReviewRoute());
                   },
@@ -373,7 +373,7 @@ class ReviewScreen extends StatelessWidget {
           ],
         ),
         const Spacer(),
-        const Text('هل لديك استفسار؟', style: TextStyle(fontSize: 16)),
+        Text('have_inquiry'.tr, style: const TextStyle(fontSize: 16)),
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () {},

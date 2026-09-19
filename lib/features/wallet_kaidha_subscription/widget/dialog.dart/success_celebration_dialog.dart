@@ -47,7 +47,7 @@ class _Success_Celebration_dialogState extends State<Success_Celebration_dialog>
               ),
               child: AnimatedTextKit(
                 animatedTexts: [
-                  ScaleAnimatedText('🎉 تم التسجيل بنجاح! 🎉'),
+                  ScaleAnimatedText('registered_successfully'.tr),
                 ],
                 isRepeatingAnimation: false,
               ),
@@ -125,7 +125,7 @@ class _SuccessCelebrationWidgetState extends State<SuccessCelebrationWidget> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('🎉', textAlign: TextAlign.center, style: TextStyle(fontSize: 70)),
+                const Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 70),
                 const SizedBox(height: 20),
                 SizedBox(
                   height: 50,
@@ -133,10 +133,10 @@ class _SuccessCelebrationWidgetState extends State<SuccessCelebrationWidget> {
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
                     child: AnimatedTextKit(
                       animatedTexts: [
-                        ScaleAnimatedText('🎉 مبروك! لقد فزت معنا بقسيمة شرائية! 🎉'),
+                        ScaleAnimatedText('won_coupon_message'.tr),
                       ],
-                      repeatForever: true, // ✅ تتكرر بلا توقف
-                      pause: const Duration(milliseconds: 500), // ⏸️ وقت التوقف بين كل دورة
+                      repeatForever: true,
+                      pause: const Duration(milliseconds: 500),
                     ),
                   ),
                 ),
@@ -145,7 +145,7 @@ class _SuccessCelebrationWidgetState extends State<SuccessCelebrationWidget> {
                   '''عميلنا العزيز
 يسعدنا أن نزف إليك خبر فوزك معنا بقسيمة شرائية
 
- تصل قيمتها إلى 250 ريال! 🛍️
+ تصل قيمتها إلى 250 ريال!
 
 هذه فرصتك للاستمتاع بمنتجاتنا وخدماتنا المميزة.
 للحصول على قسيمتك سجل عضويتك الان بقيدها''',

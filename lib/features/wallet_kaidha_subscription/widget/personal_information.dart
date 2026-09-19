@@ -300,7 +300,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     context: context,
                     text: 'full_name_as_in_id'.tr,
                     hintText: (Get.locale?.languageCode == 'ar')
-                        ? 'ادخل اسمك بالكامل كما هو في الهوية'
+                        ? 'enter_full_name_as_in_id'.tr
                         : 'Enter your full name as in ID',
                     mycontroller: KaidhaSub_Controller.fullNameController,
                     focusNode: KaidhaSub_Controller.firstNameFocus,
@@ -315,7 +315,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     isBirthDate: true,
                     hasError: KaidhaSub_Controller.isBirthDateEmpty,
                     errorMessage: (Get.locale?.languageCode == 'ar')
-                        ? 'الرجاء اختيار تاريخ الميلاد'
+                        ? 'please_select_birth_date'.tr
                         : 'Please select date of birth',
                     scrollKey: KaidhaSubscriptionController.birthDateKey,
                     focusNode: KaidhaSub_Controller.birthDateFocus,
@@ -349,7 +349,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                   // National ID / Iqama Number
                   _custom_number(
                     KaidhaSub_Controller,
-                    hintText: '١٠ أرقام (مثال: 1XXXXXXXXX)',
+                    hintText: 'ten_digits_example'.tr,
                     obscureText: false,
                     mycontroller: KaidhaSub_Controller.identity_card_number,
                     text: 'identity_card_number'.tr,
@@ -370,7 +370,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     isBirthDate: false,
                     hasError: KaidhaSub_Controller.isEndDateEmpty,
                     errorMessage: (Get.locale?.languageCode == 'ar')
-                        ? 'الرجاء اختيار تاريخ الانتهاء'
+                        ? 'please_select_expiry_date'.tr
                         : 'Please select expiry date',
                     scrollKey: KaidhaSubscriptionController.endDateKey,
                     focusNode: KaidhaSub_Controller.endDateFocus,
@@ -387,7 +387,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
             ),
 
             const SizedBox(height: 20),
-            _sectionTitle('بيانات السكن'),
+            _sectionTitle('housing_data'.tr),
             const SizedBox(height: 12),
 
             Container(
@@ -416,8 +416,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
                   _customTextFormAuth(
                     KaidhaSub_Controller,
                     mycontroller: KaidhaSub_Controller.building_number,
-                    text: (Get.locale?.languageCode == 'ar') ? 'رقم المبنى' : 'Building number',
-                    hintText: (Get.locale?.languageCode == 'ar') ? 'ادخل رقم المبنى' : 'Enter building number',
+                    text: 'building_number'.tr,
+                    hintText: 'enter_building_number'.tr,
                     context: context,
                     focusNode: null,
                     isEmpty: false,
@@ -432,8 +432,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
                   _customTextFormAuth(
                     KaidhaSub_Controller,
                     mycontroller: KaidhaSub_Controller.street_name,
-                    text: (Get.locale?.languageCode == 'ar') ? 'اسم الشارع' : 'Street name',
-                    hintText: (Get.locale?.languageCode == 'ar') ? 'ادخل اسم الشارع' : 'Enter street name',
+                    text: 'street_name'.tr,
+                    hintText: 'enter_street_name'.tr,
                     context: context,
                     focusNode: null,
                     isEmpty: false,
@@ -445,7 +445,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     KaidhaSub_Controller,
                     mycontroller: KaidhaSub_Controller.neighborhood,
                     text: 'neighborhood'.tr,
-                    hintText: (Get.locale?.languageCode == 'ar') ? 'ادخل اسم الحي' : 'Enter neighborhood name',
+                    hintText: 'enter_neighborhood_name'.tr,
                     context: context,
                     focusNode: KaidhaSub_Controller.neighborhoodFocus,
                     isEmpty: KaidhaSub_Controller.isNeighborhoodEmpty,
@@ -457,8 +457,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     KaidhaSub_Controller,
                     isNumber: true,
                     mycontroller: KaidhaSub_Controller.postal_code,
-                    text: (Get.locale?.languageCode == 'ar') ? 'الرمز البريدي' : 'Postal code',
-                    hintText: (Get.locale?.languageCode == 'ar') ? 'ادخل الرمز البريدي' : 'Enter postal code',
+                    text: 'postal_code'.tr,
+                    hintText: 'enter_postal_code'.tr,
                     context: context,
                     focusNode: null,
                     isEmpty: false,
@@ -489,9 +489,9 @@ class _PersonalInformationState extends State<PersonalInformation> {
                   ),
                 ],
               ),
-              child: const FileUploadWithNameWidget(
+              child: FileUploadWithNameWidget(
                 isIncome: false,
-                instruction: 'أرفق صوراً واضحة لمستنداتك مثل الهوية أو عقد الإيجار ، وسم كل ملف قبل رفعه',
+                instruction: 'attach_documents_instruction'.tr,
               ),
             ),
           ],
@@ -703,8 +703,8 @@ class _PersonalInformationState extends State<PersonalInformation> {
     return GetBuilder<KaidhaSubscriptionController>(
       builder: (c) {
         final options = [
-          {'label': (Get.locale?.languageCode == 'ar') ? 'ملك' : 'Owned', 'value': 'owned'},
-          {'label': (Get.locale?.languageCode == 'ar') ? 'إيجار' : 'Rent', 'value': 'rent'},
+          {'label': 'owned'.tr, 'value': 'owned'},
+          {'label': 'rent'.tr, 'value': 'rent'},
         ];
 
         return Column(
@@ -716,7 +716,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                 const Text('*', style: TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold)),
                 const SizedBox(width: 4),
                 Text(
-                  (Get.locale?.languageCode == 'ar') ? 'نوع السكن' : 'Ownership',
+                  'housing_type'.tr,
                   style: robotoMedium.copyWith(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF111B18), fontFamily: 'Tajawal'),
                 ),
               ],
@@ -1081,11 +1081,11 @@ class _PersonalInformationState extends State<PersonalInformation> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'هذا الحقل مطلوب';
+                  return 'required'.tr;
                 }
                 // ignore: deprecated_member_use
                 if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                  return 'يجب إدخال أرقام فقط';
+                  return 'enter_numbers_only'.tr;
                 }
                 return null;
               },
@@ -1141,7 +1141,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
         },
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'هذا الحقل مطلوب';
+            return 'required'.tr;
           }
           return null;
         },
@@ -1233,7 +1233,7 @@ class _PersonalInformationState extends State<PersonalInformation> {
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'هذا الحقل مطلوب';
+                        return 'required'.tr;
                       }
                       return null;
                     },

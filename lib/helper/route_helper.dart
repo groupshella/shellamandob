@@ -29,6 +29,7 @@ import 'package:sixam_mart/features/wallet_transfer/screens/wallet_transaction_d
 import 'package:sixam_mart/features/loyalty/screens/loyalty_screen.dart';
 import 'package:sixam_mart/features/profile/domain/models/update_user_model.dart';
 import 'package:sixam_mart/features/refer_and_earn/screens/refer_and_earn_screen.dart';
+import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_screen.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/home/screens/market_store_screen.dart';
@@ -141,6 +142,12 @@ import '../features/statistics/domain/repositories/analytics_repository.dart';
 import '../features/statistics/domain/repositories/qidha_wallet_repository.dart';
 import '../features/statistics/data/network_info.dart';
 import '../features/wallet_kaidha_subscription/screen/wallet_kaidha_screen.dart';
+import '../features/employee/attendance/screens/select_work_zone_screen.dart';
+import '../features/employee/attendance/screens/attendance_stepper_screen.dart';
+import '../features/employee/visits/screens/daily_visits_screen.dart';
+import '../features/employee/reports/screens/daily_performance_summary_screen.dart';
+import '../features/employee/requests/screens/employee_requests_screen.dart';
+import '../features/employee/screens/employee_settings_screen.dart';
 
 class RouteHelper {
   static const String posCheckout = '/pos-checkout';
@@ -219,6 +226,20 @@ class RouteHelper {
   static const String loyalty = '/loyalty';
   static const String referAndEarn = '/refer-and-earn';
   static const String marketer = '/marketer';
+  static const String employeeMain = '/employee-main';
+  static String getEmployeeMainRoute() => employeeMain;
+  static const String selectWorkZone = '/select-work-zone';
+  static String getSelectWorkZoneRoute() => selectWorkZone;
+  static const String attendanceStepper = '/attendance-stepper';
+  static String getAttendanceStepperRoute() => attendanceStepper;
+  static const String dailyVisits = '/daily-visits';
+  static String getDailyVisitsRoute() => dailyVisits;
+  static const String dailySummary = '/daily-performance-summary';
+  static String getDailySummaryRoute() => dailySummary;
+  static const String employeeRequests = '/employee-requests';
+  static String getEmployeeRequestsRoute() => employeeRequests;
+  static const String employeeSettings = '/employee-settings';
+  static String getEmployeeSettingsRoute() => employeeSettings;
   static const String messages = '/messages';
   static const String conversation = '/conversation';
   static const String chatSearch = '/chat-search';
@@ -1411,6 +1432,13 @@ class RouteHelper {
     GetPage(
         name: referAndEarn, page: () => getRoute(const ReferAndEarnScreen())),
     GetPage(name: marketer, page: () => getRoute(const MarketerScreen())),
+    GetPage(name: employeeMain, page: () => getRoute(const EmployeeMainScreen())),
+    GetPage(name: selectWorkZone, page: () => getRoute(const SelectWorkZoneScreen())),
+    GetPage(name: attendanceStepper, page: () => getRoute(const AttendanceStepperScreen())),
+    GetPage(name: dailyVisits, page: () => getRoute(const DailyVisitsScreen())),
+    GetPage(name: dailySummary, page: () => getRoute(const DailyPerformanceSummaryScreen())),
+    GetPage(name: employeeRequests, page: () => getRoute(const EmployeeRequestsScreen())),
+    GetPage(name: employeeSettings, page: () => getRoute(const EmployeeSettingsScreen())),
     GetPage(
         name: messages,
         page: () {

@@ -116,11 +116,11 @@ class BuildCouponList extends StatelessWidget {
     }
     final String code = coupon.code?.trim() ?? '';
     if (code.isEmpty) {
-      showCustomSnackBar('كود القسيمة غير متاح');
+      showCustomSnackBar('coupon_code_unavailable'.tr);
       return;
     }
     await Clipboard.setData(ClipboardData(text: code));
-    showCustomSnackBar('تم نسخ الكود، استخدمه عند إتمام الطلب', isError: false);
+    showCustomSnackBar('code_copied_use_at_checkout'.tr, isError: false);
   }
 
   @override

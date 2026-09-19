@@ -356,7 +356,7 @@ class _SignInViewState extends State<SignInView> {
                   authController, phone, isPhone, password, status);
             }
           } else {
-            showCustomSnackBar('تأكد من الرقم او كلمة المرور');
+            showCustomSnackBar('check_phone_or_password'.tr);
           }
         });
       }
