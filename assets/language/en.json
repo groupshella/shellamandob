@@ -3286,5 +3286,21 @@
   "failed_start_payment_no_link": "Failed to start payment - no payment link received",
   "cannot_exec_nafath_without_user_id": "Cannot execute Nafath request without user ID",
   "server_response_error": "Server response error",
-  "could_not_open_store": "Could not open store"
+  "could_not_open_store": "Could not open store",
+  "upcoming_single": "Upcoming",
+  "in_progress_single": "In Progress",
+  "completed_single": "Completed",
+  "start_visit_action": "Start Visit",
+  "view_report": "View Report",
+  "resume_visit": "Resume Visit",
+  "start_visit_confirm_title": "Start visit to @store?",
+  "start_visit_confirm_subtitle": "Visit start time and location will be recorded",
+  "distance_km": "km",
+  "doc_and_finish_visit": "Document & Finish Visit",
+  "visit_timer_title": "Visit Timer",
+  "max_visit_duration_hint": "Maximum visit duration is 30 minutes",
+  "alerts_log_title": "Alerts Log",
+  "visit_started_label": "Visit Started",
+  "distance_label": "Distance",
+  "elapsed_label": "Elapsed"
 }

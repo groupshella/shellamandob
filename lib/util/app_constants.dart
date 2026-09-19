@@ -233,6 +233,8 @@ class AppConstants {
   static const String marketerShiftHistoryUri = '/api/v1/customer/marketer/shift/history';
   static const String marketerDashboardUri = '/api/v1/customer/marketer/dashboard';
   static const String marketerApplyUri = '/api/v1/customer/marketer/apply';
+  static const String marketerVisitsUri = '/api/v1/customer/marketer/visits';
+  static const String marketerVisitsStoreUri = '/api/v1/customer/marketer/visits/store';
 
   /// Authenticated My Coupons list (user-specific e.g. is_used). Use headers + auth.
   static const String couponUri = '/api/v1/coupon/list';

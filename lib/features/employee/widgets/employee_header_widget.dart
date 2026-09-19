@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 
@@ -17,7 +18,16 @@ class EmployeeHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
-        final name = controller.shiftModel.employeeName;
+        String name = controller.shiftModel.employeeName;
+        if (name.trim().isEmpty && Get.isRegistered<ProfileController>()) {
+          final userInfo = Get.find<ProfileController>().userInfoModel;
+          if (userInfo != null) {
+            name = '${userInfo.fName ?? ''} ${userInfo.lName ?? ''}'.trim();
+          }
+        }
+        final String greeting = name.trim().isNotEmpty ? '${'hello'.tr} $name' : 'hello'.tr;
+        final bool hasWarnings = controller.shiftModel.warningCount > 0 || controller.warnings.isNotEmpty;
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
@@ -32,7 +42,7 @@ class EmployeeHeaderWidget extends StatelessWidget {
                     child: Container(
                       width: 44,
                       height: 44,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: _iconBg,
                         shape: BoxShape.circle,
                       ),
@@ -45,7 +55,7 @@ class EmployeeHeaderWidget extends StatelessWidget {
                             color: _darkText,
                           ),
                           // Unread notification badge dot if there are warnings or alerts
-                          if (controller.warnings.isNotEmpty)
+                          if (hasWarnings)
                             Positioned(
                               top: 10,
                               right: 12,
@@ -69,7 +79,7 @@ class EmployeeHeaderWidget extends StatelessWidget {
 
               // Greeting & Question
               Text(
-                '${'hello'.tr} $name',
+                greeting,
                 style: const TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 22,

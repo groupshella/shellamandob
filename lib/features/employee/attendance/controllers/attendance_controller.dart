@@ -20,6 +20,7 @@ class AttendanceController extends GetxController implements GetxService {
   bool isLoadingZones = false;
   bool isLockingZone = false;
   bool isStartingShift = false;
+  DateTime? attendanceConfirmedTime;
 
   // Stepper: 0 = الموقع, 1 = الصورة, 2 = تأكيد
   int currentStep = 0;
@@ -308,6 +309,7 @@ class AttendanceController extends GetxController implements GetxService {
 
     isStartingShift = false;
     if (success) {
+      attendanceConfirmedTime = DateTime.now();
       setStep(2);
     }
     update();

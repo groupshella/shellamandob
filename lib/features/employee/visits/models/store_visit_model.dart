@@ -191,4 +191,53 @@ class StoreVisitModel {
         .map((s) => s.trim())
         .join(' - ');
   }
+
+  factory StoreVisitModel.fromJson(Map<String, dynamic> json) {
+    StoreVisitStatus status = StoreVisitStatus.scheduled;
+    final statusStr = json['visit_status']?.toString().toLowerCase() ?? 'scheduled';
+    if (statusStr == 'completed') {
+      status = StoreVisitStatus.completed;
+    } else if (statusStr == 'follow_up' || statusStr == 'followup') {
+      status = StoreVisitStatus.followUp;
+    } else if (statusStr == 'in_progress' || statusStr == 'inprogress') {
+      status = StoreVisitStatus.inProgress;
+    }
+
+    StorePipelineStep step = StorePipelineStep.notMet;
+    final stepStr = json['pipeline_step']?.toString() ?? '';
+    for (var s in StorePipelineStep.values) {
+      if (s.name == stepStr) {
+        step = s;
+        break;
+      }
+    }
+
+    return StoreVisitModel(
+      id: json['id']?.toString() ?? '',
+      storeName: json['store_name']?.toString() ?? '',
+      managerName: json['manager_name']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      openingsCount: int.tryParse('${json['openings_count']}') ?? 1,
+      crNumber: json['cr_number']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      category: json['category']?.toString() ?? '',
+      distanceKm: double.tryParse('${json['distance_km']}') ?? 0.5,
+      timeSlot: json['time_slot']?.toString() ?? '',
+      pipelineStep: step,
+      visitStatus: status,
+      isQualifiedOutcome: json['is_qualified'] == 1 || json['is_qualified'] == true,
+      frontImagePath: json['front_image']?.toString(),
+      insideImagePath: json['inside_image']?.toString(),
+      nextFollowUpDate: json['next_follow_up_date'] != null ? DateTime.tryParse('${json['next_follow_up_date']}') : null,
+      nextFollowUpCommitments: json['next_follow_up_commitments']?.toString(),
+      obstaclesNotes: json['obstacles_notes']?.toString(),
+      closingReason: json['closing_reason']?.toString(),
+      closingReasonOtherDetails: json['closing_reason_other_details']?.toString(),
+      confidentialNotes: json['confidential_notes']?.toString(),
+      contractSignaturePath: json['contract_signature_path']?.toString(),
+      durationMinutes: int.tryParse('${json['duration_minutes']}') ?? 0,
+      startedAt: json['started_at'] != null ? DateTime.tryParse('${json['started_at']}') : null,
+      completedAt: json['completed_at'] != null ? DateTime.tryParse('${json['completed_at']}') : null,
+    );
+  }
 }

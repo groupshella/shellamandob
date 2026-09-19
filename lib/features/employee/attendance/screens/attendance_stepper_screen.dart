@@ -2,10 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import '../../controllers/employee_navigation_controller.dart';
 import '../../controllers/employee_shift_controller.dart';
+import '../../models/employee_shift_model.dart';
 import '../controllers/attendance_controller.dart';
 import '../widgets/attendance_geofence_map_widget.dart';
 
@@ -521,6 +523,25 @@ class AttendanceStepperScreen extends StatelessWidget {
 
   // STEP 3: شاشة نجاح وتأكيد بداية العمل (Success View)
   Widget _buildSuccessStep(BuildContext context, AttendanceController controller) {
+    final attendanceDateTime = controller.attendanceConfirmedTime ?? DateTime.now();
+
+    // Dynamic Start Time
+    String formattedTime = '';
+    if (Get.isRegistered<EmployeeShiftController>()) {
+      final shiftModel = Get.find<EmployeeShiftController>().shiftModel;
+      if (shiftModel.status == ShiftStatus.active &&
+          shiftModel.startTimeText.isNotEmpty &&
+          shiftModel.startTimeText != '--:--') {
+        formattedTime = shiftModel.localizedStartTime;
+      }
+    }
+    if (formattedTime.isEmpty) {
+      formattedTime = DateFormat('hh:mm a', Get.locale?.languageCode ?? 'ar').format(attendanceDateTime);
+    }
+
+    // Dynamic Date
+    final formattedDate = DateFormat('EEEE، d MMMM y', Get.locale?.languageCode ?? 'ar').format(attendanceDateTime);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
@@ -586,9 +607,9 @@ class AttendanceStepperScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: _primaryGreen.withValues(alpha: 0.2)),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Text(
+                const Text(
                   'وقت بدء العمل',
                   style: TextStyle(
                     fontFamily: 'Tajawal',
@@ -596,20 +617,20 @@ class AttendanceStepperScreen extends StatelessWidget {
                     color: _subText,
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
-                  '08:35 AM',
-                  style: TextStyle(
+                  formattedTime,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     color: _primaryGreen,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'الأحد، 14 سبتمبر 2026',
-                  style: TextStyle(
+                  formattedDate,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
                     color: _subText,

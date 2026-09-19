@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import '../models/employee_shift_model.dart';
 import '../models/employee_warning_model.dart';
 import '../services/marketer_shift_service.dart';
@@ -44,26 +46,116 @@ class EmployeeShiftController extends GetxController implements GetxService {
       final res = await _service.getCurrentShift();
       if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
         final data = res.body['data'];
-        final String serverStatus = (data['status'] ?? 'none').toString().toLowerCase();
-        currentShiftId = int.tryParse('${data['shift_id']}');
-        currentZoneId = int.tryParse('${data['zone_id']}');
 
-        final int workedSeconds = int.tryParse('${data['worked_seconds'] ?? data['elapsed_seconds'] ?? 0}') ?? 0;
-        final int breakSeconds = int.tryParse('${data['break_seconds'] ?? 0}') ?? 0;
+        // Handle nested shift object or root data
+        final Map<String, dynamic> shiftData = (data['shift'] is Map)
+            ? Map<String, dynamic>.from(data['shift'])
+            : (data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{});
+
+        final String serverStatus = (shiftData['status'] ?? data['status'] ?? 'not_started').toString().toLowerCase();
+        currentShiftId = int.tryParse('${shiftData['shift_id'] ?? shiftData['id'] ?? data['shift_id']}');
+        currentZoneId = int.tryParse('${shiftData['zone_id'] ?? data['zone_id']}');
 
         ShiftStatus mappedStatus = ShiftStatus.notStarted;
         if (serverStatus == 'active') {
           mappedStatus = ShiftStatus.active;
-        } else if (serverStatus == 'break') {
+        } else if (serverStatus == 'break' || serverStatus == 'on_break') {
           mappedStatus = ShiftStatus.onBreak;
         } else {
           mappedStatus = ShiftStatus.notStarted;
         }
 
+        // 1. Employee Name
+        String employeeName = '';
+        if (data['employee'] is Map && data['employee']['name'] != null) {
+          employeeName = data['employee']['name'].toString();
+        }
+        if (employeeName.isEmpty && Get.isRegistered<ProfileController>()) {
+          final userInfo = Get.find<ProfileController>().userInfoModel;
+          if (userInfo != null) {
+            employeeName = '${userInfo.fName ?? ''} ${userInfo.lName ?? ''}'.trim();
+          }
+        }
+
+        // 2. Start Time
+        String startTimeText = shiftData['start_time_text']?.toString() ?? '';
+        if (startTimeText.isEmpty && shiftData['started_at'] != null) {
+          try {
+            final dt = DateTime.parse(shiftData['started_at'].toString());
+            startTimeText = DateFormat('hh:mm a', 'ar').format(dt);
+          } catch (_) {
+            startTimeText = shiftData['started_at'].toString();
+          }
+        }
+        if (startTimeText.isEmpty && mappedStatus == ShiftStatus.notStarted) {
+          startTimeText = '--:--';
+        }
+
+        // 3. Work Seconds and Work Time Text
+        final int workedSeconds = int.tryParse('${shiftData['worked_seconds'] ?? shiftData['elapsed_seconds'] ?? data['worked_seconds'] ?? 0}') ?? 0;
+        final String workedTimeText = shiftData['worked_time_text']?.toString() ?? '';
+        final int breakSeconds = int.tryParse('${shiftData['break_seconds'] ?? data['break_seconds'] ?? 0}') ?? 0;
+
+        // 4. Overtime
+        final int overtimeSeconds = int.tryParse('${shiftData['overtime_seconds'] ?? 0}') ?? 0;
+        final String overtimeText = shiftData['overtime_text']?.toString() ?? '';
+
+        // 5. Approved Leave
+        final int approvedLeaveSeconds = int.tryParse('${shiftData['approved_leave_seconds'] ?? 0}') ?? 0;
+        final String approvedLeaveText = shiftData['approved_leave_text']?.toString() ?? '';
+
+        // 6. Warnings
+        List<EmployeeWarningModel> warningsList = [];
+        int warningCount = 0;
+        if (data['warnings'] != null) {
+          if (data['warnings'] is Map) {
+            warningCount = int.tryParse('${data['warnings']['count']}') ?? 0;
+            if (data['warnings']['items'] is List) {
+              warningsList = (data['warnings']['items'] as List)
+                  .map((e) => EmployeeWarningModel.fromJson(Map<String, dynamic>.from(e)))
+                  .toList();
+            }
+          } else if (data['warnings'] is List) {
+            warningsList = (data['warnings'] as List)
+                .map((e) => EmployeeWarningModel.fromJson(Map<String, dynamic>.from(e)))
+                .toList();
+            warningCount = warningsList.length;
+          }
+        }
+        if (warningCount == 0 && warningsList.isNotEmpty) {
+          warningCount = warningsList.length;
+        }
+
+        // 7. Visits Summary
+        int totalVisits = 0;
+        int completedVisits = 0;
+        int upcomingVisits = 0;
+        int followUpVisits = 0;
+        if (data['visits_summary'] is Map) {
+          final vs = data['visits_summary'];
+          totalVisits = int.tryParse('${vs['total']}') ?? 0;
+          completedVisits = int.tryParse('${vs['completed']}') ?? 0;
+          upcomingVisits = int.tryParse('${vs['upcoming']}') ?? 0;
+          followUpVisits = int.tryParse('${vs['needs_follow_up'] ?? vs['follow_up']}') ?? 0;
+        }
+
         _shiftModel = _shiftModel.copyWith(
           status: mappedStatus,
+          employeeName: employeeName.isNotEmpty ? employeeName : _shiftModel.employeeName,
+          startTimeText: startTimeText.isNotEmpty ? startTimeText : _shiftModel.startTimeText,
           actualWorkSeconds: workedSeconds,
+          workedTimeText: workedTimeText,
           breakSeconds: breakSeconds,
+          overtimeSeconds: overtimeSeconds,
+          overtimeHoursText: overtimeText,
+          approvedLeaveSeconds: approvedLeaveSeconds,
+          approvedLeaveHoursText: approvedLeaveText,
+          totalVisits: totalVisits,
+          completedVisits: completedVisits,
+          upcomingVisits: upcomingVisits,
+          followUpVisits: followUpVisits,
+          warnings: warningsList,
+          warningCount: warningCount,
         );
 
         if (mappedStatus == ShiftStatus.active || mappedStatus == ShiftStatus.onBreak) {
@@ -127,10 +219,28 @@ class EmployeeShiftController extends GetxController implements GetxService {
       if (res.statusCode == 200 && res.body != null) {
         final data = res.body['data'] ?? {};
         currentShiftId = int.tryParse('${data['shift_id']}');
-        _shiftModel = _shiftModel.copyWith(status: ShiftStatus.active);
+        
+        String startText = '';
+        if (data['started_at'] != null) {
+          try {
+            final dt = DateTime.parse(data['started_at'].toString());
+            startText = DateFormat('hh:mm a', 'ar').format(dt);
+          } catch (_) {
+            startText = data['started_at'].toString();
+          }
+        }
+        if (startText.isEmpty) {
+          startText = DateFormat('hh:mm a', 'ar').format(DateTime.now());
+        }
+
+        _shiftModel = _shiftModel.copyWith(
+          status: ShiftStatus.active,
+          startTimeText: startText,
+        );
         _startTimer();
         _startPolling();
         update();
+        loadCurrentShift(notify: true);
         return true;
       } else {
         final msg = res.body?['message'] ?? 'فشل في بدء الدوام';
@@ -158,6 +268,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
       if (res.statusCode == 200) {
         _shiftModel = _shiftModel.copyWith(status: ShiftStatus.onBreak);
         update();
+        loadCurrentShift(notify: true);
         return true;
       } else {
         final msg = res.body?['message'] ?? 'فشل في طلب الراحة';
@@ -185,6 +296,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
       if (res.statusCode == 200) {
         _shiftModel = _shiftModel.copyWith(status: ShiftStatus.active);
         update();
+        loadCurrentShift(notify: true);
         return true;
       } else {
         final msg = res.body?['message'] ?? 'فشل في استئناف العمل';
@@ -215,9 +327,13 @@ class EmployeeShiftController extends GetxController implements GetxService {
       if (res.statusCode == 200) {
         _tickerTimer?.cancel();
         _stopPolling();
-        _shiftModel = _shiftModel.copyWith(status: ShiftStatus.notStarted);
+        _shiftModel = _shiftModel.copyWith(
+          status: ShiftStatus.notStarted,
+          actualWorkSeconds: 0,
+        );
         update();
         showCustomSnackBar('تم إنهاء الدوام بنجاح', isError: false);
+        loadCurrentShift(notify: true);
         return true;
       } else {
         final msg = res.body?['message'] ?? 'فشل في إنهاء الدوام';

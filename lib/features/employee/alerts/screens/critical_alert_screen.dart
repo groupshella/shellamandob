@@ -23,9 +23,27 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // Prevent back button until resumed
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop && Get.isRegistered<AntiFraudAlertsController>()) {
+          Get.find<AntiFraudAlertsController>().resumeActivity();
+        }
+      },
       child: Scaffold(
         backgroundColor: const Color(0xFF1F1212),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close_rounded, color: Colors.white, size: 26),
+            onPressed: () {
+              if (Get.isRegistered<AntiFraudAlertsController>()) {
+                Get.find<AntiFraudAlertsController>().resumeActivity();
+              }
+              Get.back();
+            },
+          ),
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),

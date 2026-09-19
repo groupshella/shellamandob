@@ -20,7 +20,7 @@ class ShiftMetricsGridWidget extends StatelessWidget {
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final model = controller.shiftModel;
-        final workTime = controller.formattedWorkHours;
+        final workTime = model.localizedWorkedTime;
         final String currentDate = DateFormat('d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
 
         return Padding(

@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:sixam_mart/api/api_client.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import '../models/store_visit_model.dart';
 import '../../controllers/employee_shift_controller.dart';
 import '../../alerts/controllers/anti_fraud_alerts_controller.dart';
@@ -25,11 +28,32 @@ class StoreVisitsController extends GetxController {
   int _elapsedVisitSeconds = 0;
   int get elapsedVisitSeconds => _elapsedVisitSeconds;
   int get remainingVisitSeconds => (maxVisitMinutes * 60) - _elapsedVisitSeconds;
+  int get remainingMinutes => ((maxVisitMinutes * 60 - _elapsedVisitSeconds) / 60).clamp(0, maxVisitMinutes).ceil();
+  double get progressPercent => (_elapsedVisitSeconds / (maxVisitMinutes * 60)).clamp(0.0, 1.0);
 
   // Inactivity tracking (10-minute threshold)
   int _inactivitySeconds = 0;
   int get inactivitySeconds => _inactivitySeconds;
   static const int inactivityThresholdSeconds = 600; // 10 minutes
+
+  // Inactivity Alert logs matching Figma
+  final List<Map<String, dynamic>> _alertHistory = [];
+  List<Map<String, dynamic>> get alertHistory => _alertHistory;
+
+  bool isAlertsLogExpanded = false;
+  void toggleAlertsLog() {
+    isAlertsLogExpanded = !isAlertsLogExpanded;
+    update();
+  }
+
+  void addAlertLog({required String title, required String time, required int level}) {
+    _alertHistory.add({
+      'title': title,
+      'time': time,
+      'level': level,
+    });
+    update();
+  }
 
   // Temporary micro-form state for active visit
   final TextEditingController storeNameController = TextEditingController();
@@ -64,6 +88,10 @@ class StoreVisitsController extends GetxController {
   bool _isConfidentialReportExpanded = false;
   bool get isConfidentialReportExpanded => _isConfidentialReportExpanded;
 
+  bool isLoading = false;
+
+  String get zoneName => 'غرب الرياض';
+
   // Visits lists
   final List<StoreVisitModel> _allVisits = [];
   List<StoreVisitModel> get allVisits => _allVisits;
@@ -71,7 +99,36 @@ class StoreVisitsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initMockVisits();
+    loadVisits();
+  }
+
+  Future<void> loadVisits({bool notify = true}) async {
+    isLoading = true;
+    if (notify) update();
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData(AppConstants.marketerVisitsUri);
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          final list = res.body['data']['visits'];
+          if (list is List && list.isNotEmpty) {
+            _allVisits.clear();
+            for (var item in list) {
+              _allVisits.add(StoreVisitModel.fromJson(Map<String, dynamic>.from(item)));
+            }
+            isLoading = false;
+            if (notify) update();
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadVisits error: $e');
+    }
+    if (_allVisits.isEmpty) {
+      _initMockVisits();
+    }
+    isLoading = false;
+    if (notify) update();
   }
 
   @override
@@ -163,7 +220,7 @@ class StoreVisitsController extends GetxController {
         openingsCount: 1,
         crNumber: '1010998877',
         address: 'حي العارض - شارع ريحانة بنت زيد',
-        category: 'عطارة ومحامص',
+        category: 'محامص ومكسرات',
         distanceKm: 1.8,
         timeSlot: '12:00 م - 12:30 م',
         visitStatus: StoreVisitStatus.scheduled,
@@ -174,13 +231,43 @@ class StoreVisitsController extends GetxController {
         id: 'VIS-106',
         storeName: 'صيدلية النقاء الحديثة',
         managerName: 'د. خالد الزهراني',
-        phone: '0534455667',
-        openingsCount: 2,
+        phone: '0531122334',
+        openingsCount: 1,
         crNumber: '1010445566',
         address: 'حي حطين - طريق الأمير تركي الأول',
         category: 'صيدليات وعناية',
         distanceKm: 2.2,
-        timeSlot: '01:00 م - 01:30 م',
+        timeSlot: '12:45 م - 01:15 م',
+        visitStatus: StoreVisitStatus.scheduled,
+        pipelineStep: StorePipelineStep.notMet,
+        isQualifiedOutcome: false,
+      ),
+      const StoreVisitModel(
+        id: 'VIS-107',
+        storeName: 'معرض الأناقة للأحذية والحقائب',
+        managerName: 'يوسف الغامدي',
+        phone: '0554433221',
+        openingsCount: 2,
+        crNumber: '1010223344',
+        address: 'حي المروة - شارع الإمام مسلم',
+        category: 'أزياء وملابس',
+        distanceKm: 2.5,
+        timeSlot: '01:30 م - 02:00 م',
+        visitStatus: StoreVisitStatus.scheduled,
+        pipelineStep: StorePipelineStep.notMet,
+        isQualifiedOutcome: false,
+      ),
+      const StoreVisitModel(
+        id: 'VIS-108',
+        storeName: 'مخبز ومطاحن خيرات بلادي',
+        managerName: 'عماد الشريف',
+        phone: '0509988776',
+        openingsCount: 1,
+        crNumber: '1010112233',
+        address: 'حي نمار - طريق ديراب',
+        category: 'مخابز ومعجنات',
+        distanceKm: 3.1,
+        timeSlot: '02:15 م - 02:45 م',
         visitStatus: StoreVisitStatus.scheduled,
         pipelineStep: StorePipelineStep.notMet,
         isQualifiedOutcome: false,
@@ -188,40 +275,54 @@ class StoreVisitsController extends GetxController {
     ]);
   }
 
-  // Filtered lists
+  void selectFilterTab(int index) {
+    _selectedFilterIndex = index;
+    update();
+  }
+
   List<StoreVisitModel> get filteredVisits {
     switch (_selectedFilterIndex) {
       case 1:
-        return _allVisits.where((v) => v.visitStatus == StoreVisitStatus.scheduled || v.visitStatus == StoreVisitStatus.inProgress).toList();
+        return _allVisits.where((v) => v.visitStatus == StoreVisitStatus.scheduled).toList();
       case 2:
         return _allVisits.where((v) => v.visitStatus == StoreVisitStatus.completed).toList();
       case 3:
         return _allVisits.where((v) => v.visitStatus == StoreVisitStatus.followUp).toList();
+      case 0:
       default:
         return _allVisits;
     }
   }
 
-  int get completedVisitsCount => _allVisits.where((v) => v.visitStatus == StoreVisitStatus.completed).length;
+  int get scheduledCount => _allVisits.where((v) => v.visitStatus == StoreVisitStatus.scheduled).length;
+  int get completedCount => _allVisits.where((v) => v.visitStatus == StoreVisitStatus.completed).length;
+  int get followUpCount => _allVisits.where((v) => v.visitStatus == StoreVisitStatus.followUp).length;
+  int get inProgressCount => _allVisits.where((v) => v.visitStatus == StoreVisitStatus.inProgress).length;
+
+  int get completedVisitsCount => completedCount;
   int get qualifiedVisitsCount => _allVisits.where((v) => v.isQualifiedOutcome).length;
-  int get followUpVisitsCount => _allVisits.where((v) => v.visitStatus == StoreVisitStatus.followUp).length;
+  int get followUpVisitsCount => followUpCount;
+  int get scheduledVisitsCount => scheduledCount;
+  int get totalVisitsCount => _allVisits.length;
   double get dailyProgressPercentage => (qualifiedVisitsCount / dailyTargetVisits).clamp(0.0, 1.0);
 
   void setFilterIndex(int index) {
+    setFilterIndexTab(index);
+  }
+
+  void setFilterIndexTab(int index) {
     _selectedFilterIndex = index;
     update();
   }
 
-  void toggleConfidentialReport() {
-    _isConfidentialReportExpanded = !_isConfidentialReportExpanded;
-    update();
-  }
-
   // Start a store visit
-  void startVisit(StoreVisitModel visit) {
+  Future<void> startVisit(StoreVisitModel visit) async {
+    final now = DateTime.now();
+    final startedAt = visit.startedAt ?? now;
+
     _activeVisit = visit.copyWith(
       visitStatus: StoreVisitStatus.inProgress,
-      startedAt: DateTime.now(),
+      startedAt: startedAt,
     );
 
     // Populate controllers
@@ -236,11 +337,42 @@ class StoreVisitsController extends GetxController {
     obstaclesController.text = visit.obstaclesNotes ?? '';
     _selectedClosingReason = visit.closingReason;
 
-    _elapsedVisitSeconds = 0;
+    final diff = now.difference(startedAt).inSeconds;
+    _elapsedVisitSeconds = diff.clamp(0, maxVisitMinutes * 60);
     _inactivitySeconds = 0;
+
+    // Update in all visits list immediately
+    final index = _allVisits.indexWhere((v) => v.id == visit.id);
+    if (index != -1) {
+      _allVisits[index] = _activeVisit!;
+    }
 
     _startVisitTimer();
     update();
+
+    // Call backend API in background
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().postData(
+          '${AppConstants.marketerVisitsUri}/${visit.id}/start',
+          {},
+        );
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          final visitData = res.body['data']['visit'];
+          if (visitData != null && visitData['started_at'] != null) {
+            final serverStartedAt = DateTime.tryParse(visitData['started_at'].toString());
+            if (serverStartedAt != null && _activeVisit != null) {
+              _activeVisit = _activeVisit!.copyWith(startedAt: serverStartedAt);
+              final sDiff = DateTime.now().difference(serverStartedAt).inSeconds;
+              _elapsedVisitSeconds = sDiff.clamp(0, maxVisitMinutes * 60);
+              update();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] startVisit api error: $e');
+    }
   }
 
   void _startVisitTimer() {
@@ -249,27 +381,65 @@ class StoreVisitsController extends GetxController {
       _elapsedVisitSeconds++;
       _inactivitySeconds++;
 
-      // Trigger anti-fraud inactivity warnings if inactive for >= 10 minutes
-      if (_inactivitySeconds == inactivityThresholdSeconds) {
-        if (Get.isRegistered<AntiFraudAlertsController>()) {
-          Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.alert1);
-        }
-      } else if (_inactivitySeconds == inactivityThresholdSeconds + 180) { // +3 min
-        if (Get.isRegistered<AntiFraudAlertsController>()) {
-          Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.alert2);
-        }
-      } else if (_inactivitySeconds == inactivityThresholdSeconds + 360) { // +6 min
-        if (Get.isRegistered<AntiFraudAlertsController>()) {
-          Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.alert3);
-        }
-      } else if (_inactivitySeconds >= inactivityThresholdSeconds + 540) { // +9 min -> critical
-        if (Get.isRegistered<AntiFraudAlertsController>()) {
-          Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.criticalAlert4);
+      // Trigger anti-fraud inactivity warnings if inactive for >= 10 minutes (bypassed in test/local mode)
+      if (!AntiFraudAlertsController.disableInactivityAlertsInTest) {
+        if (_inactivitySeconds == inactivityThresholdSeconds) {
+          addAlertLog(
+            title: 'تنبيه أول',
+            time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
+            level: 1,
+          );
+          if (Get.isRegistered<AntiFraudAlertsController>()) {
+            Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.alert1);
+          }
+          _syncAlertToBackend(1, 'تنبيه أول', 'يبدو أنك لم تتحرك نحو المتجر المستهدف');
+        } else if (_inactivitySeconds == inactivityThresholdSeconds + 180) { // +3 min
+          addAlertLog(
+            title: 'تنبيه ثاني',
+            time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
+            level: 2,
+          );
+          if (Get.isRegistered<AntiFraudAlertsController>()) {
+            Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.alert2);
+          }
+          _syncAlertToBackend(2, 'تنبيه ثاني', 'لم يتم رصد تقدم كافٍ نحو المتجر');
+        } else if (_inactivitySeconds == inactivityThresholdSeconds + 360) { // +6 min
+          addAlertLog(
+            title: 'تنبيه ثالث',
+            time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
+            level: 3,
+          );
+          if (Get.isRegistered<AntiFraudAlertsController>()) {
+            Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.alert3);
+          }
+          _syncAlertToBackend(3, 'تنبيه ثالث', 'تم تسجيل عدم نشاط مستمر أثناء الجولة');
+        } else if (_inactivitySeconds >= inactivityThresholdSeconds + 540) { // +9 min -> critical
+          addAlertLog(
+            title: 'تنبيه حرج',
+            time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
+            level: 4,
+          );
+          if (Get.isRegistered<AntiFraudAlertsController>()) {
+            Get.find<AntiFraudAlertsController>().triggerAlert(AlertLevel.criticalAlert4);
+          }
+          _syncAlertToBackend(4, 'تنبيه حرج', 'تم احتساب هذا الوقت خارج الدوام');
         }
       }
 
       update();
     });
+  }
+
+  void _syncAlertToBackend(int level, String title, String reason) async {
+    if (_activeVisit == null) return;
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        await Get.find<ApiClient>().postData(
+          '${AppConstants.marketerVisitsUri}/${_activeVisit!.id}/alert',
+          {'level': level, 'title': title, 'reason': reason},
+        );
+      }
+    } catch (_) {}
   }
 
   // Reset inactivity counter whenever representative interacts with the form or moves
@@ -317,28 +487,58 @@ class StoreVisitsController extends GetxController {
 
   // Anti-spoofing live camera capture (strictly camera, no gallery)
   Future<void> captureStorePhoto({required bool isFrontImage}) async {
+    if (isFrontImage) {
+      await captureFrontImage();
+    } else {
+      await captureInsideImage();
+    }
+  }
+
+  Future<void> captureFrontImage() async {
+    registerActivity();
     try {
-      final XFile? file = await _picker.pickImage(
+      final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: 85,
-        maxWidth: 1280,
+        imageQuality: 70,
+        preferredCameraDevice: CameraDevice.rear,
       );
-      if (file != null) {
-        if (isFrontImage) {
-          _frontImagePath = file.path;
-        } else {
-          _insideImagePath = file.path;
-        }
-        registerActivity();
+      if (photo != null) {
+        _frontImagePath = photo.path;
         update();
       }
     } catch (e) {
-      debugPrint('Error capturing store photo: $e');
+      debugPrint('Front photo capture error: $e');
     }
+  }
+
+  Future<void> captureInsideImage() async {
+    registerActivity();
+    try {
+      final XFile? photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70,
+        preferredCameraDevice: CameraDevice.rear,
+      );
+      if (photo != null) {
+        _insideImagePath = photo.path;
+        update();
+      }
+    } catch (e) {
+      debugPrint('Inside photo capture error: $e');
+    }
+  }
+
+  void toggleConfidentialReport() {
+    _isConfidentialReportExpanded = !_isConfidentialReportExpanded;
+    update();
   }
 
   // Save digital signature
   void setContractSignature(String path) {
+    applyContractSignature(path);
+  }
+
+  void applyContractSignature(String path) {
     if (_activeVisit != null) {
       _activeVisit = _activeVisit!.copyWith(
         contractSignaturePath: path,
@@ -349,12 +549,11 @@ class StoreVisitsController extends GetxController {
     }
   }
 
-  // Finish visit logic with qualification evaluation
+  // Finish visit logic with qualification evaluation & backend API sync
   bool submitAndFinishVisit() {
     if (_activeVisit == null) return false;
 
     // Outcome logic: qualified if minimum conditions met
-    // (Presented, Interested, Grace Period, Negotiating, or Contract Signed + at least one photo captured)
     final bool isQualified = (_selectedPipelineStep != StorePipelineStep.notMet &&
             _selectedPipelineStep != StorePipelineStep.rejected &&
             _selectedPipelineStep != StorePipelineStep.notQualified) &&
@@ -394,9 +593,39 @@ class StoreVisitsController extends GetxController {
       _allVisits.add(updated);
     }
 
+    final finishedVisitId = updated.id;
     _visitTimer?.cancel();
     _activeVisit = null;
     update();
+
+    // Call backend API in background
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        Get.find<ApiClient>().postData(
+          '${AppConstants.marketerVisitsUri}/$finishedVisitId/complete',
+          {
+            'store_name': updated.storeName,
+            'manager_name': updated.managerName,
+            'phone': updated.phone,
+            'openings_count': updated.openingsCount,
+            'cr_number': updated.crNumber,
+            'pipeline_step': updated.pipelineStep.name,
+            'obstacles_notes': updated.obstaclesNotes,
+            'closing_reason': updated.closingReason,
+            'closing_reason_other_details': updated.closingReasonOtherDetails,
+            'confidential_notes': updated.confidentialNotes,
+            'front_image': updated.frontImagePath,
+            'inside_image': updated.insideImagePath,
+            'is_qualified': updated.isQualifiedOutcome,
+            if (updated.nextFollowUpDate != null)
+              'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
+            'next_follow_up_commitments': updated.nextFollowUpCommitments,
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] completeVisit api error: $e');
+    }
 
     // Update main shift metrics if controller exists
     if (Get.isRegistered<EmployeeShiftController>()) {

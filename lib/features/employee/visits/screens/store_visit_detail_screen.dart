@@ -8,8 +8,13 @@ import 'follow_up_task_screen.dart';
 
 class StoreVisitDetailScreen extends StatefulWidget {
   final StoreVisitModel visit;
+  final bool isReadOnly;
 
-  const StoreVisitDetailScreen({super.key, required this.visit});
+  const StoreVisitDetailScreen({
+    super.key,
+    required this.visit,
+    this.isReadOnly = false,
+  });
 
   @override
   State<StoreVisitDetailScreen> createState() => _StoreVisitDetailScreenState();
@@ -31,7 +36,21 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.isRegistered<StoreVisitsController>()) {
-        Get.find<StoreVisitsController>().startVisit(widget.visit);
+        final controller = Get.find<StoreVisitsController>();
+        if (!widget.isReadOnly && widget.visit.visitStatus != StoreVisitStatus.completed) {
+          if (controller.activeVisit?.id != widget.visit.id) {
+            controller.startVisit(widget.visit);
+          }
+        } else {
+          // Read-only viewing: populate fields without overriding active visit timer
+          controller.storeNameController.text = widget.visit.storeName;
+          controller.managerNameController.text = widget.visit.managerName;
+          controller.phoneController.text = widget.visit.phone;
+          controller.openingsController.text = widget.visit.openingsCount.toString();
+          controller.crNumberController.text = widget.visit.crNumber;
+          controller.obstaclesController.text = widget.visit.obstaclesNotes ?? '';
+          controller.confidentialNotesController.text = widget.visit.confidentialNotes ?? '';
+        }
       }
     });
   }
@@ -60,10 +79,36 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
             foregroundColor: const Color(0xFF111827),
             elevation: 0.5,
             actions: [
-              // 30-min visit countdown pill
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              if (widget.isReadOnly || widget.visit.visitStatus == StoreVisitStatus.completed)
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF30913F)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.check_circle_outline_rounded, size: 16, color: Color(0xFF30913F)),
+                      SizedBox(width: 4),
+                      Text(
+                        'زيارة مكتملة',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF30913F),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                // 30-min visit countdown pill
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: controller.remainingVisitSeconds < 300
                       ? const Color(0xFFFEE2E2)
@@ -670,22 +715,40 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
 
                   const SizedBox(height: 28),
 
-                  // 10. Finish & Submit Button: [إنهاء الزيارة وإرسال التقرير]
-                  ElevatedButton.icon(
-                    onPressed: () => _handleFinishVisit(context, controller, visit),
-                    icon: const Icon(Icons.send_rounded, size: 20),
-                    label: Text(
-                      'finish_visit_and_submit'.tr,
-                      style: const TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                  if (widget.isReadOnly || widget.visit.visitStatus == StoreVisitStatus.completed)
+                    ElevatedButton.icon(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                      label: const Text(
+                        'العودة لقائمة الزيارات',
+                        style: TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF43474F),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 1,
+                      ),
+                    )
+                  else ...[
+                    // 10. Finish & Submit Button: [إنهاء الزيارة وإرسال التقرير]
+                    ElevatedButton.icon(
+                      onPressed: () => _handleFinishVisit(context, controller, visit),
+                      icon: const Icon(Icons.send_rounded, size: 20),
+                      label: Text(
+                        'finish_visit_and_submit'.tr,
+                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF30913F),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 3,
+                      ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF30913F),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      elevation: 3,
-                    ),
-                  ),
+                  ],
 
                   const SizedBox(height: 12),
 
@@ -855,7 +918,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
 
     final success = controller.submitAndFinishVisit();
     if (success) {
-      Get.back();
+      Get.until((route) => route.isFirst || Get.currentRoute.contains('DailyVisitsScreen'));
       Get.snackbar(
         'report_sent_success_title'.tr,
         'report_sent_success_body'.tr,

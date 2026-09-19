@@ -18,6 +18,9 @@ enum AlertLevel {
 }
 
 class AntiFraudAlertsController extends GetxController {
+  /// Test/Local environment flag: completely disables anti-fraud penalties, warning popups, and CriticalAlertScreen
+  static bool disableInactivityAlertsInTest = true;
+
   AlertLevel _currentAlertLevel = AlertLevel.none;
   AlertLevel get currentAlertLevel => _currentAlertLevel;
 
@@ -33,7 +36,20 @@ class AntiFraudAlertsController extends GetxController {
   String? _currentAlertMessage;
   String? get currentAlertMessage => _currentAlertMessage;
 
+  @override
+  void onInit() {
+    super.onInit();
+    if (disableInactivityAlertsInTest) {
+      resumeActivity();
+    }
+  }
+
   void triggerAlert(AlertLevel level) {
+    if (disableInactivityAlertsInTest) {
+      debugPrint('⚠️ [AntiFraudAlertsController] Inactivity alert ($level) bypassed in test/local mode.');
+      return;
+    }
+
     _currentAlertLevel = level;
     _lastAlertTime = DateTime.now();
 

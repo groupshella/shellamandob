@@ -3286,5 +3286,21 @@
   "failed_start_payment_no_link": "فشل بدء الدفع - لم يتم استلام رابط الدفع",
   "cannot_exec_nafath_without_user_id": "لا يمكن تنفيذ طلب نفاذ بدون معرف المستخدم",
   "server_response_error": "خطأ في استجابة الخادم",
-  "could_not_open_store": "تعذر فتح المتجر"
+  "could_not_open_store": "تعذر فتح المتجر",
+  "upcoming_single": "قادمة",
+  "in_progress_single": "جارية",
+  "completed_single": "مكتملة",
+  "start_visit_action": "بدء الزيارة",
+  "view_report": "عرض التقرير",
+  "resume_visit": "متابعة الزيارة",
+  "start_visit_confirm_title": "بدء زيارة @store ؟",
+  "start_visit_confirm_subtitle": "سيتم تسجيل وقت وموقع بدء الزيارة",
+  "distance_km": "كم",
+  "doc_and_finish_visit": "توثيق و إنهاء الزيارة",
+  "visit_timer_title": "مؤقت الزيارة",
+  "max_visit_duration_hint": "الحد الأقصى للزيارة 30 دقيقة",
+  "alerts_log_title": "سجل التنبيهات",
+  "visit_started_label": "بدأت الزيارة",
+  "distance_label": "المسافة",
+  "elapsed_label": "مضى"
 }

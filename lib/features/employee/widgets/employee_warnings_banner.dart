@@ -14,12 +14,20 @@ class EmployeeWarningsBanner extends StatelessWidget {
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final warnings = controller.warnings;
-        if (warnings.isEmpty) return const SizedBox.shrink();
+        final int count = controller.shiftModel.warningCount > 0
+            ? controller.shiftModel.warningCount
+            : warnings.length;
+
+        if (count == 0 && warnings.isEmpty) return const SizedBox.shrink();
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: InkWell(
-            onTap: () => EmployeeWarningsBottomSheet.show(context, warnings),
+            onTap: () {
+              if (warnings.isNotEmpty) {
+                EmployeeWarningsBottomSheet.show(context, warnings);
+              }
+            },
             borderRadius: BorderRadius.circular(14),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -49,7 +57,7 @@ class EmployeeWarningsBanner extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${warnings.length} ${'warning_single'.tr}',
+                      '$count ${'warning_single'.tr}',
                       style: const TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 12,
