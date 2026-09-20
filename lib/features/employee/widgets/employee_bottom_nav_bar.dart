@@ -87,18 +87,6 @@ class EmployeeBottomNavBar extends StatelessWidget {
             size: 24,
             color: isSelected ? _activeColor : _inactiveColor,
           ),
-          const SizedBox(height: 4),
-          if (isSelected)
-            Container(
-              width: 5,
-              height: 5,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: _activeColor,
-              ),
-            )
-          else
-            const SizedBox(height: 5),
         ],
       ),
     );

@@ -55,7 +55,7 @@ class StoreVisitsController extends GetxController {
     update();
   }
 
-  // Temporary micro-form state for active visit
+  // Form state for active visit
   final TextEditingController storeNameController = TextEditingController();
   final TextEditingController managerNameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -67,8 +67,23 @@ class StoreVisitsController extends GetxController {
   final TextEditingController otherReasonController = TextEditingController();
   final TextEditingController confidentialNotesController = TextEditingController();
 
+  // Dynamic conditional controllers
+  final TextEditingController reasonNotMetController = TextEditingController();
+  final TextEditingController reasonRejectedController = TextEditingController();
+  final TextEditingController reasonDisqualifiedController = TextEditingController();
+  final TextEditingController confidentialTitleController = TextEditingController();
+
   StorePipelineStep _selectedPipelineStep = StorePipelineStep.notMet;
   StorePipelineStep get selectedPipelineStep => _selectedPipelineStep;
+
+  String _selectedInterestStatus = 'very_interested';
+  String get selectedInterestStatus => _selectedInterestStatus;
+
+  void setInterestStatus(String status) {
+    _selectedInterestStatus = status;
+    registerActivity();
+    update();
+  }
 
   String? _selectedClosingReason;
   String? get selectedClosingReason => _selectedClosingReason;
@@ -82,8 +97,14 @@ class StoreVisitsController extends GetxController {
   String? _frontImagePath;
   String? get frontImagePath => _frontImagePath;
 
+  DateTime? _frontPhotoCapturedTime;
+  DateTime? get frontPhotoCapturedTime => _frontPhotoCapturedTime;
+
   String? _insideImagePath;
   String? get insideImagePath => _insideImagePath;
+
+  DateTime? _insidePhotoCapturedTime;
+  DateTime? get insidePhotoCapturedTime => _insidePhotoCapturedTime;
 
   bool _isConfidentialReportExpanded = false;
   bool get isConfidentialReportExpanded => _isConfidentialReportExpanded;
@@ -92,7 +113,7 @@ class StoreVisitsController extends GetxController {
 
   String get zoneName => 'غرب الرياض';
 
-  // Visits lists
+  // Visits lists (Real database data only)
   final List<StoreVisitModel> _allVisits = [];
   List<StoreVisitModel> get allVisits => _allVisits;
 
@@ -124,9 +145,6 @@ class StoreVisitsController extends GetxController {
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] loadVisits error: $e');
     }
-    if (_allVisits.isEmpty) {
-      _initMockVisits();
-    }
     isLoading = false;
     if (notify) update();
   }
@@ -144,135 +162,11 @@ class StoreVisitsController extends GetxController {
     obstaclesController.dispose();
     otherReasonController.dispose();
     confidentialNotesController.dispose();
+    reasonNotMetController.dispose();
+    reasonRejectedController.dispose();
+    reasonDisqualifiedController.dispose();
+    confidentialTitleController.dispose();
     super.onClose();
-  }
-
-  void _initMockVisits() {
-    _allVisits.addAll([
-      const StoreVisitModel(
-        id: 'VIS-101',
-        storeName: 'مطاعم ومطابخ شواية الرياض',
-        managerName: 'أبو فهد القحطاني',
-        phone: '0501234567',
-        openingsCount: 3,
-        crNumber: '1010892341',
-        address: 'حي الملقا - طريق أنس بن مالك',
-        category: 'مطاعم ومأكولات',
-        distanceKm: 0.3,
-        timeSlot: '09:00 ص - 09:30 ص',
-        visitStatus: StoreVisitStatus.completed,
-        pipelineStep: StorePipelineStep.contractSigned,
-        isQualifiedOutcome: true,
-        durationMinutes: 24,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-102',
-        storeName: 'أريج كافيه & روستري',
-        managerName: 'م. راكان الشمري',
-        phone: '0559876543',
-        openingsCount: 2,
-        crNumber: '1010774512',
-        address: 'حي الياسمين - طريق الثمامة',
-        category: 'كافيهات ومشروبات',
-        distanceKm: 0.6,
-        timeSlot: '09:45 ص - 10:15 ص',
-        visitStatus: StoreVisitStatus.completed,
-        pipelineStep: StorePipelineStep.negotiating,
-        isQualifiedOutcome: true,
-        durationMinutes: 28,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-103',
-        storeName: 'أسواق زهرة الربيع للمواد الغذائية',
-        managerName: 'عبدالرحمن العتيبي',
-        phone: '0543322114',
-        openingsCount: 4,
-        crNumber: '1010654321',
-        address: 'حي الصحافة - شارع العليا',
-        category: 'سوبرماركت وتموينات',
-        distanceKm: 1.1,
-        timeSlot: '10:30 ص - 11:00 ص',
-        visitStatus: StoreVisitStatus.followUp,
-        pipelineStep: StorePipelineStep.gracePeriod,
-        isQualifiedOutcome: true,
-        durationMinutes: 19,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-104',
-        storeName: 'حلويات وبقلاوة النخيل الذهبي',
-        managerName: 'فراس المصري',
-        phone: '0562211998',
-        openingsCount: 1,
-        crNumber: '1010334455',
-        address: 'حي النرجس - طريق أبي بكر الصديق',
-        category: 'حلويات ومخبوزات',
-        distanceKm: 1.4,
-        timeSlot: '11:15 ص - 11:45 ص',
-        visitStatus: StoreVisitStatus.scheduled,
-        pipelineStep: StorePipelineStep.notMet,
-        isQualifiedOutcome: false,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-105',
-        storeName: 'مكسرات ومحامص البن الأصيل',
-        managerName: 'سعود الدوسري',
-        phone: '0507788990',
-        openingsCount: 1,
-        crNumber: '1010998877',
-        address: 'حي العارض - شارع ريحانة بنت زيد',
-        category: 'محامص ومكسرات',
-        distanceKm: 1.8,
-        timeSlot: '12:00 م - 12:30 م',
-        visitStatus: StoreVisitStatus.scheduled,
-        pipelineStep: StorePipelineStep.notMet,
-        isQualifiedOutcome: false,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-106',
-        storeName: 'صيدلية النقاء الحديثة',
-        managerName: 'د. خالد الزهراني',
-        phone: '0531122334',
-        openingsCount: 1,
-        crNumber: '1010445566',
-        address: 'حي حطين - طريق الأمير تركي الأول',
-        category: 'صيدليات وعناية',
-        distanceKm: 2.2,
-        timeSlot: '12:45 م - 01:15 م',
-        visitStatus: StoreVisitStatus.scheduled,
-        pipelineStep: StorePipelineStep.notMet,
-        isQualifiedOutcome: false,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-107',
-        storeName: 'معرض الأناقة للأحذية والحقائب',
-        managerName: 'يوسف الغامدي',
-        phone: '0554433221',
-        openingsCount: 2,
-        crNumber: '1010223344',
-        address: 'حي المروة - شارع الإمام مسلم',
-        category: 'أزياء وملابس',
-        distanceKm: 2.5,
-        timeSlot: '01:30 م - 02:00 م',
-        visitStatus: StoreVisitStatus.scheduled,
-        pipelineStep: StorePipelineStep.notMet,
-        isQualifiedOutcome: false,
-      ),
-      const StoreVisitModel(
-        id: 'VIS-108',
-        storeName: 'مخبز ومطاحن خيرات بلادي',
-        managerName: 'عماد الشريف',
-        phone: '0509988776',
-        openingsCount: 1,
-        crNumber: '1010112233',
-        address: 'حي نمار - طريق ديراب',
-        category: 'مخابز ومعجنات',
-        distanceKm: 3.1,
-        timeSlot: '02:15 م - 02:45 م',
-        visitStatus: StoreVisitStatus.scheduled,
-        pipelineStep: StorePipelineStep.notMet,
-        isQualifiedOutcome: false,
-      ),
-    ]);
   }
 
   void selectFilterTab(int index) {
@@ -336,6 +230,13 @@ class StoreVisitsController extends GetxController {
     _insideImagePath = visit.insideImagePath;
     obstaclesController.text = visit.obstaclesNotes ?? '';
     _selectedClosingReason = visit.closingReason;
+    reasonNotMetController.clear();
+    reasonRejectedController.clear();
+    reasonDisqualifiedController.clear();
+    confidentialTitleController.clear();
+    _selectedInterestStatus = 'interested';
+    _frontPhotoCapturedTime = visit.frontImagePath != null ? DateTime.now() : null;
+    _insidePhotoCapturedTime = visit.insideImagePath != null ? DateTime.now() : null;
 
     final diff = now.difference(startedAt).inSeconds;
     _elapsedVisitSeconds = diff.clamp(0, maxVisitMinutes * 60);
@@ -504,6 +405,7 @@ class StoreVisitsController extends GetxController {
       );
       if (photo != null) {
         _frontImagePath = photo.path;
+        _frontPhotoCapturedTime = DateTime.now();
         update();
       }
     } catch (e) {
@@ -517,10 +419,11 @@ class StoreVisitsController extends GetxController {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 70,
-        preferredCameraDevice: CameraDevice.rear,
+        preferredCameraDevice: CameraDevice.front,
       );
       if (photo != null) {
         _insideImagePath = photo.path;
+        _insidePhotoCapturedTime = DateTime.now();
         update();
       }
     } catch (e) {
@@ -564,6 +467,24 @@ class StoreVisitsController extends GetxController {
         _selectedPipelineStep == StorePipelineStep.interested ||
         _selectedFollowUpDate != null);
 
+    String? effectiveClosingReason = _selectedClosingReason;
+    String effectiveOtherDetails = otherReasonController.text.trim();
+    if (_selectedPipelineStep == StorePipelineStep.notMet) {
+      effectiveClosingReason = 'لم تتم المقابلة';
+      effectiveOtherDetails = reasonNotMetController.text.trim();
+    } else if (_selectedPipelineStep == StorePipelineStep.rejected) {
+      effectiveClosingReason = 'رفض';
+      effectiveOtherDetails = reasonRejectedController.text.trim();
+    } else if (_selectedPipelineStep == StorePipelineStep.notQualified) {
+      effectiveClosingReason = 'غير مؤهل';
+      effectiveOtherDetails = reasonDisqualifiedController.text.trim();
+    }
+
+    String fullConfidentialNotes = confidentialNotesController.text.trim();
+    if (confidentialTitleController.text.trim().isNotEmpty) {
+      fullConfidentialNotes = '[${confidentialTitleController.text.trim()}] $fullConfidentialNotes';
+    }
+
     final updated = _activeVisit!.copyWith(
       storeName: storeNameController.text.trim(),
       managerName: managerNameController.text.trim(),
@@ -578,9 +499,9 @@ class StoreVisitsController extends GetxController {
       nextFollowUpDate: _selectedFollowUpDate,
       nextFollowUpCommitments: commitmentsController.text.trim(),
       obstaclesNotes: obstaclesController.text.trim(),
-      closingReason: _selectedClosingReason,
-      closingReasonOtherDetails: otherReasonController.text.trim(),
-      confidentialNotes: confidentialNotesController.text.trim(),
+      closingReason: effectiveClosingReason,
+      closingReasonOtherDetails: effectiveOtherDetails,
+      confidentialNotes: fullConfidentialNotes,
       durationMinutes: (_elapsedVisitSeconds / 60).ceil(),
       completedAt: DateTime.now(),
     );

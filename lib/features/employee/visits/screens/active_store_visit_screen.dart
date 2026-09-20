@@ -4,7 +4,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:intl/intl.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
-import 'store_visit_detail_screen.dart';
+import 'visit_photo_documentation_screen.dart';
 
 class ActiveStoreVisitScreen extends StatelessWidget {
   final StoreVisitModel visit;
@@ -109,10 +109,9 @@ class ActiveStoreVisitScreen extends StatelessWidget {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to StoreVisitDetailScreen for documentation & report submission
-                        Get.to(() => StoreVisitDetailScreen(
+                        // Navigate to VisitPhotoDocumentationScreen for storefront & inside camera capture
+                        Get.to(() => VisitPhotoDocumentationScreen(
                               visit: currentVisit,
-                              isReadOnly: false,
                             ));
                       },
                       style: ElevatedButton.styleFrom(
