@@ -69,6 +69,7 @@ class StoreVisitModel {
   final String storeName;
   final String managerName;
   final String phone;
+  final String? interestStatus; // حالة الاهتمام: طلب مهلة, مهتم, مهتم جدًا, يحتاج متابعة, غير مهتم
   final int openingsCount; // عدد الفتحات
   final String crNumber; // رقم السجل التجاري
   final String address;
@@ -97,6 +98,7 @@ class StoreVisitModel {
     required this.storeName,
     required this.managerName,
     required this.phone,
+    this.interestStatus,
     this.openingsCount = 1,
     this.crNumber = '',
     required this.address,
@@ -126,6 +128,7 @@ class StoreVisitModel {
     String? storeName,
     String? managerName,
     String? phone,
+    String? interestStatus,
     int? openingsCount,
     String? crNumber,
     String? address,
@@ -154,6 +157,7 @@ class StoreVisitModel {
       storeName: storeName ?? this.storeName,
       managerName: managerName ?? this.managerName,
       phone: phone ?? this.phone,
+      interestStatus: interestStatus ?? this.interestStatus,
       openingsCount: openingsCount ?? this.openingsCount,
       crNumber: crNumber ?? this.crNumber,
       address: address ?? this.address,
@@ -212,11 +216,16 @@ class StoreVisitModel {
       }
     }
 
+    if (step == StorePipelineStep.contractSigned) {
+      status = StoreVisitStatus.completed;
+    }
+
     return StoreVisitModel(
       id: json['id']?.toString() ?? '',
       storeName: json['store_name']?.toString() ?? '',
       managerName: json['manager_name']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
+      interestStatus: json['interest_status']?.toString() ?? 'مهتم جدًا',
       openingsCount: int.tryParse('${json['openings_count']}') ?? 1,
       crNumber: json['cr_number']?.toString() ?? '',
       address: json['address']?.toString() ?? '',
@@ -225,10 +234,16 @@ class StoreVisitModel {
       timeSlot: json['time_slot']?.toString() ?? '',
       pipelineStep: step,
       visitStatus: status,
-      isQualifiedOutcome: json['is_qualified'] == 1 || json['is_qualified'] == true,
+      isQualifiedOutcome: step == StorePipelineStep.contractSigned ||
+          json['is_qualified'] == 1 ||
+          json['is_qualified'] == true,
       frontImagePath: json['front_image']?.toString(),
       insideImagePath: json['inside_image']?.toString(),
-      nextFollowUpDate: json['next_follow_up_date'] != null ? DateTime.tryParse('${json['next_follow_up_date']}') : null,
+      nextFollowUpDate: step == StorePipelineStep.contractSigned
+          ? null
+          : (json['next_follow_up_date'] != null
+              ? DateTime.tryParse('${json['next_follow_up_date']}')
+              : null),
       nextFollowUpCommitments: json['next_follow_up_commitments']?.toString(),
       obstaclesNotes: json['obstacles_notes']?.toString(),
       closingReason: json['closing_reason']?.toString(),

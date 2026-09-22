@@ -19,6 +19,7 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/helper/firebase/my_notification_service.dart';
 import 'package:sixam_mart/theme/light_theme.dart';
+import 'package:sixam_mart/theme/dark_theme.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/features/campaign/services/gift_campaign_deep_link_service.dart';
 import 'package:sixam_mart/util/messages.dart';
@@ -553,8 +554,12 @@ class _MyAppState extends State<MyApp> {
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch},
       ),
-      // Dark mode removed — always use the light theme.
-      theme: light(),
+      theme: light(
+          color: themeController.lightColor ?? const Color(0xFF31A342)),
+      darkTheme: dark(
+          color: themeController.darkColor ?? const Color(0xFF31A342)),
+      themeMode:
+          themeController.darkTheme ? ThemeMode.dark : ThemeMode.light,
       locale: localizeController.locale,
       translations: Messages(languages: widget.languages),
       fallbackLocale: Locale(
@@ -587,6 +592,7 @@ class _MyAppState extends State<MyApp> {
               textScaler: const TextScaler.linear(1),
             ),
             child: Material(
+              color: themeController.darkTheme ? const Color(0xFF121418) : Colors.white,
               child: Stack(
                 fit: StackFit.expand,
                 clipBehavior: Clip.none,

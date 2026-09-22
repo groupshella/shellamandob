@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeController extends GetxController implements GetxService {
   final SharedPreferences sharedPreferences;
   ThemeController({required this.sharedPreferences}) {
+    _darkTheme = sharedPreferences.getBool(AppConstants.theme) ?? false;
     _loadCurrentTheme();
   }
 
@@ -29,12 +31,15 @@ class ThemeController extends GetxController implements GetxService {
   void toggleTheme() {
     _darkTheme = !_darkTheme;
     sharedPreferences.setBool(AppConstants.theme, _darkTheme);
+    Get.changeThemeMode(_darkTheme ? ThemeMode.dark : ThemeMode.light);
+    update();
     update(<String>['app_theme']);
   }
 
   void changeTheme(Color lightColor, Color darkColor) {
     _lightColor = lightColor;
     _darkColor = darkColor;
+    update();
     update(<String>['app_theme']);
   }
 
@@ -43,6 +48,7 @@ class ThemeController extends GetxController implements GetxService {
     _darkMap = await rootBundle.loadString('assets/map/dark_map.json');
     _lightMapTaxi = await rootBundle.loadString('assets/map/light_taxi.json');
     _darkTheme = sharedPreferences.getBool(AppConstants.theme) ?? false;
+    update();
     update(<String>['app_theme']);
   }
 }

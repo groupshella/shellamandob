@@ -128,18 +128,24 @@ class StoreVisitsController extends GetxController {
     if (notify) update();
     try {
       if (Get.isRegistered<ApiClient>()) {
-        final res = await Get.find<ApiClient>().getData(AppConstants.marketerVisitsUri);
+        final res = await Get.find<ApiClient>().getData(
+          AppConstants.marketerVisitsUri,
+          useEtag: false,
+          headers: {'X-No-ETag': '1', 'Cache-Control': 'no-cache'},
+        );
+        debugPrint('🔍 [StoreVisitsController] loadVisits status: ${res.statusCode}, hasBody: ${res.body != null}');
         if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
           final list = res.body['data']['visits'];
+          _allVisits.clear();
           if (list is List && list.isNotEmpty) {
-            _allVisits.clear();
             for (var item in list) {
               _allVisits.add(StoreVisitModel.fromJson(Map<String, dynamic>.from(item)));
             }
-            isLoading = false;
-            if (notify) update();
-            return;
           }
+          debugPrint('✅ [StoreVisitsController] Loaded ${_allVisits.length} visits successfully');
+          isLoading = false;
+          if (notify) update();
+          return;
         }
       }
     } catch (e) {
@@ -276,6 +282,40 @@ class StoreVisitsController extends GetxController {
     }
   }
 
+  // Resume an existing in-progress visit
+  void resumeVisit(StoreVisitModel visit) {
+    _activeVisit = visit.copyWith(visitStatus: StoreVisitStatus.inProgress);
+    storeNameController.text = visit.storeName;
+    managerNameController.text = visit.managerName;
+    phoneController.text = visit.phone;
+    openingsController.text = visit.openingsCount.toString();
+    crNumberController.text = visit.crNumber;
+    _selectedPipelineStep = visit.pipelineStep;
+    _frontImagePath = visit.frontImagePath;
+    _insideImagePath = visit.insideImagePath;
+    obstaclesController.text = visit.obstaclesNotes ?? '';
+    _selectedClosingReason = visit.closingReason;
+    if (visit.interestStatus != null && visit.interestStatus!.isNotEmpty) {
+      _selectedInterestStatus = visit.interestStatus!;
+    }
+    _selectedFollowUpDate = visit.nextFollowUpDate;
+    commitmentsController.text = visit.nextFollowUpCommitments ?? '';
+
+    final now = DateTime.now();
+    final startedAt = visit.startedAt ?? now;
+    final diff = now.difference(startedAt).inSeconds;
+    _elapsedVisitSeconds = diff.clamp(0, maxVisitMinutes * 60);
+    _inactivitySeconds = 0;
+
+    final index = _allVisits.indexWhere((v) => v.id == visit.id);
+    if (index != -1) {
+      _allVisits[index] = _activeVisit!;
+    }
+
+    _startVisitTimer();
+    update();
+  }
+
   void _startVisitTimer() {
     _visitTimer?.cancel();
     _visitTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -409,7 +449,20 @@ class StoreVisitsController extends GetxController {
         update();
       }
     } catch (e) {
-      debugPrint('Front photo capture error: $e');
+      debugPrint('Front photo capture camera error: $e. Falling back to gallery...');
+      try {
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 70,
+        );
+        if (photo != null) {
+          _frontImagePath = photo.path;
+          _frontPhotoCapturedTime = DateTime.now();
+          update();
+        }
+      } catch (e2) {
+        debugPrint('Gallery fallback error: $e2');
+      }
     }
   }
 
@@ -427,7 +480,20 @@ class StoreVisitsController extends GetxController {
         update();
       }
     } catch (e) {
-      debugPrint('Inside photo capture error: $e');
+      debugPrint('Inside photo capture camera error: $e. Falling back to gallery...');
+      try {
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 70,
+        );
+        if (photo != null) {
+          _insideImagePath = photo.path;
+          _insidePhotoCapturedTime = DateTime.now();
+          update();
+        }
+      } catch (e2) {
+        debugPrint('Gallery fallback error: $e2');
+      }
     }
   }
 
@@ -453,22 +519,34 @@ class StoreVisitsController extends GetxController {
   }
 
   // Finish visit logic with qualification evaluation & backend API sync
-  bool submitAndFinishVisit() {
-    if (_activeVisit == null) return false;
+  Future<bool> submitAndFinishVisit({StoreVisitModel? targetVisit}) async {
+    final baseVisit = targetVisit ?? _activeVisit;
+    if (baseVisit == null) return false;
 
-    // Outcome logic: qualified if minimum conditions met
-    final bool isQualified = (_selectedPipelineStep != StorePipelineStep.notMet &&
-            _selectedPipelineStep != StorePipelineStep.rejected &&
-            _selectedPipelineStep != StorePipelineStep.notQualified) &&
-        (_frontImagePath != null || _insideImagePath != null);
+    final bool isContractSigned = (_selectedPipelineStep == StorePipelineStep.contractSigned ||
+        baseVisit.pipelineStep == StorePipelineStep.contractSigned);
 
-    final bool isFollowUpNeeded = (_selectedPipelineStep == StorePipelineStep.gracePeriod ||
-        _selectedPipelineStep == StorePipelineStep.negotiating ||
-        _selectedPipelineStep == StorePipelineStep.interested ||
-        _selectedFollowUpDate != null);
+    final bool isDisqualifiedOrRejected = (_selectedPipelineStep == StorePipelineStep.rejected ||
+        _selectedPipelineStep == StorePipelineStep.notQualified);
 
-    String? effectiveClosingReason = _selectedClosingReason;
-    String effectiveOtherDetails = otherReasonController.text.trim();
+    final bool isFollowUpNeeded = !isContractSigned &&
+        !isDisqualifiedOrRejected &&
+        (_selectedPipelineStep == StorePipelineStep.gracePeriod ||
+            _selectedPipelineStep == StorePipelineStep.negotiating ||
+            _selectedPipelineStep == StorePipelineStep.interested ||
+            _selectedFollowUpDate != null);
+
+    // Outcome logic: qualified if contract signed or minimum conditions met
+    final bool isQualified = isContractSigned ||
+        ((_selectedPipelineStep != StorePipelineStep.notMet &&
+                _selectedPipelineStep != StorePipelineStep.rejected &&
+                _selectedPipelineStep != StorePipelineStep.notQualified) &&
+            (_frontImagePath != null || _insideImagePath != null || baseVisit.frontImagePath != null));
+
+    String? effectiveClosingReason = _selectedClosingReason ?? baseVisit.closingReason;
+    String effectiveOtherDetails = otherReasonController.text.trim().isNotEmpty
+        ? otherReasonController.text.trim()
+        : (baseVisit.closingReasonOtherDetails ?? '');
     if (_selectedPipelineStep == StorePipelineStep.notMet) {
       effectiveClosingReason = 'لم تتم المقابلة';
       effectiveOtherDetails = reasonNotMetController.text.trim();
@@ -484,29 +562,54 @@ class StoreVisitsController extends GetxController {
     if (confidentialTitleController.text.trim().isNotEmpty) {
       fullConfidentialNotes = '[${confidentialTitleController.text.trim()}] $fullConfidentialNotes';
     }
+    if (fullConfidentialNotes.isEmpty && baseVisit.confidentialNotes != null) {
+      fullConfidentialNotes = baseVisit.confidentialNotes!;
+    }
 
-    final updated = _activeVisit!.copyWith(
-      storeName: storeNameController.text.trim(),
-      managerName: managerNameController.text.trim(),
-      phone: phoneController.text.trim(),
-      openingsCount: int.tryParse(openingsController.text.trim()) ?? 1,
-      crNumber: crNumberController.text.trim(),
-      pipelineStep: _selectedPipelineStep,
+    final effectiveStoreName = storeNameController.text.trim().isNotEmpty
+        ? storeNameController.text.trim()
+        : baseVisit.storeName;
+    final effectiveManagerName = managerNameController.text.trim().isNotEmpty
+        ? managerNameController.text.trim()
+        : baseVisit.managerName;
+    final effectivePhone = phoneController.text.trim().isNotEmpty
+        ? phoneController.text.trim()
+        : baseVisit.phone;
+    final effectiveOpenings = int.tryParse(openingsController.text.trim()) ?? baseVisit.openingsCount;
+    final effectiveCrNumber = crNumberController.text.trim().isNotEmpty
+        ? crNumberController.text.trim()
+        : baseVisit.crNumber;
+
+    final updated = baseVisit.copyWith(
+      storeName: effectiveStoreName,
+      managerName: effectiveManagerName,
+      phone: effectivePhone,
+      openingsCount: effectiveOpenings,
+      crNumber: effectiveCrNumber,
+      pipelineStep: _selectedPipelineStep != StorePipelineStep.notMet ? _selectedPipelineStep : baseVisit.pipelineStep,
       visitStatus: isFollowUpNeeded ? StoreVisitStatus.followUp : StoreVisitStatus.completed,
       isQualifiedOutcome: isQualified,
-      frontImagePath: _frontImagePath,
-      insideImagePath: _insideImagePath,
-      nextFollowUpDate: _selectedFollowUpDate,
-      nextFollowUpCommitments: commitmentsController.text.trim(),
-      obstaclesNotes: obstaclesController.text.trim(),
+      frontImagePath: _frontImagePath ?? baseVisit.frontImagePath,
+      insideImagePath: _insideImagePath ?? baseVisit.insideImagePath,
+      nextFollowUpDate: isFollowUpNeeded
+          ? (_selectedFollowUpDate ?? baseVisit.nextFollowUpDate)
+          : null,
+      nextFollowUpCommitments: isFollowUpNeeded
+          ? (commitmentsController.text.trim().isNotEmpty
+              ? commitmentsController.text.trim()
+              : baseVisit.nextFollowUpCommitments)
+          : null,
+      obstaclesNotes: obstaclesController.text.trim().isNotEmpty
+          ? obstaclesController.text.trim()
+          : baseVisit.obstaclesNotes,
       closingReason: effectiveClosingReason,
       closingReasonOtherDetails: effectiveOtherDetails,
       confidentialNotes: fullConfidentialNotes,
-      durationMinutes: (_elapsedVisitSeconds / 60).ceil(),
+      durationMinutes: _elapsedVisitSeconds > 0 ? (_elapsedVisitSeconds / 60).ceil() : baseVisit.durationMinutes,
       completedAt: DateTime.now(),
     );
 
-    // Update in all visits list
+    // Update in all visits list immediately
     final index = _allVisits.indexWhere((v) => v.id == updated.id);
     if (index != -1) {
       _allVisits[index] = updated;
@@ -519,10 +622,10 @@ class StoreVisitsController extends GetxController {
     _activeVisit = null;
     update();
 
-    // Call backend API in background
+    // Call backend API and await
     try {
       if (Get.isRegistered<ApiClient>()) {
-        Get.find<ApiClient>().postData(
+        await Get.find<ApiClient>().postData(
           '${AppConstants.marketerVisitsUri}/$finishedVisitId/complete',
           {
             'store_name': updated.storeName,
@@ -531,6 +634,7 @@ class StoreVisitsController extends GetxController {
             'openings_count': updated.openingsCount,
             'cr_number': updated.crNumber,
             'pipeline_step': updated.pipelineStep.name,
+            'visit_status': updated.visitStatus == StoreVisitStatus.followUp ? 'follow_up' : 'completed',
             'obstacles_notes': updated.obstaclesNotes,
             'closing_reason': updated.closingReason,
             'closing_reason_other_details': updated.closingReasonOtherDetails,
@@ -538,9 +642,10 @@ class StoreVisitsController extends GetxController {
             'front_image': updated.frontImagePath,
             'inside_image': updated.insideImagePath,
             'is_qualified': updated.isQualifiedOutcome,
-            if (updated.nextFollowUpDate != null)
+            if (isFollowUpNeeded && updated.nextFollowUpDate != null)
               'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
-            'next_follow_up_commitments': updated.nextFollowUpCommitments,
+            if (isFollowUpNeeded)
+              'next_follow_up_commitments': updated.nextFollowUpCommitments,
           },
         );
       }

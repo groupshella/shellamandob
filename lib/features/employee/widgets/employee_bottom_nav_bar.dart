@@ -1,38 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/employee_navigation_controller.dart';
 
 class EmployeeBottomNavBar extends StatelessWidget {
   const EmployeeBottomNavBar({super.key});
 
-  static const Color _activeColor = Color(0xFF111B18);
-  static const Color _inactiveColor = Color(0xFF9CA3AF);
-
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<EmployeeNavigationController>(
-      builder: (controller) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            border: Border(top: BorderSide(color: Color(0xFFF0F0F2), width: 1)),
-          ),
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).padding.bottom > 0
-                ? MediaQuery.of(context).padding.bottom
-                : 10,
-            top: 10,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
+        final navBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
+        final activeColor = isDark ? Colors.white : const Color(0xFF111B18);
+        const inactiveColor = Color(0xFF9CA3AF);
+
+        return GetBuilder<EmployeeNavigationController>(
+          builder: (controller) {
+            return Container(
+              decoration: BoxDecoration(
+                color: navBg,
+                border: Border(top: BorderSide(color: borderColor, width: 1)),
+              ),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom > 0
+                    ? MediaQuery.of(context).padding.bottom
+                    : 10,
+                top: 10,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
               // الرئيسية (Home) - Far right in RTL
               _buildNavItem(
                 index: 0,
                 icon: IconlyLight.home,
                 activeIcon: IconlyBold.home,
                 isSelected: controller.currentIndex == 0,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
                 onTap: () => controller.changeIndex(0),
               ),
 
@@ -42,6 +50,8 @@ class EmployeeBottomNavBar extends StatelessWidget {
                 icon: IconlyLight.chart,
                 activeIcon: IconlyBold.chart,
                 isSelected: controller.currentIndex == 2,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
                 onTap: () => controller.changeIndex(2),
               ),
 
@@ -51,6 +61,8 @@ class EmployeeBottomNavBar extends StatelessWidget {
                 icon: IconlyLight.calendar,
                 activeIcon: IconlyBold.calendar,
                 isSelected: controller.currentIndex == 1,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
                 onTap: () => controller.changeIndex(1),
               ),
 
@@ -60,6 +72,8 @@ class EmployeeBottomNavBar extends StatelessWidget {
                 icon: IconlyLight.profile,
                 activeIcon: IconlyBold.profile,
                 isSelected: controller.currentIndex == 3,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
                 onTap: () => controller.changeIndex(3),
               ),
             ],
@@ -67,6 +81,8 @@ class EmployeeBottomNavBar extends StatelessWidget {
         );
       },
     );
+  },
+);
   }
 
   Widget _buildNavItem({
@@ -74,6 +90,8 @@ class EmployeeBottomNavBar extends StatelessWidget {
     required IconData icon,
     required IconData activeIcon,
     required bool isSelected,
+    required Color activeColor,
+    required Color inactiveColor,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
@@ -85,7 +103,7 @@ class EmployeeBottomNavBar extends StatelessWidget {
           Icon(
             isSelected ? activeIcon : icon,
             size: 24,
-            color: isSelected ? _activeColor : _inactiveColor,
+            color: isSelected ? activeColor : inactiveColor,
           ),
         ],
       ),

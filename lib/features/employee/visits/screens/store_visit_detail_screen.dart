@@ -58,6 +58,10 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<StoreVisitsController>(
+      init: Get.isRegistered<StoreVisitsController>()
+          ? Get.find<StoreVisitsController>()
+          : Get.put(StoreVisitsController(), permanent: true),
+      autoRemove: false,
       builder: (controller) {
         final visit = controller.activeVisit ?? widget.visit;
 
@@ -561,33 +565,43 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                           style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
                         ),
                         const SizedBox(height: 10),
-                        DropdownButtonFormField<String>(
-                          initialValue: controller.selectedClosingReason,
-                          hint: Text(
-                            'choose_closing_action'.tr,
-                            style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Color(0xFF9CA3AF)),
-                          ),
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color(0xFFF9FAFB),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                            ),
-                          ),
-                          items: _closingReasonsList.map((reason) {
-                            return DropdownMenuItem(
-                              value: reason,
-                              child: Text(
-                                reason,
-                                style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+                        Builder(
+                          builder: (context) {
+                            final selected = controller.selectedClosingReason;
+                            final itemsList = List<String>.from(_closingReasonsList);
+                            if (selected != null && selected.isNotEmpty && !itemsList.contains(selected)) {
+                              itemsList.add(selected);
+                            }
+                            final uniqueItems = itemsList.toSet().toList();
+                            return DropdownButtonFormField<String>(
+                              initialValue: (selected != null && uniqueItems.contains(selected)) ? selected : null,
+                              hint: Text(
+                                'choose_closing_action'.tr,
+                                style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Color(0xFF9CA3AF)),
                               ),
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFFF9FAFB),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                ),
+                              ),
+                              items: uniqueItems.map((reason) {
+                                return DropdownMenuItem(
+                                  value: reason,
+                                  child: Text(
+                                    reason,
+                                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (val) {
+                                controller.setClosingReason(val);
+                              },
                             );
-                          }).toList(),
-                          onChanged: (val) {
-                            controller.setClosingReason(val);
                           },
                         ),
                         // When "أخرى" / other is chosen, show high management input box
@@ -904,7 +918,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
     );
   }
 
-  void _handleFinishVisit(BuildContext context, StoreVisitsController controller, StoreVisitModel visit) {
+  Future<void> _handleFinishVisit(BuildContext context, StoreVisitsController controller, StoreVisitModel visit) async {
     if (controller.frontImagePath == null && controller.insideImagePath == null) {
       Get.snackbar(
         'photo_doc_required_snack_title'.tr,
@@ -916,7 +930,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
       return;
     }
 
-    final success = controller.submitAndFinishVisit();
+    final success = await controller.submitAndFinishVisit(targetVisit: visit);
     if (success) {
       Get.until((route) => route.isFirst || Get.currentRoute.contains('DailyVisitsScreen'));
       Get.snackbar(

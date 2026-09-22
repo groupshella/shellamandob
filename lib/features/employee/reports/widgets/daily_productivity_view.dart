@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/marketer_productivity_model.dart';
 import '../../visits/screens/daily_visits_screen.dart';
 
@@ -10,54 +11,65 @@ class DailyProductivityView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 1. Top 4 KPI Cards Grid
-          _buildKpiGrid(data.kpis),
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
+        final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
+        final textColor = isDark ? Colors.white : const Color(0xFF111B18);
+        final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final dividerColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
+        final innerItemBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
 
-          const SizedBox(height: 16),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Top 4 KPI Cards Grid
+              _buildKpiGrid(data.kpis, cardBg, borderColor, dividerColor, subTextColor),
 
-          // 2. Daily Target Progress Card (الهدف اليومي)
-          _buildDailyTargetCard(data.dailyTarget),
+              const SizedBox(height: 16),
 
-          const SizedBox(height: 20),
+              // 2. Daily Target Progress Card (الهدف اليومي)
+              _buildDailyTargetCard(data.dailyTarget, cardBg, borderColor, textColor, subTextColor, isDark),
 
-          // 3. Day Timeline (تفاصيل اليوم)
-          _buildTimelineSection(data.timeline),
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 20),
+              // 3. Day Timeline (تفاصيل اليوم)
+              _buildTimelineSection(data.timeline, cardBg, borderColor, textColor, subTextColor, isDark),
 
-          // 4. Signed Agreements (الاتفاقيات الموقعة)
-          _buildSignedAgreementsSection(data.signedAgreements),
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 20),
+              // 4. Signed Agreements (الاتفاقيات الموقعة)
+              _buildSignedAgreementsSection(data.signedAgreements, cardBg, borderColor, textColor, subTextColor, dividerColor),
 
-          // 5. Upcoming Follow-ups (المتابعات القادمة)
-          _buildUpcomingFollowUpsSection(data.upcomingFollowUps),
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 30),
-        ],
-      ),
+              // 5. Upcoming Follow-ups (المتابعات القادمة)
+              _buildUpcomingFollowUpsSection(data.upcomingFollowUps, cardBg, borderColor, textColor, subTextColor, innerItemBg),
+
+              const SizedBox(height: 30),
+            ],
+          ),
+        );
+      },
     );
   }
 
   // 1. Top 4 KPI Grid matching Figma Frame 2085665812
-  Widget _buildKpiGrid(ProductivityKpis kpis) {
+  Widget _buildKpiGrid(
+    ProductivityKpis kpis,
+    Color cardBg,
+    Color borderColor,
+    Color dividerColor,
+    Color subTextColor,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
@@ -70,19 +82,21 @@ class DailyProductivityView extends StatelessWidget {
                   title: 'successful_visits_label'.tr,
                   value: kpis.successfulVisitsText,
                   valueColor: const Color(0xFF30913F),
+                  subTextColor: subTextColor,
                 ),
               ),
-              Container(width: 1, height: 44, color: const Color(0xFFF3F4F6)),
+              Container(width: 1, height: 44, color: dividerColor),
               Expanded(
                 child: _buildKpiItem(
                   title: 'work_hours_label'.tr,
                   value: kpis.workHours,
                   valueColor: const Color(0xFF30913F),
+                  subTextColor: subTextColor,
                 ),
               ),
             ],
           ),
-          const Divider(height: 20, thickness: 1, color: Color(0xFFF3F4F6)),
+          Divider(height: 20, thickness: 1, color: dividerColor),
           // Row 2: الإنذارات & الاتفاقيات الموقعة
           Row(
             children: [
@@ -91,15 +105,17 @@ class DailyProductivityView extends StatelessWidget {
                   title: 'warnings_label'.tr,
                   value: kpis.warningsText,
                   valueColor: const Color(0xFFDC2626),
+                  subTextColor: subTextColor,
                   icon: const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFDC2626)),
                 ),
               ),
-              Container(width: 1, height: 44, color: const Color(0xFFF3F4F6)),
+              Container(width: 1, height: 44, color: dividerColor),
               Expanded(
                 child: _buildKpiItem(
                   title: 'signed_agreements_label'.tr,
                   value: kpis.signedContractsText,
                   valueColor: const Color(0xFF7861A6),
+                  subTextColor: subTextColor,
                 ),
               ),
             ],
@@ -113,6 +129,7 @@ class DailyProductivityView extends StatelessWidget {
     required String title,
     required String value,
     required Color valueColor,
+    required Color subTextColor,
     Widget? icon,
   }) {
     return Padding(
@@ -122,10 +139,10 @@ class DailyProductivityView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 11,
-              color: Color(0xFF6B7280),
+              color: subTextColor,
             ),
           ),
           const SizedBox(height: 4),
@@ -152,14 +169,21 @@ class DailyProductivityView extends StatelessWidget {
   }
 
   // 2. Daily Target Progress Card
-  Widget _buildDailyTargetCard(DailyTargetInfo target) {
+  Widget _buildDailyTargetCard(
+    DailyTargetInfo target,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    bool isDark,
+  ) {
     final progress = (target.percentage / 100.0).clamp(0.0, 1.0);
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -170,11 +194,11 @@ class DailyProductivityView extends StatelessWidget {
             children: [
               Text(
                 'daily_target_label'.tr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1F2937),
+                  color: textColor,
                 ),
               ),
               Text(
@@ -194,17 +218,17 @@ class DailyProductivityView extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 7,
-              backgroundColor: const Color(0xFFE5E7EB),
+              backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE5E7EB),
               valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             target.subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 12,
-              color: Color(0xFF6B7280),
+              color: subTextColor,
             ),
           ),
         ],
@@ -213,12 +237,19 @@ class DailyProductivityView extends StatelessWidget {
   }
 
   // 3. Day Timeline (تفاصيل اليوم)
-  Widget _buildTimelineSection(List<TimelineItem> timeline) {
+  Widget _buildTimelineSection(
+    List<TimelineItem> timeline,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    bool isDark,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -226,11 +257,11 @@ class DailyProductivityView extends StatelessWidget {
         children: [
           Text(
             'day_details_label'.tr,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF111B18),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -241,7 +272,7 @@ class DailyProductivityView extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = timeline[index];
               final isLast = (index == timeline.length - 1);
-              return _buildTimelineRow(item, isLast);
+              return _buildTimelineRow(item, isLast, textColor, subTextColor, isDark);
             },
           ),
         ],
@@ -249,7 +280,13 @@ class DailyProductivityView extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineRow(TimelineItem item, bool isLast) {
+  Widget _buildTimelineRow(
+    TimelineItem item,
+    bool isLast,
+    Color textColor,
+    Color subTextColor,
+    bool isDark,
+  ) {
     Color dotColor = const Color(0xFF9CA3AF);
     if (item.statusColor == 'green') dotColor = const Color(0xFF30913F);
     if (item.statusColor == 'orange') dotColor = const Color(0xFFF59E0B);
@@ -264,10 +301,10 @@ class DailyProductivityView extends StatelessWidget {
             width: 58,
             child: Text(
               item.time,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 11,
-                color: Color(0xFF6B7280),
+                color: subTextColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -287,7 +324,7 @@ class DailyProductivityView extends StatelessWidget {
                 Expanded(
                   child: Container(
                     width: 2,
-                    color: const Color(0xFFE5E7EB),
+                    color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
                   ),
                 ),
             ],
@@ -303,11 +340,11 @@ class DailyProductivityView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF111B18),
+                        color: textColor,
                       ),
                     ),
                   ),
@@ -317,8 +354,8 @@ class DailyProductivityView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: item.statusColor == 'green'
-                            ? const Color(0xFFDCFCE7)
-                            : const Color(0xFFFEF3C7),
+                            ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
+                            : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -344,12 +381,19 @@ class DailyProductivityView extends StatelessWidget {
   }
 
   // 4. Signed Agreements (الاتفاقيات الموقعة)
-  Widget _buildSignedAgreementsSection(List<SignedAgreementItem> agreements) {
+  Widget _buildSignedAgreementsSection(
+    List<SignedAgreementItem> agreements,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    Color dividerColor,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -357,11 +401,11 @@ class DailyProductivityView extends StatelessWidget {
         children: [
           Text(
             'signed_agreements_label'.tr,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF111B18),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 12),
@@ -369,10 +413,12 @@ class DailyProductivityView extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: agreements.length,
-            separatorBuilder: (_, __) => const Divider(height: 16, thickness: 0.8, color: Color(0xFFF3F4F6)),
+            separatorBuilder: (_, __) => Divider(height: 16, thickness: 0.8, color: dividerColor),
             itemBuilder: (context, index) {
               final a = agreements[index];
               final isGreen = a.statusColor == 'green';
+              final isDark = Theme.of(context).brightness == Brightness.dark || Get.find<ThemeController>().darkTheme;
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -381,20 +427,20 @@ class DailyProductivityView extends StatelessWidget {
                     children: [
                       Text(
                         a.storeName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1F2937),
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         a.time,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 11,
-                          color: Color(0xFF6B7280),
+                          color: subTextColor,
                         ),
                       ),
                     ],
@@ -402,7 +448,9 @@ class DailyProductivityView extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isGreen ? const Color(0xFFDCFCE7) : const Color(0xFFFEF3C7),
+                      color: isGreen
+                          ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
+                          : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -425,12 +473,19 @@ class DailyProductivityView extends StatelessWidget {
   }
 
   // 5. Upcoming Follow-ups (المتابعات القادمة)
-  Widget _buildUpcomingFollowUpsSection(List<UpcomingFollowUpItem> followUps) {
+  Widget _buildUpcomingFollowUpsSection(
+    List<UpcomingFollowUpItem> followUps,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    Color innerItemBg,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -441,11 +496,11 @@ class DailyProductivityView extends StatelessWidget {
             children: [
               Text(
                 'upcoming_follow_ups_label'.tr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF111B18),
+                  color: textColor,
                 ),
               ),
               InkWell(
@@ -475,9 +530,9 @@ class DailyProductivityView extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
+                  color: innerItemBg,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: borderColor),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,20 +549,20 @@ class DailyProductivityView extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       f.storeName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111B18),
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       f.note,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 11,
-                        color: Color(0xFF6B7280),
+                        color: subTextColor,
                       ),
                     ),
                   ],

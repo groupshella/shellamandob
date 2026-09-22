@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import '../controllers/employee_navigation_controller.dart';
 import '../controllers/employee_shift_controller.dart';
@@ -20,53 +21,64 @@ class EmployeeHomeScreen extends StatelessWidget {
       Get.put(EmployeeShiftController(), permanent: true);
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: RefreshIndicator(
-          color: const Color(0xFF30913F),
-          onRefresh: () async {
-            if (Get.isRegistered<EmployeeShiftController>()) {
-              await Get.find<EmployeeShiftController>().loadCurrentShift(notify: true);
-            }
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. الترويسة والترحيب
-                EmployeeHeaderWidget(
-                  onNotificationTap: () {
-                    // Notification routing if needed
-                  },
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
+        final bg = isDark ? const Color(0xFF121418) : Colors.white;
+
+        return Container(
+          color: bg,
+          child: SafeArea(
+            bottom: false,
+            child: RefreshIndicator(
+              color: const Color(0xFF30913F),
+              onRefresh: () async {
+                if (Get.isRegistered<EmployeeShiftController>()) {
+                  await Get.find<EmployeeShiftController>().loadCurrentShift(notify: true);
+                }
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 1. الترويسة والترحيب
+                    EmployeeHeaderWidget(
+                      isDark: isDark,
+                      onNotificationTap: () {
+                        // Notification routing if needed
+                      },
+                    ),
+
+                    // 2. بطاقة حالة الدوام الديناميكية (لم يبدأ / نشط مع عداد حي / استراحة)
+                    ShiftStatusCardWidget(
+                      isDark: isDark,
+                      onStartShift: onStartShiftPressed ?? () {
+                        Get.toNamed(RouteHelper.getSelectWorkZoneRoute());
+                      },
+                    ),
+
+                    // 3. شبكة المقاييس (وقت البدء، وقت العمل، خارج الدوام، الاستئذان المعتمد)
+                    ShiftMetricsGridWidget(isDark: isDark),
+
+                    // 4. شريط ونافذة الإنذارات
+                    EmployeeWarningsBanner(isDark: isDark),
+
+                    // 5. ملخص زيارات اليوم
+                    TodayVisitsSummaryWidget(
+                      isDark: isDark,
+                      onStartNextVisit: () {
+                        Get.find<EmployeeNavigationController>().changeIndex(1);
+                      },
+                    ),
+                  ],
                 ),
-
-                // 2. بطاقة حالة الدوام الديناميكية (لم يبدأ / نشط مع عداد حي / استراحة)
-                ShiftStatusCardWidget(
-                  onStartShift: onStartShiftPressed ?? () {
-                    Get.toNamed(RouteHelper.getSelectWorkZoneRoute());
-                  },
-                ),
-
-                // 3. شبكة المقاييس (وقت البدء، وقت العمل، خارج الدوام، الاستئذان المعتمد)
-                const ShiftMetricsGridWidget(),
-
-                // 4. شريط ونافذة الإنذارات
-                const EmployeeWarningsBanner(),
-
-                // 5. ملخص زيارات اليوم
-                TodayVisitsSummaryWidget(
-                  onStartNextVisit: () {
-                    Get.find<EmployeeNavigationController>().changeIndex(1);
-                  },
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

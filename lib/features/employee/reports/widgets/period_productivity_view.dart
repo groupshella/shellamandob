@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/marketer_productivity_model.dart';
 
 class PeriodProductivityView extends StatelessWidget {
@@ -16,44 +17,101 @@ class PeriodProductivityView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 1. Target Progress Header & 3 Top Badges
-          _buildPeriodTargetHeader(data.targetProgress, data.kpis),
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
+        final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
+        final textColor = isDark ? Colors.white : const Color(0xFF1F2937);
+        final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final innerItemBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
+        final innerBorderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+        final dividerColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
 
-          const SizedBox(height: 16),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. Target Progress Header & 3 Top Badges
+              _buildPeriodTargetHeader(
+                data.targetProgress,
+                data.kpis,
+                cardBg,
+                borderColor,
+                textColor,
+                subTextColor,
+                innerItemBg,
+                innerBorderColor,
+                isDark,
+              ),
 
-          // 2. Days Accordion List (قائمة الأيام)
-          _buildDaysAccordionList(data.days),
+              const SizedBox(height: 16),
 
-          const SizedBox(height: 20),
+              // 2. Days Accordion List (قائمة الأيام)
+              _buildDaysAccordionList(
+                data.days,
+                cardBg,
+                borderColor,
+                textColor,
+                subTextColor,
+                innerItemBg,
+                innerBorderColor,
+              ),
 
-          // 3. Signed Agreements (الاتفاقيات الموقعة)
-          _buildSignedAgreementsSection(data.signedAgreements),
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 20),
+              // 3. Signed Agreements (الاتفاقيات الموقعة)
+              _buildSignedAgreementsSection(
+                data.signedAgreements,
+                cardBg,
+                borderColor,
+                textColor,
+                subTextColor,
+                dividerColor,
+                isDark,
+              ),
 
-          // 4. Period Summary (ملخص الفترة)
-          _buildPeriodSummarySection(data.periodSummary),
+              const SizedBox(height: 20),
 
-          const SizedBox(height: 30),
-        ],
-      ),
+              // 4. Period Summary (ملخص الفترة)
+              _buildPeriodSummarySection(
+                data.periodSummary,
+                cardBg,
+                borderColor,
+                textColor,
+                subTextColor,
+                innerItemBg,
+                innerBorderColor,
+              ),
+
+              const SizedBox(height: 30),
+            ],
+          ),
+        );
+      },
     );
   }
 
   // 1. Target Progress Header & 3 Top Badges
-  Widget _buildPeriodTargetHeader(DailyTargetInfo target, PeriodKpis kpis) {
+  Widget _buildPeriodTargetHeader(
+    DailyTargetInfo target,
+    PeriodKpis kpis,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    Color innerItemBg,
+    Color innerBorderColor,
+    bool isDark,
+  ) {
     final progress = (target.percentage / 100.0).clamp(0.0, 1.0);
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -64,11 +122,11 @@ class PeriodProductivityView extends StatelessWidget {
             children: [
               Text(
                 'target_achievement_label'.tr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1F2937),
+                  color: textColor,
                 ),
               ),
               Text(
@@ -88,7 +146,7 @@ class PeriodProductivityView extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 7,
-              backgroundColor: const Color(0xFFE5E7EB),
+              backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE5E7EB),
               valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
             ),
           ),
@@ -101,6 +159,9 @@ class PeriodProductivityView extends StatelessWidget {
                   title: 'warnings_label'.tr,
                   value: kpis.warningsText,
                   color: const Color(0xFFDC2626),
+                  innerItemBg: innerItemBg,
+                  innerBorderColor: innerBorderColor,
+                  subTextColor: subTextColor,
                 ),
               ),
               const SizedBox(width: 8),
@@ -109,6 +170,9 @@ class PeriodProductivityView extends StatelessWidget {
                   title: 'work_hours_label'.tr,
                   value: kpis.workHours,
                   color: const Color(0xFF30913F),
+                  innerItemBg: innerItemBg,
+                  innerBorderColor: innerBorderColor,
+                  subTextColor: subTextColor,
                 ),
               ),
               const SizedBox(width: 8),
@@ -117,6 +181,9 @@ class PeriodProductivityView extends StatelessWidget {
                   title: 'signed_agreements_label'.tr,
                   value: kpis.signedContractsText,
                   color: const Color(0xFF7861A6),
+                  innerItemBg: innerItemBg,
+                  innerBorderColor: innerBorderColor,
+                  subTextColor: subTextColor,
                 ),
               ),
             ],
@@ -130,22 +197,25 @@ class PeriodProductivityView extends StatelessWidget {
     required String title,
     required String value,
     required Color color,
+    required Color innerItemBg,
+    required Color innerBorderColor,
+    required Color subTextColor,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: innerItemBg,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: innerBorderColor),
       ),
       child: Column(
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 10,
-              color: Color(0xFF6B7280),
+              color: subTextColor,
             ),
           ),
           const SizedBox(height: 3),
@@ -164,7 +234,15 @@ class PeriodProductivityView extends StatelessWidget {
   }
 
   // 2. Days Accordion List matching Figma Frame 2085665814
-  Widget _buildDaysAccordionList(List<PeriodDayItem> days) {
+  Widget _buildDaysAccordionList(
+    List<PeriodDayItem> days,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    Color innerItemBg,
+    Color innerBorderColor,
+  ) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -176,10 +254,10 @@ class PeriodProductivityView extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardBg,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isExpanded ? const Color(0xFF30913F).withValues(alpha: 0.4) : const Color(0xFFF0F0F2),
+              color: isExpanded ? const Color(0xFF30913F).withValues(alpha: 0.5) : borderColor,
               width: 1,
             ),
           ),
@@ -199,19 +277,19 @@ class PeriodProductivityView extends StatelessWidget {
                         children: [
                           Text(
                             day.dayName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF1F2937),
+                              color: textColor,
                             ),
                           ),
                           Text(
                             day.dateFormatted,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 11,
-                              color: Color(0xFF6B7280),
+                              color: subTextColor,
                             ),
                           ),
                         ],
@@ -224,12 +302,14 @@ class PeriodProductivityView extends StatelessWidget {
                         count: '${day.visitsCount}',
                         label: 'visit_unit_text'.tr,
                         color: const Color(0xFFF59E0B),
+                        subTextColor: subTextColor,
                       ),
                       const SizedBox(width: 6),
                       _buildChip(
                         count: '${day.contractsCount}',
                         label: 'contract_unit_text'.tr,
                         color: const Color(0xFF7861A6),
+                        subTextColor: subTextColor,
                       ),
                       if (day.warningsCount > 0) ...[
                         const SizedBox(width: 6),
@@ -237,6 +317,7 @@ class PeriodProductivityView extends StatelessWidget {
                           count: '${day.warningsCount}',
                           label: 'warning_unit_text'.tr,
                           color: const Color(0xFFDC2626),
+                          subTextColor: subTextColor,
                         ),
                       ],
 
@@ -246,7 +327,7 @@ class PeriodProductivityView extends StatelessWidget {
                       Icon(
                         isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         size: 20,
-                        color: const Color(0xFF9CA3AF),
+                        color: subTextColor,
                       ),
                     ],
                   ),
@@ -259,9 +340,9 @@ class PeriodProductivityView extends StatelessWidget {
                   margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: innerItemBg,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(color: innerBorderColor),
                   ),
                   child: Column(
                     children: [
@@ -272,19 +353,21 @@ class PeriodProductivityView extends StatelessWidget {
                               title: 'successful_visits_label'.tr,
                               value: day.details.successfulVisits,
                               valueColor: const Color(0xFFF59E0B),
+                              subTextColor: subTextColor,
                             ),
                           ),
-                          Container(width: 1, height: 36, color: const Color(0xFFE5E7EB)),
+                          Container(width: 1, height: 36, color: innerBorderColor),
                           Expanded(
                             child: _buildExpandedMetric(
                               title: 'work_hours_label'.tr,
                               value: day.details.workHours,
                               valueColor: const Color(0xFF30913F),
+                              subTextColor: subTextColor,
                             ),
                           ),
                         ],
                       ),
-                      const Divider(height: 16, thickness: 0.8, color: Color(0xFFE5E7EB)),
+                      Divider(height: 16, thickness: 0.8, color: innerBorderColor),
                       Row(
                         children: [
                           Expanded(
@@ -292,14 +375,16 @@ class PeriodProductivityView extends StatelessWidget {
                               title: 'warnings_label'.tr,
                               value: day.details.warningsCount,
                               valueColor: const Color(0xFFDC2626),
+                              subTextColor: subTextColor,
                             ),
                           ),
-                          Container(width: 1, height: 36, color: const Color(0xFFE5E7EB)),
+                          Container(width: 1, height: 36, color: innerBorderColor),
                           Expanded(
                             child: _buildExpandedMetric(
                               title: 'contract_unit_text'.tr,
                               value: day.details.contractsCount,
                               valueColor: const Color(0xFF7861A6),
+                              subTextColor: subTextColor,
                             ),
                           ),
                         ],
@@ -319,11 +404,12 @@ class PeriodProductivityView extends StatelessWidget {
     required String count,
     required String label,
     required Color color,
+    required Color subTextColor,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -341,10 +427,10 @@ class PeriodProductivityView extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 9,
-              color: Color(0xFF6B7280),
+              color: subTextColor,
             ),
           ),
         ],
@@ -356,6 +442,7 @@ class PeriodProductivityView extends StatelessWidget {
     required String title,
     required String value,
     required Color valueColor,
+    required Color subTextColor,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -364,10 +451,10 @@ class PeriodProductivityView extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 10,
-              color: Color(0xFF6B7280),
+              color: subTextColor,
             ),
           ),
           const SizedBox(height: 2),
@@ -386,12 +473,20 @@ class PeriodProductivityView extends StatelessWidget {
   }
 
   // 3. Signed Agreements Section
-  Widget _buildSignedAgreementsSection(List<SignedAgreementItem> agreements) {
+  Widget _buildSignedAgreementsSection(
+    List<SignedAgreementItem> agreements,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    Color dividerColor,
+    bool isDark,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -399,11 +494,11 @@ class PeriodProductivityView extends StatelessWidget {
         children: [
           Text(
             'signed_agreements_label'.tr,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF111B18),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 12),
@@ -411,7 +506,7 @@ class PeriodProductivityView extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: agreements.length,
-            separatorBuilder: (_, __) => const Divider(height: 16, thickness: 0.8, color: Color(0xFFF3F4F6)),
+            separatorBuilder: (_, __) => Divider(height: 16, thickness: 0.8, color: dividerColor),
             itemBuilder: (context, index) {
               final a = agreements[index];
               final isGreen = a.statusColor == 'green';
@@ -423,20 +518,20 @@ class PeriodProductivityView extends StatelessWidget {
                     children: [
                       Text(
                         a.storeName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1F2937),
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         a.time,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 11,
-                          color: Color(0xFF6B7280),
+                          color: subTextColor,
                         ),
                       ),
                     ],
@@ -444,7 +539,9 @@ class PeriodProductivityView extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isGreen ? const Color(0xFFDCFCE7) : const Color(0xFFFEF3C7),
+                      color: isGreen
+                          ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
+                          : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -467,12 +564,20 @@ class PeriodProductivityView extends StatelessWidget {
   }
 
   // 4. Period Summary Grid (6 cards matching Figma)
-  Widget _buildPeriodSummarySection(PeriodSummaryInfo summary) {
+  Widget _buildPeriodSummarySection(
+    PeriodSummaryInfo summary,
+    Color cardBg,
+    Color borderColor,
+    Color textColor,
+    Color subTextColor,
+    Color innerItemBg,
+    Color innerBorderColor,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F2), width: 1),
+        border: Border.all(color: borderColor, width: 1),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -480,11 +585,11 @@ class PeriodProductivityView extends StatelessWidget {
         children: [
           Text(
             'period_summary_title'.tr,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1F2937),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 12),
@@ -496,12 +601,12 @@ class PeriodProductivityView extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             childAspectRatio: 2.1,
             children: [
-              _buildSummaryCard('total_work_hours_label'.tr, summary.totalWorkHours),
-              _buildSummaryCard('total_visits_label'.tr, '${summary.totalVisits}'),
-              _buildSummaryCard('signed_agreements_label'.tr, '${summary.totalSignedContracts}'),
-              _buildSummaryCard('warnings_label'.tr, '${summary.totalWarnings}'),
-              _buildSummaryCard('covered_distance_label'.tr, summary.totalDistanceKm),
-              _buildSummaryCard('scheduled_followups_label'.tr, '${summary.totalScheduledFollowups}'),
+              _buildSummaryCard('total_work_hours_label'.tr, summary.totalWorkHours, innerItemBg, innerBorderColor, textColor, subTextColor),
+              _buildSummaryCard('total_visits_label'.tr, '${summary.totalVisits}', innerItemBg, innerBorderColor, textColor, subTextColor),
+              _buildSummaryCard('signed_agreements_label'.tr, '${summary.totalSignedContracts}', innerItemBg, innerBorderColor, textColor, subTextColor),
+              _buildSummaryCard('warnings_label'.tr, '${summary.totalWarnings}', innerItemBg, innerBorderColor, textColor, subTextColor),
+              _buildSummaryCard('covered_distance_label'.tr, summary.totalDistanceKm, innerItemBg, innerBorderColor, textColor, subTextColor),
+              _buildSummaryCard('scheduled_followups_label'.tr, '${summary.totalScheduledFollowups}', innerItemBg, innerBorderColor, textColor, subTextColor),
             ],
           ),
         ],
@@ -509,13 +614,20 @@ class PeriodProductivityView extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard(String title, String value) {
+  Widget _buildSummaryCard(
+    String title,
+    String value,
+    Color innerItemBg,
+    Color innerBorderColor,
+    Color textColor,
+    Color subTextColor,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: innerItemBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: innerBorderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,11 +635,11 @@ class PeriodProductivityView extends StatelessWidget {
         children: [
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1F2937),
+              color: textColor,
             ),
           ),
           const SizedBox(height: 2),
@@ -535,10 +647,10 @@ class PeriodProductivityView extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 11,
-              color: Color(0xFF6B7280),
+              color: subTextColor,
             ),
           ),
         ],

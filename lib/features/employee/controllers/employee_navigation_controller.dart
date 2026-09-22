@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../visits/controllers/store_visits_controller.dart';
 
 class EmployeeNavigationController extends GetxController implements GetxService {
   int _currentIndex = 0;
@@ -8,6 +9,9 @@ class EmployeeNavigationController extends GetxController implements GetxService
     if (_currentIndex != index) {
       _currentIndex = index;
       update();
+      if (index == 1 && Get.isRegistered<StoreVisitsController>()) {
+        Get.find<StoreVisitsController>().loadVisits();
+      }
     }
   }
 }

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 import 'employee_warnings_bottom_sheet.dart';
 
 class EmployeeWarningsBanner extends StatelessWidget {
-  const EmployeeWarningsBanner({super.key});
+  final bool? isDark;
+  const EmployeeWarningsBanner({super.key, this.isDark});
 
   static const Color _redColor = Color(0xFFDC2626);
-  static const Color _redBg = Color(0xFFFEE2E2);
 
   @override
   Widget build(BuildContext context) {
+    final dark = isDark ?? (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
+    final redBg = dark ? const Color(0xFF3B1818) : const Color(0xFFFEE2E2);
+
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final warnings = controller.warnings;
@@ -32,7 +36,7 @@ class EmployeeWarningsBanner extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: _redBg,
+                color: redBg,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(

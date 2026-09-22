@@ -2,21 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 
 class ShiftMetricsGridWidget extends StatelessWidget {
-  const ShiftMetricsGridWidget({super.key});
-
-  static const Color _darkText = Color(0xFF111B18);
-  static const Color _subText = Color(0xFF555555);
-  static const Color _purpleBg = Color(0xFFDFD3F5);
-  static const Color _purpleTitle = Color(0xFF331259);
-  static const Color _purpleValue = Color(0xFF240648);
-  static const Color _cardBg = Color(0xFFFAFBFB);
-  static const Color _borderColor = Color(0xFFF0F0F2);
+  final bool? isDark;
+  const ShiftMetricsGridWidget({super.key, this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final dark = isDark ?? (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
+    final darkText = dark ? Colors.white : const Color(0xFF111B18);
+    final subText = dark ? const Color(0xFF9CA3AF) : const Color(0xFF555555);
+    final purpleBg = dark ? const Color(0xFF261D3B) : const Color(0xFFDFD3F5);
+    final purpleTitle = dark ? const Color(0xFFD3BFFF) : const Color(0xFF331259);
+    final purpleValue = dark ? Colors.white : const Color(0xFF240648);
+    final cardBg = dark ? const Color(0xFF1C2028) : const Color(0xFFFAFBFB);
+    final borderColor = dark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
+
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final model = controller.shiftModel;
@@ -36,11 +39,12 @@ class ShiftMetricsGridWidget extends StatelessWidget {
                       date: currentDate,
                       title: 'shift_start_time'.tr,
                       value: model.localizedStartTime,
-                      backgroundColor: _purpleBg,
-                      titleColor: _purpleTitle,
-                      valueColor: _purpleValue,
+                      backgroundColor: purpleBg,
+                      borderColor: borderColor,
+                      titleColor: purpleTitle,
+                      valueColor: purpleValue,
                       icon: IconlyLight.timeCircle,
-                      iconColor: _purpleTitle,
+                      iconColor: purpleTitle,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -51,11 +55,12 @@ class ShiftMetricsGridWidget extends StatelessWidget {
                       date: currentDate,
                       title: 'work_time'.tr,
                       value: workTime,
-                      backgroundColor: _cardBg,
-                      titleColor: _subText,
-                      valueColor: _darkText,
+                      backgroundColor: cardBg,
+                      borderColor: borderColor,
+                      titleColor: subText,
+                      valueColor: darkText,
                       icon: IconlyLight.work,
-                      iconColor: _subText,
+                      iconColor: subText,
                     ),
                   ),
                 ],
@@ -71,11 +76,12 @@ class ShiftMetricsGridWidget extends StatelessWidget {
                       date: currentDate,
                       title: 'overtime_hours'.tr,
                       value: model.localizedOvertimeHours,
-                      backgroundColor: _cardBg,
-                      titleColor: _subText,
-                      valueColor: _darkText,
+                      backgroundColor: cardBg,
+                      borderColor: borderColor,
+                      titleColor: subText,
+                      valueColor: darkText,
                       icon: IconlyLight.timeSquare,
-                      iconColor: _subText,
+                      iconColor: subText,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -86,11 +92,12 @@ class ShiftMetricsGridWidget extends StatelessWidget {
                       date: currentDate,
                       title: 'approved_leave'.tr,
                       value: model.localizedApprovedLeaveHours,
-                      backgroundColor: _cardBg,
-                      titleColor: _subText,
-                      valueColor: _darkText,
+                      backgroundColor: cardBg,
+                      borderColor: borderColor,
+                      titleColor: subText,
+                      valueColor: darkText,
                       icon: IconlyLight.ticketStar,
-                      iconColor: _subText,
+                      iconColor: subText,
                     ),
                   ),
                 ],
@@ -107,6 +114,7 @@ class ShiftMetricsGridWidget extends StatelessWidget {
     required String title,
     required String value,
     required Color backgroundColor,
+    required Color borderColor,
     required Color titleColor,
     required Color valueColor,
     IconData? icon,
@@ -118,7 +126,7 @@ class ShiftMetricsGridWidget extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: _borderColor,
+          color: borderColor,
           width: 1,
         ),
       ),
@@ -128,10 +136,10 @@ class ShiftMetricsGridWidget extends StatelessWidget {
           // Date
           Text(
             date,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 11,
-              color: _subText,
+              color: titleColor,
             ),
           ),
           const SizedBox(height: 6),

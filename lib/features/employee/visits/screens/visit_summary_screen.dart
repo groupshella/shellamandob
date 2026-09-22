@@ -1,530 +1,559 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:intl/intl.dart';
+import '../../../../common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'contract_signing_screen.dart';
+import 'follow_up_task_screen.dart';
 
-class VisitSummaryScreen extends StatelessWidget {
+class VisitSummaryScreen extends StatefulWidget {
   final StoreVisitModel visit;
+  final bool isReadOnly;
 
   const VisitSummaryScreen({
     super.key,
     required this.visit,
+    this.isReadOnly = false,
   });
 
+  @override
+  State<VisitSummaryScreen> createState() => _VisitSummaryScreenState();
+}
+
+class _InterestOptionItem {
+  final String key;
+  final String label;
+  const _InterestOptionItem({required this.key, required this.label});
+}
+
+class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
   static const Color _primaryGreen = Color(0xFF30913F);
-  static const Color _lightGreenBg = Color(0xFFEBFEEB);
-  static const Color _lightGreenBorder = Color(0xFFB8F2BD);
-  static const Color _screenBg = Color(0xFFF8F9FA);
-  static const Color _cardBorder = Color(0xFFE5E7EB);
-  static const Color _darkText = Color(0xFF111B18);
-  static const Color _subText = Color(0xFF6B7280);
+
+  late bool _isEditable;
+
+  List<_InterestOptionItem> get _interestOptions => [
+    _InterestOptionItem(key: 'requested_grace_period', label: 'requested_grace_period'.tr),
+    _InterestOptionItem(key: 'interested', label: 'interested'.tr),
+    _InterestOptionItem(key: 'very_interested', label: 'very_interested'.tr),
+    _InterestOptionItem(key: 'needs_follow_up', label: 'needs_follow_up'.tr),
+    _InterestOptionItem(key: 'not_interested', label: 'not_interested'.tr),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _isEditable = !widget.isReadOnly || widget.visit.visitStatus == StoreVisitStatus.followUp;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<StoreVisitsController>()) {
+        final controller = Get.find<StoreVisitsController>();
+        controller.storeNameController.text = widget.visit.storeName;
+        controller.managerNameController.text = widget.visit.managerName;
+        controller.phoneController.text = widget.visit.phone;
+        controller.openingsController.text = widget.visit.openingsCount.toString();
+        controller.crNumberController.text = widget.visit.crNumber;
+        controller.commitmentsController.text = widget.visit.nextFollowUpCommitments ?? '';
+        controller.obstaclesController.text = widget.visit.obstaclesNotes ?? '';
+        controller.confidentialNotesController.text = widget.visit.confidentialNotes ?? '';
+        controller.setPipelineStep(widget.visit.pipelineStep);
+        if (widget.visit.interestStatus != null && widget.visit.interestStatus!.isNotEmpty) {
+          controller.setInterestStatus(widget.visit.interestStatus!);
+        }
+        if (widget.visit.closingReason != null) {
+          controller.reasonNotMetController.text = widget.visit.closingReason!;
+          controller.reasonRejectedController.text = widget.visit.closingReason!;
+          controller.reasonDisqualifiedController.text = widget.visit.closingReason!;
+        }
+      }
+    });
+  }
+
+  void _syncInputsToController(StoreVisitsController controller) {
+    controller.registerActivity();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<StoreVisitsController>(
-      builder: (controller) {
-        final currentVisit = controller.activeVisit ?? visit;
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
+        final screenBg = isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
+        final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+        final darkText = isDark ? Colors.white : const Color(0xFF111B18);
+        final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final inputFill = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+        final selectedBg = isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB);
+        final unselectedBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+        final unselectedBorder = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
 
-        return Scaffold(
-          backgroundColor: _screenBg,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0.5,
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: _darkText, size: 20),
-              onPressed: () => Get.back(),
-            ),
-            title: Text(
-              'visit_summary'.tr,
-              style: const TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: _darkText,
-              ),
-            ),
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 1. Store Data Section
-                _buildCardSection(
-                  title: 'store_data_section'.tr,
-                  children: [
-                    _buildTextField(
-                      label: 'openings_count'.tr,
-                      controller: controller.openingsController,
-                      keyboardType: TextInputType.number,
-                      hintText: '1',
-                      onChanged: (_) => controller.registerActivity(),
-                    ),
-                    const SizedBox(height: 14),
-                    _buildTextField(
-                      label: 'cr_number_label'.tr,
-                      controller: controller.crNumberController,
-                      hintText: 'commercial_register_hint'.tr,
-                      onChanged: (_) => controller.registerActivity(),
-                    ),
-                  ],
+        return GetBuilder<StoreVisitsController>(
+          init: Get.isRegistered<StoreVisitsController>()
+              ? Get.find<StoreVisitsController>()
+              : Get.put(StoreVisitsController(), permanent: true),
+          autoRemove: false,
+          builder: (controller) {
+            final currentVisit = widget.isReadOnly ? widget.visit : (controller.activeVisit ?? widget.visit);
+            final isContract = controller.selectedPipelineStep == StorePipelineStep.contractSigned;
+
+            return Scaffold(
+              backgroundColor: screenBg,
+              appBar: AppBar(
+                backgroundColor: cardBg,
+                elevation: 0.5,
+                centerTitle: true,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
+                  onPressed: () => Get.back(),
                 ),
-
-                const SizedBox(height: 16),
-
-                // 2. Manager Data Section
-                _buildCardSection(
-                  title: 'manager_data_section'.tr,
-                  children: [
-                    _buildTextField(
-                      label: 'manager_name'.tr,
-                      controller: controller.managerNameController,
-                      hintText: 'contact_person_hint'.tr,
-                      onChanged: (_) => controller.registerActivity(),
-                    ),
-                    const SizedBox(height: 14),
-                    _buildTextField(
-                      label: 'phone_number_label'.tr,
-                      controller: controller.phoneController,
-                      keyboardType: TextInputType.phone,
-                      hintText: 'enter_phone'.tr,
-                      onChanged: (_) => controller.registerActivity(),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // 3. Interest Status Section
-                _buildCardSection(
-                  title: 'interest_status'.tr,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildInterestChip(
-                          label: 'very_interested'.tr,
-                          keyName: 'very_interested',
-                          controller: controller,
-                        ),
-                        _buildInterestChip(
-                          label: 'interested'.tr,
-                          keyName: 'interested',
-                          controller: controller,
-                        ),
-                        _buildInterestChip(
-                          label: 'grace_period'.tr,
-                          keyName: 'grace_period',
-                          controller: controller,
-                        ),
-                        _buildInterestChip(
-                          label: 'needs_follow_up'.tr,
-                          keyName: 'needs_follow_up',
-                          controller: controller,
-                        ),
-                        _buildInterestChip(
-                          label: 'not_interested'.tr,
-                          keyName: 'not_interested',
-                          controller: controller,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // 4. Sales Stage Section
-                _buildCardSection(
-                  title: 'sales_stage'.tr,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildPipelineChip(
-                          label: 'not_met'.tr,
-                          step: StorePipelineStep.notMet,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'introduced'.tr,
-                          step: StorePipelineStep.presented,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'interested'.tr,
-                          step: StorePipelineStep.interested,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'grace_period'.tr,
-                          step: StorePipelineStep.gracePeriod,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'negotiating'.tr,
-                          step: StorePipelineStep.negotiating,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'contract_signed'.tr,
-                          step: StorePipelineStep.contractSigned,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'not_qualified'.tr,
-                          step: StorePipelineStep.notQualified,
-                          controller: controller,
-                        ),
-                        _buildPipelineChip(
-                          label: 'rejected'.tr,
-                          step: StorePipelineStep.rejected,
-                          controller: controller,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // 5. Dynamic Conditional Content Based on Selected Sales Stage
-                if (controller.selectedPipelineStep == StorePipelineStep.notMet) ...[
-                  _buildCardSection(
-                    title: 'reason_not_met'.tr,
-                    children: [
-                      _buildTextField(
-                        label: 'reason_not_met'.tr,
-                        controller: controller.reasonNotMetController,
-                        hintText: 'enter_reason_hint'.tr,
-                        maxLines: 3,
-                        onChanged: (_) => controller.registerActivity(),
-                      ),
-                    ],
+                title: Text(
+                  'visit_summary'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: darkText,
                   ),
-                ] else if (controller.selectedPipelineStep == StorePipelineStep.rejected) ...[
-                  _buildCardSection(
-                    title: 'reason_rejected'.tr,
-                    children: [
-                      _buildTextField(
-                        label: 'reason_rejected'.tr,
-                        controller: controller.reasonRejectedController,
-                        hintText: 'enter_reason_hint'.tr,
-                        maxLines: 3,
-                        onChanged: (_) => controller.registerActivity(),
+                ),
+                actions: [
+                  if (currentVisit.visitStatus == StoreVisitStatus.followUp)
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF3B1F56) : const Color(0xFFDFD3F5),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: isDark ? const Color(0xFF7861A6) : const Color(0xFFC7B3E8)),
                       ),
-                    ],
-                  ),
-                ] else if (controller.selectedPipelineStep == StorePipelineStep.notQualified) ...[
-                  _buildCardSection(
-                    title: 'reason_disqualified'.tr,
-                    children: [
-                      _buildTextField(
-                        label: 'reason_disqualified'.tr,
-                        controller: controller.reasonDisqualifiedController,
-                        hintText: 'enter_reason_hint'.tr,
-                        maxLines: 3,
-                        onChanged: (_) => controller.registerActivity(),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.schedule_rounded, size: 14, color: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6)),
+                          const SizedBox(width: 4),
+                          Text(
+                            'needs_follow_up'.tr,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ] else ...[
-                  // Green Wallet Alert Box
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: _lightGreenBg,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _lightGreenBorder, width: 1),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.info_outline_rounded,
-                          color: _primaryGreen,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'wallet_balance_first_alert'.tr,
+                    )
+                  else if (currentVisit.visitStatus == StoreVisitStatus.completed)
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: isDark ? const Color(0xFF2E7D32) : const Color(0xFFB8F2BD)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.check_circle_rounded, size: 14, color: _primaryGreen),
+                          const SizedBox(width: 4),
+                          Text(
+                            'completed_visit_badge'.tr,
                             style: const TextStyle(
                               fontFamily: 'Tajawal',
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                               color: _primaryGreen,
-                              height: 1.4,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Next Follow Up Date Picker (if applicable)
-                  if (controller.selectedPipelineStep == StorePipelineStep.gracePeriod ||
-                      controller.selectedPipelineStep == StorePipelineStep.negotiating ||
-                      controller.selectedPipelineStep == StorePipelineStep.interested) ...[
-                    _buildCardSection(
-                      title: 'next_follow_up_date'.tr,
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            final now = DateTime.now();
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: controller.selectedFollowUpDate ?? now.add(const Duration(days: 2)),
-                              firstDate: now,
-                              lastDate: now.add(const Duration(days: 90)),
-                            );
-                            if (picked != null) {
-                              controller.setFollowUpDate(picked);
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF9FAFB),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: _cardBorder, width: 1),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  controller.selectedFollowUpDate != null
-                                      ? DateFormat('yyyy-MM-dd').format(controller.selectedFollowUpDate!)
-                                      : 'select_date'.tr.isNotEmpty && 'select_date'.tr != 'select_date'
-                                          ? 'select_date'.tr
-                                          : 'اختر التاريخ',
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 14,
-                                    color: controller.selectedFollowUpDate != null ? _darkText : _subText,
-                                  ),
-                                ),
-                                const Icon(IconlyLight.calendar, color: Color(0xFF6B7280), size: 20),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-
-                  // Required Commitments Card
-                  _buildCardSection(
-                    title: 'required_commitments'.tr,
-                    children: [
-                      _buildTextField(
-                        label: 'required_commitments'.tr,
-                        controller: controller.commitmentsController,
-                        hintText: 'commitments_hint'.tr,
-                        maxLines: 3,
-                        onChanged: (_) => controller.registerActivity(),
+                        ],
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Obstacles & Issues Card
-                  _buildCardSection(
-                    title: 'obstacles_and_issues'.tr,
-                    children: [
-                      _buildTextField(
-                        label: 'obstacles_and_issues'.tr,
-                        controller: controller.obstaclesController,
-                        hintText: 'obstacles_hint'.tr,
-                        maxLines: 3,
-                        onChanged: (_) => controller.registerActivity(),
-                      ),
-                    ],
-                  ),
-                ],
-
-                const SizedBox(height: 30),
-              ],
-            ),
-          ),
-          bottomNavigationBar: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(color: Color(0xFFE5E7EB), width: 1),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x0A000000),
-                  blurRadius: 10,
-                  offset: Offset(0, -4),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  // Confidential Report Button
-                  SizedBox(
-                    height: 50,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showConfidentialReportBottomSheet(context, controller, currentVisit),
-                      icon: const Icon(IconlyLight.shieldDone, size: 18, color: Color(0xFF374151)),
+                    ),
+                  if (!_isEditable)
+                    TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _isEditable = true;
+                        });
+                      },
+                      icon: const Icon(Icons.edit_outlined, size: 16, color: _primaryGreen),
                       label: Text(
-                        'confidential_report'.tr,
+                        'edit'.tr,
                         style: const TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF374151),
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFFD1D5DB), width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  // Complete and Document Visit Button
-                  Expanded(
-                    child: SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          final isContract = controller.selectedPipelineStep == StorePipelineStep.contractSigned;
-                          controller.submitAndFinishVisit();
-
-                          if (isContract) {
-                            Get.off(() => ContractSigningScreen(visit: currentVisit));
-                          } else {
-                            Get.back(); // close summary
-                            Get.back(); // close photo doc
-                            Get.snackbar(
-                              'visit_completed_successfully'.tr,
-                              '${'store_name'.tr}: ${currentVisit.storeName}',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: const Color(0xFFECFDF5),
-                              colorText: _primaryGreen,
-                              margin: const EdgeInsets.all(16),
-                              duration: const Duration(seconds: 3),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _primaryGreen,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'finish_and_document_visit'.tr,
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: _primaryGreen,
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
-            ),
-          ),
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. بيانات المحل (Figma Container 8915:35142)
+                    _buildSectionHeader('store_data'.tr, darkText),
+                    const SizedBox(height: 8),
+                    _buildCardContainer(
+                      cardBg: cardBg,
+                      borderColor: borderColor,
+                      children: [
+                        _buildInputField(
+                          label: 'openings_count'.tr,
+                          controller: controller.openingsController,
+                          hintText: 'openings_example'.tr,
+                          keyboardType: TextInputType.number,
+                          readOnly: !_isEditable,
+                          initialValue: currentVisit.openingsCount.toString(),
+                          onChanged: (_) => _syncInputsToController(controller),
+                          darkText: darkText,
+                          inputFill: inputFill,
+                          isDark: isDark,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildInputField(
+                          label: 'cr_number'.tr,
+                          controller: controller.crNumberController,
+                          hintText: '1010XXXXXX',
+                          readOnly: !_isEditable,
+                          initialValue: currentVisit.crNumber,
+                          onChanged: (_) => _syncInputsToController(controller),
+                          darkText: darkText,
+                          inputFill: inputFill,
+                          isDark: isDark,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 2. بيانات المسؤول (Figma Container 8940:108585)
+                    _buildSectionHeader('manager_data'.tr, darkText),
+                    const SizedBox(height: 8),
+                    _buildCardContainer(
+                      cardBg: cardBg,
+                      borderColor: borderColor,
+                      children: [
+                        _buildInputField(
+                          label: 'manager_name'.tr,
+                          controller: controller.managerNameController,
+                          hintText: 'enter_name'.tr,
+                          readOnly: !_isEditable,
+                          initialValue: currentVisit.managerName,
+                          onChanged: (_) => _syncInputsToController(controller),
+                          darkText: darkText,
+                          inputFill: inputFill,
+                          isDark: isDark,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildInputField(
+                          label: 'phone_number'.tr,
+                          controller: controller.phoneController,
+                          hintText: '05XXXXXXXX',
+                          keyboardType: TextInputType.phone,
+                          readOnly: !_isEditable,
+                          initialValue: currentVisit.phone,
+                          onChanged: (_) => _syncInputsToController(controller),
+                          darkText: darkText,
+                          inputFill: inputFill,
+                          isDark: isDark,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 3. حالة الاهتمام (Figma Node 8937:108427, 8942:1746, 8945:23023)
+                    _buildSectionHeader('interest_status'.tr, darkText),
+                    const SizedBox(height: 8),
+                    _buildCardContainer(
+                      cardBg: cardBg,
+                      borderColor: borderColor,
+                      children: [
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _interestOptions.map((option) {
+                            final isSelected = controller.selectedInterestStatus == option.key ||
+                                controller.selectedInterestStatus == option.label;
+                            return InkWell(
+                              onTap: !_isEditable ? null : () => controller.setInterestStatus(option.label),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? selectedBg : unselectedBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: isSelected ? _primaryGreen : unselectedBorder,
+                                    width: isSelected ? 1.4 : 1.0,
+                                  ),
+                                ),
+                                child: Text(
+                                  option.label,
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 13,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSelected ? _primaryGreen : darkText,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 4. مرحلة البيع (Figma Node 8937:108427, 8942:1746, 8945:23023)
+                    _buildSectionHeader('sales_pipeline_step'.tr, darkText),
+                    const SizedBox(height: 4),
+                    Text(
+                      'select_current_stage'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13,
+                        color: subText,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    _buildCardContainer(
+                      cardBg: cardBg,
+                      borderColor: borderColor,
+                      children: [
+                        _buildSalesStageGrid(
+                          controller,
+                          !_isEditable,
+                          currentVisit.pipelineStep,
+                          selectedBg: selectedBg,
+                          unselectedBg: unselectedBg,
+                          unselectedBorder: unselectedBorder,
+                          darkText: darkText,
+                        ),
+
+                        // Conditional reason when 'لم تتم المقابلة' is selected (Figma Node 8942:1746 & 8945:23023)
+                        if (controller.selectedPipelineStep == StorePipelineStep.notMet) ...[
+                          const SizedBox(height: 14),
+                          _buildInputField(
+                            label: 'reason_not_met'.tr,
+                            controller: controller.reasonNotMetController,
+                            hintText: 'enter_reason'.tr,
+                            readOnly: !_isEditable,
+                            initialValue: currentVisit.closingReason,
+                            onChanged: (_) => _syncInputsToController(controller),
+                            darkText: darkText,
+                            inputFill: inputFill,
+                            isDark: isDark,
+                          ),
+                        ],
+
+                        // Conditional reason when 'رفض' is selected
+                        if (controller.selectedPipelineStep == StorePipelineStep.rejected) ...[
+                          const SizedBox(height: 14),
+                          _buildInputField(
+                            label: 'reason_rejection'.tr,
+                            controller: controller.reasonRejectedController,
+                            hintText: 'enter_reason'.tr,
+                            readOnly: !_isEditable,
+                            initialValue: currentVisit.closingReason,
+                            onChanged: (_) => _syncInputsToController(controller),
+                            darkText: darkText,
+                            inputFill: inputFill,
+                            isDark: isDark,
+                          ),
+                        ],
+
+                        // Conditional reason when 'غير مؤهل' is selected
+                        if (controller.selectedPipelineStep == StorePipelineStep.notQualified) ...[
+                          const SizedBox(height: 14),
+                          _buildInputField(
+                            label: 'reason_disqualification'.tr,
+                            controller: controller.reasonDisqualifiedController,
+                            hintText: 'enter_reason'.tr,
+                            readOnly: !_isEditable,
+                            initialValue: currentVisit.closingReason,
+                            onChanged: (_) => _syncInputsToController(controller),
+                            darkText: darkText,
+                            inputFill: inputFill,
+                            isDark: isDark,
+                          ),
+                        ],
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 5. الالتزامات والمعوقات (Figma Container 8937:108427)
+                    _buildCardContainer(
+                      cardBg: cardBg,
+                      borderColor: borderColor,
+                      children: [
+                        _buildInputField(
+                          label: 'required_commitments'.tr,
+                          controller: controller.commitmentsController,
+                          hintText: 'commitments_example'.tr,
+                          readOnly: !_isEditable,
+                          initialValue: currentVisit.nextFollowUpCommitments,
+                          onChanged: (_) => _syncInputsToController(controller),
+                          darkText: darkText,
+                          inputFill: inputFill,
+                          isDark: isDark,
+                        ),
+                        const SizedBox(height: 14),
+                        _buildInputField(
+                          label: 'obstacles_and_issues'.tr,
+                          controller: controller.obstaclesController,
+                          hintText: 'obstacles_example'.tr,
+                          readOnly: !_isEditable,
+                          initialValue: currentVisit.obstaclesNotes,
+                          onChanged: (_) => _syncInputsToController(controller),
+                          darkText: darkText,
+                          inputFill: inputFill,
+                          isDark: isDark,
+                        ),
+                      ],
+                    ),
+
+                    // Display Confidential Report if exists
+                    if (currentVisit.confidentialNotes != null && currentVisit.confidentialNotes!.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      _buildSectionHeader('confidential_report'.tr, darkText),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF252B37) : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: isDark ? const Color(0xFF854D0E) : const Color(0xFFFEF08A)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(IconlyLight.shieldDone, color: Color(0xFFCA8A04), size: 20),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                currentVisit.confidentialNotes!,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 13,
+                                  color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF854D0E),
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+              bottomNavigationBar: _buildBottomBar(
+                context,
+                controller,
+                currentVisit,
+                isContract,
+                isDark: isDark,
+                cardBg: cardBg,
+                borderColor: borderColor,
+                darkText: darkText,
+                subText: subText,
+                inputFill: inputFill,
+              ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _buildCardSection({
-    required String title,
+  Widget _buildSectionHeader(String title, Color darkText) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontFamily: 'Tajawal',
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        color: darkText,
+      ),
+    );
+  }
+
+  Widget _buildCardContainer({
     required List<Widget> children,
+    required Color cardBg,
+    required Color borderColor,
   }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _cardBorder, width: 1),
+        border: Border.all(color: borderColor, width: 1),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x05000000),
-            blurRadius: 8,
+            color: Color(0x06000000),
+            blurRadius: 10,
             offset: Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: _darkText,
-            ),
-          ),
-          const SizedBox(height: 12),
-          ...children,
-        ],
+        children: children,
       ),
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildInputField({
     required String label,
     required TextEditingController controller,
-    String? hintText,
+    required String hintText,
     TextInputType keyboardType = TextInputType.text,
-    int maxLines = 1,
+    bool readOnly = false,
+    String? initialValue,
     required ValueChanged<String> onChanged,
+    required Color darkText,
+    required Color inputFill,
+    required bool isDark,
   }) {
+    if (readOnly && controller.text.isEmpty && initialValue != null) {
+      controller.text = initialValue;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF374151),
+            color: darkText,
           ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
+          readOnly: readOnly,
           keyboardType: keyboardType,
-          maxLines: maxLines,
           onChanged: onChanged,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 14,
-            color: _darkText,
+            fontWeight: FontWeight.w500,
+            color: darkText,
           ),
           decoration: InputDecoration(
             hintText: hintText,
@@ -534,15 +563,19 @@ class VisitSummaryScreen extends StatelessWidget {
               color: Color(0xFF9CA3AF),
             ),
             filled: true,
-            fillColor: const Color(0xFFF9FAFB),
+            fillColor: readOnly ? (isDark ? const Color(0xFF1E232D) : const Color(0xFFF9FAFB)) : inputFill,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+              borderSide: BorderSide.none,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: _primaryGreen, width: 1.5),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(color: _primaryGreen, width: 1.5),
             ),
           ),
         ),
@@ -550,218 +583,136 @@ class VisitSummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInterestChip({
-    required String label,
-    required String keyName,
-    required StoreVisitsController controller,
+  // Figma 3-row grid for 8 Sales Stages
+  Widget _buildSalesStageGrid(
+    StoreVisitsController controller,
+    bool readOnly,
+    StorePipelineStep initialStep, {
+    required Color selectedBg,
+    required Color unselectedBg,
+    required Color unselectedBorder,
+    required Color darkText,
   }) {
-    final bool isSelected = controller.selectedInterestStatus == keyName;
+    final activeStep = readOnly ? initialStep : controller.selectedPipelineStep;
 
-    return InkWell(
-      onTap: () => controller.setInterestStatus(keyName),
-      borderRadius: BorderRadius.circular(8),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: isSelected ? _lightGreenBg : const Color(0xFFF9FAFB),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? _primaryGreen : const Color(0xFFE5E7EB),
-            width: isSelected ? 1.5 : 1,
+    final row1 = [
+      StorePipelineStep.notMet,
+      StorePipelineStep.presented,
+      StorePipelineStep.interested,
+    ];
+
+    final row2 = [
+      StorePipelineStep.gracePeriod,
+      StorePipelineStep.negotiating,
+      StorePipelineStep.contractSigned,
+    ];
+
+    final row3 = [
+      StorePipelineStep.rejected,
+      StorePipelineStep.notQualified,
+    ];
+
+    Widget buildStageButton(StorePipelineStep step) {
+      final isSelected = activeStep == step;
+      return Expanded(
+        child: InkWell(
+          onTap: readOnly ? null : () => controller.setPipelineStep(step),
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            height: 42,
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isSelected ? selectedBg : unselectedBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isSelected ? _primaryGreen : unselectedBorder,
+                width: isSelected ? 1.4 : 1.0,
+              ),
+            ),
+            child: Text(
+              step.localizedLabel,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? _primaryGreen : darkText,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? _primaryGreen : const Color(0xFF4B5563),
-          ),
+      );
+    }
+
+    return Column(
+      children: [
+        // Row 1: لم تتم المقابلة | تم تقديم شلة | مهتم
+        Row(
+          children: row1.map(buildStageButton).toList(),
         ),
-      ),
+        const SizedBox(height: 8),
+
+        // Row 2: طلب مهلة | تفاوض | تم توقيع العقد
+        Row(
+          children: row2.map(buildStageButton).toList(),
+        ),
+        const SizedBox(height: 8),
+
+        // Row 3: رفض | غير مؤهل
+        Row(
+          children: [
+            buildStageButton(row3[0]),
+            buildStageButton(row3[1]),
+            const Spacer(),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildPipelineChip({
-    required String label,
-    required StorePipelineStep step,
-    required StoreVisitsController controller,
-  }) {
-    final bool isSelected = controller.selectedPipelineStep == step;
-
-    return InkWell(
-      onTap: () => controller.setPipelineStep(step),
-      borderRadius: BorderRadius.circular(8),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: isSelected ? _lightGreenBg : const Color(0xFFF9FAFB),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? _primaryGreen : const Color(0xFFE5E7EB),
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? _primaryGreen : const Color(0xFF4B5563),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showConfidentialReportBottomSheet(
+  // Figma Frame 7 & Frame 2085664369: Bottom Actions
+  Widget _buildBottomBar(
     BuildContext context,
     StoreVisitsController controller,
-    StoreVisitModel visit,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 20,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(IconlyLight.shieldDone, color: _primaryGreen, size: 22),
-                        const SizedBox(width: 8),
-                        Text(
-                          'confidential_report'.tr,
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: _darkText,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded, color: Color(0xFF6B7280)),
-                      onPressed: () => Navigator.of(ctx).pop(),
-                    ),
-                  ],
-                ),
-                Text(
-                  'confidential_notes_disclaimer'.tr,
-                  style: const TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 12,
-                    color: _subText,
-                  ),
-                ),
-                const Divider(height: 24, color: Color(0xFFF3F4F6)),
+    StoreVisitModel currentVisit,
+    bool isContract, {
+    required bool isDark,
+    required Color cardBg,
+    required Color borderColor,
+    required Color darkText,
+    required Color subText,
+    required Color inputFill,
+  }) {
+    if (!_isEditable) {
+      final hasSignedContract = currentVisit.contractSignaturePath != null ||
+          currentVisit.pipelineStep == StorePipelineStep.contractSigned;
 
-                // Report Title Field
-                _buildTextField(
-                  label: 'report_title'.tr,
-                  controller: controller.confidentialTitleController,
-                  hintText: 'report_title_hint'.tr,
-                  onChanged: (_) => controller.registerActivity(),
-                ),
-
-                const SizedBox(height: 14),
-
-                // Store Name (Read only)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'concerned_store'.tr,
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF374151),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
-                      ),
-                      child: Text(
-                        visit.storeName,
-                        style: const TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _darkText,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 14),
-
-                // Confidential Notes Field
-                _buildTextField(
-                  label: 'confidential_notes'.tr,
-                  controller: controller.confidentialNotesController,
-                  hintText: 'confidential_notes_hint'.tr,
-                  maxLines: 4,
-                  onChanged: (_) => controller.registerActivity(),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Save Button
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: cardBg,
+          border: Border(top: BorderSide(color: borderColor, width: 1)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasSignedContract) ...[
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      controller.registerActivity();
-                      Navigator.of(ctx).pop();
-                      Get.snackbar(
-                        'confidential_report'.tr,
-                        'save_confidential_report'.tr,
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: const Color(0xFFECFDF5),
-                        colorText: _primaryGreen,
-                        margin: const EdgeInsets.all(16),
-                      );
-                    },
+                    onPressed: () => Get.to(() => ContractSigningScreen(visit: currentVisit)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryGreen,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     child: Text(
-                      'save_confidential_report'.tr,
+                      'contract_details'.tr,
                       style: const TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 15,
@@ -771,9 +722,361 @@ class VisitSummaryScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
               ],
-            ),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isEditable = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _primaryGreen,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    'edit_and_save_data'.tr,
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    'done_back_to_visits'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: darkText,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: cardBg,
+        border: Border(top: BorderSide(color: borderColor, width: 1)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 10,
+            offset: Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Frame 7: تقرير سري Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () => _showConfidentialReportBottomSheet(
+                  context,
+                  controller,
+                  currentVisit,
+                  isDark: isDark,
+                  cardBg: cardBg,
+                  darkText: darkText,
+                  inputFill: inputFill,
+                ),
+                icon: Icon(IconlyLight.shieldDone, size: 20, color: darkText),
+                label: Text(
+                  'confidential_report'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: darkText,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF6F6F6),
+                  elevation: 0,
+                  side: BorderSide(color: borderColor, width: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Frame 2085664369: متابعة لنتيجة الزيارة / الانتقال لتوقيع العقد
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Save all current form fields to the active visit model
+                  final updatedVisit = currentVisit.copyWith(
+                    openingsCount: int.tryParse(controller.openingsController.text) ?? currentVisit.openingsCount,
+                    crNumber: controller.crNumberController.text,
+                    managerName: controller.managerNameController.text,
+                    phone: controller.phoneController.text,
+                    pipelineStep: controller.selectedPipelineStep,
+                    interestStatus: controller.selectedInterestStatus,
+                    nextFollowUpCommitments: controller.commitmentsController.text,
+                    obstaclesNotes: controller.obstaclesController.text,
+                    closingReason: controller.selectedPipelineStep == StorePipelineStep.notMet
+                        ? controller.reasonNotMetController.text
+                        : (controller.selectedPipelineStep == StorePipelineStep.rejected
+                            ? controller.reasonRejectedController.text
+                            : controller.reasonDisqualifiedController.text),
+                  );
+
+                  if (isContract) {
+                    Get.to(() => ContractSigningScreen(visit: updatedVisit));
+                  } else {
+                    Get.to(() => FollowUpTaskScreen(visit: updatedVisit));
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _primaryGreen,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(
+                  isContract ? 'contract_signed'.tr : 'continue_text'.tr,
+                  style: const TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Figma Frame 8937:108513: تقرير سري BottomSheet
+  void _showConfidentialReportBottomSheet(
+    BuildContext context,
+    StoreVisitsController controller,
+    StoreVisitModel visit, {
+    required bool isDark,
+    required Color cardBg,
+    required Color darkText,
+    required Color inputFill,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: cardBg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final bool hasContent = controller.confidentialNotesController.text.trim().isNotEmpty ||
+                controller.confidentialTitleController.text.trim().isNotEmpty;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 14,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Sheet Drag Handle
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+
+                    // Title: تقرير سري
+                    Text(
+                      'confidential_report'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Subtitle: Store Name
+                    Text(
+                      visit.storeName.isNotEmpty ? visit.storeName : '',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // 1. Label: عنوان التقرير
+                    Text(
+                      'report_title'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: inputFill,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: controller.confidentialTitleController,
+                        onChanged: (_) => setModalState(() {}),
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: darkText,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'report_title_example'.tr,
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF707784),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // 2. Label: الملاحظات السرية
+                    Text(
+                      'confidential_notes'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    Container(
+                      height: 110,
+                      decoration: BoxDecoration(
+                        color: inputFill,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: controller.confidentialNotesController,
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        onChanged: (_) => setModalState(() {}),
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: darkText,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'write_notes_here'.tr,
+                          hintStyle: const TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF707784),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Action Button: حفظ الملاحظات
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          Get.snackbar(
+                            'notes_saved_success'.tr,
+                            'notes_saved_success'.tr,
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB),
+                            colorText: _primaryGreen,
+                            margin: const EdgeInsets.all(16),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: hasContent ? _primaryGreen : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'save_notes'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: hasContent ? Colors.white : const Color(0xFF555555),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );

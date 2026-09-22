@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 import '../models/employee_shift_model.dart';
 
@@ -8,6 +9,7 @@ class ShiftStatusCardWidget extends StatelessWidget {
   final VoidCallback? onRequestBreak;
   final VoidCallback? onResumeWork;
   final VoidCallback? onEndShift;
+  final bool? isDark;
 
   const ShiftStatusCardWidget({
     super.key,
@@ -15,14 +17,19 @@ class ShiftStatusCardWidget extends StatelessWidget {
     this.onRequestBreak,
     this.onResumeWork,
     this.onEndShift,
+    this.isDark,
   });
 
   static const Color _primaryGreen = Color(0xFF30913F);
-  static const Color _darkText = Color(0xFF111B18);
-  static const Color _subText = Color(0xFF555555);
 
   @override
   Widget build(BuildContext context) {
+    final dark = isDark ?? (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
+    final cardBg = dark ? const Color(0xFF1C2028) : Colors.white;
+    final borderColor = dark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final darkText = dark ? Colors.white : const Color(0xFF111B18);
+    final subText = dark ? const Color(0xFF9CA3AF) : const Color(0xFF555555);
+
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final status = controller.status;
@@ -33,10 +40,10 @@ class ShiftStatusCardWidget extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardBg,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: const Color(0xFFE5E7EB),
+              color: borderColor,
               width: 1,
             ),
             boxShadow: const [
@@ -61,10 +68,10 @@ class ShiftStatusCardWidget extends StatelessWidget {
                     children: [
                       Text(
                         'shift_status'.tr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
-                          color: _subText,
+                          color: subText,
                           height: 1.2,
                         ),
                       ),
@@ -83,11 +90,11 @@ class ShiftStatusCardWidget extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             _getStatusTitle(status),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: _darkText,
+                              color: darkText,
                               height: 1.2,
                             ),
                           ),
@@ -97,7 +104,7 @@ class ShiftStatusCardWidget extends StatelessWidget {
                   ),
 
                   // Pill Badge (Child 1 -> Far left in RTL)
-                  _buildPillBadge(status),
+                  _buildPillBadge(status, dark),
                 ],
               ),
               const SizedBox(height: 16),
@@ -127,11 +134,11 @@ class ShiftStatusCardWidget extends StatelessWidget {
                   ),
                 ),
               ] else if (isActive) ...[
-                // Timer Container (matching Figma bg: #E8F5E9)
+                // Timer Container
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+                    color: dark ? const Color(0xFF163E20) : const Color(0xFFE8F5E9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -150,11 +157,11 @@ class ShiftStatusCardWidget extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         'actual_work_time'.tr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF236B30),
+                          color: dark ? const Color(0xFF81C784) : const Color(0xFF236B30),
                         ),
                       ),
                     ],
@@ -192,14 +199,14 @@ class ShiftStatusCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
 
-                    // إنهاء الدوام (Light grey button #F6F6F6 - Child 1 -> Left in RTL)
+                    // إنهاء الدوام
                     Expanded(
                       child: SizedBox(
                         height: 48,
                         child: ElevatedButton(
                           onPressed: controller.isLoading ? null : (onEndShift ?? () => controller.endShift()),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFF6F6F6),
+                            backgroundColor: dark ? const Color(0xFF2B3240) : const Color(0xFFF6F6F6),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -207,11 +214,11 @@ class ShiftStatusCardWidget extends StatelessWidget {
                           ),
                           child: Text(
                             'end_shift'.tr,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF43474F),
+                              color: dark ? Colors.white : const Color(0xFF43474F),
                             ),
                           ),
                         ),
@@ -273,7 +280,7 @@ class ShiftStatusCardWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildPillBadge(ShiftStatus status) {
+  Widget _buildPillBadge(ShiftStatus status, bool isDark) {
     String label;
     Color bgColor;
     Color textColor;
@@ -281,18 +288,18 @@ class ShiftStatusCardWidget extends StatelessWidget {
     switch (status) {
       case ShiftStatus.active:
         label = 'active'.tr;
-        bgColor = const Color(0xFFE8F5E9);
-        textColor = _primaryGreen;
+        bgColor = isDark ? const Color(0xFF163E20) : const Color(0xFFE8F5E9);
+        textColor = isDark ? const Color(0xFF81C784) : _primaryGreen;
         break;
       case ShiftStatus.onBreak:
         label = 'break'.tr;
-        bgColor = const Color(0xFFFEF3C7);
+        bgColor = isDark ? const Color(0xFF3B2E15) : const Color(0xFFFEF3C7);
         textColor = const Color(0xFFF59E0B);
         break;
       case ShiftStatus.notStarted:
         label = 'inactive'.tr;
-        bgColor = const Color(0xFFF6F5F8);
-        textColor = const Color(0xFF555555);
+        bgColor = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+        textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555);
         break;
     }
 

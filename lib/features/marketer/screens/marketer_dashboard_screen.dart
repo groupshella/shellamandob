@@ -9,7 +9,7 @@ import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dar
 import 'package:sixam_mart/features/marketer/screens/marketer_commissions_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
-import 'package:sixam_mart/features/employee/screens/employee_settings_screen.dart';
+import 'package:sixam_mart/features/employee/screens/employee_profile_screen.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -33,10 +33,12 @@ class MarketerDashboardScreen extends StatelessWidget {
             Column(
               children: [
                 MarketerHeader(
-                  title: isRoot ? 'my_account_and_marketer'.tr : 'voucher_marketer'.tr,
+                  title: isRoot
+                      ? 'my_account_and_marketer'.tr
+                      : 'voucher_marketer'.tr,
                   showBackButton: !isRoot,
                   trailing: GestureDetector(
-                    onTap: () => Get.to(() => const EmployeeSettingsScreen()),
+                    onTap: () => Get.to(() => const EmployeeProfileScreen()),
                     child: Container(
                       width: 38,
                       height: 38,
@@ -59,7 +61,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                         color: _primaryGreen,
                         onRefresh: c.loadDashboard,
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -190,7 +193,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       const SarCurrencyWidget(size: 28, color: _darkText),
                       const SizedBox(width: 8),
                       Text(
-                        c.balance.toStringAsFixed(c.balance.truncateToDouble() == c.balance ? 0 : 2),
+                        c.balance.toStringAsFixed(
+                            c.balance.truncateToDouble() == c.balance ? 0 : 2),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: _primaryGreen,
@@ -214,11 +218,13 @@ class MarketerDashboardScreen extends StatelessWidget {
               Expanded(
                 child: Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     color: _primaryGreen,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     shadows: const [
                       BoxShadow(
                         color: Color(0x07000000),
@@ -263,12 +269,14 @@ class MarketerDashboardScreen extends StatelessWidget {
               Expanded(
                 child: Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     color: const Color(0xFFF6F5F8),
                     shape: RoundedRectangleBorder(
-                      side: const BorderSide(width: 1, color: Color(0x1E555555)),
+                      side:
+                          const BorderSide(width: 1, color: Color(0x1E555555)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     shadows: const [
@@ -332,12 +340,14 @@ class MarketerDashboardScreen extends StatelessWidget {
               Expanded(
                 child: Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     color: const Color(0xFFF6F5F8),
                     shape: RoundedRectangleBorder(
-                      side: const BorderSide(width: 1, color: Color(0x1E555555)),
+                      side:
+                          const BorderSide(width: 1, color: Color(0x1E555555)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     shadows: const [
@@ -481,9 +491,11 @@ class MarketerDashboardScreen extends StatelessWidget {
                     // Messenger — exact Figma gradient circle
                     GestureDetector(
                       onTap: () async {
-                        final uri = Uri.parse('fb-messenger://share?link=${Uri.encodeComponent(c.qrLink)}');
+                        final uri = Uri.parse(
+                            'fb-messenger://share?link=${Uri.encodeComponent(c.qrLink)}');
                         if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          await launchUrl(uri,
+                              mode: LaunchMode.externalApplication);
                         } else {
                           Share.share(c.shareText);
                         }
@@ -517,7 +529,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                         final uri = Uri.parse(
                             'https://t.me/share/url?url=${Uri.encodeComponent(c.qrLink)}&text=${Uri.encodeComponent(c.shareText)}');
                         if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          await launchUrl(uri,
+                              mode: LaunchMode.externalApplication);
                         } else {
                           Share.share(c.shareText);
                         }
@@ -539,7 +552,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                         final uri = Uri.parse(
                             'https://wa.me/?text=${Uri.encodeComponent(c.shareText)}');
                         if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          await launchUrl(uri,
+                              mode: LaunchMode.externalApplication);
                         } else {
                           Share.share(c.shareText);
                         }
@@ -574,7 +588,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                           color: const Color(0xFFEBFEEB),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: _primaryGreen.withValues(alpha: 0.3)),
+                            side: BorderSide(
+                                color: _primaryGreen.withValues(alpha: 0.3)),
                           ),
                         ),
                         child: Center(
@@ -647,7 +662,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     child: const Center(
-                      child: Icon(IconlyLight.addUser, color: Colors.white, size: 20),
+                      child: Icon(IconlyLight.addUser,
+                          color: Colors.white, size: 20),
                     ),
                   ),
                 ],
@@ -688,7 +704,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                 decoration: ShapeDecoration(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(width: 0.80, color: Color(0xFFF3F4F6)),
+                    side:
+                        const BorderSide(width: 0.80, color: Color(0xFFF3F4F6)),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
@@ -702,7 +719,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       children: [
                         // Growth badge (green)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: ShapeDecoration(
                             color: const Color(0xFFF0FDF4),
                             shape: RoundedRectangleBorder(
@@ -712,7 +730,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.north_east, size: 12, color: Color(0xFF008236)),
+                              const Icon(Icons.north_east,
+                                  size: 12, color: Color(0xFF008236)),
                               const SizedBox(width: 2),
                               Text(
                                 '${c.kpiGrowthPct}%',
@@ -737,7 +756,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                             ),
                           ),
                           child: const Center(
-                            child: Icon(IconlyLight.profile, color: Colors.white, size: 18),
+                            child: Icon(IconlyLight.profile,
+                                color: Colors.white, size: 18),
                           ),
                         ),
                       ],
@@ -777,7 +797,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                 decoration: ShapeDecoration(
                   color: const Color(0xFFFCFCFD),
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(width: 0.80, color: Color(0xFFF3F4F6)),
+                    side:
+                        const BorderSide(width: 0.80, color: Color(0xFFF3F4F6)),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
@@ -791,7 +812,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       children: [
                         // Pending badge
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: ShapeDecoration(
                             color: const Color(0xFFFFFBEB),
                             shape: RoundedRectangleBorder(
@@ -801,7 +823,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.access_time, size: 12, color: Color(0xFFD97706)),
+                              const Icon(Icons.access_time,
+                                  size: 12, color: Color(0xFFD97706)),
                               const SizedBox(width: 2),
                               Text(
                                 '${c.hesitantCustomers}',
@@ -826,7 +849,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                             ),
                           ),
                           child: const Center(
-                            child: Icon(IconlyLight.timeCircle, color: Colors.white, size: 18),
+                            child: Icon(IconlyLight.timeCircle,
+                                color: Colors.white, size: 18),
                           ),
                         ),
                       ],
@@ -932,10 +956,12 @@ class MarketerDashboardScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () => Get.to(() => const MarketerCommissionsScreen()),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: ShapeDecoration(
                     color: const Color(0xFFF6F5F8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   child: Text(
                     'view_all'.tr,
@@ -971,7 +997,8 @@ class MarketerDashboardScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: recent.length,
-              separatorBuilder: (_, __) => const Divider(height: 14, color: Color(0xFFF3F4F6)),
+              separatorBuilder: (_, __) =>
+                  const Divider(height: 14, color: Color(0xFFF3F4F6)),
               itemBuilder: (context, i) {
                 final t = recent[i];
                 final isPending = (t['status'] ?? '').toString() == 'pending' ||
@@ -985,7 +1012,9 @@ class MarketerDashboardScreen extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: ShapeDecoration(
-                        color: isPending ? const Color(0xFFFEF3DC) : const Color(0xFFE6F9F0),
+                        color: isPending
+                            ? const Color(0xFFFEF3DC)
+                            : const Color(0xFFE6F9F0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -994,7 +1023,9 @@ class MarketerDashboardScreen extends StatelessWidget {
                         child: Icon(
                           IconlyLight.paper,
                           size: 20,
-                          color: isPending ? const Color(0xFFEC9C17) : _primaryGreen,
+                          color: isPending
+                              ? const Color(0xFFEC9C17)
+                              : _primaryGreen,
                         ),
                       ),
                     ),
@@ -1006,7 +1037,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            (t['title'] ?? 'عمولة انضمام عميل جديدة').toString(),
+                            (t['title'] ?? 'عمولة انضمام عميل جديدة')
+                                .toString(),
                             style: const TextStyle(
                               color: Color(0xFF1A1A2E),
                               fontSize: 13,
@@ -1016,7 +1048,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            (t['time'] ?? t['date'] ?? 'اليوم، 2:30 م').toString(),
+                            (t['time'] ?? t['date'] ?? 'اليوم، 2:30 م')
+                                .toString(),
                             style: const TextStyle(
                               color: Color(0xFF6B7280),
                               fontSize: 11,
@@ -1026,9 +1059,13 @@ class MarketerDashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            isPending ? 'معلّقة – متبقي 3 أيام' : 'تم تسجيل بنجاح',
+                            isPending
+                                ? 'معلّقة – متبقي 3 أيام'
+                                : 'تم تسجيل بنجاح',
                             style: TextStyle(
-                              color: isPending ? const Color(0xFFEC9C17) : _primaryGreen,
+                              color: isPending
+                                  ? const Color(0xFFEC9C17)
+                                  : _primaryGreen,
                               fontSize: 11,
                               fontFamily: 'Tajawal',
                               fontWeight: FontWeight.w500,
@@ -1045,7 +1082,9 @@ class MarketerDashboardScreen extends StatelessWidget {
                         Text(
                           '+$amount ',
                           style: TextStyle(
-                            color: isPending ? const Color(0xFFEC9C17) : _primaryGreen,
+                            color: isPending
+                                ? const Color(0xFFEC9C17)
+                                : _primaryGreen,
                             fontSize: 15,
                             fontFamily: 'Tajawal',
                             fontWeight: FontWeight.w800,
@@ -1053,7 +1092,9 @@ class MarketerDashboardScreen extends StatelessWidget {
                         ),
                         SarCurrencyWidget(
                           size: 14,
-                          color: isPending ? const Color(0xFFEC9C17) : _primaryGreen,
+                          color: isPending
+                              ? const Color(0xFFEC9C17)
+                              : _primaryGreen,
                         ),
                       ],
                     ),
@@ -1077,7 +1118,7 @@ class MarketerDashboardScreen extends StatelessWidget {
         final imageUrl = userInfo?.imageFullUrl ?? '';
 
         return InkWell(
-          onTap: () => Get.to(() => const EmployeeSettingsScreen()),
+          onTap: () => Get.to(() => const EmployeeProfileScreen()),
           borderRadius: BorderRadius.circular(16),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1137,7 +1178,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -1146,7 +1188,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(IconlyLight.setting, size: 16, color: _primaryGreen),
+                      const Icon(IconlyLight.setting,
+                          size: 16, color: _primaryGreen),
                       const SizedBox(width: 4),
                       Text(
                         'settings'.tr,
@@ -1199,7 +1242,7 @@ class MarketerDashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           ElevatedButton.icon(
-            onPressed: () => Get.to(() => const EmployeeSettingsScreen()),
+            onPressed: () => Get.to(() => const EmployeeProfileScreen()),
             icon: const Icon(IconlyLight.setting, size: 18),
             label: Text(
               'open_settings'.tr,
@@ -1214,7 +1257,8 @@ class MarketerDashboardScreen extends StatelessWidget {
               foregroundColor: _primaryGreen,
               elevation: 0,
               side: const BorderSide(color: Color(0xFFE5E7EB)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
           ),

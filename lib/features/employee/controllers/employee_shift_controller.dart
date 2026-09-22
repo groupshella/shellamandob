@@ -24,7 +24,12 @@ class EmployeeShiftController extends GetxController implements GetxService {
   Timer? _tickerTimer;
   Timer? _pollingTimer;
 
-  MarketerShiftService get _service => Get.find<MarketerShiftService>();
+  MarketerShiftService get _service {
+    if (Get.isRegistered<MarketerShiftService>()) {
+      return Get.find<MarketerShiftService>();
+    }
+    return Get.put(MarketerShiftService(apiClient: Get.find()));
+  }
 
   @override
   void onInit() {

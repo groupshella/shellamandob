@@ -148,6 +148,7 @@ import '../features/employee/visits/screens/daily_visits_screen.dart';
 import '../features/employee/reports/screens/daily_performance_summary_screen.dart';
 import '../features/employee/requests/screens/employee_requests_screen.dart';
 import '../features/employee/screens/employee_settings_screen.dart';
+import '../features/employee/screens/employee_profile_screen.dart';
 
 class RouteHelper {
   static const String posCheckout = '/pos-checkout';
@@ -240,6 +241,8 @@ class RouteHelper {
   static String getEmployeeRequestsRoute() => employeeRequests;
   static const String employeeSettings = '/employee-settings';
   static String getEmployeeSettingsRoute() => employeeSettings;
+  static const String employeeProfile = '/employee-profile';
+  static String getEmployeeProfileRoute() => employeeProfile;
   static const String messages = '/messages';
   static const String conversation = '/conversation';
   static const String chatSearch = '/chat-search';
@@ -1439,6 +1442,7 @@ class RouteHelper {
     GetPage(name: dailySummary, page: () => getRoute(const DailyPerformanceSummaryScreen())),
     GetPage(name: employeeRequests, page: () => getRoute(const EmployeeRequestsScreen())),
     GetPage(name: employeeSettings, page: () => getRoute(const EmployeeSettingsScreen())),
+    GetPage(name: employeeProfile, page: () => getRoute(const EmployeeProfileScreen())),
     GetPage(
         name: messages,
         page: () {
