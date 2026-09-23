@@ -1,5 +1,3 @@
-import 'package:sixam_mart/features/auth/widgets/auth_dialog_widget.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -45,16 +43,8 @@ class NotLoggedInScreen extends StatelessWidget {
               width: 200,
               child: CustomButton(buttonText: 'login'.tr, height: 40, onPressed: () async {
 
-                if(!ResponsiveHelper.isDesktop(context)) {
-                  await Get.toNamed(RouteHelper.getSignInRoute(Get.currentRoute));
-                }else{
-                  Get.dialog(const Center(child: AuthDialogWidget(exitFromApp: false, backFromThis: true)),barrierDismissible: false).then((value) => callBack(true));
-                }
-                if(Get.find<OrderController>().showBottomSheet) {
-                  Get.find<OrderController>().showRunningOrders();
-                }
+                await Get.toNamed(RouteHelper.getSignInRoute(Get.currentRoute));
                 callBack(true);
-
               }),
             ),
 

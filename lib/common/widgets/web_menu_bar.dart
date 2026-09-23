@@ -3,7 +3,6 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/auth/widgets/auth_dialog_widget.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
@@ -319,30 +318,7 @@ class WebMenuBar extends StatelessWidget implements PreferredSizeWidget {
                             );
                           }
                         }),
-                    const SizedBox(width: 20),
-                    MenuIconButton(
-                        icon: GetBuilder<CartController>(
-                          builder: (cartController) {
-                            final bool hasItems = cartController.cartList.isNotEmpty;
-                            return Image.asset(
-                              hasItems ? Images.bag_v2_active : Images.bag_v2,
-                              width: 24,
-                              height: 24,
-                              // Active cart icon tinted white to match the design.
-                              color: Colors.white,
-                            );
-                          },
-                        ),
-                        isCart: true,
-                        onTap: () {
-                          if (AddressHelper.getUserAddressFromSharedPref() != null) {
-                            Get.toNamed(RouteHelper.getCartRoute());
-                          } else {
-                            showCustomSnackBar(
-                              'please_select_address_first'.tr,
-                            );
-                          }
-                        }),
+
                     const SizedBox(width: 20),
                     GetBuilder<AuthController>(builder: (authController) {
                       return InkWell(
@@ -414,33 +390,14 @@ class MenuIconButton extends StatelessWidget {
     return TextHover(builder: (hovered) {
       return IconButton(
         onPressed: onTap as void Function()?,
-        icon: GetBuilder<CartController>(
-          id: 'cart_count', // 🔥 FIX: Use cart_count ID to receive updates from _onCartMutated()
-          builder: (cartController) {
-          final int cartQuantity = cartController.totalCartQuantity;
-          return Stack(clipBehavior: Clip.none, children: [
-            icon is IconData ? Icon(
-              icon,
-              color: hovered ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color,
-            ) : icon,
-            (isCart && cartQuantity > 0)
-                ? Positioned(
-                    top: -5,
-                    right: -5,
-                    child: Container(
-                      height: 15,
-                      width: 15,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).primaryColor),
-                      child: Text(
-                        cartQuantity.toString(),
-                        style: robotoRegular.copyWith(fontSize: 12, color: Theme.of(context).cardColor),
-                      ),
-                    ),
-                  )
-                : const SizedBox()
-          ]);
-        }),
+        icon: icon is IconData
+            ? Icon(
+                icon,
+                color: hovered
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).textTheme.bodyLarge!.color,
+              )
+            : icon,
       );
     });
   }

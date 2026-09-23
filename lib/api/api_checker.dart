@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
@@ -47,7 +45,6 @@ class ApiChecker {
       Get.find<AuthController>()
           .clearSharedData(removeToken: false)
           .then((_) {
-        Get.find<FavouriteController>().removeFavourite();
         Get.offAllNamed<void>(RouteHelper.getInitialRoute());
       });
     } else {
@@ -73,17 +70,7 @@ class ApiChecker {
       debugPrint('🔐 ApiChecker: Handling 401 Unauthorized for $uri');
     }
 
-    // Clear local cart to avoid corrupted state during auth failure
-    try {
-      if (Get.isRegistered<CartController>()) {
-        final cartController = Get.find<CartController>();
-        await cartController.clearLocalCartForUnauthorized();
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('⚠️ ApiChecker: Failed to clear local cart on 401 - $e');
-      }
-    }
+
 
     // Attempt token refresh if not guest
     if (!AuthHelper.isGuestLoggedIn()) {
@@ -158,7 +145,6 @@ class ApiChecker {
           );
         }
         await authController.clearSharedData(removeToken: false);
-        Get.find<FavouriteController>().removeFavourite();
         Get.offAllNamed<void>(
           RouteHelper.getSignInRoute(Get.currentRoute),
         );
@@ -186,7 +172,6 @@ class ApiChecker {
           );
         }
         await Get.find<AuthController>().clearSharedData(removeToken: false);
-        Get.find<FavouriteController>().removeFavourite();
         Get.offAllNamed<void>(
           RouteHelper.getSignInRoute(Get.currentRoute),
         );
@@ -232,7 +217,6 @@ class ApiChecker {
     } catch (_) {}
     try {
       await Get.find<AuthController>().clearSharedData(removeToken: false);
-      Get.find<FavouriteController>().removeFavourite();
       Get.offAllNamed<void>(
         RouteHelper.getSignInRoute(Get.currentRoute),
       );

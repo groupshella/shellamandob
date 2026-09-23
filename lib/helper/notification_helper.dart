@@ -3,14 +3,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sixam_mart/common/widgets/demo_reset_dialog_widget.dart';
-import 'package:sixam_mart/common/widgets/taxi_make_payment_bottomsheet.dart';
 import 'package:sixam_mart/features/chat/controllers/chat_controller.dart';
 import 'package:sixam_mart/features/chat/enums/user_type_enum.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/features/rental_module/rental_order/controllers/taxi_order_controller.dart';
-import 'package:sixam_mart/features/rental_module/rental_order/screens/taxi_order_details_screen.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/firebase/my_notification_service.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -90,10 +87,7 @@ class NotificationHelper {
                 RouteHelper.getLoyaltyRoute(fromNotification: true)),
             NotificationType.general: () => Get.toNamed(
                 RouteHelper.getNotificationRoute(fromNotification: true)),
-            NotificationType.trip: () => AppConstants.isMarketerApp
-                ? null
-                : Get.to(() => TaxiOrderDetailsScreen(
-                    tripId: int.parse(payload.orderId.toString()))),
+            NotificationType.trip: () => null,
             NotificationType.coupon: () =>
                 Get.toNamed(RouteHelper.getCouponRoute()),
           };
@@ -153,22 +147,6 @@ class NotificationHelper {
         NotificationHelper.showNotification(
             message, flutterLocalNotificationsPlugin);
       } else if (message.data['type'] == 'demo_reset') {
-      } else if (!AppConstants.isMarketerApp &&
-          message.data['type'] == 'trip_status' &&
-          message.data['status'] == 'completed' &&
-          message.data['order_id'] != '' &&
-          message.data['order_id'] != null) {
-        if (!Get.currentRoute.contains('/TaxiOrderDetailsScreen')) {
-          Get.bottomSheet(
-              TaxiMakePaymentBottomSheet(orderId: (message.data['order_id'] as String?) ?? ''));
-        }
-        Get.find<TaxiOrderController>().getTripList(1);
-        Get.find<TaxiOrderController>().getTripList(1, isRunning: false);
-        if (Get.currentRoute.contains('/TaxiOrderDetailsScreen')) {
-          Get.find<TaxiOrderController>().getTripDetails(
-              int.parse(message.data['order_id']?.toString() ?? ''),
-              willUpdate: false);
-        }
       } else {
         if (NotificationService.shouldSuppressPendingDigitalOrderNotification(
             message)) {
@@ -181,39 +159,7 @@ class NotificationHelper {
         NotificationHelper.showNotification(
             message, flutterLocalNotificationsPlugin);
         if (AuthHelper.isLoggedIn()) {
-          if (message.data['type'] != 'trip_status' && !AppConstants.isMarketerApp) {
-            Get.find<OrderController>().getRunningOrders(1);
-            Get.find<OrderController>().getHistoryOrders(1);
-          }
-
           Get.find<NotificationController>().getNotificationList(true);
-          if (!AppConstants.isMarketerApp &&
-              message.data['type'] == 'trip_status' &&
-              message.data['order_id'] != '' &&
-              message.data['order_id'] != null) {
-            if (Get.isBottomSheetOpen!) {
-              Get.back();
-            }
-            if (Get.currentRoute.contains('/TaxiOrderDetailsScreen')) {
-              await Get.find<TaxiOrderController>().getTripDetails(
-                  int.parse(message.data['order_id']?.toString() ?? ''),
-                  willUpdate: false);
-            }
-            Get.find<TaxiOrderController>().getTripList(1);
-            Get.find<TaxiOrderController>().getTripList(1, isRunning: false);
-          }
-        } else if (!AppConstants.isMarketerApp &&
-            message.data['type'] == 'trip_status' &&
-            message.data['order_id'] != '' &&
-            message.data['order_id'] != null) {
-          if (Get.isBottomSheetOpen!) {
-            Get.back();
-          }
-          if (Get.currentRoute.contains('/TaxiOrderDetailsScreen')) {
-            await Get.find<TaxiOrderController>().getTripDetails(
-                int.parse(message.data['order_id']?.toString() ?? ''),
-                willUpdate: false);
-          }
         }
       }
 
@@ -270,10 +216,7 @@ class NotificationHelper {
                 RouteHelper.getLoyaltyRoute(fromNotification: true)),
             NotificationType.general: () => Get.toNamed(
                 RouteHelper.getNotificationRoute(fromNotification: true)),
-            NotificationType.trip: () => AppConstants.isMarketerApp
-                ? null
-                : Get.to(() => TaxiOrderDetailsScreen(
-                    tripId: int.parse(message.data['order_id']?.toString() ?? ''))),
+            NotificationType.trip: () => null,
           };
 
           notificationActions[notificationBody.notificationType]?.call();

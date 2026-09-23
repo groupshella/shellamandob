@@ -1,8 +1,5 @@
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/common/widgets/veg_filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/util/images.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -97,38 +94,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
             
-            // Cart and filter buttons (trailing side in LTR)
-            if (showCart || onVegFilterTap != null)
-              PositionedDirectional(
-                bottom: 10,
-                end: 15,
-                child: Row(
-                  children: [
-                    if (showCart)
-                      IconButton(
-                        onPressed: () => Get.toNamed(RouteHelper.getCartRoute()),
-                        icon: GetBuilder<CartController>(
-                          builder: (cartController) {
-                            final bool hasItems = cartController.cartList.isNotEmpty;
-                            return Image.asset(
-                              hasItems ? Images.bag_v2_active : Images.bag_v2,
-                              width: 24,
-                              height: 24,
-                              // Active cart icon tinted white to match the design.
-                              color: Colors.white,
-                            );
-                          },
-                        ),
-                      ),
-                    if (onVegFilterTap != null)
-                      VegFilterWidget(
-                        type: type,
-                        onSelected: onVegFilterTap,
-                        fromAppBar: true,
-                      ),
-                  ],
-                ),
-              ),
           ],
         ),
       ),

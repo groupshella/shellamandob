@@ -8,7 +8,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
@@ -21,25 +20,17 @@ import 'package:sixam_mart/helper/firebase/my_notification_service.dart';
 import 'package:sixam_mart/theme/light_theme.dart';
 import 'package:sixam_mart/theme/dark_theme.dart';
 import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/campaign/services/gift_campaign_deep_link_service.dart';
 import 'package:sixam_mart/util/messages.dart';
-import 'package:sixam_mart/features/home/widgets/cookies_view.dart';
 import 'package:sixam_mart/services/secure_token_loader.dart';
 import 'package:sixam_mart/services/cache_manager.dart';
 import 'package:sixam_mart/services/edge_to_edge_service.dart';
 import 'package:sixam_mart/common/utils/app_logger.dart';
 import 'package:sixam_mart/common/security/certificate_pinning.dart';
-import 'package:sixam_mart/common/widgets/global_sticky_cart_overlay.dart';
 import 'package:sixam_mart/core/logger/app_logger.dart' as logger_package;
-import 'package:sixam_mart/core/cache/hive_home_cache_service.dart';
-import 'package:sixam_mart/core/cache/hive_migration_service.dart';
-import 'package:sixam_mart/core/cache/app_upgrade_cache_migration.dart';
 import 'package:sixam_mart/core/debug/leak_tracking_wrapper.dart';
 import 'package:flutter/foundation.dart';
 import 'helper/get_di.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sixam_mart/features/auth/helper/qr_referral_install_referrer_service.dart';
-import 'package:sixam_mart/features/pos/services/pos_checkout_deep_link_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -199,29 +190,6 @@ Future<Map<String, Map<String, String>>> _initEssentialOnly() async {
   // Only initialize the bare minimum needed for DI and routing
   final languages = await init();
 
-  // 🔄 APP UPGRADE: The first launch after an APK upgrade must clear stale
-  // layout/home cache (cached module selection, config, module list, home data)
-  // BEFORE any config/module is read, so the new design loads exactly like a
-  // fresh install. Auth token and saved address are preserved. No-op (single
-  // SharedPreferences read) on every normal launch once the version is recorded.
-  await AppUpgradeCacheMigration.runIfUpgraded();
-
-  unawaited(
-    QrReferralInstallReferrerService.captureFromInstallReferrer(
-      Get.find<SharedPreferences>(),
-    ),
-  );
-  unawaited(
-    GiftCampaignDeepLinkService.init(
-      Get.find<SharedPreferences>(),
-    ),
-  );
-  unawaited(
-    PosCheckoutDeepLinkService.init(
-      Get.find<SharedPreferences>(),
-    ),
-  );
-
   final duration = DateTime.now().difference(startTime).inMilliseconds;
   appLogger.info('⚡ Essential services initialized in ${duration}ms');
 
@@ -254,14 +222,6 @@ Future<void> _initializeHeavyServices() async {
       if (kDebugMode) debugPrint('⚠️ Background handler registration note: $e');
     }
     // STAGE 2: Stagger heavy service init to reduce frame drops on splash/onboarding
-    // 🎯 MARKETER: Skip customer-specific home cache — not needed for marketer app
-    if (!AppConstants.isMarketerApp) {
-      await CacheManager().initialize();
-      await HiveHomeCacheService().initialize();
-      if (kDebugMode) debugPrint('✅ Core cache services initialized (Stage 2)');
-    } else {
-      if (kDebugMode) debugPrint('⚡ [MARKETER] Skipped customer home cache (Stage 2)');
-    }
 
     unawaited(NotificationService().initialize());
     if (kDebugMode) {
@@ -311,18 +271,7 @@ void _initializeNonCriticalServices() {
     }
   });
 
-  // 🎯 MARKETER: Skip Hive migration — only relevant for customer module cache
-  if (!AppConstants.isMarketerApp) {
-    Future.microtask(() async {
-      try {
-        // Hive migration (non-blocking)
-        await HiveMigrationService.migrateFromSharedPreferences();
-        if (kDebugMode) debugPrint('✅ Hive migration completed');
-      } catch (e) {
-        if (kDebugMode) debugPrint('⚠️ Migration failed: $e');
-      }
-    });
-  }
+
 
   Future.microtask(() async {
     try {
@@ -370,9 +319,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (Get.isRegistered<SharedPreferences>()) {
-        await PosCheckoutDeepLinkService.init(Get.find<SharedPreferences>());
-      }
       await _route();
     });
   }
@@ -396,20 +342,6 @@ class _MyAppState extends State<MyApp> {
 
         if (!AuthHelper.isLoggedIn() && !AuthHelper.isGuestLoggedIn()) {
           await Get.find<AuthController>().guestLogin();
-        }
-
-        if ((AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) &&
-            Get.find<SplashController>().cacheModule != null) {
-          // Only load cart data if not already loaded
-          final cartController = Get.find<CartController>();
-          if (cartController.cartList.isEmpty) {
-            debugPrint(
-                '🔄 Main: Loading cart data on app start (empty cart)');
-            // ⚡ Load cart in background (non-blocking)
-            unawaited(cartController.getCartDataOnline());
-          } else {
-            debugPrint('💾 Main: Using existing cart data on app start');
-          }
         }
 
         // ⚡ Load config data will be called from routingCallback when GetMaterialApp is ready
@@ -505,9 +437,6 @@ class _MyAppState extends State<MyApp> {
         final previousRoute = routing?.previous;
         final isBack = routing?.isBack ?? false;
 
-        StickyCartNavSession.syncRoutingCurrentFromGetCallback(routeName);
-        syncStickyCartOverlayCartRouteFlagFromRouteName(routeName);
-
         if (routeName != null && routeName.trim().isNotEmpty) {
           if (routeName == previousRoute) {
             return;
@@ -536,7 +465,6 @@ class _MyAppState extends State<MyApp> {
             debugPrint('📱 تم الانتقال إلى: $routeName');
           }
 
-          bumpStickyCartRouteTick();
 
           // LEAK TRACKING: Trigger leak check after route change
           if (kDebugMode) {
@@ -573,12 +501,7 @@ class _MyAppState extends State<MyApp> {
       getPages: RouteHelper.routes,
       defaultTransition: Transition.topLevel,
       transitionDuration: const Duration(milliseconds: 500),
-      navigatorObservers: <NavigatorObserver>[
-        if (!AppConstants.isMarketerApp) ...[
-          stickyCartNavigatorObserver,
-          cartRouteObserverForStickyOverlay,
-        ],
-      ],
+      navigatorObservers: const <NavigatorObserver>[],
       // Navigator + global overlays must live inside this builder (not outside
       // GetMaterialApp) so they share the same element tree, MediaQuery, and theme.
       builder: (BuildContext context, Widget? child) {
@@ -593,33 +516,7 @@ class _MyAppState extends State<MyApp> {
             ),
             child: Material(
               color: themeController.darkTheme ? const Color(0xFF121418) : Colors.white,
-              child: Stack(
-                fit: StackFit.expand,
-                clipBehavior: Clip.none,
-                children: <Widget>[
-                  Positioned.fill(child: navigatorChild),
-                  if (!AppConstants.isMarketerApp)
-                    GetBuilder<SplashController>(
-                      id: 'cookies_status',
-                      builder: (splashController) {
-                        final showCookies = !splashController.savedCookiesData &&
-                            !splashController.getAcceptCookiesStatus(
-                                splashController.configModel?.cookiesText ?? '');
-
-                        if (showCookies && ResponsiveHelper.isWeb()) {
-                          return const Align(
-                            alignment: Alignment.bottomCenter,
-                            child: CookiesView(),
-                          );
-                        }
-
-                        return const SizedBox();
-                      },
-                    ),
-                  // 🎨 REDESIGN: floating cart button removed — the cart count
-                  // now shows as a badge on the bottom nav bar.
-                ],
-              ),
+              child: navigatorChild,
             ),
           ),
         );

@@ -8,7 +8,6 @@ import 'package:sixam_mart/features/auth/domain/models/social_log_in_body.dart';
 import 'package:sixam_mart/features/auth/domain/reposotories/auth_repository_interface.dart';
 import 'package:sixam_mart/features/auth/domain/services/auth_service_interface.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/wallet_kaidha_subscription/controllers/kaidhaSub_controller.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
 class AuthService implements AuthServiceInterface {

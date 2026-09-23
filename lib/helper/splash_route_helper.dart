@@ -5,16 +5,13 @@ import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/common/cache/comprehensive_home_cache_manager.dart';
+import 'package:sixam_mart/common/models/module_model.dart';
+import 'package:sixam_mart/common/utils/app_logger.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sixam_mart/core/cache/hive_home_cache_service.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/common/utils/app_logger.dart';
-import 'package:sixam_mart/features/home/controllers/home_unified_controller.dart';
 
 // class SplashRouteHelper{
 
@@ -223,9 +220,6 @@ void route(BuildContext context,
   }
   // Check if configModel is loaded first
   final splashController = Get.find<SplashController>();
-  if (Get.isRegistered<HomeUnifiedController>()) {
-    Get.find<HomeUnifiedController>().forceResetLoadingState();
-  }
   if (splashController.configModel == null) {
     appLogger.warning(
         'ConfigModel not loaded yet - applying fallback config to prevent stuck splash');
@@ -322,9 +316,9 @@ Future<void> _forLoggedInUserRouteProcess(
   // ⚡ OPTIMIZATION: Allow home screen to render from cache even without GPS fix
   // Check if we have valid cache - if so, render home screen and update location in background
   final hasAddress = AddressHelper.getUserAddressFromSharedPref() != null;
-  final hasValidCache = await ComprehensiveHomeCacheManager.isCacheValid();
+  const hasValidCache = false;
 
-  if (hasAddress || hasValidCache) {
+  if (hasAddress) {
     // Go directly to home screen - data is already loaded in splash or available in cache
     appLogger.info(
         'Routing logged in user to home screen (hasAddress: $hasAddress, hasValidCache: $hasValidCache)');
@@ -333,9 +327,7 @@ Future<void> _forLoggedInUserRouteProcess(
     final splashController = Get.find<SplashController>();
     final moduleList = splashController.moduleList;
 
-    // 🔒 BOOTSTRAP PROTECTION: Check for cached module ID FIRST (before resolveInitialModule)
-    // If cached module exists, use it and go directly to Home WITHOUT MultiModuleHomeScreen
-    final cachedModuleId = await HiveHomeCacheService.getLastSelectedModuleId();
+    const int? cachedModuleId = null;
 
     // 🎯 CRITICAL FIX (Bug 2): If cached module ID is known, route directly to
     // /module/<id> EVEN IF moduleList is not yet populated. We resolve the
@@ -418,9 +410,9 @@ Future<void> _forGuestUserRouteProcess(
   // ⚡ OPTIMIZATION: Allow home screen to render from cache even without GPS fix
   // Check if we have valid cache - if so, render home screen and update location in background
   final hasAddress = AddressHelper.getUserAddressFromSharedPref() != null;
-  final hasValidCache = await ComprehensiveHomeCacheManager.isCacheValid();
+  const hasValidCache = false;
 
-  if (hasAddress || hasValidCache) {
+  if (hasAddress) {
     // Go directly to home screen - data is already loaded in splash or available in cache
     appLogger.info(
         'Routing guest user to home screen (hasAddress: $hasAddress, hasValidCache: $hasValidCache)');
@@ -429,9 +421,7 @@ Future<void> _forGuestUserRouteProcess(
     final splashController = Get.find<SplashController>();
     final moduleList = splashController.moduleList;
 
-    // 🔒 BOOTSTRAP PROTECTION: Check for cached module ID FIRST (before resolveInitialModule)
-    // If cached module exists, use it and go directly to Home WITHOUT MultiModuleHomeScreen
-    final cachedModuleId = await HiveHomeCacheService.getLastSelectedModuleId();
+    const int? cachedModuleId = null;
 
     // 🎯 CRITICAL FIX (Bug 2): cached module path resolved via fallback even
     // if moduleList isn't ready yet. Same logic as the logged-in path.

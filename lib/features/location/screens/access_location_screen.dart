@@ -22,7 +22,6 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
-import 'package:sixam_mart/features/location/screens/web_landing_page.dart';
 import 'package:sixam_mart/features/location/widgets/zone_redirection_dialog.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
@@ -578,14 +577,7 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
         ),
         child: GetBuilder<AddressController>(builder: (locationController) {
           final bool isLoggedIn = AuthHelper.isLoggedIn();
-          return (ResponsiveHelper.isDesktop(context) &&
-                  AddressHelper.getUserAddressFromSharedPref() == null)
-              ? WebLandingPage(
-                  fromSignUp: widget.fromSignUp,
-                  fromHome: widget.fromHome,
-                  route: widget.route,
-                )
-              : isLoggedIn
+          return isLoggedIn
                   ? RefreshIndicator(
                       onRefresh: () async {
                         await locationController.getAddressList();
