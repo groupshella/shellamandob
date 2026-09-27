@@ -2,39 +2,20 @@
 
 import 'dart:convert';
 import 'package:sixam_mart/common/performance/page_tracker.dart';
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/auth/screens/new_user_setup_screen.dart';
-import 'package:sixam_mart/features/auth/screens/succsessflyCreated.dart';
-import 'package:sixam_mart/features/location/screens/my_Location.dart';
-import 'package:sixam_mart/features/location/screens/select_location_screen.dart';
-import 'package:sixam_mart/features/address/screens/address_details_screen.dart';
-import 'package:sixam_mart/features/address/screens/delivery_addresses_screen.dart';
-import 'package:sixam_mart/features/address/domain/models/check_zone_model.dart';
 import 'package:sixam_mart/features/profile/domain/models/update_user_model.dart';
 import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_screen.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/address/screens/add_address_screen.dart';
-import 'package:sixam_mart/features/address/screens/address_screen.dart';
-import 'package:sixam_mart/features/auth/screens/delivery_man_registration_screen.dart';
-// ignore: unused_import
-import 'package:sixam_mart/features/auth/screens/sign_in_screen.dart';
 import 'package:sixam_mart/features/auth/screens/welcome_screen.dart';
 import 'package:sixam_mart/features/auth/screens/phone_login_screen.dart';
 import 'package:sixam_mart/features/auth/screens/otp_verification_screen.dart';
 import 'package:sixam_mart/features/auth/screens/create_account_screen.dart';
 import 'package:sixam_mart/features/auth/screens/sign_up_screen.dart';
-import 'package:sixam_mart/features/auth/screens/store_registration_screen.dart';
-import 'package:sixam_mart/features/location/screens/map_screen.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/util/html_type.dart';
-import 'package:sixam_mart/common/widgets/image_viewer_screen.dart';
 import 'package:sixam_mart/common/widgets/not_found.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/verification/screens/forget_pass_screen.dart';
 import 'package:sixam_mart/features/verification/screens/new_pass_screen.dart';
 import 'package:sixam_mart/features/verification/screens/verification_screen.dart';
@@ -450,11 +431,7 @@ class RouteHelper {
 
   static String getOrderTrackingRoute(int? id, String? contactNumber) =>
       '$orderTracking?id=$id&number=${Uri.encodeQueryComponent(contactNumber ?? '')}';
-  static String getBasicCampaignRoute(BasicCampaignModel basicCampaignModel) {
-    final String data =
-        base64Encode(utf8.encode(jsonEncode(basicCampaignModel.toJson())));
-    return '$basicCampaign?data=$data';
-  }
+  static String getBasicCampaignRoute([dynamic basicCampaignModel]) => basicCampaign;
 
   static String getHtmlRoute(String page) => '$html?page=$page';
   static String getCategoryRoute() => categories;
@@ -490,19 +467,11 @@ class RouteHelper {
   }
 
   static String getStoreReviewRoute(
-      int? storeID, String? storeName, Store store) {
-    final String data =
-        base64Url.encode(utf8.encode(jsonEncode(store.toJson())));
-    return '$storeReview?storeID=$storeID&storeName=${Uri.encodeQueryComponent(storeName ?? '')}&store=$data';
-  }
+      int? storeID, String? storeName, [dynamic store]) => storeReview;
 
   static String getAllStoreRoute(String page, {bool isNearbyStore = false}) =>
       '$allStores?page=$page${isNearbyStore ? '&nearby=${isNearbyStore.toString()}' : ''}';
-  static String getItemImagesRoute(Item item) {
-    final String data =
-        base64Url.encode(utf8.encode(jsonEncode(item.toJson())));
-    return '$itemImages?item=$data';
-  }
+  static String getItemImagesRoute([dynamic item]) => itemImages;
 
   static String getParcelCategoryRoute() => parcelCategory;
 
@@ -525,27 +494,19 @@ class RouteHelper {
   static String getReferAndEarnRoute() => referAndEarn;
   static String getMarketerRoute() => marketer;
   static String getChatRoute(
-      {required NotificationBodyModel? notificationBody,
-      User? user,
+      {NotificationBodyModel? notificationBody,
+      dynamic user,
       int? conversationID,
       int? index,
       bool? fromNotification,
-      OrderChatModel? orderChatModel,
+      dynamic orderChatModel,
       bool isClosed = false}) {
     String notificationBody0 = 'null';
     if (notificationBody != null) {
       notificationBody0 =
           base64Encode(utf8.encode(jsonEncode(notificationBody.toJson())));
     }
-    String user0 = 'null';
-    if (user != null) {
-      user0 = base64Encode(utf8.encode(jsonEncode(user.toJson())));
-    }
-    String orderChat = 'null';
-    if (orderChatModel != null) {
-      orderChat = base64Encode(utf8.encode(jsonEncode(orderChatModel.toJson())));
-    }
-    return '$messages?notification=$notificationBody0&user=$user0&conversation_id=$conversationID&index=$index&from=${fromNotification.toString()}&order-chat=$orderChat&isClosed=$isClosed';
+    return '$messages?notification=$notificationBody0&conversation_id=$conversationID&index=$index&from=${fromNotification.toString()}&isClosed=$isClosed';
   }
 
   static String getConversationRoute() => conversation;
@@ -555,19 +516,7 @@ class RouteHelper {
   static String getDeliverymanRegistrationRoute() => deliveryManRegistration;
   static String getRefundRequestRoute(String orderID) => '$refund?id=$orderID';
 
-  static String getOfflinePaymentScreen({
-    required PlaceOrderBodyModel placeOrderBody,
-    required int? zoneId,
-    required double total,
-    required double? maxCodOrderAmount,
-    required bool fromCart,
-    required bool? isCodActive,
-    required bool forParcel,
-  }) {
-    final List<int> encoded = utf8.encode(jsonEncode(placeOrderBody.toJson()));
-    final String data = base64Encode(encoded);
-    return '$offlinePaymentScreen?order_body=$data&zone_id=$zoneId&total=$total&max_cod_amount=$maxCodOrderAmount&from_cart=$fromCart&cod_active=$isCodActive&for_parcel=$forParcel';
-  }
+  static String getOfflinePaymentScreen([dynamic params]) => offlinePaymentScreen;
 
   static String getFlashSaleDetailsScreen(int id) =>
       '$flashSaleDetailsScreen?id=$id';
@@ -624,7 +573,12 @@ class RouteHelper {
         name: language,
         page: () =>
             ChooseLanguageScreen(fromMenu: Get.parameters['page'] == 'menu')),
-    GetPage(name: onBoarding, page: () => const NotFound()),
+    GetPage(
+        name: onBoarding,
+        page: () => const PageTracker(
+              pageName: 'WelcomeScreen',
+              child: WelcomeScreen(),
+            )),
     GetPage(
         name: welcome,
         page: () => const PageTracker(
@@ -804,44 +758,7 @@ class RouteHelper {
     GetPage(name: employeeRequests, page: () => getRoute(const EmployeeRequestsScreen())),
     GetPage(name: employeeSettings, page: () => getRoute(const EmployeeSettingsScreen())),
     GetPage(name: employeeProfile, page: () => getRoute(const EmployeeProfileScreen())),
-    GetPage(
-        name: messages,
-        page: () {
-          NotificationBodyModel? notificationBody;
-          if (Get.parameters['notification'] != 'null') {
-            notificationBody = NotificationBodyModel.fromJson(jsonDecode(
-                    utf8.decode(base64Url.decode(
-                        Get.parameters['notification']!.replaceAll(' ', '+'))))
-                as Map<String, dynamic>);
-          }
-          OrderChatModel? orderChat;
-          if (Get.parameters['order-chat'] != 'null') {
-            orderChat = OrderChatModel.fromJson(jsonDecode(utf8.decode(
-                    base64Url.decode(
-                        Get.parameters['order-chat']!.replaceAll(' ', '+'))))
-                as Map<String, dynamic>);
-          }
-          User? user;
-          if (Get.parameters['user'] != 'null') {
-            user = User.fromJson(jsonDecode(utf8.decode(base64Url
-                    .decode(Get.parameters['user']!.replaceAll(' ', '+'))))
-                as Map<String, dynamic>);
-          }
-          return getRoute(ChatScreen(
-            notificationBody: notificationBody,
-            user: user,
-            index: Get.parameters['index'] != 'null'
-                ? int.parse(Get.parameters['index']!)
-                : null,
-            fromNotification: Get.parameters['from'] == 'true',
-            isClosed: Get.parameters['isClosed'] == 'true',
-            conversationID: (Get.parameters['conversation_id'] != null &&
-                    Get.parameters['conversation_id'] != 'null')
-                ? int.parse(Get.parameters['conversation_id']!)
-                : null,
-            orderChatModel: orderChat,
-          ));
-        }),
+    GetPage(name: messages, page: () => const NotFound()),
     GetPage(name: conversation, page: () => const NotFound()),
 
     GetPage(name: succsessflycreated, page: () => const NotFound()),
@@ -875,19 +792,7 @@ class RouteHelper {
           Get.find<SplashController>().configModel!.appMinimumVersionIos;
     }
 
-    // ✅ تسجيل Search dependencies فقط إذا كانت الشاشة SearchScreen
-    if (navigateTo is SearchScreen &&
-        !Get.isRegistered<SearchServiceInterface>()) {
-      Get.lazyPut<SearchRepositoryInterface>(() => SearchRepository(
-          apiClient: Get.find(), sharedPreferences: Get.find()));
 
-      Get.lazyPut<SearchServiceInterface>(
-          () => SearchService(searchRepositoryInterface: Get.find()));
-
-      Get.lazyPut(() => SearchController(
-            searchServiceInterface: Get.find(),
-          ));
-    }
 
 
     // Check if we have a valid location (either saved in SharedPreferences or in LocationController)

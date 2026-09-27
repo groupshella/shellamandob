@@ -56,10 +56,12 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.wtColor,
+      backgroundColor: isDark ? const Color(0xFF121418) : AppColors.wtColor,
       appBar: AppBar(
-        backgroundColor: AppColors.wtColor,
+        backgroundColor: isDark ? const Color(0xFF121418) : AppColors.wtColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -70,7 +72,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
             fontFamily: 'Tajawal',
             fontSize: 16.r(context),
             fontWeight: FontWeight.w700,
-            color: _titleColor,
+            color: isDark ? Colors.white : _titleColor,
           ),
         ),
         leading: IconButton(
@@ -78,7 +80,7 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
           icon: Icon(
             Icons.arrow_back_ios_new,
             size: 20.r(context),
-            color: _titleColor,
+            color: isDark ? Colors.white : _titleColor,
           ),
         ),
       ),
@@ -89,10 +91,10 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
               padding: EdgeInsets.symmetric(
                   horizontal: 20.r(context), vertical: 8.r(context)),
               itemCount: AppConstants.languages.length,
-              separatorBuilder: (_, __) => const Divider(
+              separatorBuilder: (_, __) => Divider(
                 height: 1,
                 thickness: 1,
-                color: Color(0xFFF1F2F4),
+                color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF1F2F4),
               ),
               itemBuilder: (BuildContext context, int index) {
                 final bool selected = controller.selectedLanguageIndex == index;
@@ -123,12 +125,12 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
                               fontFamily: 'Tajawal',
                               fontSize: 14.r(context),
                               fontWeight: FontWeight.w700,
-                              color: _titleColor,
+                              color: isDark ? Colors.white : _titleColor,
                             ),
                           ),
                         ),
                         SizedBox(width: 12.r(context)),
-                        _radio(context, selected),
+                        _radio(context, selected, isDark),
                       ],
                     ),
                   ),
@@ -141,14 +143,16 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
     );
   }
 
-  Widget _radio(BuildContext context, bool selected) {
+  Widget _radio(BuildContext context, bool selected, bool isDark) {
     return Container(
       width: 22.r(context),
       height: 22.r(context),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? _radioColor : AppColors.gryColor_4,
+          color: selected
+              ? (isDark ? const Color(0xFF30913F) : _radioColor)
+              : (isDark ? const Color(0xFF4B5563) : AppColors.gryColor_4),
           width: 6.r(context),
         ),
       ),

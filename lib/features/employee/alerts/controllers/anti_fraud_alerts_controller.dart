@@ -55,28 +55,28 @@ class AntiFraudAlertsController extends GetxController {
 
     switch (level) {
       case AlertLevel.alert1:
-        _currentAlertMessage = 'تنبيه خفيف: تم رصد توقف عن الحركة لأكثر من 10 دقائق داخل الزيارة. يرجى استئناف النشاط الميداني لتفادي تسجيل مخالفة.';
+        _currentAlertMessage = 'alert1_message'.tr;
         _showGentleSnackbar(title: 'field_movement_alert_first'.tr, message: _currentAlertMessage!, color: const Color(0xFF3B82F6));
         break;
 
       case AlertLevel.alert2:
-        _currentAlertMessage = 'تنبيه ثانٍ: عدم استقرار أو حركة نحو المتجر. اضغط "طلب راحة" إذا كنت في فترة توقف مصرح بها.';
+        _currentAlertMessage = 'alert2_message'.tr;
         _showGentleSnackbar(title: 'idle_alert_second'.tr, message: _currentAlertMessage!, color: const Color(0xFFF59E0B));
         break;
 
       case AlertLevel.alert3:
-        _currentAlertMessage = 'تحذير متقدم: أنت على وشك تجاوز المدة القصوى المسموحة للخمول. الإنذار القادم سيؤدي إلى الخصم واحتساب وقت خارج الدوام!';
+        _currentAlertMessage = 'alert3_message'.tr;
         _showAdvancedDialog();
         break;
 
       case AlertLevel.criticalAlert4:
         _isPenaltyActive = true;
         _totalViolationsCount++;
-        _currentAlertMessage = 'تم تفعيل الإنذار الرابع الحرج: بدء احتساب الوقت كـ "خارج الدوام" وتوثيق مخالفة خمول بنظام الرقابة والامتثال.';
+        _currentAlertMessage = 'alert4_message'.tr;
         // Notify shift controller of warning
         if (Get.isRegistered<EmployeeShiftController>()) {
           Get.find<EmployeeShiftController>().addWarning(
-            reason: 'خمول مستمر وتجاوز مهلة الـ 10 دقائق في الزيارة الميدانية',
+            reason: 'inactivity_warning_reason'.tr,
           );
         }
         _showCriticalPenaltyScreen();
@@ -106,16 +106,23 @@ class AntiFraudAlertsController extends GetxController {
   }
 
   void _showAdvancedDialog() {
+    final ctx = Get.context;
+    final isDark = ctx != null && Theme.of(ctx).brightness == Brightness.dark;
+    final dialogBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final textDark = isDark ? Colors.white : const Color(0xFF111827);
+    final textSub = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF374151);
+
     Get.dialog(
       AlertDialog(
+        backgroundColor: dialogBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: Row(
-          children: const [
-            Icon(Icons.report_problem_rounded, color: Color(0xFFEF4444), size: 28),
-            SizedBox(width: 8),
+          children: [
+            const Icon(Icons.report_problem_rounded, color: Color(0xFFEF4444), size: 28),
+            const SizedBox(width: 8),
             Text(
-              'الإنذار الثالث (تحذير متقدم)',
-              style: TextStyle(fontFamily: 'Tajawal', fontSize: 17, fontWeight: FontWeight.bold),
+              'third_alert_advanced'.tr,
+              style: TextStyle(fontFamily: 'Tajawal', fontSize: 17, fontWeight: FontWeight.bold, color: textDark),
             ),
           ],
         ),
@@ -125,24 +132,29 @@ class AntiFraudAlertsController extends GetxController {
           children: [
             Text(
               _currentAlertMessage ?? '',
-              style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, height: 1.5, color: Color(0xFF374151)),
+              style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, height: 1.5, color: textSub),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
+                color: isDark ? const Color(0xFF351A1A) : const Color(0xFFFEF2F2),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFFCA5A5)),
+                border: Border.all(color: isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFCA5A5)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.timer_off_outlined, color: Color(0xFFEF4444), size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.timer_off_outlined, color: Color(0xFFEF4444), size: 20),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'تبقى دقيقة واحدة فقط قبل بدء احتساب وقتك كـ "خارج الدوام".',
-                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF991B1B), fontWeight: FontWeight.w600),
+                      'one_minute_remaining_penalty'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 12,
+                        color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFF991B1B),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

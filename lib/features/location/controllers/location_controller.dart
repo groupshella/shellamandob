@@ -5,35 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/location/domain/models/delivery_man_last_location.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_data_model.dart';
 import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/features/location/domain/models/prediction_model.dart';
 import 'package:sixam_mart/features/address/controllers/address_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/features/home/screens/home_screen.dart';
-import 'package:sixam_mart/features/home/controllers/home_controller.dart';
-import 'package:sixam_mart/features/home/controllers/home_unified_controller.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
 import 'package:sixam_mart/features/location/widgets/module_dialog_widget.dart';
 import 'package:sixam_mart/features/location/widgets/service_area_dialog_widget.dart';
-import 'package:sixam_mart/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/helper/taxi_helper.dart';
 import 'package:sixam_mart/core/cache/hive_home_cache_service.dart';
 import 'package:sixam_mart/core/cache/hive_cache_config.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -235,13 +224,7 @@ class LocationController extends GetxController implements GetxService {
     }
     _homeReloadTriggered = true;
     debugPrint(
-        '🔄 LocationController: Location changed - triggering home data reload (once)');
-    try {
-      HomeScreen.loadData(context, true);
-    } catch (e) {
-      debugPrint(
-          '⚠️ Error loading home data (location may be outside zone): $e');
-    }
+        '🔄 LocationController: Location changed');
   }
 
   /// Reset home reload flag (call when location changes significantly)
@@ -591,10 +574,6 @@ class LocationController extends GetxController implements GetxService {
           address.zoneData = responseModel.zoneData;
           await AddressHelper.saveUserAddressInSharedPref(address);
 
-          // 🔄 Trigger home reload now that zone headers are ready!
-          if (Get.isRegistered<HomeUnifiedController>()) {
-            Get.find<HomeUnifiedController>().loadHomeData(forceRefresh: true);
-          }
         } else {
           debugPrint(
               '⚠️ LocationController: No address found in SharedPreferences');
@@ -905,17 +884,6 @@ class LocationController extends GetxController implements GetxService {
         return;
       }
       if (response.isSuccess && response.zoneIds.isNotEmpty) {
-        // Only refresh cart if zone change affects cart items
-        // This prevents unnecessary API calls on every location update
-        final cartController = Get.find<CartController>();
-        if (cartController.cartList.isNotEmpty) {
-          debugPrint(
-              '🔄 LocationController: Refreshing cart after zone change');
-          cartController.getCartDataOnline();
-        } else {
-          debugPrint(
-              '💾 LocationController: No cart items to refresh after zone change');
-        }
         address.zoneId = response.zoneIds[0];
         address.zoneIds = [];
         address.zoneIds!.addAll(response.zoneIds);
@@ -1052,13 +1020,6 @@ class LocationController extends GetxController implements GetxService {
     }
 
     try {
-      await _handleTaxiModuleCart(address);
-    } catch (e) {
-      debugPrint('⚠️ Error handling taxi module cart: $e');
-      // Continue even if taxi cart handling fails
-    }
-
-    try {
       await AddressHelper.saveUserAddressInSharedPref(address);
     } catch (e) {
       debugPrint('⚠️ Error saving address: $e');
@@ -1070,13 +1031,7 @@ class LocationController extends GetxController implements GetxService {
 
     if (AuthHelper.isLoggedIn()) {
       try {
-        if (Get.find<SplashController>().module != null) {
-          await Get.find<FavouriteController>().getFavouriteList();
-        } else {
-          Get.find<SplashController>().getConfigData(
-            context,
-          );
-        }
+        Get.find<SplashController>().getConfigData(context);
         Get.find<AuthController>().updateZone();
       } catch (e) {
         debugPrint('⚠️ Error updating user data: $e');
@@ -1157,18 +1112,7 @@ class LocationController extends GetxController implements GetxService {
     _lastHomeReloadLat = newLat;
     _lastHomeReloadLng = newLng;
 
-    // 🔧 FIX 2: Notify HomeController of zone change for reactive data loading
-    if (Get.isRegistered<HomeController>()) {
-      final zoneId = address.zoneId ?? 0;
-      Get.find<HomeController>().reloadOnZoneChange(zoneId);
-    }
 
-    try {
-      Get.find<CheckoutController>().clearPrevData();
-    } catch (e) {
-      debugPrint('⚠️ Error clearing checkout data: $e');
-      // Continue even if clearing checkout data fails
-    }
 
     if (Get.context != null &&
         ResponsiveHelper.isDesktop(Get.context!) &&
@@ -1198,28 +1142,7 @@ class LocationController extends GetxController implements GetxService {
     // resetSkipZoneValidation();
   }
 
-  Future<void> _handleTaxiModuleCart(AddressModel address) async {
-    if (TaxiHelper.haveTaxiModule() &&
-        address.zoneIds != null &&
-        Get.find<TaxiCartController>().cartList.isNotEmpty) {
-      final List<int> providerZones =
-          Get.find<TaxiCartController>().cartList[0].provider!.pickupZoneId ??
-              [];
-      final List<int> zoneIds = address.zoneIds ?? [];
 
-      if (!_hasIntersection(providerZones, zoneIds)) {
-        showCustomSnackBar(
-            'your_cart_has_been_cleared_as_the_selected_zone_does_not_support_the_previous_pickup_point'
-                .tr,
-            showDuration: 10);
-        Get.find<TaxiCartController>().clearTaxiCart();
-      }
-    }
-  }
-
-  bool _hasIntersection(List<int> list1, List<int> list2) {
-    return list1.toSet().intersection(list2.toSet()).isNotEmpty;
-  }
 
   Future<AddressModel> setLocation(String? placeID, String? address,
       GoogleMapController? mapController) async {
@@ -1407,38 +1330,7 @@ class LocationController extends GetxController implements GetxService {
     }
   }
 
-  Future<void> setStoreAddressToUserAddress(LatLng storeAddress) async {
-    final Position storePosition = positionFromLatLng(
-      storeAddress.latitude,
-      storeAddress.longitude,
-    );
-    final String addressFromGeocode = await getAddressFromGeocode(
-        LatLng(storeAddress.latitude, storeAddress.longitude));
-    final ZoneResponseModel responseModel = await getZone(
-        storePosition.latitude.toString(),
-        storePosition.longitude.toString(),
-        true);
-    _buttonDisabled = !responseModel.isSuccess;
-    final AddressModel addressModel = AddressModel(
-      latitude: storePosition.latitude.toString(),
-      longitude: storePosition.longitude.toString(),
-      addressType: 'others',
-      zoneId: responseModel.isSuccess ? responseModel.zoneIds[0] : 0,
-      zoneIds: responseModel.zoneIds,
-      address: addressFromGeocode,
-      zoneData: responseModel.zoneData,
-      areaIds: responseModel.areaIds,
-    );
-    await AddressHelper.saveUserAddressInSharedPref(addressModel);
 
-    await Get.find<SplashController>().getModules();
-    final List<ModuleModel>? modules = Get.find<SplashController>().moduleList;
-    for (final ModuleModel m in modules!) {
-      if (m.id == Get.find<StoreController>().store!.moduleId) {
-        Get.find<SplashController>().setModule(m);
-      }
-    }
-  }
 
 // =====================================================================================================
 

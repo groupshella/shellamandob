@@ -4,9 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/business/controllers/business_controller.dart';
-import 'package:sixam_mart/features/business/domain/models/package_model.dart';
-import 'package:sixam_mart/features/home/controllers/home_controller.dart';
+import 'package:sixam_mart/features/auth/domain/models/package_model.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
@@ -474,22 +472,7 @@ class StoreRegistrationController extends GetxController
 
     if ((response.statusCode == 200 || response.statusCode == 201) &&
         !hasErrors) {
-      Get.find<HomeController>().saveRegistrationSuccessfulSharedPref(true);
-      final int? storeId = bodyMap?['store_id'] as int?;
-      final int? packageId = bodyMap?['package_id'] as int?;
-      if (storeId == null) {
-        debugPrint(
-            'Store registration response missing store_id. body: ${response.body}');
-      } else if (packageId == null) {
-        Get.find<BusinessController>()
-            .submitBusinessPlan(storeId: storeId, packageId: null);
-      } else {
-        Get.toNamed<String>(RouteHelper.getSubscriptionPaymentRoute(
-          storeId: storeId,
-          packageId: packageId,
-        ));
-      }
-      // Get.offAllNamed(RouteHelper.getBusinessPlanRoute(storeId, packageId));
+      Get.offAllNamed(RouteHelper.getInitialRoute());
     }
     _isLoading = false;
     update();

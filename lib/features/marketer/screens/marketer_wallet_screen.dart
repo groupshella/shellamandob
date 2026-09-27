@@ -22,12 +22,14 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
             elevation: 0,
             centerTitle: true,
             automaticallyImplyLeading: !widget.isRoot,
@@ -37,16 +39,16 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                     onPressed: () => Get.back(),
                     icon: Icon(
                       locCtrl.isLtr ? IconlyLight.arrowLeft2 : IconlyLight.arrowRight2,
-                      color: _darkText,
+                      color: isDark ? Colors.white : _darkText,
                     ),
                   ),
             title: Text(
               'wallet_and_earnings'.tr,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: _darkText,
+                color: isDark ? Colors.white : _darkText,
               ),
             ),
           ),
@@ -196,7 +198,7 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton.icon(
-                                  onPressed: () => _showWithdrawDialog(context, c),
+                                  onPressed: () => _showWithdrawDialog(context, c, isDark),
                                   icon: const Icon(IconlyLight.wallet, size: 20, color: _primaryGreen),
                                   label: Text(
                                     'request_payout_bank'.tr,
@@ -226,47 +228,44 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                           children: [
                             Text(
                               'commissions_and_transfers_log'.tr,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: _darkText,
+                                color: isDark ? Colors.white : _darkText,
                               ),
                             ),
                             Row(
                               children: [
-                                _buildTabChip(0, 'filter_all'.tr),
+                                _buildTabChip(0, 'filter_all'.tr, isDark),
                                 const SizedBox(width: 4),
-                                _buildTabChip(1, 'tab_approved'.tr),
+                                _buildTabChip(1, 'tab_approved'.tr, isDark),
                                 const SizedBox(width: 4),
-                                _buildTabChip(2, 'tab_pending'.tr),
+                                _buildTabChip(2, 'tab_pending'.tr, isDark),
                               ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-
-                        // Transactions List
                         if (filtered.isEmpty)
                           Container(
                             padding: const EdgeInsets.all(40),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF9FAFB),
+                              color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Column(
                               children: [
-                                const Icon(IconlyLight.document, size: 48, color: Color(0xFFD1D5DB)),
+                                Icon(IconlyLight.document, size: 48, color: isDark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB)),
                                 const SizedBox(height: 10),
                                 Text(
-                                  'no_transactions_yet'.tr,
-                                  style: const TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 14,
-                                    color: Color(0xFF6B7280),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                   'no_transactions_yet'.tr,
+                                   style: TextStyle(
+                                     fontFamily: 'Tajawal',
+                                     fontSize: 14,
+                                     color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                                     fontWeight: FontWeight.w600,
+                                   ),
+                                 ),
                               ],
                             ),
                           )
@@ -280,22 +279,23 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                           final item = filtered[index];
                           final hasPaid = item['has_paid'] == true || item['status'] == 'paid';
                           final reward = double.tryParse('${item['reward'] ?? 1.0}') ?? 1.0;
-                          final customer = (item['customer'] ?? 'عميل').toString();
-                          final title = (item['title'] ?? 'عمولة إحالة').toString();
+                          final customer = (item['customer'] ?? 'customer'.tr).toString();
+                          final title = (item['title'] ?? 'referral_commission_title'.tr).toString();
                           final date = (item['date'] ?? '').toString();
                           final time = (item['time'] ?? '').toString();
 
                           return Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: isDark ? const Color(0xFF1C2028) : Colors.white,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFF3F4F6)),
-                              boxShadow: const [
+                              border: Border.all(
+                                  color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Color(0x04000000),
+                                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                                   blurRadius: 6,
-                                  offset: Offset(0, 2),
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
@@ -305,13 +305,17 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                                   width: 42,
                                   height: 42,
                                   decoration: BoxDecoration(
-                                    color: hasPaid ? const Color(0xFFF0FDF4) : const Color(0xFFF3F4F6),
+                                    color: hasPaid
+                                        ? (isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4))
+                                        : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6)),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
                                     child: Icon(
                                       hasPaid ? IconlyLight.arrowUp : IconlyLight.timeCircle,
-                                      color: hasPaid ? _primaryGreen : const Color(0xFF6B7280),
+                                      color: hasPaid
+                                          ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                                          : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
                                       size: 22,
                                     ),
                                   ),
@@ -323,20 +327,20 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                                     children: [
                                       Text(
                                         title,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Tajawal',
                                           fontSize: 13,
                                           fontWeight: FontWeight.w700,
-                                          color: _darkText,
+                                          color: isDark ? Colors.white : _darkText,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         '$customer • $date $time',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Tajawal',
                                           fontSize: 11,
-                                          color: Color(0xFF9CA3AF),
+                                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF),
                                         ),
                                       ),
                                     ],
@@ -351,13 +355,17 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                                         fontFamily: 'Tajawal',
                                         fontSize: 16,
                                         fontWeight: FontWeight.w800,
-                                        color: hasPaid ? _primaryGreen : const Color(0xFF6B7280),
+                                        color: hasPaid
+                                            ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                                            : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
                                       ),
                                     ),
                                     const SizedBox(width: 3),
                                     SarCurrencyWidget(
                                       size: 12,
-                                      color: hasPaid ? _primaryGreen : const Color(0xFF6B7280),
+                                      color: hasPaid
+                                          ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                                          : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
                                     ),
                                   ],
                                 ),
@@ -378,15 +386,20 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
     );
   }
 
-  Widget _buildTabChip(int index, String label) {
+  Widget _buildTabChip(int index, String label, bool isDark) {
     final isSelected = _selectedTabIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _selectedTabIndex = index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? _primaryGreen : const Color(0xFFF3F4F6),
+          color: isSelected
+              ? _primaryGreen
+              : (isDark ? const Color(0xFF1C2028) : const Color(0xFFF3F4F6)),
           borderRadius: BorderRadius.circular(8),
+          border: isDark && !isSelected
+              ? Border.all(color: const Color(0xFF2C3240))
+              : null,
         ),
         child: Text(
           label,
@@ -394,14 +407,16 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
             fontFamily: 'Tajawal',
             fontSize: 11,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? Colors.white : const Color(0xFF6B7280),
+            color: isSelected
+                ? Colors.white
+                : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
           ),
         ),
       ),
     );
   }
 
-  void _showWithdrawDialog(BuildContext context, MarketerController c) {
+  void _showWithdrawDialog(BuildContext context, MarketerController c, bool isDark) {
     if (c.balance < c.minTransferAmount) {
       showCustomSnackBar(
         '${'min_withdraw_limit'.tr}: ${c.minTransferAmount.toStringAsFixed(0)} ${'sar'.tr}. ${'available_balance_withdraw'.tr}: ${c.balance.toStringAsFixed(2)} ${'sar'.tr}',
@@ -425,9 +440,9 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
           top: 24,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C2028) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -438,47 +453,92 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
               children: [
                 Text(
                   'request_payout_title'.tr,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: _darkText,
+                    color: isDark ? Colors.white : _darkText,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(ctx),
-                  icon: const Icon(Icons.close, color: Color(0xFF9CA3AF)),
+                  icon: Icon(Icons.close, color: isDark ? Colors.white : const Color(0xFF9CA3AF)),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             TextField(
               controller: holderCtrl,
-              style: const TextStyle(fontFamily: 'Tajawal'),
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                color: isDark ? Colors.white : Colors.black,
+              ),
               decoration: InputDecoration(
                 labelText: 'full_name_bank_account'.tr,
-                labelStyle: const TextStyle(fontFamily: 'Tajawal'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                labelStyle: TextStyle(
+                  fontFamily: 'Tajawal',
+                  color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: isDark ? const Color(0xFF2C3240) : const Color(0xFFD1D5DB),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: _primaryGreen),
+                ),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: bankCtrl,
-              style: const TextStyle(fontFamily: 'Tajawal'),
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                color: isDark ? Colors.white : Colors.black,
+              ),
               decoration: InputDecoration(
                 labelText: 'bank_name_hint'.tr,
-                labelStyle: const TextStyle(fontFamily: 'Tajawal'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                labelStyle: TextStyle(
+                  fontFamily: 'Tajawal',
+                  color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: isDark ? const Color(0xFF2C3240) : const Color(0xFFD1D5DB),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: _primaryGreen),
+                ),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: ibanCtrl,
-              style: const TextStyle(fontFamily: 'Tajawal'),
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                color: isDark ? Colors.white : Colors.black,
+              ),
               decoration: InputDecoration(
                 labelText: 'iban_hint'.tr,
-                labelStyle: const TextStyle(fontFamily: 'Tajawal'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                labelStyle: TextStyle(
+                  fontFamily: 'Tajawal',
+                  color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: isDark ? const Color(0xFF2C3240) : const Color(0xFFD1D5DB),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: _primaryGreen),
+                ),
               ),
             ),
             const SizedBox(height: 18),

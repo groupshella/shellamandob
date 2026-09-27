@@ -22,8 +22,11 @@ class AttendanceStepperScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AttendanceController>(
       builder: (controller) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final scaffoldBg = isDark ? const Color(0xFF121418) : Colors.white;
+
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: scaffoldBg,
           body: SafeArea(
             child: Column(
               children: [
@@ -31,13 +34,13 @@ class AttendanceStepperScreen extends StatelessWidget {
                 MarketerHeader(title: 'confirm_attendance'.tr),
 
                 // 3-Step Stepper Bar
-                _buildStepperBar(controller.currentStep),
+                _buildStepperBar(controller.currentStep, isDark),
 
                 // Step Content
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
-                    child: _buildCurrentStep(context, controller),
+                    child: _buildCurrentStep(context, controller, isDark),
                   ),
                 ),
               ],
@@ -49,7 +52,7 @@ class AttendanceStepperScreen extends StatelessWidget {
   }
 
   // Stepper Header: 1: الموقع, 2: الصورة, 3: تأكيد
-  Widget _buildStepperBar(int currentStep) {
+  Widget _buildStepperBar(int currentStep, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       child: Row(
@@ -62,8 +65,9 @@ class AttendanceStepperScreen extends StatelessWidget {
             icon: Icons.check,
             isActive: currentStep == 2,
             isCompleted: currentStep > 2,
+            isDark: isDark,
           ),
-          _buildStepConnector(isCompleted: currentStep >= 2),
+          _buildStepConnector(isCompleted: currentStep >= 2, isDark: isDark),
 
           // 2. الصورة
           _buildStepNode(
@@ -72,8 +76,9 @@ class AttendanceStepperScreen extends StatelessWidget {
             icon: IconlyLight.camera,
             isActive: currentStep == 1,
             isCompleted: currentStep > 1,
+            isDark: isDark,
           ),
-          _buildStepConnector(isCompleted: currentStep >= 1),
+          _buildStepConnector(isCompleted: currentStep >= 1, isDark: isDark),
 
           // 1. الموقع
           _buildStepNode(
@@ -82,6 +87,7 @@ class AttendanceStepperScreen extends StatelessWidget {
             icon: IconlyLight.location,
             isActive: currentStep == 0,
             isCompleted: currentStep > 0,
+            isDark: isDark,
           ),
         ],
       ),
@@ -94,6 +100,7 @@ class AttendanceStepperScreen extends StatelessWidget {
     required IconData icon,
     required bool isActive,
     required bool isCompleted,
+    required bool isDark,
   }) {
     Color circleColor;
     Color iconColor;
@@ -102,12 +109,19 @@ class AttendanceStepperScreen extends StatelessWidget {
       circleColor = _primaryGreen;
       iconColor = Colors.white;
     } else if (isCompleted) {
-      circleColor = const Color(0xFFEBFEEB);
-      iconColor = _primaryGreen;
+      circleColor = isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB);
+      iconColor = isDark ? const Color(0xFF4CAF50) : _primaryGreen;
     } else {
-      circleColor = const Color(0xFFF3F4F6);
-      iconColor = const Color(0xFF9CA3AF);
+      circleColor = isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6);
+      iconColor = isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF);
     }
+
+    final borderColor = isActive || isCompleted
+        ? _primaryGreen
+        : (isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB));
+    final textColor = isActive
+        ? _primaryGreen
+        : (isDark ? const Color(0xFF9CA3AF) : _subText);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -119,7 +133,7 @@ class AttendanceStepperScreen extends StatelessWidget {
             color: circleColor,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isActive || isCompleted ? _primaryGreen : const Color(0xFFE5E7EB),
+              color: borderColor,
               width: 1.5,
             ),
           ),
@@ -136,62 +150,73 @@ class AttendanceStepperScreen extends StatelessWidget {
             fontFamily: 'Tajawal',
             fontSize: 12,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            color: isActive ? _primaryGreen : _subText,
+            color: textColor,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStepConnector({required bool isCompleted}) {
+  Widget _buildStepConnector({required bool isCompleted, required bool isDark}) {
     return Expanded(
       child: Container(
         height: 2,
         margin: const EdgeInsets.only(bottom: 18),
-        color: isCompleted ? _primaryGreen : const Color(0xFFE5E7EB),
+        color: isCompleted
+            ? _primaryGreen
+            : (isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
       ),
     );
   }
 
-  Widget _buildCurrentStep(BuildContext context, AttendanceController controller) {
+  Widget _buildCurrentStep(BuildContext context, AttendanceController controller, bool isDark) {
     switch (controller.currentStep) {
       case 0:
-        return _buildGeofenceStep(context, controller);
+        return _buildGeofenceStep(context, controller, isDark);
       case 1:
-        return _buildSelfieStep(context, controller);
+        return _buildSelfieStep(context, controller, isDark);
       case 2:
       default:
-        return _buildSuccessStep(context, controller);
+        return _buildSuccessStep(context, controller, isDark);
     }
   }
 
   // STEP 1: الموقع والجغرافيا (Geofence View)
-  Widget _buildGeofenceStep(BuildContext context, AttendanceController controller) {
+  Widget _buildGeofenceStep(BuildContext context, AttendanceController controller, bool isDark) {
     final isInside = controller.geofenceStatus == GeofenceStatus.inside;
+    final textDark = isDark ? Colors.white : _darkText;
+    final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
+    final statusBg = isInside
+        ? (isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB))
+        : (isDark ? const Color(0xFF3B1E1E) : const Color(0xFFFEECEB));
+    final statusColor = isInside
+        ? (isDark ? const Color(0xFF4CAF50) : _primaryGreen)
+        : const Color(0xFFE53935);
+    final outlineBorder = isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'تأكيد موقعك',
+          Text(
+            'confirm_your_location'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: _darkText,
+              color: textDark,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'يجب أن تكون داخل النطاق المحدد لبدء الدوام.',
+          Text(
+            'must_be_within_specified_range'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
-              color: _subText,
+              color: textSub,
             ),
           ),
           const SizedBox(height: 20),
@@ -205,7 +230,7 @@ class AttendanceStepperScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             decoration: BoxDecoration(
-              color: isInside ? const Color(0xFFEBFEEB) : const Color(0xFFFEECEB),
+              color: statusBg,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -214,16 +239,16 @@ class AttendanceStepperScreen extends StatelessWidget {
                 Icon(
                   isInside ? Icons.check_circle : Icons.error_outline,
                   size: 18,
-                  color: isInside ? _primaryGreen : const Color(0xFFE53935),
+                  color: statusColor,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isInside ? 'أنت داخل النطاق' : 'حدث خطأ ما (خارج النطاق)',
+                  isInside ? 'you_are_inside_geofence'.tr : 'outside_geofence_error'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: isInside ? _primaryGreen : const Color(0xFFE53935),
+                    color: statusColor,
                   ),
                 ),
               ],
@@ -244,9 +269,9 @@ class AttendanceStepperScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text(
-                  'متابعة',
-                  style: TextStyle(
+                child: Text(
+                  'continue_label'.tr.isNotEmpty ? 'continue_label'.tr : 'continue'.tr,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -267,9 +292,9 @@ class AttendanceStepperScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'حاول مرة أخرى',
-                  style: TextStyle(
+                child: Text(
+                  'try_again'.tr,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -284,18 +309,18 @@ class AttendanceStepperScreen extends StatelessWidget {
               child: OutlinedButton(
                 onPressed: () => _showChangeZoneBottomSheet(context, controller),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFE5E7EB)),
+                  side: BorderSide(color: outlineBorder),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'طلب تغيير المنطقة',
+                child: Text(
+                  'request_change_zone'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: _darkText,
+                    color: textDark,
                   ),
                 ),
               ),
@@ -307,32 +332,40 @@ class AttendanceStepperScreen extends StatelessWidget {
   }
 
   // STEP 2: التقاط صورة التحقق الذاتية (Selfie Verification View)
-  Widget _buildSelfieStep(BuildContext context, AttendanceController controller) {
+  Widget _buildSelfieStep(BuildContext context, AttendanceController controller, bool isDark) {
     final hasPhoto = controller.selfieImage != null;
+    final textDark = isDark ? Colors.white : _darkText;
+    final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
+    final frameBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB);
+    final frameBorder = hasPhoto
+        ? _primaryGreen
+        : (isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB));
+    final badgeBg = isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB);
+    final badgeColor = isDark ? const Color(0xFF4CAF50) : _primaryGreen;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'التقاط صورة التحقق',
+          Text(
+            'take_verification_photo'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: _darkText,
+              color: textDark,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'التقط صورة مباشرة للتحقق من حضورك ومظهرك المهني.',
+          Text(
+            'take_verification_photo_desc'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
-              color: _subText,
+              color: textSub,
             ),
           ),
           const SizedBox(height: 24),
@@ -345,10 +378,10 @@ class AttendanceStepperScreen extends StatelessWidget {
                 width: 290,
                 height: 310,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
+                  color: frameBg,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: hasPhoto ? _primaryGreen : const Color(0xFFE5E7EB),
+                    color: frameBorder,
                     width: 2,
                   ),
                 ),
@@ -370,14 +403,14 @@ class AttendanceStepperScreen extends StatelessWidget {
                                 color: Colors.black.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.circle, color: Colors.green, size: 8),
-                                  SizedBox(width: 6),
+                                  const Icon(Icons.circle, color: Colors.green, size: 8),
+                                  const SizedBox(width: 6),
                                   Text(
-                                    'كاميرا أمامية',
-                                    style: TextStyle(
+                                    'front_camera'.tr,
+                                    style: const TextStyle(
                                       fontFamily: 'Tajawal',
                                       fontSize: 12,
                                       color: Colors.white,
@@ -393,12 +426,12 @@ class AttendanceStepperScreen extends StatelessWidget {
                               color: Color(0xFF9CA3AF),
                             ),
                             const SizedBox(height: 12),
-                            const Text(
-                              'اضغط للالتقاط بكاميرا السيلفي',
+                            Text(
+                              'tap_to_capture_selfie'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
-                                color: _subText,
+                                color: textSub,
                               ),
                             ),
                           ],
@@ -414,21 +447,21 @@ class AttendanceStepperScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFEBFEEB),
+                color: badgeBg,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check_circle, size: 18, color: _primaryGreen),
-                  SizedBox(width: 8),
+                  Icon(Icons.check_circle, size: 18, color: badgeColor),
+                  const SizedBox(width: 8),
                   Text(
-                    'تم التقاط الصورة',
+                    'photo_captured'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: _primaryGreen,
+                      color: badgeColor,
                     ),
                   ),
                 ],
@@ -448,9 +481,9 @@ class AttendanceStepperScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text(
-                  'متابعة',
-                  style: TextStyle(
+                child: Text(
+                  'continue_label'.tr.isNotEmpty ? 'continue_label'.tr : 'continue'.tr,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -464,13 +497,13 @@ class AttendanceStepperScreen extends StatelessWidget {
             // Button 2: إعادة التقاط الصورة
             TextButton(
               onPressed: () => controller.captureSelfie(),
-              child: const Text(
-                'إعادة التقاط الصورة',
+              child: Text(
+                'retake_photo'.tr,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: _subText,
+                  color: textSub,
                 ),
               ),
             ),
@@ -481,9 +514,9 @@ class AttendanceStepperScreen extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () => controller.captureSelfie(),
                 icon: const Icon(IconlyLight.camera, color: Colors.white, size: 20),
-                label: const Text(
-                  'التقاط الصورة',
-                  style: TextStyle(
+                label: Text(
+                  'capture_photo'.tr,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -504,14 +537,14 @@ class AttendanceStepperScreen extends StatelessWidget {
             // Secondary option: اختيار من المعرض
             TextButton.icon(
               onPressed: () => controller.captureSelfie(fromGallery: true),
-              icon: const Icon(IconlyLight.image, size: 18, color: _subText),
-              label: const Text(
-                'أو اختيار صورة من المعرض',
+              icon: Icon(IconlyLight.image, size: 18, color: textSub),
+              label: Text(
+                'choose_from_gallery'.tr,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: _subText,
+                  color: textSub,
                 ),
               ),
             ),
@@ -522,8 +555,13 @@ class AttendanceStepperScreen extends StatelessWidget {
   }
 
   // STEP 3: شاشة نجاح وتأكيد بداية العمل (Success View)
-  Widget _buildSuccessStep(BuildContext context, AttendanceController controller) {
+  Widget _buildSuccessStep(BuildContext context, AttendanceController controller, bool isDark) {
     final attendanceDateTime = controller.attendanceConfirmedTime ?? DateTime.now();
+    final textDark = isDark ? Colors.white : _darkText;
+    final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
+    final glowColor = isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB);
+    final cardBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFF1FBF2);
+    final cardBorder = _primaryGreen.withValues(alpha: isDark ? 0.35 : 0.2);
 
     // Dynamic Start Time
     String formattedTime = '';
@@ -553,9 +591,9 @@ class AttendanceStepperScreen extends StatelessWidget {
             child: Container(
               width: 100,
               height: 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color(0xFFEBFEEB),
+                color: glowColor,
               ),
               child: Center(
                 child: Container(
@@ -573,27 +611,27 @@ class AttendanceStepperScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Title
-          const Text(
-            'تم تأكيد بداية العمل',
+          Text(
+            'work_start_confirmed_title'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: _darkText,
+              color: textDark,
             ),
           ),
           const SizedBox(height: 10),
 
           // Subtitle
-          const Text(
-            'تم تأكيد بداية العمل، نلفت انتباهك أن سبب التقاط الصورة هو التأكد من المظهر العام والمهنية.',
+          Text(
+            'work_start_confirmed_subtitle'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: _subText,
+              color: textSub,
               height: 1.5,
             ),
           ),
@@ -603,18 +641,18 @@ class AttendanceStepperScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1FBF2),
+              color: cardBg,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: _primaryGreen.withValues(alpha: 0.2)),
+              border: Border.all(color: cardBorder),
             ),
             child: Column(
               children: [
-                const Text(
-                  'وقت بدء العمل',
+                Text(
+                  'shift_start_time'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 13,
-                    color: _subText,
+                    color: textSub,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -630,10 +668,10 @@ class AttendanceStepperScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   formattedDate,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
-                    color: _subText,
+                    color: textSub,
                   ),
                 ),
               ],
@@ -661,9 +699,9 @@ class AttendanceStepperScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'استكشاف الزيارات الميدانية',
-                style: TextStyle(
+              child: Text(
+                'explore_field_visits'.tr,
+                style: const TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -679,7 +717,12 @@ class AttendanceStepperScreen extends StatelessWidget {
 
   // Change Zone Bottom Sheet
   void _showChangeZoneBottomSheet(BuildContext context, AttendanceController controller) {
-    String selectedReason = 'خطأ في اختيار المنطقة';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final sheetBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final inputBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+    final textDark = isDark ? Colors.white : _darkText;
+    final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
+    String selectedReason = 'wrong_zone_selected'.tr;
     final TextEditingController notesCtrl = TextEditingController();
 
     showModalBottomSheet(
@@ -693,45 +736,45 @@ class AttendanceStepperScreen extends StatelessWidget {
           ),
           child: Container(
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: sheetBg,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'طلب تغيير المنطقة',
+                Text(
+                  'request_change_zone'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: _darkText,
+                    color: textDark,
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'سيتم إرسال الطلب للمشرف للموافقة.',
+                Text(
+                  'change_request_supervisor_notice'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 13,
-                    color: _subText,
+                    color: textSub,
                   ),
                 ),
                 const SizedBox(height: 20),
 
                 // Reason dropdown
-                const Text(
-                  'سبب التغيير',
-                  textAlign: TextAlign.right,
+                Text(
+                  'reason_for_change'.tr,
+                  textAlign: TextAlign.start,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: _darkText,
+                    color: textDark,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -739,26 +782,27 @@ class AttendanceStepperScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF6F5F8),
+                    color: inputBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: selectedReason,
+                      dropdownColor: sheetBg,
                       isExpanded: true,
                       items: [
-                        'خطأ في اختيار المنطقة',
-                        'إعادة توزيع الزيارات',
-                        'طلب من المشرف',
-                        'سبب آخر',
+                        'wrong_zone_selected'.tr,
+                        'redistribute_visits'.tr,
+                        'supervisor_request'.tr,
+                        'other_reason'.tr,
                       ].map((r) => DropdownMenuItem(
                             value: r,
                             child: Text(
                               r,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 14,
-                                color: _darkText,
+                                color: textDark,
                               ),
                             ),
                           )).toList(),
@@ -773,26 +817,27 @@ class AttendanceStepperScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Notes input
-                const Text(
-                  'ملاحظة إضافية (اختياري)',
-                  textAlign: TextAlign.right,
+                Text(
+                  'additional_note_optional'.tr,
+                  textAlign: TextAlign.start,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: _darkText,
+                    color: textDark,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: notesCtrl,
                   maxLines: 3,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(fontFamily: 'Tajawal', color: textDark),
                   decoration: InputDecoration(
                     hintText: 'add_details_if_needed'.tr,
                     hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Color(0xFF9CA3AF)),
                     filled: true,
-                    fillColor: const Color(0xFFF6F5F8),
+                    fillColor: inputBg,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -812,8 +857,8 @@ class AttendanceStepperScreen extends StatelessWidget {
                       );
                       Navigator.of(ctx).pop();
                       Get.snackbar(
-                        'تم إرسال الطلب',
-                        'بانتظار موافقة المشرف، سيتم إشعارك فور الاعتماد.',
+                        'request_sent_title'.tr,
+                        'request_sent_waiting_supervisor'.tr,
                         backgroundColor: _primaryGreen,
                         colorText: Colors.white,
                       );
@@ -825,9 +870,9 @@ class AttendanceStepperScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'إرسال الطلب للمشرف',
-                      style: TextStyle(
+                    child: Text(
+                      'send_request_to_supervisor'.tr,
+                      style: const TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -841,13 +886,13 @@ class AttendanceStepperScreen extends StatelessWidget {
                 // Cancel Button
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text(
-                    'إلغاء',
+                  child: Text(
+                    'cancel'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: _subText,
+                      color: textSub,
                     ),
                   ),
                 ),

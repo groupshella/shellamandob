@@ -31,8 +31,10 @@ class MarketerPendingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -85,11 +87,11 @@ class MarketerPendingScreen extends StatelessWidget {
                         Text(
                           'application_under_final_review'.tr,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            color: _darkText,
+                            color: isDark ? Colors.white : _darkText,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -98,11 +100,11 @@ class MarketerPendingScreen extends StatelessWidget {
                         Text(
                           'application_received_desc'.tr,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF555555),
+                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555),
                             height: 1.6,
                           ),
                         ),
@@ -112,19 +114,19 @@ class MarketerPendingScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               IconlyLight.timeCircle,
                               size: 20,
-                              color: Color(0xFF6B7280),
+                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               '${'submission_date'.tr}: ${controller.appliedAt}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF4B5563),
+                                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                               ),
                             ),
                           ],
@@ -148,24 +150,25 @@ class MarketerPendingScreen extends StatelessWidget {
                   onPressed: () {
                     Get.toNamed(RouteHelper.getSupportRoute());
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     IconlyLight.call,
                     size: 20,
-                    color: _darkText,
+                    color: isDark ? Colors.white : _darkText,
                   ),
                   label: Text(
                     'contact_customer_service'.tr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: _darkText,
+                      color: isDark ? Colors.white : _darkText,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF6F5F8),
-                    foregroundColor: _darkText,
+                    backgroundColor: isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8),
+                    foregroundColor: isDark ? Colors.white : _darkText,
                     elevation: 0,
+                    side: isDark ? const BorderSide(color: Color(0xFF2C3240)) : BorderSide.none,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

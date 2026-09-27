@@ -15,6 +15,9 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
+import 'package:sixam_mart/features/marketer/widgets/marketer_bank_transfer_sheet.dart';
+import 'package:sixam_mart/features/marketer/widgets/marketer_pending_balance_sheet.dart';
 
 class MarketerDashboardScreen extends StatelessWidget {
   final bool isRoot;
@@ -25,8 +28,45 @@ class MarketerDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
+      bottomNavigationBar: Container(
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Get.back();
+                } else {
+                  Get.offAll(() => const EmployeeMainScreen());
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _primaryGreen,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(
+                'marketing_specialist_mode'.tr,
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -42,14 +82,14 @@ class MarketerDashboardScreen extends StatelessWidget {
                     child: Container(
                       width: 38,
                       height: 38,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF6F5F8),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         IconlyLight.setting,
                         size: 20,
-                        color: Color(0xFF111B18),
+                        color: isDark ? Colors.white : const Color(0xFF111B18),
                       ),
                     ),
                   ),
@@ -68,28 +108,28 @@ class MarketerDashboardScreen extends StatelessWidget {
                             children: [
                               // 0. Profile Summary Bar (when in root tab)
                               if (isRoot) ...[
-                                _buildProfileSummaryBar(),
+                                _buildProfileSummaryBar(isDark),
                                 const SizedBox(height: 14),
                               ],
 
                               // 1. Hero Gradient Balance Card
-                              _buildHeroBalanceCard(c),
+                              _buildHeroBalanceCard(context, c, isDark),
                               const SizedBox(height: 16),
 
                               // 2. Personal QR Code Card
-                              _buildQRCard(context, c),
+                              _buildQRCard(context, c, isDark),
                               const SizedBox(height: 16),
 
                               // 3. KPI Cards
-                              _buildKPICards(c),
+                              _buildKPICards(c, isDark),
                               const SizedBox(height: 16),
 
                               // 4. Recent Commissions Card
-                              _buildRecentCommissionsCard(c),
+                              _buildRecentCommissionsCard(c, isDark),
                               const SizedBox(height: 16),
 
                               // 5. Settings Quick Card
-                              _buildSettingsQuickCard(),
+                              _buildSettingsQuickCard(isDark),
                               const SizedBox(height: 70),
                             ],
                           ),
@@ -111,15 +151,16 @@ class MarketerDashboardScreen extends StatelessWidget {
                   width: 54,
                   height: 54,
                   decoration: ShapeDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF1C2028) : Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(35),
+                      side: isDark ? const BorderSide(color: Color(0xFF2C3240)) : BorderSide.none,
                     ),
-                    shadows: const [
+                    shadows: [
                       BoxShadow(
-                        color: Color(0x21000000),
+                        color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.13),
                         blurRadius: 8,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -140,19 +181,25 @@ class MarketerDashboardScreen extends StatelessWidget {
   }
 
   // ---------------------------------------------------- 1. Hero Balance Card (Figma Exact)
-  Widget _buildHeroBalanceCard(MarketerController c) {
+  Widget _buildHeroBalanceCard(BuildContext context, MarketerController c, bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: ShapeDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment(0.03, 0.03),
-          end: Alignment(0.93, 1.00),
-          colors: [
-            Color(0xFFDFD3F5),
-            Color(0xFFEBFEEB),
-            Color(0xFFDFD3F5),
-          ],
+        gradient: LinearGradient(
+          begin: const Alignment(0.03, 0.03),
+          end: const Alignment(0.93, 1.00),
+          colors: isDark
+              ? const [
+                  Color(0xFF221A35),
+                  Color(0xFF162D1D),
+                  Color(0xFF221A35),
+                ]
+              : const [
+                  Color(0xFFDFD3F5),
+                  Color(0xFFEBFEEB),
+                  Color(0xFFDFD3F5),
+                ],
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
@@ -165,9 +212,12 @@ class MarketerDashboardScreen extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: ShapeDecoration(
-              color: Colors.white.withValues(alpha: 0.42),
+              color: isDark
+                  ? const Color(0xFF1C2028).withValues(alpha: 0.6)
+                  : Colors.white.withValues(alpha: 0.42),
               shape: RoundedRectangleBorder(
-                side: const BorderSide(width: 0.80, color: Colors.white),
+                side: BorderSide(
+                    width: 0.80, color: isDark ? const Color(0xFF2C3240) : Colors.white),
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
@@ -176,8 +226,8 @@ class MarketerDashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   'current_balance'.tr,
-                  style: const TextStyle(
-                    color: _darkText,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : _darkText,
                     fontSize: 16,
                     fontFamily: 'Tajawal',
                     fontWeight: FontWeight.w700,
@@ -190,7 +240,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SarCurrencyWidget(size: 28, color: _darkText),
+                      SarCurrencyWidget(
+                          size: 28, color: isDark ? Colors.white : _darkText),
                       const SizedBox(width: 8),
                       Text(
                         c.balance.toStringAsFixed(
@@ -216,50 +267,53 @@ class MarketerDashboardScreen extends StatelessWidget {
             children: [
               // Card 1: Bank Transfer (Right)
               Expanded(
-                child: Container(
-                  height: 80,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: ShapeDecoration(
-                    color: _primaryGreen,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                    shadows: const [
-                      BoxShadow(
-                        color: Color(0x07000000),
-                        blurRadius: 8.90,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'bank_transfer'.tr,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontFamily: 'Tajawal',
-                          fontWeight: FontWeight.w700,
+                child: GestureDetector(
+                  onTap: () => MarketerBankTransferSheet.show(context),
+                  child: Container(
+                    height: 80,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: ShapeDecoration(
+                      color: _primaryGreen,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      shadows: const [
+                        BoxShadow(
+                          color: Color(0x07000000),
+                          blurRadius: 8.90,
+                          offset: Offset(0, 4),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        'bank_transfer_min_desc'.tr,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                          fontFamily: 'Tajawal',
-                          fontWeight: FontWeight.w500,
-                          height: 1.3,
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'bank_transfer'.tr,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontFamily: 'Tajawal',
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 3),
+                        Text(
+                          'bank_transfer_min_desc'.tr,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontFamily: 'Tajawal',
+                            fontWeight: FontWeight.w500,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -267,70 +321,75 @@ class MarketerDashboardScreen extends StatelessWidget {
 
               // Card 2: Pending Balance (Middle)
               Expanded(
-                child: Container(
-                  height: 80,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFF6F5F8),
-                    shape: RoundedRectangleBorder(
-                      side:
-                          const BorderSide(width: 1, color: Color(0x1E555555)),
-                      borderRadius: BorderRadius.circular(8),
+                child: GestureDetector(
+                  onTap: () => MarketerPendingBalanceSheet.show(context),
+                  child: Container(
+                    height: 80,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: ShapeDecoration(
+                      color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                            width: 1,
+                            color: isDark ? const Color(0xFF2C3240) : const Color(0x1E555555)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Color(0x07000000),
+                          blurRadius: 8.90,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Color(0x07000000),
-                        blurRadius: 8.90,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'pending_balance'.tr,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: _darkText,
-                          fontSize: 12,
-                          fontFamily: 'Tajawal',
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SarCurrencyWidget(size: 13, color: _darkText),
-                          const SizedBox(width: 4),
-                          Text(
-                            c.pendingBalance.toStringAsFixed(0),
-                            style: const TextStyle(
-                              color: _darkText,
-                              fontSize: 18,
-                              fontFamily: 'Tajawal',
-                              fontWeight: FontWeight.w800,
-                            ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'pending_balance'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : _darkText,
+                            fontSize: 12,
+                            fontFamily: 'Tajawal',
+                            fontWeight: FontWeight.w700,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        c.pendingBalance > 0
-                            ? '${'remaining_days'.tr} ${c.pendingDays} ${'days'.tr}'
-                            : 'no_pending_balance'.tr,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFF555555),
-                          fontSize: 9,
-                          fontFamily: 'Tajawal',
-                          fontWeight: FontWeight.w400,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SarCurrencyWidget(
+                                size: 13, color: isDark ? Colors.white : _darkText),
+                            const SizedBox(width: 4),
+                            Text(
+                              c.pendingBalance.toStringAsFixed(0),
+                              style: TextStyle(
+                                color: isDark ? Colors.white : _darkText,
+                                fontSize: 18,
+                                fontFamily: 'Tajawal',
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          c.pendingBalance > 0
+                              ? '${'remaining_days'.tr} ${c.pendingDays} ${'days'.tr}'
+                              : 'no_pending_balance'.tr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555),
+                            fontSize: 9,
+                            fontFamily: 'Tajawal',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -344,10 +403,11 @@ class MarketerDashboardScreen extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
-                    color: const Color(0xFFF6F5F8),
+                    color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8),
                     shape: RoundedRectangleBorder(
-                      side:
-                          const BorderSide(width: 1, color: Color(0x1E555555)),
+                      side: BorderSide(
+                          width: 1,
+                          color: isDark ? const Color(0xFF2C3240) : const Color(0x1E555555)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     shadows: const [
@@ -364,8 +424,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       Text(
                         'today_customers'.tr,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: _darkText,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : _darkText,
                           fontSize: 12,
                           fontFamily: 'Tajawal',
                           fontWeight: FontWeight.w700,
@@ -375,8 +435,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       Text(
                         '${c.todayReferred} ${'customer'.tr}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: _darkText,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : _darkText,
                           fontSize: 15,
                           fontFamily: 'Tajawal',
                           fontWeight: FontWeight.w700,
@@ -394,20 +454,21 @@ class MarketerDashboardScreen extends StatelessWidget {
   }
 
   // ---------------------------------------------------- 2. Personal QR Card (Figma Exact)
-  Widget _buildQRCard(BuildContext context, MarketerController c) {
+  Widget _buildQRCard(BuildContext context, MarketerController c, bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: ShapeDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
+          side: isDark ? const BorderSide(color: Color(0xFF2C3240)) : BorderSide.none,
         ),
-        shadows: const [
+        shadows: [
           BoxShadow(
-            color: Color(0x0F000000),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
             blurRadius: 12,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -416,8 +477,8 @@ class MarketerDashboardScreen extends StatelessWidget {
         children: [
           Text(
             'personal_qr_code'.tr,
-            style: const TextStyle(
-              color: Color(0xFF1A1A2E),
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF1A1A2E),
               fontSize: 15,
               fontFamily: 'Tajawal',
               fontWeight: FontWeight.w700,
@@ -426,8 +487,8 @@ class MarketerDashboardScreen extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             'let_others_scan_and_join'.tr,
-            style: const TextStyle(
-              color: Color(0xFF6B7280),
+            style: TextStyle(
+              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
               fontSize: 12,
               fontFamily: 'Tajawal',
               fontWeight: FontWeight.w400,
@@ -475,7 +536,7 @@ class MarketerDashboardScreen extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: ShapeDecoration(
-              color: const Color(0xFFF0F4F8),
+              color: isDark ? const Color(0xFF252B37) : const Color(0xFFF0F4F8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -627,7 +688,7 @@ class MarketerDashboardScreen extends StatelessWidget {
   }
 
   // ---------------------------------------------------- 3. KPI Cards (Figma Exact)
-  Widget _buildKPICards(MarketerController c) {
+  Widget _buildKPICards(MarketerController c, bool isDark) {
     return Column(
       children: [
         // KPI Card 1: Acquired Customers (Full Width)
@@ -635,11 +696,11 @@ class MarketerDashboardScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: ShapeDecoration(
-            color: const Color(0xFFFAFFFA),
+            color: isDark ? const Color(0xFF162A1D) : const Color(0xFFFAFFFA),
             shape: RoundedRectangleBorder(
-              side: const BorderSide(
+              side: BorderSide(
                 width: 0.80,
-                color: Color(0x7030913F),
+                color: isDark ? const Color(0xFF2C3240) : const Color(0x7030913F),
               ),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -651,7 +712,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildGrowthBadge('${c.kpiGrowthPct}%'),
+                  _buildGrowthBadge('${c.kpiGrowthPct}%', isDark),
                   Container(
                     width: 44,
                     height: 44,
@@ -670,9 +731,9 @@ class MarketerDashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'العملاء الدافعون (أتموا الشراء)',
-                style: const TextStyle(
-                  color: Color(0xFF6A7282),
+                'paying_customers_completed'.tr,
+                style: TextStyle(
+                  color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
                   fontSize: 15,
                   fontFamily: 'Tajawal',
                   fontWeight: FontWeight.w600,
@@ -681,8 +742,8 @@ class MarketerDashboardScreen extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '${c.payingCustomers} ${'customers'.tr}',
-                style: const TextStyle(
-                  color: Color(0xFF1E2939),
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF1E2939),
                   fontSize: 24,
                   fontFamily: 'Tajawal',
                   fontWeight: FontWeight.w700,
@@ -702,10 +763,11 @@ class MarketerDashboardScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: ShapeDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1C2028) : Colors.white,
                   shape: RoundedRectangleBorder(
-                    side:
-                        const BorderSide(width: 0.80, color: Color(0xFFF3F4F6)),
+                    side: BorderSide(
+                        width: 0.80,
+                        color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
@@ -722,7 +784,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           decoration: ShapeDecoration(
-                            color: const Color(0xFFF0FDF4),
+                            color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
                             ),
@@ -730,13 +792,14 @@ class MarketerDashboardScreen extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.north_east,
-                                  size: 12, color: Color(0xFF008236)),
+                              Icon(Icons.north_east,
+                                  size: 12,
+                                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236)),
                               const SizedBox(width: 2),
                               Text(
                                 '${c.kpiGrowthPct}%',
-                                style: const TextStyle(
-                                  color: Color(0xFF008236),
+                                style: TextStyle(
+                                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236),
                                   fontSize: 12,
                                   fontFamily: 'Tajawal',
                                   fontWeight: FontWeight.w500,
@@ -763,11 +826,11 @@ class MarketerDashboardScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'إجمالي المسجلين',
+                    Text(
+                      'total_registered'.tr,
                       textAlign: TextAlign.right,
                       style: TextStyle(
-                        color: Color(0xFF6A7282),
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
                         fontSize: 13,
                         fontFamily: 'Tajawal',
                         fontWeight: FontWeight.w500,
@@ -777,8 +840,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                     Text(
                       '${c.registeredCustomers} ${'customers'.tr}',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Color(0xFF1E2939),
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF1E2939),
                         fontSize: 20,
                         fontFamily: 'Tajawal',
                         fontWeight: FontWeight.w700,
@@ -795,10 +858,11 @@ class MarketerDashboardScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: ShapeDecoration(
-                  color: const Color(0xFFFCFCFD),
+                  color: isDark ? const Color(0xFF1C2028) : const Color(0xFFFCFCFD),
                   shape: RoundedRectangleBorder(
-                    side:
-                        const BorderSide(width: 0.80, color: Color(0xFFF3F4F6)),
+                    side: BorderSide(
+                        width: 0.80,
+                        color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
@@ -815,7 +879,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: ShapeDecoration(
-                            color: const Color(0xFFFFFBEB),
+                            color: isDark ? const Color(0xFF332512) : const Color(0xFFFFFBEB),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
                             ),
@@ -856,11 +920,11 @@ class MarketerDashboardScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'لم يدفعوا بعد',
+                    Text(
+                      'haven_not_paid_yet'.tr,
                       textAlign: TextAlign.right,
                       style: TextStyle(
-                        color: Color(0xFF6A7282),
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
                         fontSize: 13,
                         fontFamily: 'Tajawal',
                         fontWeight: FontWeight.w500,
@@ -868,10 +932,10 @@ class MarketerDashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${c.hesitantCustomers} عميل',
+                      '${c.hesitantCustomers} ${'customer'.tr}',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        color: Color(0xFF1E2939),
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF1E2939),
                         fontSize: 20,
                         fontFamily: 'Tajawal',
                         fontWeight: FontWeight.w700,
@@ -887,11 +951,11 @@ class MarketerDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGrowthBadge(String value) {
+  Widget _buildGrowthBadge(String value, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: ShapeDecoration(
-        color: const Color(0xFFF0FDF4),
+        color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -899,12 +963,14 @@ class MarketerDashboardScreen extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.arrow_upward, size: 12, color: Color(0xFF008236)),
+          Icon(Icons.arrow_upward,
+              size: 12,
+              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236)),
           const SizedBox(width: 2),
           Text(
             value,
-            style: const TextStyle(
-              color: Color(0xFF008236),
+            style: TextStyle(
+              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236),
               fontSize: 12,
               fontFamily: 'Tajawal',
               fontWeight: FontWeight.w500,
@@ -916,7 +982,7 @@ class MarketerDashboardScreen extends StatelessWidget {
   }
 
   // ---------------------------------------------------- 4. Recent Commissions Card (Figma Exact)
-  Widget _buildRecentCommissionsCard(MarketerController c) {
+  Widget _buildRecentCommissionsCard(MarketerController c, bool isDark) {
     final txns = c.transactions;
     final recent = txns.take(4).toList();
 
@@ -924,15 +990,16 @@ class MarketerDashboardScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
+          side: isDark ? const BorderSide(color: Color(0xFF2C3240)) : BorderSide.none,
         ),
-        shadows: const [
+        shadows: [
           BoxShadow(
-            color: Color(0x0F000000),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
             blurRadius: 12,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -946,8 +1013,8 @@ class MarketerDashboardScreen extends StatelessWidget {
             children: [
               Text(
                 'recent_commissions'.tr,
-                style: const TextStyle(
-                  color: Color(0xFF1A1A2E),
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                   fontSize: 14,
                   fontFamily: 'Tajawal',
                   fontWeight: FontWeight.w700,
@@ -959,7 +1026,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: ShapeDecoration(
-                    color: const Color(0xFFF6F5F8),
+                    color: isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
                   ),
@@ -984,10 +1051,10 @@ class MarketerDashboardScreen extends StatelessWidget {
               child: Center(
                 child: Text(
                   'no_commissions_yet'.tr,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 13,
-                    color: Color(0xFF98A2B3),
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF98A2B3),
                   ),
                 ),
               ),
@@ -998,7 +1065,7 @@ class MarketerDashboardScreen extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: recent.length,
               separatorBuilder: (_, __) =>
-                  const Divider(height: 14, color: Color(0xFFF3F4F6)),
+                  Divider(height: 14, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
               itemBuilder: (context, i) {
                 final t = recent[i];
                 final isPending = (t['status'] ?? '').toString() == 'pending' ||
@@ -1013,8 +1080,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                       height: 40,
                       decoration: ShapeDecoration(
                         color: isPending
-                            ? const Color(0xFFFEF3DC)
-                            : const Color(0xFFE6F9F0),
+                            ? (isDark ? const Color(0xFF332512) : const Color(0xFFFEF3DC))
+                            : (isDark ? const Color(0xFF1E3A24) : const Color(0xFFE6F9F0)),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1037,10 +1104,10 @@ class MarketerDashboardScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            (t['title'] ?? 'عمولة انضمام عميل جديدة')
+                            (t['title'] ?? 'new_client_join_commission'.tr)
                                 .toString(),
-                            style: const TextStyle(
-                              color: Color(0xFF1A1A2E),
+                            style: TextStyle(
+                              color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                               fontSize: 13,
                               fontFamily: 'Tajawal',
                               fontWeight: FontWeight.w600,
@@ -1048,10 +1115,10 @@ class MarketerDashboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            (t['time'] ?? t['date'] ?? 'اليوم، 2:30 م')
+                            (t['time'] ?? t['date'] ?? 'today_sample_time'.tr)
                                 .toString(),
-                            style: const TextStyle(
-                              color: Color(0xFF6B7280),
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                               fontSize: 11,
                               fontFamily: 'Tajawal',
                               fontWeight: FontWeight.w400,
@@ -1060,8 +1127,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(
                             isPending
-                                ? 'معلّقة – متبقي 3 أيام'
-                                : 'تم تسجيل بنجاح',
+                                ? 'pending_days_remaining_sample'.tr
+                                : 'registered_successfully'.tr,
                             style: TextStyle(
                               color: isPending
                                   ? const Color(0xFFEC9C17)
@@ -1107,7 +1174,7 @@ class MarketerDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileSummaryBar() {
+  Widget _buildProfileSummaryBar(bool isDark) {
     return GetBuilder<ProfileController>(
       builder: (profileCtrl) {
         final userInfo = profileCtrl.userInfoModel;
@@ -1123,9 +1190,10 @@ class MarketerDashboardScreen extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
+              color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(
+                  color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
             ),
             child: Row(
               children: [
@@ -1158,20 +1226,20 @@ class MarketerDashboardScreen extends StatelessWidget {
                     children: [
                       Text(
                         name.isNotEmpty ? name : 'shella_agent'.tr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: _darkText,
+                          color: isDark ? Colors.white : _darkText,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         phone.isNotEmpty ? phone : 'certified_marketer'.tr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
-                          color: Color(0xFF6B7280),
+                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                         ),
                       ),
                     ],
@@ -1181,9 +1249,10 @@ class MarketerDashboardScreen extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF252B37) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                    border: Border.all(
+                        color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1193,11 +1262,11 @@ class MarketerDashboardScreen extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         'settings'.tr,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: _darkText,
+                          color: isDark ? Colors.white : _darkText,
                         ),
                       ),
                     ],
@@ -1211,33 +1280,34 @@ class MarketerDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsQuickCard() {
+  Widget _buildSettingsQuickCard(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(
+            color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             'app_and_account_settings'.tr,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: _darkText,
+              color: isDark ? Colors.white : _darkText,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'app_and_account_settings_desc'.tr,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 12,
-              color: Color(0xFF6B7280),
+              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
             ),
           ),
           const SizedBox(height: 12),
@@ -1253,10 +1323,11 @@ class MarketerDashboardScreen extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
+              backgroundColor: isDark ? const Color(0xFF252B37) : Colors.white,
               foregroundColor: _primaryGreen,
               elevation: 0,
-              side: const BorderSide(color: Color(0xFFE5E7EB)),
+              side: BorderSide(
+                  color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               padding: const EdgeInsets.symmetric(vertical: 12),

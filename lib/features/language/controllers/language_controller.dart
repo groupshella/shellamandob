@@ -1,9 +1,6 @@
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/language/domain/models/language_model.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/home/screens/home_screen.dart';
+import 'package:sixam_mart/features/language/domain/models/language_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/language/domain/service/language_service_interface.dart';
@@ -38,23 +35,6 @@ class LocalizationController extends GetxController implements GetxService {
       saveLanguage(_locale);
     }
 
-    if (!AppConstants.isMarketerApp) {
-      if (AddressHelper.getUserAddressFromSharedPref() != null &&
-          !fromBottomSheet) {
-        HomeScreen.loadData(context, true);
-      } else if (Get.context != null && ResponsiveHelper.isDesktop(Get.context!) &&
-          AddressHelper.getUserAddressFromSharedPref() == null) {
-        Get.find<SplashController>().getLandingPageData();
-      }
-
-      if (Get.find<SplashController>().moduleList == null) {
-        Get.find<SplashController>().getModules(headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          AppConstants.localizationKey:
-              Get.find<LocalizationController>().locale.languageCode
-        });
-      }
-    }
 
     update();
     update(['app_locale']);

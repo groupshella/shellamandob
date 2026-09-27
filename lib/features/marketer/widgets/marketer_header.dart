@@ -18,8 +18,12 @@ class MarketerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF121418) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF111B18);
+
     return Container(
-      color: Colors.white,
+      color: bgColor,
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 8,
         bottom: 12,
@@ -32,10 +36,12 @@ class MarketerHeader extends StatelessWidget {
           if (showBackButton)
             IconButton(
               onPressed: onBackPressed ?? () => Get.back(),
-              icon: const Icon(
-                IconlyLight.arrowRight2,
+              icon: Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? IconlyLight.arrowRight2
+                    : IconlyLight.arrowLeft2,
                 size: 22,
-                color: Color(0xFF111B18),
+                color: textColor,
               ),
               splashRadius: 22,
               padding: EdgeInsets.zero,
@@ -47,11 +53,11 @@ class MarketerHeader extends StatelessWidget {
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF111B18),
+                color: textColor,
                 height: 1.3,
               ),
             ),

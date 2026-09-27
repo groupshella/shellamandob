@@ -477,8 +477,8 @@ class ActiveStoreVisitScreen extends StatelessWidget {
         titleColor = isDark ? const Color(0xFFF87171) : const Color(0xFF991B1B);
         alertBodyColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFF7F1D1D);
         defaultTitle = 'critical_alert'.tr;
-        defaultSubtitle = 'تم احتساب هذا الوقت خارج الدوام.';
-        defaultDesc = 'تم تسجيل مستوى الخمول الرابع وفق سياسة التشغيل. يمكنك رفع طلب للمشرف إذا كان هناك سبب يستدعي المراجعة.';
+        defaultSubtitle = 'active_alert4_subtitle'.tr;
+        defaultDesc = 'active_alert4_desc'.tr;
         break;
       case 3:
         bgColor = isDark ? const Color(0xFF351A1A) : const Color(0xFFFEF2F2);
@@ -486,8 +486,8 @@ class ActiveStoreVisitScreen extends StatelessWidget {
         titleColor = const Color(0xFFEF4444);
         alertBodyColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFF991B1B);
         defaultTitle = 'third_alert'.tr;
-        defaultSubtitle = 'تم تسجيل عدم نشاط مستمر أثناء الجولة.';
-        defaultDesc = 'قد يؤثر تكرار هذه الحالة على احتساب وقت العمل.';
+        defaultSubtitle = 'active_alert3_subtitle'.tr;
+        defaultDesc = 'active_alert3_desc'.tr;
         break;
       case 2:
         bgColor = isDark ? const Color(0xFF332612) : const Color(0xFFFFFBEB);
@@ -495,8 +495,8 @@ class ActiveStoreVisitScreen extends StatelessWidget {
         titleColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
         alertBodyColor = isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E);
         defaultTitle = 'second_alert'.tr;
-        defaultSubtitle = 'لم يتم رصد تقدم كافٍ نحو المتجر.';
-        defaultDesc = 'يرجى التوجه إلى موقع الزيارة أو تحديث حالة الزيارة.';
+        defaultSubtitle = 'active_alert2_subtitle'.tr;
+        defaultDesc = 'active_alert2_desc'.tr;
         break;
       case 1:
       default:
@@ -505,8 +505,8 @@ class ActiveStoreVisitScreen extends StatelessWidget {
         titleColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
         alertBodyColor = isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF);
         defaultTitle = 'first_alert'.tr;
-        defaultSubtitle = 'يبدو أنك لم تتحرك نحو المتجر المستهدف.';
-        defaultDesc = 'تحقق من موقعك واستعد لبدء الزيارة.';
+        defaultSubtitle = 'active_alert1_subtitle'.tr;
+        defaultDesc = 'active_alert1_desc'.tr;
         break;
     }
 

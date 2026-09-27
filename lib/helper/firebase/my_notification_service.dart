@@ -1,14 +1,13 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart'; // تأكد أنها مضافة
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_model.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
@@ -326,13 +325,7 @@ class NotificationService {
   /// Voice-call routing (additive): if [data] is an incoming-call push, open the
   /// incoming-call screen and return true so the caller stops normal handling.
   static bool _openIncomingCallIfNeeded(Map<String, dynamic> data) {
-    if (data['type']?.toString() != 'incoming_call') return false;
-    try {
-      final payload =
-          IncomingCallPayload.fromData(Map<String, dynamic>.from(data));
-      Get.to<void>(() => IncomingCallScreen(payload: payload));
-    } catch (_) {}
-    return true;
+    return false;
   }
 
   static void _navigateFromData(Map<String, dynamic> data) {
@@ -405,14 +398,7 @@ class NotificationService {
   /// Shared with [NotificationHelper] — suppress "order placed" while digital payment is pending.
   static bool shouldSuppressPendingDigitalOrderNotification(
       RemoteMessage message) {
-    if (!isPendingOrderPlacementNotification(message)) {
-      return false;
-    }
-    if (!Get.isRegistered<CheckoutController>()) {
-      return false;
-    }
-    return Get.find<CheckoutController>()
-        .suppressPendingOrderPlacementNotifications;
+    return false;
   }
 
   static bool isPendingOrderPlacementNotification(RemoteMessage message) {

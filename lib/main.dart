@@ -22,15 +22,14 @@ import 'package:sixam_mart/theme/dark_theme.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/messages.dart';
 import 'package:sixam_mart/services/secure_token_loader.dart';
-import 'package:sixam_mart/services/cache_manager.dart';
 import 'package:sixam_mart/services/edge_to_edge_service.dart';
 import 'package:sixam_mart/common/utils/app_logger.dart';
 import 'package:sixam_mart/common/security/certificate_pinning.dart';
 import 'package:sixam_mart/core/logger/app_logger.dart' as logger_package;
 import 'package:sixam_mart/core/debug/leak_tracking_wrapper.dart';
+import 'package:sixam_mart/core/cache/hive_home_cache_service.dart';
 import 'package:flutter/foundation.dart';
 import 'helper/get_di.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -222,6 +221,8 @@ Future<void> _initializeHeavyServices() async {
       if (kDebugMode) debugPrint('⚠️ Background handler registration note: $e');
     }
     // STAGE 2: Stagger heavy service init to reduce frame drops on splash/onboarding
+    await HiveHomeCacheService().initialize();
+    if (kDebugMode) debugPrint('✅ Core cache services initialized (Stage 2)');
 
     unawaited(NotificationService().initialize());
     if (kDebugMode) {

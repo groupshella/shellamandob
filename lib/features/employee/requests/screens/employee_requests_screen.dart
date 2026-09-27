@@ -46,15 +46,17 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: isDark ? const Color(0xFF121418) : const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: Text(
           'requests_and_leaves_management'.tr,
           style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF111827),
+        backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+        foregroundColor: isDark ? Colors.white : const Color(0xFF111827),
         elevation: 0.5,
         centerTitle: true,
       ),
@@ -66,9 +68,9 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1C2028) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
               ),
               child: Row(
                 children: [
@@ -78,24 +80,27 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
                       value: '18 ${'day_unit'.tr}',
                       icon: Icons.beach_access_rounded,
                       color: const Color(0xFF2563EB),
+                      isDark: isDark,
                     ),
                   ),
-                  Container(height: 36, width: 1, color: const Color(0xFFE5E7EB)),
+                  Container(height: 36, width: 1, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
                   Expanded(
                     child: _buildBalanceItem(
                       title: 'remaining_sick_leave'.tr,
                       value: '14 ${'day_unit'.tr}',
                       icon: Icons.medical_information_outlined,
                       color: const Color(0xFFEF4444),
+                      isDark: isDark,
                     ),
                   ),
-                  Container(height: 36, width: 1, color: const Color(0xFFE5E7EB)),
+                  Container(height: 36, width: 1, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
                   Expanded(
                     child: _buildBalanceItem(
                       title: 'permission_hours'.tr,
                       value: '04:00 ${'hour_unit'.tr}',
                       icon: Icons.hourglass_top_rounded,
                       color: const Color(0xFFF59E0B),
+                      isDark: isDark,
                     ),
                   ),
                 ],
@@ -110,11 +115,20 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
                 children: [
                   Text(
                     'previous_requests_history'.tr,
-                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
                   ),
                   Text(
                     '${_requests.length} ${'requests_count_label'.tr}',
-                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF6B7280)),
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 12,
+                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                    ),
                   ),
                 ],
               ),
@@ -129,7 +143,7 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
                 itemCount: _requests.length,
                 itemBuilder: (context, index) {
                   final req = _requests[index];
-                  return _buildRequestCard(req);
+                  return _buildRequestCard(req, isDark);
                 },
               ),
             ),
@@ -138,7 +152,7 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: ElevatedButton.icon(
-                onPressed: _showNewRequestModal,
+                onPressed: () => _showNewRequestModal(isDark),
                 icon: const Icon(Icons.add_rounded, size: 22),
                 label: Text(
                   'submit_new_request_or_leave'.tr,
@@ -164,6 +178,7 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
     required String value,
     required IconData icon,
     required Color color,
+    required bool isDark,
   }) {
     return Column(
       children: [
@@ -171,24 +186,33 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF111827)),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : const Color(0xFF111827),
+          ),
         ),
         Text(
           title,
-          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 10, color: Color(0xFF6B7280)),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 10,
+            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildRequestCard(EmployeeRequestModel req) {
+  Widget _buildRequestCard(EmployeeRequestModel req, bool isDark) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,7 +222,7 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: req.type.color.withValues(alpha: 0.1),
+                  color: req.type.color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(req.type.icon, color: req.type.color, size: 20),
@@ -210,11 +234,20 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
                   children: [
                     Text(
                       req.type.localizedTitle,
-                      style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFF111827),
+                      ),
                     ),
                     Text(
                       '${'request_number'.tr}: ${req.id} • ${req.startDate.year}/${req.startDate.month}/${req.startDate.day}',
-                      style: const TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: Color(0xFF6B7280)),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 11,
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                      ),
                     ),
                   ],
                 ),
@@ -222,7 +255,7 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: req.status.color.withValues(alpha: 0.1),
+                  color: req.status.color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -242,7 +275,11 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
           const SizedBox(height: 10),
           Text(
             '${'reason_label'.tr}: ${req.localizedReason}',
-            style: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF374151)),
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 12,
+              color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
+            ),
           ),
           if (req.attachmentName != null) ...[
             const SizedBox(height: 6),
@@ -262,7 +299,7 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF2F2),
+                color: isDark ? const Color(0xFF2D1515) : const Color(0xFFFEF2F2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -272,7 +309,11 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
                   Expanded(
                     child: Text(
                       '${'reject_reason_label'.tr}: ${req.localizedRejectReason}',
-                      style: const TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: Color(0xFF991B1B)),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 11,
+                        color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFF991B1B),
+                      ),
                     ),
                   ),
                 ],
@@ -284,10 +325,11 @@ class _EmployeeRequestsScreenState extends State<EmployeeRequestsScreen> {
     );
   }
 
-  void _showNewRequestModal() {
+  void _showNewRequestModal(bool isDark) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => _NewRequestModal(
         onSubmit: (newReq) {
@@ -324,6 +366,8 @@ class _NewRequestModalState extends State<_NewRequestModal> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -341,9 +385,17 @@ class _NewRequestModalState extends State<_NewRequestModal> {
               children: [
                 Text(
                   'submit_new_leave_request'.tr,
-                  style: const TextStyle(fontFamily: 'Tajawal', fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                  ),
                 ),
-                IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: Icon(Icons.close, color: isDark ? Colors.white : null),
+                ),
               ],
             ),
             const SizedBox(height: 14),
@@ -352,15 +404,15 @@ class _NewRequestModalState extends State<_NewRequestModal> {
             Row(
               children: [
                 Expanded(
-                  child: _buildTypeOption(RequestType.sickLeave, 'sick_leave'.tr),
+                  child: _buildTypeOption(RequestType.sickLeave, 'sick_leave'.tr, isDark),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildTypeOption(RequestType.annualLeave, 'annual_leave'.tr),
+                  child: _buildTypeOption(RequestType.annualLeave, 'annual_leave'.tr, isDark),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildTypeOption(RequestType.permission, 'hourly_permission'.tr),
+                  child: _buildTypeOption(RequestType.permission, 'hourly_permission'.tr, isDark),
                 ),
               ],
             ),
@@ -374,6 +426,7 @@ class _NewRequestModalState extends State<_NewRequestModal> {
                   child: _buildDateBox(
                     label: 'from_date'.tr,
                     date: _startDate,
+                    isDark: isDark,
                     onTap: () async {
                       final picked = await showDatePicker(
                         context: context,
@@ -390,6 +443,7 @@ class _NewRequestModalState extends State<_NewRequestModal> {
                   child: _buildDateBox(
                     label: 'to_date'.tr,
                     date: _endDate,
+                    isDark: isDark,
                     onTap: () async {
                       final picked = await showDatePicker(
                         context: context,
@@ -410,15 +464,22 @@ class _NewRequestModalState extends State<_NewRequestModal> {
             TextField(
               controller: _reasonController,
               maxLines: 2,
-              style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+              style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: isDark ? Colors.white : const Color(0xFF111827)),
               decoration: InputDecoration(
                 labelText: 'request_reason_clarification'.tr,
-                labelStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+                labelStyle: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: isDark ? const Color(0xFF9CA3AF) : null),
                 hintText: 'request_reason_hint'.tr,
-                hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF9CA3AF)),
+                hintStyle: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF)),
                 filled: true,
-                fillColor: const Color(0xFFF9FAFB),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                fillColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: isDark ? const Color(0xFF374151) : const Color(0xFFD1D5DB)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: isDark ? const Color(0xFF374151) : const Color(0xFFD1D5DB)),
+                ),
               ),
             ),
 
@@ -431,9 +492,9 @@ class _NewRequestModalState extends State<_NewRequestModal> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0FDF4),
+                  color: isDark ? const Color(0xFF162A1D) : const Color(0xFFF0FDF4),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF86EFAC)),
+                  border: Border.all(color: isDark ? const Color(0xFF22C55E).withValues(alpha: 0.3) : const Color(0xFF86EFAC)),
                 ),
                 child: Row(
                   children: [
@@ -448,7 +509,9 @@ class _NewRequestModalState extends State<_NewRequestModal> {
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
-                          color: _pickedFileName != null ? const Color(0xFF15803D) : const Color(0xFF4B5563),
+                          color: _pickedFileName != null
+                              ? const Color(0xFF22C55E)
+                              : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563)),
                           fontWeight: _pickedFileName != null ? FontWeight.bold : FontWeight.normal,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -481,7 +544,7 @@ class _NewRequestModalState extends State<_NewRequestModal> {
     );
   }
 
-  Widget _buildTypeOption(RequestType type, String label) {
+  Widget _buildTypeOption(RequestType type, String label, bool isDark) {
     final isSelected = _selectedType == type;
 
     return InkWell(
@@ -490,7 +553,7 @@ class _NewRequestModalState extends State<_NewRequestModal> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? type.color : const Color(0xFFF3F4F6),
+          color: isSelected ? type.color : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6)),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
@@ -500,7 +563,7 @@ class _NewRequestModalState extends State<_NewRequestModal> {
               fontFamily: 'Tajawal',
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.white : const Color(0xFF374151),
+              color: isSelected ? Colors.white : (isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151)),
             ),
           ),
         ),
@@ -508,25 +571,37 @@ class _NewRequestModalState extends State<_NewRequestModal> {
     );
   }
 
-  Widget _buildDateBox({required String label, required DateTime date, required VoidCallback onTap}) {
+  Widget _buildDateBox({required String label, required DateTime date, required VoidCallback onTap, required bool isDark}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFFF9FAFB),
+          color: isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFD1D5DB)),
+          border: Border.all(color: isDark ? const Color(0xFF374151) : const Color(0xFFD1D5DB)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(fontFamily: 'Tajawal', fontSize: 10, color: Color(0xFF6B7280))),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 10,
+                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+              ),
+            ),
             const SizedBox(height: 2),
             Text(
               '${date.year}/${date.month}/${date.day}',
-              style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF111827),
+              ),
             ),
           ],
         ),

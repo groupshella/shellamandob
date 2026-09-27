@@ -23,12 +23,14 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
             elevation: 0,
             centerTitle: true,
             automaticallyImplyLeading: !widget.isRoot,
@@ -38,168 +40,198 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                     onPressed: () => Get.back(),
                     icon: Icon(
                       locCtrl.isLtr ? IconlyLight.arrowLeft2 : IconlyLight.arrowRight2,
-                      color: _darkText,
+                      color: isDark ? Colors.white : _darkText,
                     ),
                   ),
             title: Text(
               'clients_and_followup'.tr,
-              style: const TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: _darkText,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : _darkText,
+              ),
+            ),
           ),
-        ),
-      ),
-      body: SafeArea(
-        child: GetBuilder<MarketerController>(
-          builder: (c) {
-            final txns = c.transactions;
+          body: SafeArea(
+            child: GetBuilder<MarketerController>(
+              builder: (c) {
+                final txns = c.transactions;
 
-            final filtered = txns.where((item) {
-              final hasPaid = item['has_paid'] == true ||
-                  item['status'] == 'paid' ||
-                  (item['orders_count'] != null && (item['orders_count'] as int) > 0);
+                final filtered = txns.where((item) {
+                  final hasPaid = item['has_paid'] == true ||
+                      item['status'] == 'paid' ||
+                      (item['orders_count'] != null && (item['orders_count'] as int) > 0);
 
-              if (_selectedFilterIndex == 1 && !hasPaid) return false;
-              if (_selectedFilterIndex == 2 && hasPaid) return false;
+                  if (_selectedFilterIndex == 1 && !hasPaid) return false;
+                  if (_selectedFilterIndex == 2 && hasPaid) return false;
 
-              if (_searchQuery.trim().isNotEmpty) {
-                final customerName = (item['customer'] ?? '').toString().toLowerCase();
-                final phone = (item['phone'] ?? '').toString().toLowerCase();
-                final q = _searchQuery.trim().toLowerCase();
-                if (!customerName.contains(q) && !phone.contains(q)) return false;
-              }
-              return true;
-            }).toList();
+                  if (_searchQuery.trim().isNotEmpty) {
+                    final customerName = (item['customer'] ?? '').toString().toLowerCase();
+                    final phone = (item['phone'] ?? '').toString().toLowerCase();
+                    final q = _searchQuery.trim().toLowerCase();
+                    if (!customerName.contains(q) && !phone.contains(q)) return false;
+                  }
+                  return true;
+                }).toList();
 
-            return Column(
-              children: [
-                // Top Summary Stats Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      _buildMiniStat('registered_clients'.tr, '${c.registeredCustomers}', const Color(0xFF1D4ED8), const Color(0xFFEFF6FF)),
-                      const SizedBox(width: 8),
-                      _buildMiniStat('paying_clients'.tr, '${c.payingCustomers}', _primaryGreen, const Color(0xFFF0FDF4)),
-                      const SizedBox(width: 8),
-                      _buildMiniStat('pending_orders_clients'.tr, '${c.hesitantCustomers}', const Color(0xFFD97706), const Color(0xFFFFFBEB)),
-                    ],
-                  ),
-                ),
-
-                // Search Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TextField(
-                    onChanged: (val) => setState(() => _searchQuery = val),
-                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'search_clients_hint'.tr,
-                      hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Color(0xFF9CA3AF)),
-                      prefixIcon: const Icon(IconlyLight.search, color: Color(0xFF9CA3AF), size: 20),
-                      filled: true,
-                      fillColor: const Color(0xFFF9FAFB),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: _primaryGreen, width: 1.5),
+                return Column(
+                  children: [
+                    // Top Summary Stats Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          _buildMiniStat(
+                            'registered_clients'.tr,
+                            '${c.registeredCustomers}',
+                            isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8),
+                            isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildMiniStat(
+                            'paying_clients'.tr,
+                            '${c.payingCustomers}',
+                            isDark ? const Color(0xFF4ADE80) : _primaryGreen,
+                            isDark ? const Color(0xFF14301C) : const Color(0xFFF0FDF4),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildMiniStat(
+                            'pending_orders_clients'.tr,
+                            '${c.hesitantCustomers}',
+                            isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+                            isDark ? const Color(0xFF332512) : const Color(0xFFFFFBEB),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
 
-                // Filters Tabs
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: Row(
-                    children: List.generate(_filters.length, (index) {
-                      final isSelected = _selectedFilterIndex == index;
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: GestureDetector(
-                          onTap: () => setState(() => _selectedFilterIndex = index),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isSelected ? _primaryGreen : const Color(0xFFF3F4F6),
-                              borderRadius: BorderRadius.circular(20),
+                    // Search Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: TextField(
+                        onChanged: (val) => setState(() => _searchQuery = val),
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'search_clients_hint'.tr,
+                          hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Color(0xFF9CA3AF)),
+                          prefixIcon: const Icon(IconlyLight.search, color: Color(0xFF9CA3AF), size: 20),
+                          filled: true,
+                          fillColor: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB),
                             ),
-                            child: Text(
-                              _filters[index],
-                              style: TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                color: isSelected ? Colors.white : const Color(0xFF4B5563),
-                              ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB),
                             ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: _primaryGreen, width: 1.5),
                           ),
                         ),
-                      );
-                    }),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                      ),
+                    ),
 
-                // List of Clients
-                Expanded(
-                  child: RefreshIndicator(
-                    color: _primaryGreen,
-                    onRefresh: c.loadDashboard,
-                    child: filtered.isEmpty
-                        ? ListView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            children: [
-                              const SizedBox(height: 80),
-                              Center(
-                                child: Column(
-                                  children: [
-                                    const Icon(IconlyLight.profile, size: 54, color: Color(0xFFD1D5DB)),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      'no_clients_found'.tr,
-                                      style: const TextStyle(
-                                        fontFamily: 'Tajawal',
-                                        fontSize: 14,
-                                        color: Color(0xFF6B7280),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
+                    // Filters Tabs
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Row(
+                        children: List.generate(_filters.length, (index) {
+                          final isSelected = _selectedFilterIndex == index;
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: GestureDetector(
+                              onTap: () => setState(() => _selectedFilterIndex = index),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? _primaryGreen
+                                      : (isDark ? const Color(0xFF1C2028) : const Color(0xFFF3F4F6)),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: isDark && !isSelected
+                                      ? Border.all(color: const Color(0xFF2C3240))
+                                      : null,
+                                ),
+                                child: Text(
+                                  _filters[index],
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563)),
+                                  ),
                                 ),
                               ),
-                            ],
-                          )
-                        : ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            itemCount: filtered.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 10),
-                            itemBuilder: (context, index) {
-                              final item = filtered[index];
-                              return _buildClientCard(item);
-                            },
-                          ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Divider(height: 1, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
+
+                    // List of Clients
+                    Expanded(
+                      child: RefreshIndicator(
+                        color: _primaryGreen,
+                        onRefresh: c.loadDashboard,
+                        child: filtered.isEmpty
+                            ? ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                children: [
+                                  const SizedBox(height: 80),
+                                  Center(
+                                    child: Column(
+                                      children: [
+                                        Icon(IconlyLight.profile, size: 54, color: isDark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB)),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'no_clients_found'.tr,
+                                          style: TextStyle(
+                                            fontFamily: 'Tajawal',
+                                            fontSize: 14,
+                                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : ListView.separated(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                itemCount: filtered.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                                itemBuilder: (context, index) {
+                                  final item = filtered[index];
+                                  return _buildClientCard(item, isDark);
+                                },
+                              ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
       },
     );
   }
@@ -240,11 +272,11 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
     );
   }
 
-  Widget _buildClientCard(dynamic item) {
+  Widget _buildClientCard(dynamic item, bool isDark) {
     final hasPaid = item['has_paid'] == true ||
         item['status'] == 'paid' ||
         (item['orders_count'] != null && (item['orders_count'] as int) > 0);
-    final customerName = (item['customer'] ?? 'عميل').toString();
+    final customerName = (item['customer'] ?? 'customer'.tr).toString();
     final phone = (item['phone'] ?? '').toString();
     final date = (item['date'] ?? '').toString();
     final time = (item['time'] ?? '').toString();
@@ -254,17 +286,19 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: hasPaid ? const Color(0x6030913F) : const Color(0xFFE5E7EB),
+          color: hasPaid
+              ? (isDark ? const Color(0xFF1E3A24) : const Color(0x6030913F))
+              : (isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
           width: hasPaid ? 1.2 : 0.8,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x06000000),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
             blurRadius: 6,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -278,13 +312,17 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: hasPaid ? const Color(0xFFEBFEEB) : const Color(0xFFF3F4F6),
+                  color: hasPaid
+                      ? (isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB))
+                      : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6)),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
                   child: Icon(
                     hasPaid ? IconlyLight.shieldDone : IconlyLight.profile,
-                    color: hasPaid ? _primaryGreen : const Color(0xFF9CA3AF),
+                    color: hasPaid
+                        ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                        : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF)),
                     size: 24,
                   ),
                 ),
@@ -298,7 +336,7 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                   decoration: BoxDecoration(
                     color: hasPaid ? _primaryGreen : const Color(0xFFF59E0B),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: isDark ? const Color(0xFF1C2028) : Colors.white, width: 2),
                   ),
                 ),
               ),
@@ -316,18 +354,20 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                   children: [
                     Text(
                       customerName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: _darkText,
+                        color: isDark ? Colors.white : _darkText,
                       ),
                     ),
                     // Status Badge
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: hasPaid ? const Color(0xFFF0FDF4) : const Color(0xFFFFFBEB),
+                        color: hasPaid
+                            ? (isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4))
+                            : (isDark ? const Color(0xFF332512) : const Color(0xFFFFFBEB)),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -336,7 +376,9 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                           fontFamily: 'Tajawal',
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: hasPaid ? const Color(0xFF16A34A) : const Color(0xFFD97706),
+                          color: hasPaid
+                              ? (isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A))
+                              : (isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706)),
                         ),
                       ),
                     ),
@@ -350,10 +392,10 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                         textDirection: TextDirection.ltr,
                         child: Text(
                           phone,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 12,
-                            color: Color(0xFF6B7280),
+                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                           ),
                         ),
                       ),
@@ -361,10 +403,10 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                     ],
                     Text(
                       '$date $time',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 11,
-                        color: Color(0xFF9CA3AF),
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF),
                       ),
                     ),
                   ],
@@ -383,15 +425,18 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                 children: [
                   Text(
                     '+${reward.toStringAsFixed(0)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: _primaryGreen,
+                      color: isDark ? const Color(0xFF4ADE80) : _primaryGreen,
                     ),
                   ),
                   const SizedBox(width: 3),
-                  const SarCurrencyWidget(size: 11, color: _primaryGreen),
+                  SarCurrencyWidget(
+                    size: 11,
+                    color: isDark ? const Color(0xFF4ADE80) : _primaryGreen,
+                  ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -400,7 +445,9 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 9,
-                  color: hasPaid ? _primaryGreen : const Color(0xFF9CA3AF),
+                  color: hasPaid
+                      ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                      : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF)),
                   fontWeight: FontWeight.w500,
                 ),
               ),

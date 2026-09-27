@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sixam_mart/common/widgets/demo_reset_dialog_widget.dart';
-import 'package:sixam_mart/features/chat/controllers/chat_controller.dart';
-import 'package:sixam_mart/features/chat/enums/user_type_enum.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/firebase/my_notification_service.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -17,8 +15,6 @@ import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/backend_message_translator.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:dio/dio.dart' as dio_pkg;
-import 'package:sixam_mart/features/dashboard/screens/dashboard_screen.dart';
 import 'package:sixam_mart/features/notification/widgets/notifiation_popup_dialog_widget.dart';
 
 class NotificationHelper {
@@ -59,8 +55,7 @@ class NotificationHelper {
           final Map<NotificationType, Function> notificationActions = {
             NotificationType.order: () {
               if (AuthHelper.isGuestLoggedIn()) {
-                Get.to(() =>
-                    const DashboardScreen(pageIndex: 2));
+                Get.toNamed(RouteHelper.getInitialRoute());
               } else {
                 Get.toNamed(RouteHelper.getOrderDetailsRoute(
                     int.parse(payload.orderId.toString()),
@@ -105,45 +100,7 @@ class NotificationHelper {
       if (message.data['type'] == 'demo_reset') {
         Get.dialog(const DemoResetDialogWidget(), barrierDismissible: false);
       }
-      if (message.data['type'] == 'message' &&
-          Get.currentRoute.startsWith(RouteHelper.messages)) {
-        if (AuthHelper.isLoggedIn()) {
-          Get.find<ChatController>().getConversationList(1);
-          if (Get.find<ChatController>()
-                  .messageModel!
-                  .conversation!
-                  .id
-                  .toString() ==
-              message.data['conversation_id'].toString()) {
-            Get.find<ChatController>().getMessages(
-              1,
-              NotificationBodyModel(
-                notificationType: NotificationType.message,
-                adminId: message.data['sender_type'] == UserType.admin.name
-                    ? 0
-                    : null,
-                restaurantId:
-                    message.data['sender_type'] == UserType.vendor.name
-                        ? 0
-                        : null,
-                deliverymanId:
-                    message.data['sender_type'] == UserType.delivery_man.name
-                        ? 0
-                        : null,
-              ),
-              null,
-              int.parse(message.data['conversation_id'].toString()),
-            );
-          } else {
-            NotificationHelper.showNotification(
-                message, flutterLocalNotificationsPlugin);
-          }
-        }
-      } else if (message.data['type'] == 'message' &&
-          Get.currentRoute.startsWith(RouteHelper.conversation)) {
-        if (AuthHelper.isLoggedIn()) {
-          Get.find<ChatController>().getConversationList(1);
-        }
+      if (message.data['type'] == 'message') {
         NotificationHelper.showNotification(
             message, flutterLocalNotificationsPlugin);
       } else if (message.data['type'] == 'demo_reset') {
@@ -374,12 +331,9 @@ if (image != null && image.isNotEmpty) {
       String url, String fileName) async {
     final Directory directory = await getApplicationDocumentsDirectory();
     final String filePath = '${directory.path}/$fileName';
-    final dio_pkg.Response<List<int>> response = await dio_pkg.Dio().get<List<int>>(
-      url,
-      options: dio_pkg.Options(responseType: dio_pkg.ResponseType.bytes),
-    );
+    final response = await http.get(Uri.parse(url));
     final File file = File(filePath);
-    await file.writeAsBytes(response.data ?? []);
+    await file.writeAsBytes(response.bodyBytes);
     return filePath;
   }
 

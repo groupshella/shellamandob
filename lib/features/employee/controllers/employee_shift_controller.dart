@@ -248,14 +248,14 @@ class EmployeeShiftController extends GetxController implements GetxService {
         loadCurrentShift(notify: true);
         return true;
       } else {
-        final msg = res.body?['message'] ?? 'فشل في بدء الدوام';
+        final msg = res.body?['message'] ?? 'failed_to_start_shift'.tr;
         showCustomSnackBar(msg.toString(), isError: true);
         update();
         return false;
       }
     } catch (e) {
       isLoading = false;
-      showCustomSnackBar('حدث خطأ أثناء بدء الدوام: $e', isError: true);
+      showCustomSnackBar('${'error_starting_shift'.tr}: $e', isError: true);
       update();
       return false;
     }
@@ -276,14 +276,14 @@ class EmployeeShiftController extends GetxController implements GetxService {
         loadCurrentShift(notify: true);
         return true;
       } else {
-        final msg = res.body?['message'] ?? 'فشل في طلب الراحة';
+        final msg = res.body?['message'] ?? 'failed_to_request_break'.tr;
         showCustomSnackBar(msg.toString(), isError: true);
         update();
         return false;
       }
     } catch (e) {
       isLoading = false;
-      showCustomSnackBar('حدث خطأ أثناء طلب الراحة', isError: true);
+      showCustomSnackBar('error_requesting_break'.tr, isError: true);
       update();
       return false;
     }
@@ -304,14 +304,14 @@ class EmployeeShiftController extends GetxController implements GetxService {
         loadCurrentShift(notify: true);
         return true;
       } else {
-        final msg = res.body?['message'] ?? 'فشل في استئناف العمل';
+        final msg = res.body?['message'] ?? 'failed_to_resume_work'.tr;
         showCustomSnackBar(msg.toString(), isError: true);
         update();
         return false;
       }
     } catch (e) {
       isLoading = false;
-      showCustomSnackBar('حدث خطأ أثناء استئناف العمل', isError: true);
+      showCustomSnackBar('error_resuming_work'.tr, isError: true);
       update();
       return false;
     }
@@ -337,18 +337,18 @@ class EmployeeShiftController extends GetxController implements GetxService {
           actualWorkSeconds: 0,
         );
         update();
-        showCustomSnackBar('تم إنهاء الدوام بنجاح', isError: false);
+        showCustomSnackBar('shift_ended_successfully'.tr, isError: false);
         loadCurrentShift(notify: true);
         return true;
       } else {
-        final msg = res.body?['message'] ?? 'فشل في إنهاء الدوام';
+        final msg = res.body?['message'] ?? 'failed_to_end_shift'.tr;
         showCustomSnackBar(msg.toString(), isError: true);
         update();
         return false;
       }
     } catch (e) {
       isLoading = false;
-      showCustomSnackBar('حدث خطأ أثناء إنهاء الدوام', isError: true);
+      showCustomSnackBar('error_ending_shift'.tr, isError: true);
       update();
       return false;
     }
@@ -397,7 +397,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
     final newWarning = EmployeeWarningModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: reason,
-      date: 'اليوم',
+      date: 'today'.tr,
     );
     final updatedWarnings = List<EmployeeWarningModel>.from(_shiftModel.warnings)..add(newWarning);
     _shiftModel = _shiftModel.copyWith(warnings: updatedWarnings);

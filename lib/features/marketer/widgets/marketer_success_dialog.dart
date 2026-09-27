@@ -17,11 +17,13 @@ class MarketerSuccessDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -37,14 +39,14 @@ class MarketerSuccessDialog extends StatelessWidget {
               child: Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF3F4F6),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.close,
                   size: 20,
-                  color: Color(0xFF555555),
+                  color: isDark ? Colors.white : const Color(0xFF555555),
                 ),
               ),
             ),
@@ -57,7 +59,7 @@ class MarketerSuccessDialog extends StatelessWidget {
               height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFEBFEEB).withValues(alpha: 0.6),
+                color: (isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB)).withValues(alpha: 0.6),
               ),
               alignment: Alignment.center,
               child: Container(
@@ -86,11 +88,11 @@ class MarketerSuccessDialog extends StatelessWidget {
           Text(
             'application_sent_success'.tr,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF111B18),
+              color: isDark ? Colors.white : const Color(0xFF111B18),
               height: 1.4,
             ),
           ),
@@ -98,11 +100,11 @@ class MarketerSuccessDialog extends StatelessWidget {
           Text(
             'we_will_contact_you_soon'.tr,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF2D3633),
+              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF2D3633),
               height: 1.5,
             ),
           ),
@@ -122,9 +124,9 @@ class MarketerSuccessDialog extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'متابعة حالة الطلب',
-                style: TextStyle(
+              child: Text(
+                'track_application_status'.tr,
+                style: const TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

@@ -267,48 +267,6 @@ class AuthService implements AuthServiceInterface {
 
         // Update Qidha wallet state if wallet exists
         if (userData['has_qidha_wallet'] == true) {
-          debugPrint(
-              '💳 AuthService: User has Qidha wallet - updating wallet state...');
-          debugPrint(
-              '   - Signed: ${userData['qidha_wallet_signed'] ?? false}');
-          debugPrint(
-              '   - Active: ${userData['qidha_wallet_active'] ?? false}');
-          debugPrint(
-              '   - Balance: ${userData['qidha_wallet_balance'] ?? 'null'}');
-
-          if (Get.isRegistered<KaidhaSubscriptionController>()) {
-            final kaidhaController = Get.find<KaidhaSubscriptionController>();
-            kaidhaController.setWalletStateFromLogin(
-              signed: userData['qidha_wallet_signed'] == true,
-              active: userData['qidha_wallet_active'] == true,
-              balance: userData['qidha_wallet_balance']?.toString(),
-            );
-            debugPrint('✅ AuthService: Wallet state updated successfully');
-
-            // Only fetch full wallet data if wallet is not signed/active (needed for subscription flow)
-            final qidhaWalletSigned = userData['qidha_wallet_signed'] is bool
-                ? userData['qidha_wallet_signed'] as bool
-                : (userData['qidha_wallet_signed']?.toString() == '1' ||
-                    userData['qidha_wallet_signed']?.toString() == 'true');
-            final qidhaWalletActive = userData['qidha_wallet_active'] is bool
-                ? userData['qidha_wallet_active'] as bool
-                : (userData['qidha_wallet_active']?.toString() == '1' ||
-                    userData['qidha_wallet_active']?.toString() == 'true');
-            if (!qidhaWalletSigned || !qidhaWalletActive) {
-              debugPrint(
-                  '🔄 AuthService: Wallet not signed/active - loading full wallet data in background...');
-              // Load full wallet data in background (non-blocking) - needed for subscription flow
-              kaidhaController.get_Wallet_Kaidh();
-            } else {
-              debugPrint(
-                  '⚡ AuthService: Wallet is signed and active - no API call needed (balance already set)');
-            }
-          } else {
-            debugPrint(
-                '⚠️ AuthService: KaidhaSubscriptionController not registered');
-          }
-        } else {
-          debugPrint('ℹ️ AuthService: User has no Qidha wallet');
         }
       } else {
         debugPrint(

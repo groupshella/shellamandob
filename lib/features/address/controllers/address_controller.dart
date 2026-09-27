@@ -1,15 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:sixam_mart/common/models/response_model.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_v2_model.dart';
 import 'package:sixam_mart/features/address/domain/services/address_service_interface.dart';
 import 'package:sixam_mart/features/address/domain/services/address_v2_api.dart';
-import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
 
 class AddressController extends GetxController implements GetxService {
   final AddressServiceInterface addressServiceInterface;
@@ -40,43 +36,6 @@ class AddressController extends GetxController implements GetxService {
   Future<ResponseModel> updateAddress(AddressModel addressModel, int? addressId) async {
     _isLoading = true;
     update();
-    
-    // 🔒 TASK 2: LOCATION-CHANGE CACHE PURGE
-    // Calculate distance between new and old coordinates
-    // If distance > 500 meters, clear all module state and Hive cache
-    try {
-      final oldAddress = AddressHelper.getUserAddressFromSharedPref();
-      if (oldAddress != null && 
-          oldAddress.latitude != null && 
-          oldAddress.longitude != null &&
-          addressModel.latitude != null &&
-          addressModel.longitude != null) {
-        final oldLat = double.tryParse(oldAddress.latitude!) ?? 0.0;
-        final oldLng = double.tryParse(oldAddress.longitude!) ?? 0.0;
-        final newLat = double.tryParse(addressModel.latitude!) ?? 0.0;
-        final newLng = double.tryParse(addressModel.longitude!) ?? 0.0;
-        
-        // Calculate distance in meters
-        final distanceInMeters = Geolocator.distanceBetween(
-          oldLat, oldLng, newLat, newLng
-        );
-        
-        if (distanceInMeters > 500) {
-          if (Get.isRegistered<StoreController>()) {
-            final storeController = Get.find<StoreController>();
-            await storeController.clearAllModuleState(reload: true);
-            if (kDebugMode) {
-              debugPrint('🧹 AddressController: Location changed by ${distanceInMeters.toStringAsFixed(0)}m (>500m) - Cleared all module state and Hive cache');
-            }
-          }
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('⚠️ AddressController: Error calculating distance for cache purge: $e');
-      }
-      // Don't fail the update if distance calculation fails
-    }
     
     final ResponseModel responseModel = await addressServiceInterface.updateAddress(addressModel, addressId);
     if (responseModel.isSuccess) {
@@ -198,8 +157,6 @@ class AddressController extends GetxController implements GetxService {
         responseModel = ResponseModel(false, (Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'your_selected_location_is_from_different_zone'.tr : 'your_selected_location_is_from_different_zone_store'.tr));
       }else {
         await getAddressList();
-        // Always select the first item after reload (newest address appears first).
-        Get.find<CheckoutController>().setAddressIndex(0);
         if (kDebugMode) {
           debugPrint(
               '✅ AddressController.addAddress: selectedIndex=0, selectedAddressId=${_addressList?.isNotEmpty == true ? _addressList!.first.id : null}');

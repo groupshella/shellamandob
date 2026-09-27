@@ -34,69 +34,80 @@ class _MarketerMainScreenState extends State<MarketerMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
+          backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
           body: IndexedStack(
             index: _currentIndex,
             children: _tabs,
           ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  index: 0,
-                  activeIcon: IconlyBold.home,
-                  inactiveIcon: IconlyLight.home,
-                  label: 'nav_home'.tr,
-                ),
-                _buildNavItem(
-                  index: 1,
-                  activeIcon: IconlyBold.user3,
-                  inactiveIcon: IconlyLight.user2,
-                  label: 'nav_clients'.tr,
-                ),
-                _buildNavItem(
-                  index: 2,
-                  activeIcon: IconlyBold.wallet,
-                  inactiveIcon: IconlyLight.wallet,
-                  label: 'nav_wallet'.tr,
-                ),
-                _buildNavItem(
-                  index: 3,
-                  activeIcon: IconlyBold.profile,
-                  inactiveIcon: IconlyLight.profile,
-                  label: 'nav_profile'.tr,
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C2028) : Colors.white,
+              border: isDark
+                  ? const Border(top: BorderSide(color: Color(0xFF2C3240), width: 1))
+                  : null,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, -3),
                 ),
               ],
             ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      index: 0,
+                      activeIcon: IconlyBold.home,
+                      inactiveIcon: IconlyLight.home,
+                      label: 'nav_home'.tr,
+                      isDark: isDark,
+                    ),
+                    _buildNavItem(
+                      index: 1,
+                      activeIcon: IconlyBold.user3,
+                      inactiveIcon: IconlyLight.user2,
+                      label: 'nav_clients'.tr,
+                      isDark: isDark,
+                    ),
+                    _buildNavItem(
+                      index: 2,
+                      activeIcon: IconlyBold.wallet,
+                      inactiveIcon: IconlyLight.wallet,
+                      label: 'nav_wallet'.tr,
+                      isDark: isDark,
+                    ),
+                    _buildNavItem(
+                      index: 3,
+                      activeIcon: IconlyBold.profile,
+                      inactiveIcon: IconlyLight.profile,
+                      label: 'nav_profile'.tr,
+                      isDark: isDark,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
-  },
-);
-}
+  }
 
   Widget _buildNavItem({
     required int index,
     required IconData activeIcon,
     required IconData inactiveIcon,
     required String label,
+    required bool isDark,
   }) {
     final bool isSelected = _currentIndex == index;
 
@@ -107,7 +118,9 @@ class _MarketerMainScreenState extends State<MarketerMainScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFF0FDF4) : Colors.transparent,
+          color: isSelected
+              ? (isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4))
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -115,7 +128,9 @@ class _MarketerMainScreenState extends State<MarketerMainScreen> {
           children: [
             Icon(
               isSelected ? activeIcon : inactiveIcon,
-              color: isSelected ? _primaryGreen : const Color(0xFF9CA3AF),
+              color: isSelected
+                  ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                  : (isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF)),
               size: 22,
             ),
             const SizedBox(height: 3),
@@ -125,7 +140,9 @@ class _MarketerMainScreenState extends State<MarketerMainScreen> {
                 fontFamily: 'Tajawal',
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                color: isSelected ? _primaryGreen : const Color(0xFF6B7280),
+                color: isSelected
+                    ? (isDark ? const Color(0xFF4ADE80) : _primaryGreen)
+                    : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
               ),
             ),
           ],

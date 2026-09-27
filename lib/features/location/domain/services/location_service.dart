@@ -14,9 +14,7 @@ import 'package:sixam_mart/features/location/domain/repositories/location_reposi
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
 import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
 import 'package:sixam_mart/features/location/widgets/permission_dialog_widget.dart';
-import 'package:sixam_mart/features/parcel/domain/models/place_details_model.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/home/screens/multi_module/multi_module_home_screen.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -188,14 +186,8 @@ class LocationService implements LocationServiceInterface {
 
   @override
   void handleRoute(bool fromSignUp, String? route, bool canRoute) {
-    // Keep onboarding flow intact:
-    // Welcome screens -> Pick Map -> MultiModuleHomeScreen.
     if (route == 'onboarding' || route == RouteHelper.onBoarding) {
-      Get.offAll<dynamic>(
-        () => const MultiModuleHomeScreen(),
-        transition: Transition.fadeIn,
-        duration: const Duration(milliseconds: 250),
-      );
+      Get.offAllNamed(RouteHelper.getInitialRoute());
       return;
     }
 
@@ -211,11 +203,14 @@ class LocationService implements LocationServiceInterface {
     LatLng latLng = const LatLng(0, 0);
     final Response? response = await locationRepoInterface.get(id) as Response?;
     if (response?.statusCode == 200) {
-      final PlaceDetailsModel placeDetails =
-          PlaceDetailsModel.fromJson(response?.body as Map<String, dynamic>);
-      if (placeDetails.status == 'OK') {
-        latLng = LatLng(placeDetails.result!.geometry!.location!.lat!,
-            placeDetails.result!.geometry!.location!.lng!);
+      final body = response?.body as Map<String, dynamic>?;
+      if (body != null && body['status'] == 'OK' && body['result'] != null) {
+        final loc = (body['result'] as Map<String, dynamic>)['geometry']?['location'] as Map<String, dynamic>?;
+        if (loc != null) {
+          final lat = double.tryParse(loc['lat']?.toString() ?? '') ?? 0;
+          final lng = double.tryParse(loc['lng']?.toString() ?? '') ?? 0;
+          latLng = LatLng(lat, lng);
+        }
       }
     }
     return latLng;

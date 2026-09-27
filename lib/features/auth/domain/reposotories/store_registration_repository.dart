@@ -4,7 +4,7 @@ import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/auth/domain/models/store_body_model.dart';
 import 'package:sixam_mart/features/auth/domain/reposotories/store_registration_repository_interface.dart';
-import 'package:sixam_mart/features/business/domain/models/package_model.dart';
+import 'package:sixam_mart/features/auth/domain/models/package_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:sixam_mart/common/security/certificate_pinning.dart';

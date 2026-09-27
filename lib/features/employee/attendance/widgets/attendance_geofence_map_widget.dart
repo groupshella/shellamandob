@@ -65,8 +65,8 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
               isInside ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueRed,
             ),
             infoWindow: InfoWindow(
-              title: zone?.name ?? 'نطاق العمل',
-              snippet: 'نصف القطر: ${(radius).toInt()} م',
+              title: zone?.name ?? 'work_zone_label'.tr,
+              snippet: '${'geofence_radius'.tr}: ${(radius).toInt()} ${'meter_unit'.tr}',
             ),
           ),
           if (controller.userLocation != null)
@@ -74,17 +74,26 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
               markerId: const MarkerId('user_location'),
               position: userLatLng,
               icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-              infoWindow: const InfoWindow(
-                title: 'موقعك الحالي',
+              infoWindow: InfoWindow(
+                title: 'your_current_location'.tr,
               ),
             ),
         };
 
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         String? mapStyle;
         if (Get.isRegistered<ThemeController>()) {
           final theme = Get.find<ThemeController>();
-          mapStyle = Get.isDarkMode ? theme.darkMap : theme.lightMap;
+          mapStyle = theme.darkTheme ? theme.darkMap : theme.lightMap;
         }
+
+        final borderColor = isInside
+            ? (isDark ? const Color(0xFF166534) : const Color(0xFF86EFAC))
+            : (isDark ? const Color(0xFF991B1B) : const Color(0xFFFCA5A5));
+        final pillBg = (isDark ? const Color(0xFF1C2028) : Colors.white).withValues(alpha: 0.92);
+        final pillTextColor = isDark ? Colors.white : const Color(0xFF111B18);
+        final buttonBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+        final buttonIconColor = isDark ? Colors.white : const Color(0xFF111B18);
 
         return Container(
           width: double.infinity,
@@ -92,7 +101,7 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isInside ? const Color(0xFF86EFAC) : const Color(0xFFFCA5A5),
+              color: borderColor,
               width: 1.5,
             ),
             boxShadow: const [
@@ -133,7 +142,7 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.92),
+                      color: pillBg,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
                         BoxShadow(
@@ -153,12 +162,12 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          '${zone?.name ?? 'نطاق العمل'} (${radius.toInt()}م)',
-                          style: const TextStyle(
+                          '${zone?.name ?? 'work_zone_label'.tr} (${radius.toInt()}${'meter_unit'.tr})',
+                          style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF111B18),
+                            color: pillTextColor,
                           ),
                         ),
                       ],
@@ -175,10 +184,10 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
                     child: Container(
                       width: 40,
                       height: 40,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: buttonBg,
                         shape: BoxShape.circle,
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Color(0x1F000000),
                             blurRadius: 6,
@@ -186,10 +195,10 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.my_location,
                         size: 20,
-                        color: Color(0xFF111B18),
+                        color: buttonIconColor,
                       ),
                     ),
                   ),
@@ -198,7 +207,7 @@ class _AttendanceGeofenceMapWidgetState extends State<AttendanceGeofenceMapWidge
                 // Checking / Loading overlay
                 if (isChecking || controller.isLoadingLocation)
                   Container(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: (isDark ? Colors.black : Colors.white).withValues(alpha: 0.6),
                     child: const Center(
                       child: CircularProgressIndicator(color: _primaryGreen),
                     ),

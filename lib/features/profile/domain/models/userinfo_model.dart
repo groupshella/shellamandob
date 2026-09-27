@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:sixam_mart/features/chat/domain/models/conversation_model.dart';
 import 'package:sixam_mart/common/utils/json_parser.dart';
 
 class UserInfoModel {
@@ -195,4 +194,35 @@ String? _cleanString(dynamic value) {
     return null;
   }
   return text;
+}
+
+class User {
+  int? id;
+  String? fName;
+  String? lName;
+  String? phone;
+  String? email;
+  String? imageFullUrl;
+
+  User({this.id, this.fName, this.lName, this.phone, this.email, this.imageFullUrl});
+
+  User.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    fName = json['f_name'];
+    lName = json['l_name'];
+    phone = json['phone'];
+    email = json['email'];
+    imageFullUrl = json['image_full_url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['f_name'] = fName;
+    data['l_name'] = lName;
+    data['phone'] = phone;
+    data['email'] = email;
+    data['image_full_url'] = imageFullUrl;
+    return data;
+  }
 }

@@ -14,7 +14,6 @@ import 'package:sixam_mart/features/auth/domain/enum/centralize_login_enum.dart'
 import 'package:sixam_mart/features/auth/domain/models/signup_body_model.dart';
 import 'package:sixam_mart/features/auth/widgets/auth_dialog_widget.dart';
 import 'package:sixam_mart/features/auth/widgets/condition_check_box_widget.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -345,9 +344,6 @@ class SignUpWidgetState extends State<SignUpWidget> {
     final String numberWithCountryCode = countryCode + number;
 
     if (status.isSuccess) {
-      if (ResponsiveHelper.isDesktop(context)) {
-        Get.find<CartController>().getCartDataOnline();
-      }
       if (status.authResponseModel != null && !status.authResponseModel!.isPhoneVerified!) {
         final List<int> encoded = utf8.encode(password);
         final String data = base64Encode(encoded);

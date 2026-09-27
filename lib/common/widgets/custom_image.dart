@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:blurhash_dart/blurhash_dart.dart';
-import 'package:image/image.dart' as img;
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -262,26 +260,8 @@ class _CustomImageState extends State<CustomImage> {
 
   
   /// Decodes BlurHash string to PNG bytes for use with Image.memory
-  Future<Uint8List?> _decodeBlurHashToBytes(String hash, int width, int height) async {
-    try {
-      // Decode BlurHash to img.Image (from image package)
-      final decoded = BlurHash.decode(hash);
-      final image = decoded.toImage(width, height);
-      
-      // Encode to PNG bytes
-      return Uint8List.fromList(img.encodePng(image));
-    } catch (e) {
-      // If BlurHash decoding fails, return null to show gradient placeholder
-      if (kDebugMode) {
-        debugPrint('⚠️ BlurHash decode failed: $e');
-      }
-      return null;
-    }
-  }
+  Future<Uint8List?> _decodeBlurHashToBytes(String hash, int width, int height) async => null;
 
-  /// 🛡️ FIX: Validate image URL before attempting to decode
-  /// Prevents Android ImageDecoder crashes from invalid URLs
-  /// Blocks SVG and other unsupported formats
   static bool _isValidImageUrl(String url) {
     if (url.isEmpty || url == 'null' || url.trim().isEmpty) {
       return false;

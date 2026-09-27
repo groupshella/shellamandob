@@ -35,9 +35,10 @@ class _MarketerScreenState extends State<MarketerScreen> {
     return GetBuilder<MarketerController>(
       builder: (controller) {
         if (controller.isLoading && controller.data == null) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Scaffold(
+            backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
+            body: const Center(
               child: CircularProgressIndicator(color: _primaryGreen),
             ),
           );

@@ -22,10 +22,12 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.wtColor,
+      backgroundColor: isDark ? const Color(0xFF121418) : AppColors.wtColor,
       appBar: AppBar(
-        backgroundColor: AppColors.wtColor,
+        backgroundColor: isDark ? const Color(0xFF121418) : AppColors.wtColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -36,12 +38,12 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
             fontFamily: 'Tajawal',
             fontSize: 17.r(context),
             fontWeight: FontWeight.w700,
-            color: _titleColor,
+            color: isDark ? Colors.white : _titleColor,
           ),
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new,
-              size: 18.r(context), color: _titleColor),
+              size: 18.r(context), color: isDark ? Colors.white : _titleColor),
           onPressed: () => Get.back<String>(),
         ),
       ),
@@ -61,7 +63,7 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
                         fontFamily: 'Tajawal',
                         fontSize: 20.r(context),
                         fontWeight: FontWeight.w700,
-                        color: _titleColor,
+                        color: isDark ? Colors.white : _titleColor,
                       ),
                     ),
                     SizedBox(height: 6.r(context)),
@@ -73,11 +75,11 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
                         fontSize: 16.r(context),
                         height: 1.6,
                         fontWeight: FontWeight.w500,
-                        color: _titleColor,
+                        color: isDark ? const Color(0xFF9CA3AF) : _titleColor,
                       ),
                     ),
                     SizedBox(height: 18.r(context)),
-                    for (final String option in _options) _optionRow(option),
+                    for (final String option in _options) _optionRow(option, isDark),
                   ],
                 ),
               ),
@@ -115,7 +117,7 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
     );
   }
 
-  Widget _optionRow(String option) {
+  Widget _optionRow(String option, bool isDark) {
     final bool selected = _selected == option;
     return InkWell(
       onTap: () => setState(() => _selected = option),
@@ -124,7 +126,7 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
         padding: EdgeInsets.symmetric(vertical: 10.r(context)),
         child: Row(
           children: <Widget>[
-            _radio(selected),
+            _radio(selected, isDark),
             SizedBox(width: 12.r(context)),
             Text(
               option.tr,
@@ -132,7 +134,7 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
                 fontFamily: 'Tajawal',
                 fontSize: 15.r(context),
                 fontWeight: FontWeight.w500,
-                color: _titleColor,
+                color: isDark ? Colors.white : _titleColor,
               ),
             ),
           ],
@@ -141,14 +143,16 @@ class _GenderSelectScreenState extends State<GenderSelectScreen> {
     );
   }
 
-  Widget _radio(bool selected) {
+  Widget _radio(bool selected, bool isDark) {
     return Container(
       width: 22.r(context),
       height: 22.r(context),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? const Color(0xFF1A1A1A) : AppColors.gryColor_4,
+          color: selected
+              ? (isDark ? const Color(0xFF30913F) : const Color(0xFF1A1A1A))
+              : (isDark ? const Color(0xFF4B5563) : AppColors.gryColor_4),
           width: 6.r(context),
         ),
       ),

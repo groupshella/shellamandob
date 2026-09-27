@@ -63,6 +63,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
           : Get.put(StoreVisitsController(), permanent: true),
       autoRemove: false,
       builder: (controller) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         final visit = controller.activeVisit ?? widget.visit;
 
         // Auto outcome logic
@@ -72,15 +73,15 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
             (controller.frontImagePath != null || controller.insideImagePath != null);
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9FAFB),
+          backgroundColor: isDark ? const Color(0xFF121418) : const Color(0xFFF9FAFB),
           appBar: AppBar(
             title: Text(
               visit.storeName,
               style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.bold, fontSize: 17),
               overflow: TextOverflow.ellipsis,
             ),
-            backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFF111827),
+            backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+            foregroundColor: isDark ? Colors.white : const Color(0xFF111827),
             elevation: 0.5,
             actions: [
               if (widget.isReadOnly || widget.visit.visitStatus == StoreVisitStatus.completed)
@@ -88,17 +89,17 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
+                    color: isDark ? const Color(0xFF162A1D) : const Color(0xFFE8F5E9),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: const Color(0xFF30913F)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.check_circle_outline_rounded, size: 16, color: Color(0xFF30913F)),
-                      SizedBox(width: 4),
+                      const Icon(Icons.check_circle_outline_rounded, size: 16, color: Color(0xFF30913F)),
+                      const SizedBox(width: 4),
                       Text(
-                        'زيارة مكتملة',
-                        style: TextStyle(
+                        'completed_visit_badge'.tr,
+                        style: const TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -115,10 +116,10 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: controller.remainingVisitSeconds < 300
-                      ? const Color(0xFFFEE2E2)
+                      ? (isDark ? const Color(0xFF2A1515) : const Color(0xFFFEE2E2))
                       : controller.remainingVisitSeconds < 600
-                          ? const Color(0xFFFEF3C7)
-                          : const Color(0xFFE0F2FE),
+                          ? (isDark ? const Color(0xFF2B2212) : const Color(0xFFFEF3C7))
+                          : (isDark ? const Color(0xFF112233) : const Color(0xFFE0F2FE)),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: controller.remainingVisitSeconds < 300
@@ -202,10 +203,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -219,7 +221,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF30913F).withValues(alpha: 0.1),
+                                    color: const Color(0xFF30913F).withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: const Icon(Icons.track_changes_rounded, color: Color(0xFF30913F), size: 18),
@@ -227,7 +229,12 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                 const SizedBox(width: 8),
                                 Text(
                                   'daily_achievement_indicator'.tr,
-                                  style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : const Color(0xFF111827),
+                                  ),
                                 ),
                               ],
                             ),
@@ -245,7 +252,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                           borderRadius: BorderRadius.circular(6),
                           child: LinearProgressIndicator(
                             value: controller.dailyProgressPercentage,
-                            backgroundColor: const Color(0xFFE5E7EB),
+                            backgroundColor: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB),
                             valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
                             minHeight: 7,
                           ),
@@ -253,7 +260,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                         const SizedBox(height: 6),
                         Text(
                           'daily_target_hint'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: Color(0xFF6B7280)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 11,
+                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                          ),
                         ),
                       ],
                     ),
@@ -265,17 +276,21 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: isQualifiedOutcome ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+                      color: isQualifiedOutcome
+                          ? (isDark ? const Color(0xFF162A1D) : const Color(0xFFECFDF5))
+                          : (isDark ? const Color(0xFF2A1515) : const Color(0xFFFEF2F2)),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isQualifiedOutcome ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
+                        color: isQualifiedOutcome
+                            ? (isDark ? const Color(0xFF059669).withValues(alpha: 0.4) : const Color(0xFFA7F3D0))
+                            : (isDark ? const Color(0xFFDC2626).withValues(alpha: 0.4) : const Color(0xFFFECACA)),
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           isQualifiedOutcome ? Icons.check_circle_rounded : Icons.info_outline_rounded,
-                          color: isQualifiedOutcome ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                          color: isQualifiedOutcome ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -288,7 +303,9 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                               fontFamily: 'Tajawal',
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isQualifiedOutcome ? const Color(0xFF065F46) : const Color(0xFF991B1B),
+                              color: isQualifiedOutcome
+                                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF065F46))
+                                  : (isDark ? const Color(0xFFF87171) : const Color(0xFF991B1B)),
                             ),
                           ),
                         ),
@@ -302,10 +319,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -317,14 +335,23 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                             const SizedBox(width: 8),
                             Text(
                               'mandatory_photo_doc'.tr,
-                              style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : const Color(0xFF111827),
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'gallery_upload_prohibited'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: Color(0xFF6B7280)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 11,
+                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                          ),
                         ),
                         const SizedBox(height: 14),
                         Row(
@@ -360,10 +387,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -371,7 +399,12 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                       children: [
                         Text(
                           'facility_and_manager_info'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF111827),
+                          ),
                         ),
                         const SizedBox(height: 14),
                         _buildInputField(
@@ -437,10 +470,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -448,12 +482,21 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                       children: [
                         Text(
                           'sales_pipeline_steps'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF111827),
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'select_pipeline_step_desc'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: Color(0xFF6B7280)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 11,
+                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                          ),
                         ),
                         const SizedBox(height: 14),
                         Wrap(
@@ -477,20 +520,20 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                       fontFamily: 'Tajawal',
                                       fontSize: 12,
                                       fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                      color: isSelected ? Colors.white : const Color(0xFF374151),
+                                      color: isSelected ? Colors.white : (isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151)),
                                     ),
                                   ),
                                 ],
                               ),
                               selected: isSelected,
                               selectedColor: step.color,
-                              backgroundColor: const Color(0xFFF3F4F6),
+                              backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
                               elevation: isSelected ? 2 : 0,
                               pressElevation: 1,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                                 side: BorderSide(
-                                  color: isSelected ? step.color : const Color(0xFFE5E7EB),
+                                  color: isSelected ? step.color : (isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
                                 ),
                               ),
                               onSelected: (_) {
@@ -512,10 +555,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -523,7 +567,12 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                       children: [
                         Text(
                           'follow_up_and_obstacles'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF111827),
+                          ),
                         ),
                         const SizedBox(height: 12),
                         _buildInputField(
@@ -551,10 +600,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -562,7 +612,12 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                       children: [
                         Text(
                           'visit_closing_options'.tr,
-                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF111827),
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Builder(
@@ -575,6 +630,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                             final uniqueItems = itemsList.toSet().toList();
                             return DropdownButtonFormField<String>(
                               initialValue: (selected != null && uniqueItems.contains(selected)) ? selected : null,
+                              dropdownColor: isDark ? const Color(0xFF1C2028) : Colors.white,
                               hint: Text(
                                 'choose_closing_action'.tr,
                                 style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Color(0xFF9CA3AF)),
@@ -582,11 +638,15 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                               isExpanded: true,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: const Color(0xFFF9FAFB),
+                                fillColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                                  borderSide: BorderSide(color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
                                 ),
                               ),
                               items: uniqueItems.map((reason) {
@@ -594,7 +654,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                   value: reason,
                                   child: Text(
                                     reason,
-                                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+                                    style: TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 13,
+                                      color: isDark ? Colors.white : const Color(0xFF111827),
+                                    ),
                                   ),
                                 );
                               }).toList(),
@@ -611,9 +675,9 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFDF4FF),
+                              color: isDark ? const Color(0xFF28132B) : const Color(0xFFFDF4FF),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFE879F9)),
+                              border: Border.all(color: isDark ? const Color(0xFFA21CAF) : const Color(0xFFE879F9)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -632,15 +696,19 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                 TextField(
                                   controller: controller.otherReasonController,
                                   maxLines: 3,
-                                  style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+                                  style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: isDark ? Colors.white : const Color(0xFF111827)),
                                   decoration: InputDecoration(
                                     hintText: 'senior_management_notes_hint'.tr,
                                     hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF9CA3AF)),
                                     filled: true,
-                                    fillColor: Colors.white,
+                                    fillColor: isDark ? const Color(0xFF1C2028) : Colors.white,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(color: Color(0xFFF0ABFC)),
+                                      borderSide: BorderSide(color: isDark ? const Color(0xFFA21CAF).withValues(alpha: 0.5) : const Color(0xFFF0ABFC)),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(color: isDark ? const Color(0xFFA21CAF).withValues(alpha: 0.5) : const Color(0xFFF0ABFC)),
                                     ),
                                   ),
                                 ),
@@ -657,10 +725,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                   // 9. Confidential Supervisor Report (التقرير السري الخاص لداشبورد المشرف)
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
+                        BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 10, offset: const Offset(0, 3)),
                       ],
                     ),
                     child: Column(
@@ -675,7 +744,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFEF3C7),
+                                    color: isDark ? const Color(0xFF332211) : const Color(0xFFFEF3C7),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: const Icon(Icons.security_rounded, color: Color(0xFFD97706), size: 20),
@@ -687,11 +756,20 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                     children: [
                                       Text(
                                         'confidential_report_title'.tr,
-                                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                                        style: TextStyle(
+                                          fontFamily: 'Tajawal',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : const Color(0xFF111827),
+                                        ),
                                       ),
                                       Text(
                                         'confidential_report_desc'.tr,
-                                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: Color(0xFF6B7280)),
+                                        style: TextStyle(
+                                          fontFamily: 'Tajawal',
+                                          fontSize: 11,
+                                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -710,15 +788,19 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                             child: TextField(
                               controller: controller.confidentialNotesController,
                               maxLines: 3,
-                              style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+                              style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: isDark ? Colors.white : const Color(0xFF111827)),
                               decoration: InputDecoration(
                                 hintText: 'confidential_notes_hint'.tr,
                                 hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF9CA3AF)),
                                 filled: true,
-                                fillColor: const Color(0xFFFFFBEB),
+                                fillColor: isDark ? const Color(0xFF252B37) : const Color(0xFFFFFBEB),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(color: Color(0xFFFDE68A)),
+                                  borderSide: BorderSide(color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A)),
                                 ),
                               ),
                             ),
@@ -733,9 +815,9 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                     ElevatedButton.icon(
                       onPressed: () => Get.back(),
                       icon: const Icon(Icons.arrow_back_rounded, size: 20),
-                      label: const Text(
-                        'العودة لقائمة الزيارات',
-                        style: TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                      label: Text(
+                        'back_to_visits_list'.tr,
+                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF43474F),
@@ -801,6 +883,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
     required String? imagePath,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool hasImage = imagePath != null && imagePath.isNotEmpty;
 
     return InkWell(
@@ -810,10 +893,14 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
         height: 130,
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: hasImage ? const Color(0xFFECFDF5) : const Color(0xFFF9FAFB),
+          color: hasImage
+              ? (isDark ? const Color(0xFF162A1D) : const Color(0xFFECFDF5))
+              : (isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB)),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hasImage ? const Color(0xFF10B981) : const Color(0xFFD1D5DB),
+            color: hasImage
+                ? const Color(0xFF10B981)
+                : (isDark ? const Color(0xFF374151) : const Color(0xFFD1D5DB)),
             width: hasImage ? 1.5 : 1.0,
           ),
         ),
@@ -853,22 +940,31 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE5E7EB),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.camera_enhance_rounded, color: Color(0xFF4B5563), size: 24),
+                    child: Icon(Icons.camera_enhance_rounded, color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563), size: 24),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
                   ),
                   Text(
                     subtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 10, color: Color(0xFF6B7280)),
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 10,
+                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                    ),
                   ),
                 ],
               ),
@@ -884,33 +980,52 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
     TextInputType keyboardType = TextInputType.text,
     ValueChanged<String>? onChanged,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
-          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 13,
+            color: isDark ? Colors.white : const Color(0xFF111827),
+          ),
           onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF9CA3AF)),
-            prefixIcon: Icon(icon, size: 18, color: const Color(0xFF6B7280)),
+            hintStyle: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 12,
+              color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
+            ),
+            prefixIcon: Icon(icon, size: 18, color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
             filled: true,
-            fillColor: const Color(0xFFF9FAFB),
+            fillColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: BorderSide(color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
             ),
-            focusedBorder: OutlineInputBorder(
+            enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF30913F)),
+              borderSide: BorderSide(color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(color: Color(0xFF30913F)),
             ),
           ),
         ),

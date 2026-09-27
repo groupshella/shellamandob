@@ -9,7 +9,6 @@ import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/verification/controllers/verification_controller.dart';
 import 'package:sixam_mart/features/verification/screens/new_pass_screen.dart';
-import 'package:sixam_mart/features/checkout/widgets/checkout_loading_dialog.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -92,7 +91,6 @@ class VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _navigateAfterLoginOtpSuccess() {
-    dismissCheckoutLoadingDialogSafely();
     if (Get.isDialogOpen ?? false) {
       Get.back<void>(closeOverlays: true);
     }

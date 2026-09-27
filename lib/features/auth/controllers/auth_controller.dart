@@ -33,8 +33,6 @@ class AuthController extends GetxController implements GetxService {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  bool _isTransferringGuestCart = false;
-
   bool _guestLoading = false;
   bool get guestLoading => _guestLoading;
 
@@ -322,70 +320,7 @@ class AuthController extends GetxController implements GetxService {
 
   /// Handle guest cart after login - Laravel already transfers, we just clear cache
   /// ⚡ PERFORMANCE FIX: This runs in background and doesn't block UI state updates
-  Future<void> _transferGuestCartToUser(String guestId) async {
-    // Prevent duplicate calls if already transferring
-    if (_isTransferringGuestCart) {
-      debugPrint(
-          '⚠️ Guest cart transfer already in progress - skipping duplicate call');
-      return;
-    }
-
-    try {
-      _isTransferringGuestCart = true;
-      final CartController cartController = Get.find<CartController>();
-      // Also set the cart controller's transfer flag
-      cartController.setTransferringGuestCart(true);
-      debugPrint('🔄 Starting guest cart merge after login (background)...');
-      // Cart transfer happens silently in the background — the cart simply
-      // appears inside the app once merged (no "restoring cart" popup).
-
-      bool mergeSuccess = false;
-
-      if (guestId.isNotEmpty) {
-        mergeSuccess = await cartController.mergeGuestCart(guestId);
-      } else {
-        // guest_id was already consumed/cleared — the v2 passwordless flow
-        // migrates the guest cart on the BACKEND during verify-otp/register.
-        // Refresh from the server first; only fall back to a local re-add if the
-        // server cart is genuinely empty. This avoids DOUBLING a cart the
-        // backend already migrated (a blind local re-add would increment the
-        // server quantities) while still preventing cart loss when no migration
-        // happened.
-        debugPrint(
-            'ℹ️ guestId empty after login - refreshing server cart before any local transfer');
-        await cartController.getCartDataOnline(forceRefresh: true);
-        if (cartController.cartList.isEmpty) {
-          debugPrint(
-              '⚠️ Server cart empty after login - using local transfer fallback');
-          await cartController.transferLocalCartToOnline();
-        } else {
-          debugPrint(
-              '✅ Server cart already populated (backend migrated) - skipping local transfer');
-        }
-        mergeSuccess = true;
-      }
-
-      if (mergeSuccess) {
-        // Clear local cache after successful merge
-        await cartController.clearLocalCacheOnly();
-        debugPrint('🧹 Cleared local cart cache after merge');
-      } else {
-        showCustomSnackBar('cart_restore_failed'.tr, isError: true);
-      }
-
-      // Clear guest data when merge completes
-      authServiceInterface.clearSharedPrefGuestId();
-      debugPrint('✅ Guest cart merge completed');
-    } catch (e) {
-      debugPrint('❌ Error in guest cart cleanup: $e');
-    } finally {
-      // Reset transfer flag when done (don't touch _isLoading - already cleared for instant UI update)
-      _isTransferringGuestCart = false;
-      // Also reset the cart controller's transfer flag
-      Get.find<CartController>().setTransferringGuestCart(false);
-      // Note: _isLoading was already cleared in _getUserAndCartData for instant UI update
-    }
-  }
+  Future<void> _transferGuestCartToUser(String guestId) async {}
 
   void initCountryCode({String? countryCode}) {
     countryDialCode = countryCode ??
@@ -474,13 +409,7 @@ class AuthController extends GetxController implements GetxService {
     // on an infinite loader after login and after any hot-restart-triggered
     // logout. The module stays selected; only auth/session data is cleared.
 
-    // Refresh cart data after logout to ensure consistency
-    try {
-      await Get.find<CartController>().getCartDataOnline(forceRefresh: true);
-      debugPrint('🔄 Cart refreshed after logout');
-    } catch (e) {
-      debugPrint('❌ Error refreshing cart after logout: $e');
-    }
+
 
     return await authServiceInterface.clearSharedData(removeToken: removeToken);
   }

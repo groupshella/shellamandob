@@ -15,7 +15,7 @@ import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/order/widgets/address_details_widget.dart';
+import 'package:sixam_mart/features/address/widgets/address_details_widget.dart';
 import 'package:sixam_mart/common/widgets/error_state_view.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'dart:async';

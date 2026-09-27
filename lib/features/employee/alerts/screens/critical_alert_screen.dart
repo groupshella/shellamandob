@@ -73,10 +73,10 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                 const SizedBox(height: 20),
 
                 // Main Title
-                const Text(
-                  'الإنذار الرابع الحرج (مخالفة نظامية)',
+                Text(
+                  'critical_fourth_warning_title'.tr,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
@@ -87,10 +87,10 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                 const SizedBox(height: 8),
 
                 // Subtitle
-                const Text(
-                  'تم رصد خمول ميداني متواصل وتجاوز المهلة المسموحة للزيارة دون استقرار أو تحرك',
+                Text(
+                  'critical_warning_desc'.tr,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
                     color: Color(0xFFD1D5DB),
@@ -121,21 +121,21 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                             child: const Icon(Icons.timer_off_rounded, color: Colors.white, size: 22),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'الإجراء التشغيلي المتخذ:',
-                                  style: TextStyle(
+                                  'operational_action_taken'.tr,
+                                  style: const TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 12,
                                     color: Color(0xFFFCA5A5),
                                   ),
                                 ),
                                 Text(
-                                  'بدء احتساب الوقت كـ "خارج الدوام"',
-                                  style: TextStyle(
+                                  'start_counting_off_duty'.tr,
+                                  style: const TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 15,
                                     fontWeight: FontWeight.w800,
@@ -148,14 +148,14 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                         ],
                       ),
                       const Divider(color: Color(0xFF991B1B), height: 24),
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.warning_amber_rounded, color: Color(0xFFFBBF24), size: 18),
-                          SizedBox(width: 8),
+                          const Icon(Icons.warning_amber_rounded, color: Color(0xFFFBBF24), size: 18),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'تم توثيق المخالفة في سجل الامتثال وإشعار المشرف المباشر تلقائياً.',
-                              style: TextStyle(
+                              'violation_logged_notice'.tr,
+                              style: const TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
                                 color: Color(0xFFE5E7EB),
@@ -171,9 +171,9 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                 const SizedBox(height: 24),
 
                 // Justification Form
-                const Text(
-                  'تقديم تبرير للمشرف (اختياري / موثق):',
-                  style: TextStyle(
+                Text(
+                  'submit_justification_optional'.tr,
+                  style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -207,9 +207,9 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                 ElevatedButton.icon(
                   onPressed: _isSubmitting ? null : _handleResumeShift,
                   icon: const Icon(Icons.play_arrow_rounded, size: 24),
-                  label: const Text(
-                    'استئناف النشاط الميداني والعودة للدوام',
-                    style: TextStyle(fontFamily: 'Tajawal', fontSize: 15, fontWeight: FontWeight.bold),
+                  label: Text(
+                    'resume_field_activity'.tr,
+                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF30913F),
@@ -239,9 +239,9 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: const Text(
-                    'تحويل إلى "طلب راحة مصرحة"',
-                    style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w600),
+                  child: Text(
+                    'convert_to_authorized_break'.tr,
+                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -262,8 +262,8 @@ class _CriticalAlertScreenState extends State<CriticalAlertScreen> {
     // Give visual feedback and return
     Get.back();
     Get.snackbar(
-      'تم استئناف العمل',
-      'تم تسجيل استئناف النشاط وإرسال التبرير إلى المشرف.',
+      'work_resumed_title'.tr,
+      'work_resumed_desc'.tr,
       backgroundColor: const Color(0xFF30913F),
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,

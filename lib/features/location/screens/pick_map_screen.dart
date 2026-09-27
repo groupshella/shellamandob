@@ -3,7 +3,6 @@ import 'package:sixam_mart/features/location/controllers/location_controller.dar
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -1219,55 +1218,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
            return; // Stop here - don't navigate to checkout
          }
 
-          // 🔒 CRITICAL FIX: Ensure cart data is preserved before navigation
-          // LOCAL-FIRST APPROACH: Use getCartDataOnline which already implements local-first protection
-          // The getCartDataOnline method in CartController:
-          // 1. Loads from local storage first (Hive/SharedPreferences) - lines 643-676
-          // 2. Preserves local cart if API returns empty - lines 934-960
-          // 3. Only overwrites local cart if API has valid data
-          final cartController = Get.find<CartController>();
-          
-          // Check if cart is empty before attempting reload
-          if (cartController.cartList.isEmpty) {
-            debugPrint('⚠️ PickMapScreen: Cart is empty - attempting to reload (local-first)');
-            try {
-              // getCartDataOnline() already implements LOCAL-FIRST protection:
-              // - Loads from local storage first (Hive/SharedPreferences)
-              // - Preserves local cart if API returns empty
-              // - Only overwrites if API has valid data
-              await cartController.getCartDataOnline();
-              debugPrint('🔄 PickMapScreen: Reloaded cart (local-first) - ${cartController.cartList.length} items');
-              
-              // If still empty after local-first reload, this is a real empty cart
-              if (cartController.cartList.isEmpty) {
-                debugPrint('❌ PickMapScreen: Cart is truly empty - cannot proceed to checkout');
-                showCustomSnackBar('please_add_items_to_cart_first'.tr, isError: true);
-                return;
-              }
-            } catch (e) {
-              debugPrint('❌ PickMapScreen: Error reloading cart: $e');
-              showCustomSnackBar('error_loading_cart'.tr, isError: true);
-              return;
-            }
-          } else {
-            debugPrint('✅ PickMapScreen: Cart has ${cartController.cartList.length} items - proceeding to checkout');
-          }
-
-          // Only navigate to checkout if zone validation succeeded and cart is not empty
-          Get.back(); // Close the pick-map screen
-          // ✅ ARCHITECTURAL FIX: Pass cartList via arguments
-          final storeId = cartController.cartList.isNotEmpty
-              ? cartController.cartList.first.item?.storeId
-              : null;
-          if (storeId != null) {
-            RouteHelper.navigateToCheckout(
-              cartList: cartController.cartList,
-              storeId: storeId,
-            );
-          } else {
-            debugPrint('❌ Cannot navigate to checkout - storeId is null');
-            showCustomSnackBar('unable_to_proceed_checkout'.tr);
-          }
+          Get.back();
           return;
         }
 

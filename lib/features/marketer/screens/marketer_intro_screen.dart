@@ -11,8 +11,11 @@ class MarketerIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAr = Get.locale?.languageCode == 'ar';
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -26,15 +29,21 @@ class MarketerIntroScreen extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 26),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFDFD3F5),
-                            Color(0xFFEBFEEB),
-                            Color(0xFFDFD3F5),
-                          ],
+                          colors: isDark
+                              ? const [
+                                  Color(0xFF221A35),
+                                  Color(0xFF162D1D),
+                                  Color(0xFF221A35),
+                                ]
+                              : const [
+                                  Color(0xFFDFD3F5),
+                                  Color(0xFFEBFEEB),
+                                  Color(0xFFDFD3F5),
+                                ],
                         ),
                       ),
                       child: Column(
@@ -42,11 +51,11 @@ class MarketerIntroScreen extends StatelessWidget {
                           Text(
                             'shela_marketing_partner_program'.tr,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF111B18),
+                              color: isDark ? Colors.white70 : const Color(0xFF111B18),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -64,12 +73,12 @@ class MarketerIntroScreen extends StatelessWidget {
                           Text(
                             'marketer_intro_desc'.tr,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 14,
                               height: 1.6,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF111B18),
+                              color: isDark ? const Color(0xFFE5E7EB) : const Color(0xFF111B18),
                             ),
                           ),
                         ],
@@ -83,13 +92,14 @@ class MarketerIntroScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF1C2028) : Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: const [
+                          border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
+                          boxShadow: [
                             BoxShadow(
-                              color: Color(0x0F000000),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
                               blurRadius: 12,
-                              offset: Offset(0, 2),
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -98,41 +108,42 @@ class MarketerIntroScreen extends StatelessWidget {
                           children: [
                             Text(
                               'marketing_benefits_with_us'.tr,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1A2E),
+                                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                               ),
                             ),
                             const SizedBox(height: 20),
 
                             // Row 1 with SAR Icon
                             _buildFeatureRow(
-                              number: '١',
+                              number: isAr ? '١' : '1',
                               numberColor: const Color(0xFF0AB564),
-                              badgeBg: const Color(0x170AB564),
+                              badgeBg: isDark ? const Color(0xFF1E3A24) : const Color(0x170AB564),
+                              isDark: isDark,
                               customContent: Row(
                                 children: [
-                                  const Text(
+                                  Text(
                                     '1 ',
                                     style: TextStyle(
                                       fontFamily: 'Tajawal',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF1A1A2E),
+                                      color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                                     ),
                                   ),
-                                  const SarCurrencyWidget(size: 14, color: Color(0xFF1A1A2E)),
+                                  SarCurrencyWidget(size: 14, color: isDark ? Colors.white : const Color(0xFF1A1A2E)),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
                                       'benefit_1_reward_per_user'.tr,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontFamily: 'Tajawal',
                                         fontSize: 14,
                                         fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1A1A2E),
+                                        color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                                       ),
                                     ),
                                   ),
@@ -142,26 +153,29 @@ class MarketerIntroScreen extends StatelessWidget {
                             const SizedBox(height: 16),
 
                             _buildFeatureRow(
-                              number: '٢',
+                              number: isAr ? '٢' : '2',
                               numberColor: const Color(0xFF1655C0),
-                              badgeBg: const Color(0x171655C0),
+                              badgeBg: isDark ? const Color(0xFF1E293B) : const Color(0x171655C0),
                               title: 'benefit_2_qr_code'.tr,
+                              isDark: isDark,
                             ),
                             const SizedBox(height: 16),
 
                             _buildFeatureRow(
-                              number: '٣',
+                              number: isAr ? '٣' : '3',
                               numberColor: const Color(0xFFF5A623),
-                              badgeBg: const Color(0x17F5A623),
+                              badgeBg: isDark ? const Color(0xFF332512) : const Color(0x17F5A623),
                               title: 'benefit_3_track_operations'.tr,
+                              isDark: isDark,
                             ),
                             const SizedBox(height: 16),
 
                             _buildFeatureRow(
-                              number: '٤',
+                              number: isAr ? '٤' : '4',
                               numberColor: const Color(0xFF7861A6),
-                              badgeBg: const Color(0x69DFD3F5),
+                              badgeBg: isDark ? const Color(0xFF2A2035) : const Color(0x69DFD3F5),
                               title: 'benefit_4_receive_profits'.tr,
+                              isDark: isDark,
                             ),
                           ],
                         ),
@@ -210,6 +224,7 @@ class MarketerIntroScreen extends StatelessWidget {
     required String number,
     required Color numberColor,
     required Color badgeBg,
+    required bool isDark,
     String? title,
     Widget? customContent,
   }) {
@@ -238,11 +253,11 @@ class MarketerIntroScreen extends StatelessWidget {
           child: customContent ??
               Text(
                 title ?? '',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A2E),
+                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                 ),
               ),
         ),

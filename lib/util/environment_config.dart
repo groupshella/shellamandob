@@ -25,7 +25,7 @@ enum Environment { development, staging, production, azure }
 
 class EnvironmentConfig {
   static const String _rawEnv =
-      String.fromEnvironment('ENV', defaultValue: 'development');
+      String.fromEnvironment('ENV', defaultValue: 'production');
 
   static const String _rawBaseUrl = String.fromEnvironment('BASE_URL');
 
@@ -65,10 +65,10 @@ class EnvironmentConfig {
   static const Map<Environment, Map<String, String>> _configs = {
     Environment.development: {
       'baseUrl': String.fromEnvironment('DEV_BASE_URL',
-          defaultValue: 'http://192.168.1.4:8000'),
+          defaultValue: 'https://shellafood.com'),
       'webHostedUrl': String.fromEnvironment('DEV_BASE_URL',
-          defaultValue: 'http://192.168.1.4:8000'),
-      'description': 'Local LAN Dev (http://192.168.1.4:8000)',
+          defaultValue: 'https://shellafood.com'),
+      'description': 'Production Server (https://shellafood.com)',
     },
     Environment.staging: {
       'baseUrl': 'https://shellafood.com',

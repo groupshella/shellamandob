@@ -84,48 +84,6 @@ class ProfileController extends GetxController implements GetxService {
       _userInfoModel = userInfoModel;
       if (kDebugMode) {
         debugPrint('[PROFILE][GET_USER_INFO_DONE] status=200');
-        // Extract wallet flags from user info response (NEW - from /api/v1/customer/info)
-        // ⚡ TASK 2: If qidha_wallet_balance exists, default creditLimit to 5000.0
-        if (userInfoModel.hasQidhaWallet == true && Get.isRegistered<KaidhaSubscriptionController>()) {
-          final kaidhaController = Get.find<KaidhaSubscriptionController>();
-          // Only set wallet state if not already set (e.g., from login response)
-          if (kaidhaController.walletKaidhaModel == null) {
-            debugPrint('💳 ProfileController: Extracting wallet flags from user info response...');
-            debugPrint('   - Has Qidha Wallet: ${userInfoModel.hasQidhaWallet}');
-            debugPrint('   - Signed: ${userInfoModel.qidhaWalletSigned}');
-            debugPrint('   - Active: ${userInfoModel.qidhaWalletActive}');
-            debugPrint('   - Balance: ${userInfoModel.qidhaWalletBalance}');
-            // ⚡ TASK 2: If qidha_wallet_balance exists, set wallet state with default creditLimit
-            if (userInfoModel.qidhaWalletBalance != null) {
-              kaidhaController.setWalletStateFromLogin(
-                signed: userInfoModel.qidhaWalletSigned == true,
-                active: userInfoModel.qidhaWalletActive == true,
-                balance: userInfoModel.qidhaWalletBalance?.toString(),
-              );
-              debugPrint('✅ ProfileController: Wallet state set from user info response with default creditLimit (5000.0) - menu can show wallet button immediately');
-            }
-          } else {
-            // ⚡ TASK 2: If wallet exists but creditLimit is null/empty, default to 5000.0
-            if (kaidhaController.walletKaidhaModel?.wallet != null) {
-              final wallet = kaidhaController.walletKaidhaModel!.wallet!;
-              final currentCreditLimit = wallet.creditLimit;
-              // Check if creditLimit is null, empty string, or 0
-              final bool needsDefault = currentCreditLimit == null || 
-                  (currentCreditLimit is String && (currentCreditLimit.isEmpty || currentCreditLimit == '0')) ||
-                  (currentCreditLimit is num && currentCreditLimit == 0);
-              
-              if (needsDefault && userInfoModel.qidhaWalletBalance != null) {
-                // Update creditLimit to 5000.0
-                wallet.creditLimit = 5000.0;
-                kaidhaController.update();
-                if (kDebugMode) {
-                  debugPrint('✅ ProfileController: Defaulted creditLimit to 5000.0 (was null/empty)');
-                }
-              }
-            }
-            debugPrint('⏭️ ProfileController: Wallet state already set (e.g., from login) - skipping wallet flags extraction');
-          }
-        }
       }
     } else if (hadExistingData) {
       // ⚡ FIX: Preserve existing _userInfoModel when API returns null (304 Not Modified case)
@@ -340,11 +298,9 @@ class ProfileController extends GetxController implements GetxService {
     if (response.statusCode == 200 || response.statusCode == 203) {
       await Get.find<AuthController>().clearSharedData(removeToken: false);
       await Get.find<AuthController>().clearUserNumberAndPassword();
-      await Get.find<CartController>().clearCartList();
       if (Get.find<AuthController>().isActiveRememberMe) {
         Get.find<AuthController>().toggleRememberMe();
       }
-      Get.find<FavouriteController>().removeFavourite();
       setForceFullyUserEmpty();
       showCustomSnackBar('your_account_remove_successfully'.tr, isError: false);
       _isLoading = false;

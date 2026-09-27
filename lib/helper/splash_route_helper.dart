@@ -374,12 +374,6 @@ Future<void> _forLoggedInUserRouteProcess(
       }
       _navigateToMultiModuleHomeScreen();
     }
-
-    // ⚡ OPTIMIZATION: Update location in background if no address but cache exists
-    if (!hasAddress && hasValidCache) {
-      appLogger.info(
-          'Updating location in background for logged-in user (cache available, GPS can fix later)');
-    }
   } else {
     // No address and no cache - need location before proceeding
     if (!context.mounted) {
@@ -460,11 +454,6 @@ Future<void> _forGuestUserRouteProcess(
       }
       _navigateToMultiModuleHomeScreen();
     }
-
-    if (!hasAddress && hasValidCache) {
-      appLogger.info(
-          'Updating location in background for guest user (cache available, GPS can fix later)');
-    }
   } else {
     // No address and no cache - need location before proceeding
     if (!context.mounted) {
@@ -491,10 +480,6 @@ Future<void> _handleUserRouting(
     if (AuthHelper.isLoggedIn()) {
       appLogger.info('Marketer App: Logged-in user routing to initial (Dashboard/Marketer)');
       Get.offAllNamed<void>(RouteHelper.getInitialRoute());
-      return;
-    } else if (showIntro == true) {
-      appLogger.info('Marketer App: First launch, routing to onboarding');
-      _newlyRegisteredRouteProcess();
       return;
     } else {
       appLogger.info('Marketer App: Not logged in, routing to welcome/login');

@@ -64,13 +64,12 @@ class SplashController extends GetxController implements GetxService {
   final SplashServiceInterface splashServiceInterface;
   SplashController({required this.splashServiceInterface});
 
-  bool _hasLoadedPromotionalContent = false;
+  final bool _hasLoadedPromotionalContent = false;
   bool get isPromotionalContentReady => _hasLoadedPromotionalContent;
-  bool _hasAttemptedPromotionalLoad = false;
+  final bool _hasAttemptedPromotionalLoad = false;
   bool get hasAttemptedPromotionalLoad => _hasAttemptedPromotionalLoad;
   final Map<int, bool> _promotionalBannerLoadInProgress = {};
   final Map<int, DateTime> _promotionalContentLastLoadedAt = {};
-  static const Duration _promotionalReloadCooldown = Duration(seconds: 12);
   bool _firstInstallCheckDone = false;
   static const String _firstLaunchMarkerKey = 'app_first_launch_marker_v2';
   static const String _legacyFirstLaunchMarkerKey =
@@ -196,8 +195,6 @@ class SplashController extends GetxController implements GetxService {
   DateTime? _lastModuleSwitchAt;
   static const Duration _moduleSwitchDebounce = Duration(milliseconds: 500);
 
-  bool _isStartupModulePreloadRunning = false;
-  final Set<int> _startupPreloadedModuleIds = <int>{};
   bool _isSplashFlowActive = false;
   bool _isSplashCacheReady = false;
   bool _isFirstNavigationReleased = false;
@@ -252,14 +249,6 @@ class SplashController extends GetxController implements GetxService {
         _moduleList != null &&
         _moduleList!.isNotEmpty &&
         !_isLoadingConfig;
-  }
-
-  bool _hasStartupLocationHeadersReady() {
-    final address = AddressHelper.getUserAddressFromSharedPref();
-    final hasZone = address?.zoneIds != null && address!.zoneIds!.isNotEmpty;
-    final hasLat = (address?.latitude ?? '').trim().isNotEmpty;
-    final hasLng = (address?.longitude ?? '').trim().isNotEmpty;
-    return hasZone && hasLat && hasLng;
   }
 
   /// 🔧 FIX 5: Get default moduleId for API calls when no module is selected
@@ -463,23 +452,7 @@ class SplashController extends GetxController implements GetxService {
         // Sync with legacy _module for backward compatibility
         _module = cachedModule;
 
-        // 🔥 MODULE-READY TRIGGER: Notify HomeUnifiedController that module is ready
-        if (cachedModule.id != null &&
-            Get.isRegistered<HomeUnifiedController>()) {
-          try {
-            final homeUnifiedController = Get.find<HomeUnifiedController>();
-            homeUnifiedController.onModuleReady(cachedModule.id!);
-            if (kDebugMode) {
-              debugPrint(
-                  '🎯 SplashController.resolveInitialModule: Triggered onModuleReady for cached module ${cachedModule.id}');
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              debugPrint(
-                  '⚠️ SplashController.resolveInitialModule: Error triggering onModuleReady: $e');
-            }
-          }
-        }
+        
 
         return true;
       }
@@ -495,23 +468,7 @@ class SplashController extends GetxController implements GetxService {
       // Sync with legacy _module for backward compatibility
       _module = modules.first;
 
-      // 🔥 MODULE-READY TRIGGER: Notify HomeUnifiedController that module is ready
-      if (modules.first.id != null &&
-          Get.isRegistered<HomeUnifiedController>()) {
-        try {
-          final homeUnifiedController = Get.find<HomeUnifiedController>();
-          homeUnifiedController.onModuleReady(modules.first.id!);
-          if (kDebugMode) {
-            debugPrint(
-                '🎯 SplashController.resolveInitialModule: Triggered onModuleReady for auto-selected module ${modules.first.id}');
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-                '⚠️ SplashController.resolveInitialModule: Error triggering onModuleReady: $e');
-          }
-        }
-      }
+      
 
       return true;
     }
@@ -584,22 +541,7 @@ class SplashController extends GetxController implements GetxService {
       selectedModule.refresh();
       _module = module;
 
-      if (module.id != null && Get.isRegistered<HomeUnifiedController>()) {
-        try {
-          final homeUnifiedController = Get.find<HomeUnifiedController>();
-          homeUnifiedController.allowImmediateFetchForModule(module.id!);
-          await homeUnifiedController.onModuleReady(module.id!);
-          if (kDebugMode) {
-            debugPrint(
-                'SplashController.selectModule: onModuleReady re-triggered for module ${module.id}');
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-                'SplashController.selectModule: Error re-triggering onModuleReady: $e');
-          }
-        }
-      }
+      
 
       if (context != null) {
         final int? targetModuleId = module.id;
@@ -631,15 +573,7 @@ class SplashController extends GetxController implements GetxService {
       debugPrint(
           '[HOME_MODULE_SWITCH] from=${previousModule?.id} to=${module.id}');
     }
-    if (previousModule?.id != null &&
-        previousModule!.id != module.id &&
-        Get.isRegistered<BannerController>()) {
-      Get.find<BannerController>().invalidateModule(previousModule.id!);
-      if (kDebugMode) {
-        debugPrint(
-            'SplashController.selectModule: Cleared banner cache for old module ${previousModule.id}');
-      }
-    }
+    
 
     // ⚡ MODULE SWITCH: set switching state immediately (for shimmer)
     _isModuleSwitching = true;
@@ -657,36 +591,14 @@ class SplashController extends GetxController implements GetxService {
       // so this data survives the reset. When onModuleReady -> loadHomeData runs
       // after navigation it hits the memory-cache path (0ms) and renders instantly
       // instead of showing a loading shimmer while the API call completes.
-      bool cacheHitForNewModule = false;
-      if (module.id != null && Get.isRegistered<HomeUnifiedController>()) {
-        cacheHitForNewModule =
-            await Get.find<HomeUnifiedController>().applyFromCache(module.id!);
-      }
-
-      // ⚡ GENERATION ID: Prepare HomeUnifiedController for module switch
-      if (Get.isRegistered<HomeUnifiedController>()) {
-        final homeUnifiedController = Get.find<HomeUnifiedController>();
-        homeUnifiedController.forceResetLoadingState();
-        homeUnifiedController.prepareForModuleSwitch();
-        if (module.id != null) {
-          homeUnifiedController.allowImmediateFetchForModule(module.id!);
-        }
-        // CACHE-MISS FIX: When no cache exists, pre-set _isLoading=true and wipe
-        // stale child-controller data so the very first frame of the new screen
-        // shows a clean shimmer instead of the previous module's data.
-        if (!cacheHitForNewModule) {
-          homeUnifiedController.prepareForCacheMissSwitch();
-        }
-      }
+      
 
       // ⚡ Ensure zone/module headers are updated before any new API calls
       // resetHeaders() clears everything, so inject zone AFTER rebuilding headers
       Get.find<ApiClient>().resetHeaders();
       await setModuleHeaderOnly(module);
       await _injectLastKnownZoneFromHive(); // fallback if addressModel has no zoneIds
-      if (Get.isRegistered<StoreController>()) {
-        await Get.find<StoreController>().clearStoreData();
-      }
+      
 
       // 🏗️ MODULE-FIRST: Update Single Source of Truth (only if different module)
       if (kDebugMode) {
@@ -751,33 +663,7 @@ class SplashController extends GetxController implements GetxService {
   }
 
   /// Runs a light post-navigation refresh so module switch behaves like manual pull-to-refresh.
-  Future<void> _triggerSoftRefreshAfterModuleSwitch(int moduleId) async {
-    // Let navigation and first frame settle first for smoother UX.
-    await Future.delayed(const Duration(milliseconds: 350));
-    try {
-      if (AppConstants.useBffV2Endpoint &&
-          Get.isRegistered<HomeUnifiedController>()) {
-        final unifiedController = Get.find<HomeUnifiedController>();
-        unifiedController.allowImmediateFetchForModule(moduleId);
-        final bool success = await unifiedController.loadHomeData(
-          forceRefresh: true,
-          showLoading: false,
-        );
-        if (!success && Get.isRegistered<HomeController>()) {
-          await Get.find<HomeController>().loadHomeData(forceRefresh: true);
-        }
-        return;
-      }
-      if (Get.isRegistered<HomeController>()) {
-        await Get.find<HomeController>().loadHomeData(forceRefresh: true);
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint(
-            '⚠️ SplashController: soft refresh after module switch failed: $e');
-      }
-    }
-  }
+  Future<void> _triggerSoftRefreshAfterModuleSwitch([int? targetModuleId]) async {}
 
   Future<void> getConfigData(BuildContext context,
       {NotificationBodyModel? notificationBody,
@@ -1046,39 +932,7 @@ class SplashController extends GetxController implements GetxService {
         debugPrint(
             '⏭️ SplashController: Skipping home-unified prefetch - module unresolved (multi-module flow)');
       }
-      if (prefetchModuleId != null &&
-          Get.isRegistered<HomeUnifiedController>() &&
-          hasAddress) {
-        // Ensure headers carry the right module before the prefetch call.
-        apiClient.updateHeader(
-          apiClient.token,
-          null,
-          null,
-          null,
-          prefetchModuleId,
-          null,
-          null,
-        );
-        unawaited(
-          Get.find<HomeUnifiedController>()
-              .preloadModuleDataForSplash(prefetchModuleId)
-              .catchError((Object e) {
-            if (kDebugMode) {
-              debugPrint(
-                  '⚠️ SplashController: home-unified prefetch error (non-blocking): $e');
-            }
-            return false;
-          }),
-        );
-        if (kDebugMode) {
-          debugPrint(
-              '⚡ SplashController: home-unified prefetch started for module '
-              '$prefetchModuleId (background, non-blocking)');
-        }
-      } else if (kDebugMode && prefetchModuleId != null && !hasAddress) {
-        debugPrint(
-            '⚡ SplashController: Skipping home-unified prefetch — no address/zone headers yet (fresh install)');
-      }
+
 
       if (kDebugMode) {
         debugPrint('✅ SplashController: App-init completed');
@@ -1135,19 +989,6 @@ class SplashController extends GetxController implements GetxService {
         // Extract business settings from app-init and set in HomeController
         if (appInitData.businessSettings != null) {
           _cachedBusinessSettings = appInitData.businessSettings;
-          if (Get.isRegistered<HomeController>()) {
-            Get.find<HomeController>()
-                .setBusinessSettingsFromAppInit(appInitData.businessSettings!);
-            if (kDebugMode) {
-              debugPrint(
-                  '💾 SplashController: Business settings extracted from app-init and set in HomeController');
-            }
-          } else {
-            if (kDebugMode) {
-              debugPrint(
-                  '⚠️ SplashController: HomeController not registered yet, business settings will be set when HomeController is available');
-            }
-          }
         } else {
           if (kDebugMode) {
             debugPrint(
@@ -1262,10 +1103,7 @@ class SplashController extends GetxController implements GetxService {
           _moduleList = cachedAppInitData.modules;
           if (cachedAppInitData.businessSettings != null) {
             _cachedBusinessSettings = cachedAppInitData.businessSettings;
-            if (Get.isRegistered<HomeController>()) {
-              Get.find<HomeController>().setBusinessSettingsFromAppInit(
-                  cachedAppInitData.businessSettings!);
-            }
+            
           }
 
           // 🔧 Reset guard clause on success
@@ -1486,122 +1324,9 @@ class SplashController extends GetxController implements GetxService {
     }
   }
 
-  Future<bool> _preloadGlobalBannersAtStartup() async {
-    if (!Get.isRegistered<BannerController>()) {
-      return false;
-    }
-    try {
-      await Get.find<BannerController>().preloadGlobalBannersAtStartup();
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
   /// Warm critical modules in background while splash/onboarding is active.
   /// Non-blocking by design: it should never delay routing flow.
-  Future<void> preloadCoreModulesForFastSwitch() async {
-    if (AppConstants.isMarketerApp) {
-      return;
-    }
-    if (_isStartupModulePreloadRunning) {
-      return;
-    }
-    if (!Get.isRegistered<HomeUnifiedController>()) {
-      return;
-    }
-
-    if (!_hasStartupLocationHeadersReady()) {
-      if (kDebugMode) {
-        debugPrint(
-            '⏭️ SplashController: Skip core module preload - zone/location headers not ready');
-      }
-      return;
-    }
-
-    final modules = _moduleList;
-    if (modules == null || modules.isEmpty) {
-      return;
-    }
-
-    final Set<int> targetIds = <int>{};
-
-    // Always prioritize currently selected module first if present.
-    final selectedId = selectedModule.value?.id;
-    if (selectedId != null && selectedId > 0) {
-      targetIds.add(selectedId);
-    }
-
-    // Food modules = restaurants/cafes equivalents.
-    for (final module in modules) {
-      if (module.id != null &&
-          module.id! > 0 &&
-          module.moduleType == AppConstants.food) {
-        targetIds.add(module.id!);
-      }
-    }
-
-    // Hyper module (ecommerce) - prefer id=3 then fallback to first ecommerce.
-    final hyperById = modules
-        .firstWhereOrNull((module) => module.id == 3 && module.id != null);
-    if (hyperById?.id != null) {
-      targetIds.add(hyperById!.id!);
-    } else {
-      final firstEcommerce = modules.firstWhereOrNull((module) =>
-          module.id != null &&
-          module.id! > 0 &&
-          module.moduleType == AppConstants.ecommerce);
-      if (firstEcommerce?.id != null) {
-        targetIds.add(firstEcommerce!.id!);
-      }
-    }
-
-    // Prevent unnecessary heavy preloading.
-    final List<int> idsToPreload = targetIds
-        .where((id) => !_startupPreloadedModuleIds.contains(id))
-        .take(4)
-        .toList();
-
-    if (idsToPreload.isEmpty) {
-      return;
-    }
-
-    _isStartupModulePreloadRunning = true;
-    if (kDebugMode) {
-      debugPrint(
-          '🚀 SplashController: Starting core module preload (post-splash): $idsToPreload');
-    }
-
-    try {
-      // Keep global banners warm as part of startup preloading.
-      await _preloadGlobalBannersAtStartup();
-
-      final homeUnifiedController = Get.find<HomeUnifiedController>();
-      final results = await Future.wait(
-        idsToPreload.map(
-          (id) => homeUnifiedController.preloadModuleDataForSplash(id),
-        ),
-      );
-
-      for (int i = 0; i < idsToPreload.length; i++) {
-        if (results[i]) {
-          _startupPreloadedModuleIds.add(idsToPreload[i]);
-        }
-      }
-
-      if (kDebugMode) {
-        debugPrint(
-            '✅ SplashController: Core module preload done. success=${results.where((r) => r).length}/${results.length}');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint(
-            '⚠️ SplashController: Core module preload failed (non-blocking): $e');
-      }
-    } finally {
-      _isStartupModulePreloadRunning = false;
-    }
-  }
+  Future<void> preloadCoreModulesForFastSwitch() async {}
 
   /// Pre-load user profile data during splash screen
   /// Only loads if userInfoModel is not already set (e.g., from login response)
@@ -1685,12 +1410,7 @@ class SplashController extends GetxController implements GetxService {
     }
   }
 
-  void _onRemoveLoader() {
-    final preloader = html.document.querySelector('.preloader');
-    if (preloader != null) {
-      preloader.remove();
-    }
-  }
+  void _onRemoveLoader() {}
 
   Future<void> getLandingPageData(
       {DataSourceEnum source = DataSourceEnum.local}) async {
@@ -2000,36 +1720,10 @@ class SplashController extends GetxController implements GetxService {
         }
       }
       _cacheModule = await splashServiceInterface.setCacheModule(module);
-      if ((AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) &&
-          cacheModule != null) {
-        // Only load cart data if not already loaded
-        final cartController = Get.find<CartController>();
-        if (cartController.cartList.isEmpty) {
-          debugPrint('🔄 SplashController: Loading cart data (empty cart)');
-          cartController.getCartDataOnline();
-        } else {
-          debugPrint('💾 SplashController: Using existing cart data');
-        }
-      }
+      
     }
 
-    if (!AppConstants.isMarketerApp) {
-      if (_cacheModule != null &&
-          _cacheModule!.moduleType.toString() == AppConstants.taxi) {
-        Get.find<TaxiCartController>().getCarCartList();
-      }
-
-      if (AuthHelper.isLoggedIn()) {
-        if (Get.find<SplashController>().module != null) {
-          if (module?.moduleType.toString() == AppConstants.taxi) {
-            Get.find<TaxiFavouriteController>().getFavouriteTaxiList();
-          }
-        } else if (_cacheModule != null &&
-            _cacheModule!.moduleType.toString() == AppConstants.taxi) {
-          Get.find<TaxiCartController>().getCarCartList();
-        }
-      }
-    }
+    
     // 🔒 Lock module after headers + storage + state are set
     _isModuleLocked = module != null;
 
@@ -2185,259 +1879,6 @@ class SplashController extends GetxController implements GetxService {
     }
   }
 
-  /// Clear all controller data when switching modules
-  /// This prevents showing data from the previous module
-  // ignore: unused_element
-  Future<void> _clearAllControllerData(
-    String? newModuleType,
-    int? newModuleId, {
-    bool forceClear = false,
-  }) async {
-    if (kDebugMode) {
-      debugPrint(
-          '🧹 SplashController: Clearing all controller data for module switch');
-    }
-
-    // Reset loading state to allow fresh data loading for new module
-    LoadingStateManager().resetLoadingState();
-
-    // 🔧 TASK 2: ItemController - RESET, don't delete (persist across module switches)
-    // ItemController must remain in memory to prevent "Controller not registered" errors
-    if (Get.isRegistered<ItemController>()) {
-      try {
-        final itemController = Get.find<ItemController>();
-        await itemController.resetToDefault();
-        if (kDebugMode) {
-          debugPrint(
-              '🔄 SplashController: Reset ItemController to default state');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint('⚠️ SplashController: Error resetting ItemController: $e');
-        }
-      }
-    }
-
-    // CategoryController requires both CategoryServiceInterface and SearchServiceInterface
-    // Check if both are registered before accessing CategoryController
-    // 🚫 PRODUCTION SAFE: Always check registration before accessing Services/Controllers
-    if (Get.isRegistered<CategoryServiceInterface>() &&
-        Get.isRegistered<SearchServiceInterface>() &&
-        Get.isRegistered<CategoryController>()) {
-      try {
-        final categoryController = Get.find<CategoryController>();
-        final hasCachedDataForModule =
-            categoryController.hasHomeCategoriesForModule(newModuleId);
-        if (forceClear || !hasCachedDataForModule) {
-          categoryController.clearCategoryList();
-        } else if (kDebugMode) {
-          debugPrint(
-              '[Cache-First] SplashController: Preserving CategoryController cached data for moduleId=$newModuleId');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController: Error clearing CategoryController: $e');
-        }
-      }
-    }
-
-    // 🚫 PRODUCTION SAFE: CampaignController cleanup with safe access
-    if (Get.isRegistered<CampaignController>()) {
-      try {
-        final campaignController = Get.find<CampaignController>();
-        campaignController.itemAndBasicCampaignNull();
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController: Error clearing CampaignController: $e');
-        }
-      }
-    }
-
-    // 🚫 PRODUCTION SAFE: FlashSaleController cleanup with safe access
-    if (Get.isRegistered<FlashSaleController>()) {
-      try {
-        final flashSaleController = Get.find<FlashSaleController>();
-        flashSaleController.setEmptyFlashSale(fromModule: true);
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController: Error clearing FlashSaleController: $e');
-        }
-      }
-    }
-
-    // ⚡ Cache-First Fix: Only reset controllers if they don't have cached data
-    // Golden Rule: Never reset controller if it has valid cached data
-    // ⚡ TITAN BOARD: Core controllers - RESET only if no cached data
-    if (Get.isRegistered<StoreController>()) {
-      try {
-        final storeController = Get.find<StoreController>();
-        await storeController.resetToDefault();
-        if (kDebugMode) {
-          debugPrint(
-              '[Cache-First] SplashController: Reset StoreController for module switch');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController: Error resetting StoreController: $e');
-        }
-      }
-    }
-
-    if (Get.isRegistered<CategoryController>()) {
-      try {
-        final categoryController = Get.find<CategoryController>();
-        // ⚡ Check if has cached data before reset
-        final hasCachedDataForModule =
-            categoryController.hasHomeCategoriesForModule(newModuleId);
-        if (forceClear || !hasCachedDataForModule) {
-          categoryController.resetToDefault();
-          if (kDebugMode) {
-            debugPrint(
-                '[Cache-First] SplashController: Reset CategoryController (forceClear=$forceClear, moduleId=$newModuleId)');
-          }
-        } else if (kDebugMode) {
-          debugPrint(
-              '[Cache-First] SplashController: Preserving CategoryController cached data for moduleId=$newModuleId');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController: Error resetting CategoryController: $e');
-        }
-      }
-    }
-
-    if (Get.isRegistered<OffersController>()) {
-      try {
-        final offersController = Get.find<OffersController>();
-        // ⚡ Check if has cached data before reset
-        final hasCachedData = offersController.offersMode != null &&
-            offersController.offersMode!.data.isNotEmpty;
-        if (forceClear || !hasCachedData) {
-          offersController.resetToDefault();
-          if (kDebugMode) {
-            debugPrint(
-                '[Cache-First] SplashController: Reset OffersController (forceClear=$forceClear)');
-          }
-        } else if (kDebugMode) {
-          debugPrint(
-              '[Cache-First] SplashController: Preserving OffersController cached data');
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController: Error resetting OffersController: $e');
-        }
-      }
-    }
-
-    // ⚡ TITAN BOARD: Non-core controllers - DELETE to free memory
-    // These controllers are module-specific and can be safely deleted
-    // 🚨 TITAN BOARD MAINTENANCE WARNING:
-    // ====================================================================================
-    // This is a HARDCODED list. When adding new modules (e.g., Pharmacy with PrescriptionController),
-    // you MUST add the new controller to this list or memory leaks will return.
-    //
-    // NOTE: Consider creating BaseModuleController interface and iterating through active instances
-    // NOTE: Or use Get.deleteAll(bool force) if DI supports tracking module-specific controllers
-    // ====================================================================================
-    //
-    // Current module controllers that must be deleted on module switch:
-    // 🔧 TASK 2: ItemController is NOT deleted - it's reset above to persist across module switches
-    try {
-      if (Get.isRegistered<BannerController>()) {
-        try {
-          final bannerController = Get.find<BannerController>();
-          // ⚡ Check if has cached data before reset
-          final hasCachedData = (bannerController.bannerImageList != null &&
-                  bannerController.bannerImageList!.isNotEmpty) ||
-              (bannerController.featuredBannerList != null &&
-                  bannerController.featuredBannerList!.isNotEmpty);
-          if (forceClear || !hasCachedData) {
-            await bannerController.resetToDefault();
-            if (kDebugMode) {
-              debugPrint(
-                  '[Cache-First] SplashController: Reset BannerController (forceClear=$forceClear)');
-            }
-          } else if (kDebugMode) {
-            debugPrint(
-                '[Cache-First] SplashController: Preserving BannerController cached data');
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-                '⚠️ SplashController: Error resetting BannerController: $e');
-          }
-        }
-      }
-      if (Get.isRegistered<CampaignController>()) {
-        Get.delete<CampaignController>(force: true);
-        if (kDebugMode) {
-          debugPrint('🗑️ SplashController: Deleted CampaignController');
-        }
-      }
-      if (Get.isRegistered<FlashSaleController>()) {
-        Get.delete<FlashSaleController>(force: true);
-        if (kDebugMode) {
-          debugPrint('🗑️ SplashController: Deleted FlashSaleController');
-        }
-      }
-      if (Get.isRegistered<BrandsController>()) {
-        try {
-          final brandsController = Get.find<BrandsController>();
-          // ⚡ Check if has cached data before reset
-          final hasCachedData = brandsController.brandList != null &&
-              brandsController.brandList!.isNotEmpty;
-          if (forceClear || !hasCachedData) {
-            await brandsController.resetToDefault();
-            if (kDebugMode) {
-              debugPrint(
-                  '[Cache-First] SplashController: Reset BrandsController (forceClear=$forceClear)');
-            }
-          } else {
-            if (kDebugMode) {
-              debugPrint(
-                  '[Cache-First] SplashController: Preserving BrandsController cached data');
-            }
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-                '⚠️ SplashController: Error resetting BrandsController: $e');
-          }
-        }
-      }
-      // ⚠️ ADD NEW MODULE CONTROLLERS HERE WHEN CREATED
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('⚠️ SplashController: Error deleting controllers: $e');
-      }
-    }
-
-    // CartController: Only clear if module type changed (don't delete, just clear data)
-    if (Get.isRegistered<CartController>()) {
-      final cartController = Get.find<CartController>();
-      final currentModule = _module?.moduleType?.toString();
-
-      // Only clear cart if module type actually changed
-      if (currentModule != null && currentModule != newModuleType) {
-        if (kDebugMode) {
-          debugPrint(
-              '🛒 SplashController: Clearing cart (module type changed: $currentModule -> $newModuleType)');
-        }
-        await cartController.clearCartOnline();
-      }
-    }
-
-    if (kDebugMode) {
-      debugPrint('✅ SplashController: All controller state cleared');
-    }
-  }
-
   int getCacheModule() {
     return splashServiceInterface.getCacheModule()?.id ?? 0;
   }
@@ -2469,16 +1910,7 @@ class SplashController extends GetxController implements GetxService {
 
     // Clear related controller data without clearing module
     // 🚫 PRODUCTION SAFE: Always check registration before accessing Controllers
-    if (Get.isRegistered<HomeController>()) {
-      try {
-        Get.find<HomeController>().forcefullyNullCashBackOffers();
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController.removeModule: Error clearing HomeController: $e');
-        }
-      }
-    }
+    
     if (AuthHelper.isLoggedIn() && Get.isRegistered<AddressController>()) {
       try {
         Get.find<AddressController>().getAddressList();
@@ -2489,26 +1921,8 @@ class SplashController extends GetxController implements GetxService {
         }
       }
     }
-    if (Get.isRegistered<StoreController>()) {
-      try {
-        Get.find<StoreController>().getFeaturedStoreList();
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController.removeModule: Error clearing StoreController: $e');
-        }
-      }
-    }
-    if (Get.isRegistered<CampaignController>()) {
-      try {
-        Get.find<CampaignController>().itemAndBasicCampaignNull();
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '⚠️ SplashController.removeModule: Error clearing CampaignController: $e');
-        }
-      }
-    }
+    
+    
 
     // 🏗️ MODULE-FIRST: Do not trigger BannerController without module
     // BannerController will load automatically when module is selected
@@ -2658,202 +2072,7 @@ class SplashController extends GetxController implements GetxService {
   /// Load and cache promotional content for Module 3 (eCommerce)
   /// This is used by the multi-module home screen to display promotional banners and offers
   /// The content is cached in a dedicated Hive box for instant loading
-  Future<void> loadAndCachePromotionalContent({int? moduleId}) async {
-    _hasAttemptedPromotionalLoad = true;
-    try {
-      final int targetModuleId = moduleId ??
-          selectedModule.value?.id ??
-          _module?.id ??
-          getCacheModule();
-
-      // 🔧 FIX: Use Module 3 as default for new users instead of skipping
-      // This ensures new users see promotional content on first launch
-      final int finalModuleId = targetModuleId == 0 ? 3 : targetModuleId;
-
-      if (kDebugMode) {
-        if (targetModuleId == 0) {
-          debugPrint(
-              '🆕 PromotionalContent: New user detected - using Module 3 as default content module');
-        }
-        debugPrint(
-            '🚀 PromotionalContent: Loading for Module $finalModuleId (splashActive=$_isSplashFlowActive)');
-      }
-      final DateTime? lastLoadedAt =
-          _promotionalContentLastLoadedAt[finalModuleId];
-      final bool isWithinCooldown = lastLoadedAt != null &&
-          DateTime.now().difference(lastLoadedAt) < _promotionalReloadCooldown;
-      if (isWithinCooldown && _hasLoadedPromotionalContent) {
-        if (kDebugMode) {
-          debugPrint(
-              '⏭️ SplashController: Promotional content recently loaded for module $finalModuleId - skipping duplicate trigger');
-        }
-        return;
-      }
-
-      if (_promotionalBannerLoadInProgress[finalModuleId] == true) {
-        if (kDebugMode) {
-          debugPrint(
-              'SplashController: Promotional load already in progress for module $finalModuleId - skipping');
-        }
-        return;
-      }
-      _promotionalBannerLoadInProgress[finalModuleId] = true;
-
-      final apiClient = Get.find<ApiClient>();
-      final addressModel = AddressHelper.getUserAddressFromSharedPref();
-      if (addressModel == null || addressModel.zoneIds == null || addressModel.zoneIds!.isEmpty) {
-        if (kDebugMode) {
-          debugPrint('⏭️ SplashController: Skip loadAndCachePromotionalContent - zone/location headers not ready');
-        }
-        _promotionalBannerLoadInProgress[finalModuleId] = false;
-        return;
-      }
-      final sharedPreferences = Get.find<SharedPreferences>();
-
-      // Save current module ID from headers
-      final currentModuleId = apiClient.getHeader()['module-id'];
-
-      // Set Module ID for promotional content
-      apiClient.updateHeader(
-        apiClient.token,
-        addressModel.zoneIds,
-        addressModel.areaIds,
-        sharedPreferences.getString(AppConstants.languageCode),
-        finalModuleId,
-        addressModel.latitude,
-        addressModel.longitude,
-      );
-
-      BannerModel? bannerModel;
-      OffersModel? offersModel;
-      bool hasPromotionalBottomBanner = false;
-
-      // Load banners from Module 3 directly from API (bypass module check)
-      // Call API directly since getFeaturedBanner() requires selectedModule
-      if (Get.isRegistered<BannerController>()) {
-        try {
-          final bannerController = Get.find<BannerController>();
-          // Load directly from API using bannerService (bypasses module check)
-          bannerModel =
-              await bannerController.bannerService.getFeaturedBannerList();
-
-          // Update BannerController directly using setFromUnified
-          if (bannerModel != null) {
-            bannerController.setFromUnified(
-              bannerModel: bannerModel,
-              moduleId: finalModuleId,
-              source: 'splash_promotional_preload',
-            );
-            if (kDebugMode) {
-              debugPrint(
-                  '✅ SplashController: Loaded ${bannerModel.banners?.length ?? 0} promotional banners');
-            }
-          }
-
-          await bannerController.getPromotionalBannerList(true);
-          final String? promoUrl =
-              bannerController.promotionalBanner?.bottomSectionBannerFullUrl;
-          hasPromotionalBottomBanner = promoUrl != null && promoUrl.isNotEmpty;
-          if (kDebugMode) {
-            debugPrint(
-                '✅ SplashController: Promotional bottom banner loaded: $hasPromotionalBottomBanner');
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-                '⚠️ SplashController: Error loading promotional banners: $e');
-          }
-        }
-      }
-
-      // Load offers: prefer home-unified cached data over /api/v1/offers/active.
-      // Reason: home-unified returns correct active offers while /api/v1/offers/active
-      // may return empty due to different backend filtering, which would overwrite
-      // valid offers already loaded during the preload phase.
-      if (Get.isRegistered<OffersController>()) {
-        try {
-          final offersController = Get.find<OffersController>();
-          bool loadedFromUnified = false;
-
-          if (Get.isRegistered<HomeUnifiedController>()) {
-            final unifiedController = Get.find<HomeUnifiedController>();
-            final cachedUnified =
-                unifiedController.getModuleData(finalModuleId);
-            if (cachedUnified?.offers != null &&
-                cachedUnified!.offers!.isNotEmpty &&
-                cachedUnified.offers!.first.data.isNotEmpty) {
-              offersController.setOffersFromBootstrap(cachedUnified.offers!);
-              offersModel = offersController.offersMode;
-              loadedFromUnified = true;
-              if (kDebugMode) {
-                debugPrint(
-                    'SplashController: Loaded ${offersModel?.data.length ?? 0} promotional offers from home-unified cache');
-              }
-            }
-          }
-
-          if (!loadedFromUnified) {
-            offersModel = await offersController.getOffers(
-                specificModuleId: finalModuleId);
-            if (kDebugMode && offersModel != null) {
-              debugPrint(
-                  'SplashController: Loaded ${offersModel.data.length} promotional offers');
-            }
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            debugPrint(
-                'SplashController: Error loading promotional offers: $e');
-          }
-        }
-      }
-
-      // Save to dedicated Hive cache box
-      if (bannerModel != null ||
-          offersModel != null ||
-          hasPromotionalBottomBanner) {
-        await HiveHomeCacheService().savePromotionalContent(
-          banners: bannerModel,
-          offers: offersModel,
-        );
-        if (kDebugMode) {
-          debugPrint('💾 SplashController: Saved promotional content to cache');
-        }
-        _hasLoadedPromotionalContent = true;
-        _promotionalContentLastLoadedAt[finalModuleId] = DateTime.now();
-        update(['promotional_content']);
-      }
-
-      // Restore original module ID in headers
-      apiClient.updateHeader(
-        apiClient.token,
-        addressModel.zoneIds,
-        addressModel.areaIds,
-        sharedPreferences.getString(AppConstants.languageCode),
-        currentModuleId != null ? int.tryParse(currentModuleId) : null,
-        addressModel.latitude,
-        addressModel.longitude,
-      );
-
-      if (kDebugMode) {
-        debugPrint('✅ SplashController: Promotional content loaded and cached');
-      }
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        debugPrint('❌ SplashController: Error loading promotional content: $e');
-        debugPrint('   Stack trace: $stackTrace');
-      }
-    } finally {
-      final int targetModuleId = moduleId ??
-          selectedModule.value?.id ??
-          _module?.id ??
-          getCacheModule();
-      final int finalModuleId = targetModuleId == 0 ? 3 : targetModuleId;
-      Future.delayed(const Duration(seconds: 2), () {
-        _promotionalBannerLoadInProgress.remove(finalModuleId);
-      });
-    }
-  }
+  Future<void> loadAndCachePromotionalContent({int? moduleId}) async {}
 
   @override
   void onClose() {

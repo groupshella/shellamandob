@@ -7,6 +7,7 @@ import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart/features/profile/screens/language_select_screen.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,14 +18,30 @@ class MarketerProfileScreen extends StatelessWidget {
   static const Color _primaryGreen = Color(0xFF30913F);
   static const Color _darkText = Color(0xFF111B18);
 
+  String _getLanguageName(String code) {
+    switch (code.toLowerCase()) {
+      case 'ar':
+        return 'العربية';
+      case 'bn':
+        return 'বাংলা';
+      case 'es':
+        return 'Español';
+      case 'en':
+      default:
+        return 'English';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF9FAFB),
+          backgroundColor: isDark ? const Color(0xFF121418) : const Color(0xFFF9FAFB),
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
             elevation: 0,
             centerTitle: true,
             automaticallyImplyLeading: !isRoot,
@@ -34,16 +51,16 @@ class MarketerProfileScreen extends StatelessWidget {
                     onPressed: () => Get.back(),
                     icon: Icon(
                       locCtrl.isLtr ? IconlyLight.arrowLeft2 : IconlyLight.arrowRight2,
-                      color: _darkText,
+                      color: isDark ? Colors.white : _darkText,
                     ),
                   ),
             title: Text(
               'profile_and_settings'.tr,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: _darkText,
+                color: isDark ? Colors.white : _darkText,
               ),
             ),
           ),
@@ -67,14 +84,15 @@ class MarketerProfileScreen extends StatelessWidget {
                       return Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF1C2028) : Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFE5E7EB)),
-                          boxShadow: const [
+                          border: Border.all(
+                              color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
+                          boxShadow: [
                             BoxShadow(
-                              color: Color(0x06000000),
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
                               blurRadius: 8,
-                              offset: Offset(0, 2),
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -85,8 +103,8 @@ class MarketerProfileScreen extends StatelessWidget {
                                 Container(
                                   width: 56,
                                   height: 56,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFEBFEEB),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB),
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Center(
@@ -102,27 +120,27 @@ class MarketerProfileScreen extends StatelessWidget {
                                         children: [
                                           Text(
                                             name.isNotEmpty ? name : 'voucher_marketer'.tr,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontFamily: 'Tajawal',
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
-                                              color: _darkText,
+                                              color: isDark ? Colors.white : _darkText,
                                             ),
                                           ),
                                           const SizedBox(width: 6),
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFF0FDF4),
+                                              color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4),
                                               borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
                                               'verified_approved'.tr,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontFamily: 'Tajawal',
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w700,
-                                                color: Color(0xFF16A34A),
+                                                color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
                                               ),
                                             ),
                                           ),
@@ -132,10 +150,10 @@ class MarketerProfileScreen extends StatelessWidget {
                                       if (phone.isNotEmpty)
                                         Text(
                                           phone,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontFamily: 'Tajawal',
                                             fontSize: 13,
-                                            color: Color(0xFF6B7280),
+                                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                                           ),
                                         ),
                                     ],
@@ -144,13 +162,13 @@ class MarketerProfileScreen extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 14),
-                            const Divider(height: 1, color: Color(0xFFF3F4F6)),
+                            Divider(height: 1, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
                             const SizedBox(height: 12),
                             // Referral Code Box
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF9FAFB),
+                                color: isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
@@ -162,11 +180,11 @@ class MarketerProfileScreen extends StatelessWidget {
                                       const SizedBox(width: 8),
                                       Text(
                                         '${'marketer_code_label'.tr}: ${c.code}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Tajawal',
                                           fontSize: 13,
                                           fontWeight: FontWeight.w700,
-                                          color: _darkText,
+                                          color: isDark ? Colors.white : _darkText,
                                         ),
                                       ),
                                     ],
@@ -179,9 +197,10 @@ class MarketerProfileScreen extends StatelessWidget {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: isDark ? const Color(0xFF1C2028) : Colors.white,
                                         borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                                        border: Border.all(
+                                            color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
                                       ),
                                       child: Text(
                                         'copy'.tr,
@@ -209,9 +228,10 @@ class MarketerProfileScreen extends StatelessWidget {
               // 2. Marketer Actions Section
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1C2028) : Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(
+                      color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
                 ),
                 child: Column(
                   children: [
@@ -219,21 +239,24 @@ class MarketerProfileScreen extends StatelessWidget {
                       icon: IconlyLight.chat,
                       title: 'marketer_support_desk'.tr,
                       subtitle: 'marketer_support_subtitle'.tr,
+                      isDark: isDark,
                       onTap: () => _openWhatsAppSupport(),
                     ),
-                    const Divider(height: 1, indent: 54, color: Color(0xFFF3F4F6)),
+                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
                     _buildSettingsTile(
                       icon: IconlyLight.document,
                       title: 'commission_terms_policy'.tr,
                       subtitle: 'commission_terms_subtitle'.tr,
-                      onTap: () => _showTermsDialog(context),
+                      isDark: isDark,
+                      onTap: () => _showTermsDialog(context, isDark),
                     ),
-                    const Divider(height: 1, indent: 54, color: Color(0xFFF3F4F6)),
+                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
                     _buildSettingsTile(
                       icon: Icons.language,
                       title: 'app_language'.tr,
-                      subtitle: locCtrl.locale.languageCode == 'ar' ? 'العربية' : 'English',
-                      onTap: () => _toggleLanguage(context),
+                      subtitle: _getLanguageName(locCtrl.locale.languageCode),
+                      isDark: isDark,
+                      onTap: () => Get.to(() => const LanguageSelectScreen()),
                     ),
                   ],
                 ),
@@ -242,7 +265,7 @@ class MarketerProfileScreen extends StatelessWidget {
 
               // 3. Logout Button
               OutlinedButton.icon(
-                onPressed: () => _showLogoutConfirmDialog(context),
+                onPressed: () => _showLogoutConfirmDialog(context, isDark),
                 icon: const Icon(IconlyLight.logout, color: Color(0xFFDC2626), size: 20),
                 label: Text(
                   'sign_out'.tr,
@@ -254,10 +277,10 @@ class MarketerProfileScreen extends StatelessWidget {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFFCA5A5)),
+                  side: BorderSide(color: isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFCA5A5)),
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  backgroundColor: Colors.white,
+                  backgroundColor: isDark ? const Color(0xFF2A1515) : Colors.white,
                 ),
               ),
               const SizedBox(height: 20),
@@ -275,6 +298,7 @@ class MarketerProfileScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    required bool isDark,
   }) {
     final isLtr = Get.find<LocalizationController>().isLtr;
     return ListTile(
@@ -283,35 +307,36 @@ class MarketerProfileScreen extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F4F6),
+          color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: _primaryGreen, size: 20),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 14,
           fontWeight: FontWeight.w700,
-          color: _darkText,
+          color: isDark ? Colors.white : _darkText,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 11,
-          color: Color(0xFF6B7280),
+          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
         ),
       ),
-      trailing: Icon(isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2, size: 16, color: const Color(0xFF9CA3AF)),
+      trailing: Icon(isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2, size: 16, color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF)),
     );
   }
 
   Future<void> _openWhatsAppSupport() async {
     const phone = '+966500000000'; // Default support number
-    final uri = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent('مرحباً، أحتاج مساعدة بخصوص حسابي كمسوق في تطبيق شلة')}');
+    final message = 'whatsapp_marketer_support_message'.tr;
+    final uri = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
@@ -319,19 +344,30 @@ class MarketerProfileScreen extends StatelessWidget {
     }
   }
 
-  void _showTermsDialog(BuildContext context) {
+  void _showTermsDialog(BuildContext context, bool isDark) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'commission_terms_policy'.tr,
-          style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700, fontSize: 16),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
         content: SingleChildScrollView(
           child: Text(
             '${'term_1'.tr}\n${'term_2'.tr}\n${'term_3'.tr}\n${'term_4'.tr}\n${'term_5'.tr}',
-            style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, height: 1.6),
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 13,
+              height: 1.6,
+              color: isDark ? const Color(0xFFE5E7EB) : Colors.black87,
+            ),
           ),
         ),
         actions: [
@@ -344,32 +380,33 @@ class MarketerProfileScreen extends StatelessWidget {
     );
   }
 
-  void _toggleLanguage(BuildContext context) {
-    final locCtrl = Get.find<LocalizationController>();
-    if (locCtrl.locale.languageCode == 'ar') {
-      locCtrl.setLanguage(context, const Locale('en', 'US'));
-    } else {
-      locCtrl.setLanguage(context, const Locale('ar', 'SA'));
-    }
-  }
-
-  void _showLogoutConfirmDialog(BuildContext context) {
+  void _showLogoutConfirmDialog(BuildContext context, bool isDark) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'confirm_sign_out'.tr,
-          style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700, fontSize: 16),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
         content: Text(
           'sign_out_prompt'.tr,
-          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 13,
+            color: isDark ? const Color(0xFF9CA3AF) : Colors.black87,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('cancel'.tr, style: const TextStyle(fontFamily: 'Tajawal', color: Color(0xFF6B7280))),
+            child: Text('cancel'.tr, style: TextStyle(fontFamily: 'Tajawal', color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280))),
           ),
           ElevatedButton(
             onPressed: () async {

@@ -22,11 +22,10 @@ import 'package:sixam_mart/helper/custom_validator.dart';
 import 'package:sixam_mart/helper/get_di.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/helper/validate_check.dart';
-import 'package:sixam_mart/common/cache/comprehensive_home_cache_manager.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
+import 'package:sixam_mart/helper/validate_check.dart';
 
 class SignInView extends StatefulWidget {
   final bool exitFromApp;
@@ -374,14 +373,7 @@ class _SignInViewState extends State<SignInView> {
 
       authController.clearUserNumberAndPassword();
     }
-    if (GetPlatform.isWeb) {
-      debugPrint('\x1B[32m  333  \x1B[0m');
 
-      await Get.find<FavouriteController>().getFavouriteList();
-      if (!mounted) {
-        return;
-      }
-    }
     if (status.authResponseModel != null &&
         !status.authResponseModel!.isPhoneVerified!) {
       debugPrint('\x1B[32m  444444  \x1B[0m');
@@ -427,18 +419,13 @@ class _SignInViewState extends State<SignInView> {
 
       // Check current state before navigation
       final profileController = Get.find<ProfileController>();
-      final kaidhaController = Get.find<KaidhaSubscriptionController>();
       debugPrint('🔍 SignInView: Pre-navigation state check:');
       debugPrint(
           '   - User Info: ${profileController.userInfoModel != null ? 'SET (${profileController.userInfoModel?.fName} ${profileController.userInfoModel?.lName})' : 'NULL'}');
-      debugPrint(
-          '   - Wallet State: ${kaidhaController.walletKaidhaModel != null ? 'SET (${kaidhaController.walletKaidhaModel?.wallet?.status})' : 'NULL'}');
 
       // Navigate IMMEDIATELY (don't wait for API calls)
       debugPrint(
           '⚡ SignInView: Navigating immediately (optimistic navigation)...');
-      // Close stale modal overlays from previous checkout/login steps.
-      dismissCheckoutLoadingDialogSafely();
       if (Get.isDialogOpen ?? false) {
         Get.back<void>(closeOverlays: true);
       }
@@ -490,12 +477,6 @@ class _SignInViewState extends State<SignInView> {
     } else {
       authController.clearUserNumberAndPassword();
     }
-    if (GetPlatform.isWeb && response.authResponseModel == null) {
-      await Get.find<FavouriteController>().getFavouriteList();
-      if (!mounted) {
-        return;
-      }
-    }
 
     String? nextPage = Get.parameters['page'];
     if (nextPage == null || nextPage.isEmpty) {
@@ -531,78 +512,14 @@ class _SignInViewState extends State<SignInView> {
   /// This loads additional data (cart, wishlist) in parallel without blocking UI
   Future<void> _loadBackgroundDataAfterLogin() async {
     try {
-      debugPrint('🔄 SignInView: Loading background data after navigation...');
-      final startTime = DateTime.now();
-
-      // Check if cache is valid and restore data
-      if (await ComprehensiveHomeCacheManager.isCacheValid()) {
-        debugPrint('📦 SignInView: Cache is valid, restoring data...');
-
-        // Load cached data
-        final cachedData =
-            await ComprehensiveHomeCacheManager.loadAllHomeData();
-
-        if (cachedData.isNotEmpty) {
-          // Restore data to controllers
-          await ComprehensiveHomeCacheManager.restoreDataToControllers(
-              cachedData);
-          debugPrint('✅ SignInView: Data restored successfully');
-        }
-      } else {
-        debugPrint(
-            '⚠️ SignInView: Cache not valid, will load from API after navigation');
-      }
-
-      // Load remaining data in parallel (non-blocking)
-      // User info and wallet state are already set from login response
       if (AuthHelper.isLoggedIn()) {
         try {
           final profileController = Get.find<ProfileController>();
-          final kaidhaController = Get.find<KaidhaSubscriptionController>();
-          final cartController = Get.find<CartController>();
-          final favouriteController = Get.find<FavouriteController>();
-
-          final futures = <Future>[];
-
-          // Only load full user info if not already set from login response
           if (profileController.userInfoModel == null) {
-            debugPrint(
-                '🔄 SignInView: User info not set from login - loading from API...');
-            futures.add(profileController.getUserInfo());
-          } else {
-            debugPrint(
-                '⏭️ SignInView: User info already set from login - skipping API call');
+            await profileController.getUserInfo();
           }
-
-          // Only load wallet if not already set from login response (inactive/unsigned wallets)
-          // Active wallets already have state set from login - no API call needed!
-          if (kaidhaController.walletKaidhaModel == null) {
-            debugPrint(
-                '🔄 SignInView: Wallet state not set from login - loading from API...');
-            futures.add(kaidhaController.get_Wallet_Kaidh());
-          } else {
-            debugPrint(
-                '⏭️ SignInView: Wallet state already set from login - skipping API call');
-          }
-
-          // Load module-specific cart (non-blocking)
-          debugPrint('🔄 SignInView: Loading cart data...');
-          futures.add(cartController.getCartDataOnline());
-
-          // Load wishlist (non-blocking)
-          debugPrint('🔄 SignInView: Loading wishlist data...');
-          futures.add(favouriteController.getFavouriteList());
-
-          debugPrint(
-              '🔄 SignInView: Waiting for ${futures.length} background API calls...');
-          await Future.wait(futures);
-
-          final duration = DateTime.now().difference(startTime);
-          debugPrint(
-              '✅ SignInView: Background data loaded successfully in ${duration.inMilliseconds}ms');
         } catch (e) {
-          debugPrint('⚠️ SignInView: Error loading background data - $e');
-          // Don't block - data will load when user navigates to those screens
+          debugPrint('⚠️ SignInView: Error loading user info - $e');
         }
       }
     } catch (e) {

@@ -18,8 +18,17 @@ class SelectWorkZoneScreen extends StatelessWidget {
       Get.put(AttendanceController());
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scaffoldBg = isDark ? const Color(0xFF121418) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final selectedCardBg = isDark ? const Color(0xFF1B3822) : const Color(0xFFF1FBF2);
+    final borderColor = isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB);
+    final radioBorder = isDark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB);
+    final textDark = isDark ? Colors.white : _darkText;
+    final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
@@ -50,7 +59,7 @@ class SelectWorkZoneScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF1FBF2),
+                                  color: selectedCardBg,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
                                 ),
@@ -60,7 +69,7 @@ class SelectWorkZoneScreen extends StatelessWidget {
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        'تم قفل منطقة العمل: ${controller.selectedZone?.name ?? ''}',
+                                        '${'work_zone_locked'.tr}: ${controller.selectedZone?.name ?? ''}',
                                         style: const TextStyle(
                                           fontFamily: 'Tajawal',
                                           fontSize: 14,
@@ -74,24 +83,24 @@ class SelectWorkZoneScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                             ],
-                            const Text(
-                              'اختر المنطقة قبل بدء الجولة',
-                              textAlign: TextAlign.right,
+                            Text(
+                              'choose_zone_before_tour'.tr,
+                              textAlign: TextAlign.start,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: _darkText,
+                                color: textDark,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              'يجب أن تكون داخل النطاق المحدد لبدء الدوام.',
-                              textAlign: TextAlign.right,
+                            Text(
+                              'must_be_within_specified_range'.tr,
+                              textAlign: TextAlign.start,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
-                                color: _subText,
+                                color: textSub,
                               ),
                             ),
                           ],
@@ -118,10 +127,10 @@ class SelectWorkZoneScreen extends StatelessWidget {
                                 duration: const Duration(milliseconds: 200),
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? const Color(0xFFF1FBF2) : Colors.white,
+                                  color: isSelected ? selectedCardBg : cardBg,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: isSelected ? _primaryGreen : const Color(0xFFE5E7EB),
+                                    color: isSelected ? _primaryGreen : borderColor,
                                     width: isSelected ? 1.5 : 1,
                                   ),
                                 ),
@@ -135,7 +144,7 @@ class SelectWorkZoneScreen extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         border: Border.all(
-                                          color: isSelected ? _primaryGreen : const Color(0xFFD1D5DB),
+                                          color: isSelected ? _primaryGreen : radioBorder,
                                           width: 2,
                                         ),
                                       ),
@@ -163,16 +172,16 @@ class SelectWorkZoneScreen extends StatelessWidget {
                                             fontFamily: 'Tajawal',
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
-                                            color: isSelected ? _primaryGreen : _darkText,
+                                            color: isSelected ? _primaryGreen : textDark,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${zone.plannedVisits} زيارات مخططة',
-                                          style: const TextStyle(
+                                          '${zone.plannedVisits} ${'planned_visits'.tr}',
+                                          style: TextStyle(
                                             fontFamily: 'Tajawal',
                                             fontSize: 12,
-                                            color: _subText,
+                                            color: textSub,
                                           ),
                                         ),
                                       ],
@@ -210,8 +219,8 @@ class SelectWorkZoneScreen extends StatelessWidget {
                             ),
                             child: Text(
                               controller.isZoneLocked
-                                  ? 'متابعة إلى تسجيل الحضور'
-                                  : 'تأكيد منطقة العمل',
+                                  ? 'continue_to_attendance'.tr
+                                  : 'confirm_work_zone'.tr,
                               style: const TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
@@ -234,6 +243,12 @@ class SelectWorkZoneScreen extends StatelessWidget {
   }
 
   void _showZoneLockModal(BuildContext context, AttendanceController controller) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final sheetBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF1B3822) : const Color(0xFFF1FBF2);
+    final textDark = isDark ? Colors.white : _darkText;
+    final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -241,32 +256,32 @@ class SelectWorkZoneScreen extends StatelessWidget {
       builder: (ctx) => GetBuilder<AttendanceController>(
         builder: (attCtrl) => Container(
           padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: sheetBg,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'تأكيد منطقة العمل',
+              Text(
+                'confirm_work_zone'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: _darkText,
+                  color: textDark,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'بعد التأكيد سيتم قفل منطقة العمل لهذه الجولة، ولن تتمكن من تغييرها إلا بموافقة المشرف.',
+              Text(
+                'confirm_zone_lock_notice'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 14,
-                  color: _subText,
+                  color: textSub,
                   height: 1.5,
                 ),
               ),
@@ -276,7 +291,7 @@ class SelectWorkZoneScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1FBF2),
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
                 ),
@@ -293,11 +308,11 @@ class SelectWorkZoneScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${attCtrl.selectedZone?.plannedVisits ?? 0} زيارات مخططة',
-                      style: const TextStyle(
+                      '${attCtrl.selectedZone?.plannedVisits ?? 0} ${'planned_visits'.tr}',
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
-                        color: _subText,
+                        color: textSub,
                       ),
                     ),
                   ],
@@ -338,9 +353,9 @@ class SelectWorkZoneScreen extends StatelessWidget {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'تأكيد المنطقة',
-                          style: TextStyle(
+                      : Text(
+                          'confirm_zone_btn'.tr,
+                          style: const TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -356,13 +371,13 @@ class SelectWorkZoneScreen extends StatelessWidget {
                 height: 44,
                 child: TextButton(
                   onPressed: attCtrl.isLockingZone ? null : () => Navigator.of(ctx).pop(),
-                  child: const Text(
-                    'العودة للاختيار',
+                  child: Text(
+                    'back_to_selection'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: _subText,
+                      color: textSub,
                     ),
                   ),
                 ),

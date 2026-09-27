@@ -85,7 +85,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     }
   }
 
-  void _showTermsBottomSheet() {
+  void _showTermsBottomSheet(bool isDark) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -93,9 +93,9 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
       builder: (ctx) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C2028) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: SafeArea(
             child: Column(
@@ -111,14 +111,14 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                       child: Container(
                         width: 36,
                         height: 36,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF3F4F6),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close,
                           size: 20,
-                          color: Color(0xFF555555),
+                          color: isDark ? Colors.white : const Color(0xFF555555),
                         ),
                       ),
                     ),
@@ -126,11 +126,11 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                       child: Text(
                         'terms_and_conditions'.tr,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: _darkText,
+                          color: isDark ? Colors.white : _darkText,
                         ),
                       ),
                     ),
@@ -140,15 +140,15 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                 const SizedBox(height: 24),
 
                 // Terms List
-                _buildTermItem('term_1'.tr),
+                _buildTermItem('term_1'.tr, isDark),
                 const SizedBox(height: 14),
-                _buildTermItem('term_2'.tr),
+                _buildTermItem('term_2'.tr, isDark),
                 const SizedBox(height: 14),
-                _buildTermItem('term_3'.tr),
+                _buildTermItem('term_3'.tr, isDark),
                 const SizedBox(height: 14),
-                _buildTermItem('term_4'.tr),
+                _buildTermItem('term_4'.tr, isDark),
                 const SizedBox(height: 14),
-                _buildTermItem('term_5'.tr),
+                _buildTermItem('term_5'.tr, isDark),
                 const SizedBox(height: 28),
 
                 // Done Button
@@ -191,15 +191,15 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
-  Widget _buildTermItem(String text) {
+  Widget _buildTermItem(String text, bool isDark) {
     return Text(
       text,
       textAlign: TextAlign.right,
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'Tajawal',
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: _darkText,
+        color: isDark ? const Color(0xFFE5E7EB) : _darkText,
         height: 1.6,
       ),
     );
@@ -242,8 +242,10 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -256,47 +258,50 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                   children: [
                     Text(
                       'steps_to_become_marketer'.tr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: _darkText,
+                        color: isDark ? Colors.white : _darkText,
                       ),
                     ),
                     const SizedBox(height: 18),
 
                     // First Name
-                    _buildLabel('first_name'.tr),
+                    _buildLabel('first_name'.tr, isDark),
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _firstNameController,
                       hintText: 'enter_first_name_hint'.tr,
+                      isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 16),
 
                     // Last Name
-                    _buildLabel('last_name'.tr),
+                    _buildLabel('last_name'.tr, isDark),
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _lastNameController,
                       hintText: 'enter_last_name_hint'.tr,
+                      isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 16),
 
                     // Phone Number
-                    _buildLabel('phone_number'.tr),
+                    _buildLabel('phone_number'.tr, isDark),
                     const SizedBox(height: 8),
-                    _buildPhoneField(),
+                    _buildPhoneField(isDark),
                     const SizedBox(height: 16),
 
                     // Profession
-                    _buildLabel('profession'.tr),
+                    _buildLabel('profession'.tr, isDark),
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _professionController,
                       hintText: 'enter_profession_hint'.tr,
+                      isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 20),
@@ -304,30 +309,30 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     // Documents Upload
                     Text(
                       'documents'.tr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: _darkText,
+                        color: isDark ? Colors.white : _darkText,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'documents_desc'.tr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF6B7280),
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                         height: 1.5,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildDottedDocumentUploader(),
+                    _buildDottedDocumentUploader(isDark),
                     const SizedBox(height: 20),
 
                     // Terms and conditions checkbox
-                    _buildTermsCheckbox(),
+                    _buildTermsCheckbox(isDark),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -346,10 +351,10 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     child: ElevatedButton(
                       onPressed: enabled ? _submit : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: enabled ? _primaryGreen : const Color(0xFFE2E4E6),
-                        foregroundColor: enabled ? Colors.white : const Color(0xFF888888),
-                        disabledBackgroundColor: const Color(0xFFE2E4E6),
-                        disabledForegroundColor: const Color(0xFF888888),
+                        backgroundColor: enabled ? _primaryGreen : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
+                        foregroundColor: enabled ? Colors.white : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
+                        disabledBackgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6),
+                        disabledForegroundColor: isDark ? const Color(0xFF6B7280) : const Color(0xFF888888),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -380,17 +385,17 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, bool isDark) {
     return Text.rich(
       TextSpan(
         children: [
           TextSpan(
             text: text,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: _darkText,
+              color: isDark ? Colors.white : _darkText,
             ),
           ),
           const TextSpan(
@@ -411,32 +416,34 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     required TextEditingController controller,
     required String hintText,
     required ValueChanged<String> onChanged,
+    required bool isDark,
   }) {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: _inputBg,
+        color: isDark ? const Color(0xFF1C2028) : _inputBg,
         borderRadius: BorderRadius.circular(12),
+        border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14),
       alignment: Alignment.center,
       child: TextField(
         controller: controller,
         onChanged: onChanged,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: _darkText,
+          color: isDark ? Colors.white : _darkText,
         ),
         decoration: InputDecoration(
           isDense: true,
           hintText: hintText,
-          hintStyle: const TextStyle(
+          hintStyle: TextStyle(
             fontFamily: 'Tajawal',
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF999999),
+            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF999999),
           ),
           border: InputBorder.none,
         ),
@@ -444,84 +451,83 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
-  Widget _buildPhoneField() {
+  Widget _buildPhoneField(bool isDark) {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: _inputBg,
+        color: isDark ? const Color(0xFF1C2028) : _inputBg,
         borderRadius: BorderRadius.circular(12),
+        border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      // Force LTR so the flag + dial code sit on the left and "+966" renders
-      // correctly (RTL was flipping it to "966+" and pushing the flag right).
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: Row(
-        children: [
-          // Selectable Country Code Picker
-          CountryCodePicker(
-            onChanged: (CountryCode countryCode) {
-              setState(() {
-                _countryCode = countryCode.dialCode ?? '+966';
-              });
-            },
-            initialSelection: 'SA',
-            favorite: const ['+966', 'SA'],
-            showCountryOnly: false,
-            showOnlyCountryWhenClosed: false,
-            alignLeft: false,
-            showFlag: true,
-            showFlagMain: true,
-            showDropDownButton: false,
-            textStyle: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: _darkText,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-          ),
-          Container(
-            height: 24,
-            width: 1,
-            color: const Color(0xFFD1D5DB),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              onChanged: (_) => setState(() {}),
-              style: const TextStyle(
+          children: [
+            // Selectable Country Code Picker
+            CountryCodePicker(
+              onChanged: (CountryCode countryCode) {
+                setState(() {
+                  _countryCode = countryCode.dialCode ?? '+966';
+                });
+              },
+              initialSelection: 'SA',
+              favorite: const ['+966', 'SA'],
+              showCountryOnly: false,
+              showOnlyCountryWhenClosed: false,
+              alignLeft: false,
+              showFlag: true,
+              showFlagMain: true,
+              showDropDownButton: false,
+              textStyle: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: _darkText,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : _darkText,
               ),
-              decoration: const InputDecoration(
-                isDense: true,
-                hintText: '5XXXXXXXX',
-                hintStyle: TextStyle(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            Container(
+              height: 24,
+              width: 1,
+              color: isDark ? const Color(0xFF2C3240) : const Color(0xFFD1D5DB),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                onChanged: (_) => setState(() {}),
+                style: TextStyle(
                   fontFamily: 'Tajawal',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF999999),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : _darkText,
                 ),
-                border: InputBorder.none,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  hintText: '5XXXXXXXX',
+                  hintStyle: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF999999),
+                  ),
+                  border: InputBorder.none,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDottedDocumentUploader() {
+  Widget _buildDottedDocumentUploader(bool isDark) {
     return GestureDetector(
       onTap: _pickDocument,
       child: DottedBorder(
-        color: const Color(0xFFC6C8CE),
+        color: isDark ? const Color(0xFF4B5563) : const Color(0xFFC6C8CE),
         strokeWidth: 1.3,
         dashPattern: const [6, 4],
         borderType: BorderType.RRect,
@@ -530,7 +536,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1C2028) : Colors.white,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -561,21 +567,21 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                           : 'choose_file_and_add'.tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: _darkText,
+                        color: isDark ? Colors.white : _darkText,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'file_upload_hint'.tr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF888888),
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF888888),
                       ),
                     ),
                   ],
@@ -586,12 +592,12 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF6F5F8),
+                  color: isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   IconlyLight.document,
-                  color: Color(0xFF6B7280),
+                  color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                   size: 22,
                 ),
               ),
@@ -602,7 +608,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
-  Widget _buildTermsCheckbox() {
+  Widget _buildTermsCheckbox(bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -629,16 +635,16 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
               children: [
                 TextSpan(
                   text: 'terms_agree_prefix'.tr,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: _darkText,
+                    color: isDark ? Colors.white : _darkText,
                   ),
                 ),
                 TextSpan(
                   text: 'terms_agree_link'.tr,
-                  recognizer: TapGestureRecognizer()..onTap = _showTermsBottomSheet,
+                  recognizer: TapGestureRecognizer()..onTap = () => _showTermsBottomSheet(isDark),
                   style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 13,
@@ -650,11 +656,11 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                 ),
                 TextSpan(
                   text: 'terms_agree_suffix'.tr,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: _darkText,
+                    color: isDark ? Colors.white : _darkText,
                   ),
                 ),
               ],

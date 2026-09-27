@@ -30,7 +30,7 @@ class AttendanceController extends GetxController implements GetxService {
   LatLng? userLocation;
   bool isLoadingLocation = false;
   bool pendingSupervisorApproval = false;
-  String selectedChangeReason = 'خطأ في اختيار المنطقة';
+  String selectedChangeReason = 'wrong_zone_selected'.tr;
   String additionalChangeNotes = '';
 
   // Selfie
@@ -90,7 +90,7 @@ class AttendanceController extends GetxController implements GetxService {
     required Function(String error) onError,
   }) async {
     if (selectedZone == null) {
-      onError('يرجى اختيار منطقة أولاً');
+      onError('select_zone_first'.tr);
       return false;
     }
 
@@ -121,14 +121,14 @@ class AttendanceController extends GetxController implements GetxService {
         onSuccess();
         return true;
       } else {
-        final msg = res.body?['message'] ?? 'فشل في قفل منطقة العمل';
+        final msg = res.body?['message'] ?? 'failed_to_lock_zone'.tr;
         onError(msg.toString());
         return false;
       }
     } catch (e) {
       isLockingZone = false;
       update();
-      onError('حدث خطأ أثناء الاتصال: $e');
+      onError('${'failed_to_lock_zone'.tr}: $e');
       return false;
     }
   }
@@ -268,16 +268,16 @@ class AttendanceController extends GetxController implements GetxService {
         pendingSupervisorApproval = true;
         update();
         if (onSuccess != null) onSuccess();
-        showCustomSnackBar('تم تقديم طلب تغيير المنطقة بنجاح', isError: false);
+        showCustomSnackBar('zone_change_request_submitted'.tr, isError: false);
         return true;
       } else {
-        final msg = res.body?['message'] ?? 'فشل في تقديم الطلب';
+        final msg = res.body?['message'] ?? 'failed_to_send_request'.tr;
         if (onError != null) onError(msg.toString());
         showCustomSnackBar(msg.toString(), isError: true);
         return false;
       }
     } catch (e) {
-      final msg = 'حدث خطأ: $e';
+      final msg = '${'failed_to_send_request'.tr}: $e';
       if (onError != null) onError(msg);
       showCustomSnackBar(msg, isError: true);
       return false;

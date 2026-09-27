@@ -23,11 +23,16 @@ class EmployeeWarningsBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final redBgColor = isDark ? const Color(0xFF2A1515) : _redBg;
+    final titleTextColor = isDark ? Colors.white : _darkText;
+    final subTextColor = isDark ? const Color(0xFF9CA3AF) : _subText;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -42,24 +47,24 @@ class EmployeeWarningsBottomSheet extends StatelessWidget {
                 child: Container(
                   width: 36,
                   height: 36,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF3F4F6),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
                     size: 18,
-                    color: Color(0xFF555555),
+                    color: isDark ? Colors.white : const Color(0xFF555555),
                   ),
                 ),
               ),
               Text(
                 'warnings'.tr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: _darkText,
+                  color: titleTextColor,
                 ),
               ),
               const SizedBox(width: 36),
@@ -71,8 +76,9 @@ class EmployeeWarningsBottomSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _redBg,
+              color: redBgColor,
               borderRadius: BorderRadius.circular(16),
+              border: isDark ? Border.all(color: _redColor.withValues(alpha: 0.3)) : null,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -130,10 +136,10 @@ class EmployeeWarningsBottomSheet extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         w.date,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 13,
-                          color: _subText,
+                          color: subTextColor,
                         ),
                       ),
                     ],

@@ -18,6 +18,7 @@ import 'package:sixam_mart/features/employee/visits/models/store_visit_model.dar
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'employee_vacations_screen.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_dashboard_screen.dart';
 
 /// Employee Profile screen — faithfully matches Figma node 8976:27114 (8960:27650)
 /// Fully responsive to Dark Mode & Light Mode and connected to the database & API.
@@ -156,7 +157,15 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
                     const SizedBox(height: 12),
 
-                    // ─── 5. Logout Card (8960:27876) ────────────────────────────────
+                    // ─── 5. Marketer Mode Card (Figma 9054:69573) ────────────────────
+                    _buildMarketerModeCard(
+                      context: context,
+                      isDark: isDark,
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // ─── 6. Logout Card (8960:27876) ────────────────────────────────
                     _buildLogoutCard(
                       context: context,
                       cardBg: cardBg,
@@ -678,6 +687,74 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                 Get.toNamed(RouteHelper.getHtmlRoute('terms-and-condition')),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Marketer Mode Card (Figma 9054:69573 - Frame 2085665595)
+  Widget _buildMarketerModeCard({
+    required BuildContext context,
+    required bool isDark,
+  }) {
+    final bg = isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB);
+    final textColor = isDark ? const Color(0xFF4ADE80) : const Color(0xFF1A611E);
+    final borderColor = isDark ? const Color(0xFF1E562A) : const Color(0xFFD1FDD2);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 8.9,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            if (Get.isRegistered<MarketerController>()) {
+              Get.find<MarketerController>().loadDashboard();
+            }
+            Get.to(() => const MarketerDashboardScreen());
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Row(
+              children: [
+                Icon(
+                  IconlyLight.scan,
+                  color: textColor,
+                  size: 24,
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    'qr_marketer_mode'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                GetBuilder<LocalizationController>(
+                  builder: (locCtrl) => Icon(
+                    locCtrl.isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2,
+                    color: textColor.withValues(alpha: 0.8),
+                    size: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
