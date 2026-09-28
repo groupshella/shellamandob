@@ -306,9 +306,10 @@ class SecureHttpClient {
       }
 
       final bool duplicatePrevented = body['duplicate_prevented'] == true;
-      final String statusStr = (body['status'] ?? body['order_status'] ?? '')
-          .toString()
-          .toLowerCase();
+      final String statusStr =
+          (body['status'] ?? body['order_status'] ?? '')
+              .toString()
+              .toLowerCase();
       final String paymentStatusStr =
           (body['payment_status'] ?? '').toString().toLowerCase();
       final bool isPendingPayment =
@@ -373,8 +374,7 @@ class SecureHttpClient {
     if (kIsWeb) {
       headers['X-Platform'] = 'web';
     } else {
-      headers['X-Platform'] =
-          (!kIsWeb && Platform.isAndroid) ? 'android' : 'ios';
+      headers['X-Platform'] = (!kIsWeb && Platform.isAndroid) ? 'android' : 'ios';
     }
     headers['X-Request-ID'] = _generateRequestId();
   }

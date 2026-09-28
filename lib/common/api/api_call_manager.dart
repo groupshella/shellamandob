@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -226,9 +227,7 @@ class ApiCallManager extends GetxService {
                     "hypothesisId": "A"
                   })}\n',
               mode: FileMode.append);
-        } catch (e) {
-          if (kDebugMode) debugPrint('$e');
-        }
+        } catch (e) { if (kDebugMode) debugPrint('$e'); }
       }
       // #endregion
 

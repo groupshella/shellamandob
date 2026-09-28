@@ -1,14 +1,15 @@
+
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Cache Manager - Multi-layer caching system
-///
+/// 
 /// Implements a three-layer caching strategy:
 /// L1: Memory Cache (fastest, limited size)
 /// L2: Persistent Cache (Hive database, medium speed)
 /// L3: Network Cache (HTTP cache headers, slowest)
-///
+/// 
 /// Features:
 /// - TTL (Time To Live) support
 /// - Smart invalidation
@@ -40,7 +41,7 @@ class CacheManager {
       // Initialize SharedPreferences for persistent caching
       _sharedPreferences = await SharedPreferences.getInstance();
       _persistentInitialized = true;
-
+      
       if (kDebugMode) {
         debugPrint('✅ CacheManager initialized successfully');
       }
@@ -53,8 +54,7 @@ class CacheManager {
   }
 
   /// Get data from cache with fallback strategy
-  Future<T?> get<T>(String key,
-      {Duration? ttl, bool forceRefresh = false}) async {
+  Future<T?> get<T>(String key, {Duration? ttl, bool forceRefresh = false}) async {
     if (forceRefresh) {
       await remove(key);
     }
@@ -78,15 +78,14 @@ class CacheManager {
       try {
         final cachedData = _sharedPreferences.getString(key);
         if (cachedData != null) {
-          final entry = CacheEntry.fromJson(
-              jsonDecode(cachedData) as Map<String, dynamic>);
+          final entry = CacheEntry.fromJson(jsonDecode(cachedData) as Map<String, dynamic>);
           if (!entry.isExpired(ttl ?? _defaultTTL)) {
             _persistentHits++;
-
+            
             // Promote to memory cache
             _memoryCache[key] = entry;
             _evictMemoryCacheIfNeeded();
-
+            
             if (kDebugMode) {
               debugPrint('💾 Persistent cache HIT: $key');
             }
@@ -141,7 +140,7 @@ class CacheManager {
   /// Remove data from cache
   Future<void> remove(String key) async {
     _memoryCache.remove(key);
-
+    
     if (_persistentInitialized) {
       try {
         await _sharedPreferences.remove(key);
@@ -161,17 +160,18 @@ class CacheManager {
   Future<void> clearByPattern(String pattern) async {
     // ignore: deprecated_member_use
     final regex = RegExp(pattern.replaceAll('*', '.*'));
-
+    
     // Clear memory cache
     _memoryCache.removeWhere((key, value) => regex.hasMatch(key));
-
+    
     // Clear persistent cache
     if (_persistentInitialized) {
       try {
         final allKeys = _sharedPreferences.getKeys();
-        final keysToDelete =
-            allKeys.where((key) => regex.hasMatch(key)).toList();
-
+        final keysToDelete = allKeys
+            .where((key) => regex.hasMatch(key))
+            .toList();
+        
         for (final key in keysToDelete) {
           await _sharedPreferences.remove(key);
         }
@@ -190,7 +190,7 @@ class CacheManager {
   /// Clear all cache
   Future<void> clearAll() async {
     _memoryCache.clear();
-
+    
     if (_persistentInitialized) {
       try {
         await _sharedPreferences.clear();
@@ -210,7 +210,7 @@ class CacheManager {
   Map<String, dynamic> getStats() {
     final totalHits = _memoryHits + _persistentHits + _networkHits;
     final totalRequests = totalHits + _cacheMisses;
-
+    
     return {
       'memoryHits': _memoryHits,
       'persistentHits': _persistentHits,
@@ -220,8 +220,7 @@ class CacheManager {
       'totalRequests': totalRequests,
       'hitRate': totalRequests > 0 ? (totalHits / totalRequests * 100) : 0,
       'memoryCacheSize': _memoryCache.length,
-      'persistentCacheSize':
-          _persistentInitialized ? _sharedPreferences.getKeys().length : 0,
+      'persistentCacheSize': _persistentInitialized ? _sharedPreferences.getKeys().length : 0,
     };
   }
 
@@ -231,9 +230,8 @@ class CacheManager {
       // Remove oldest entries (simple LRU)
       final sortedEntries = _memoryCache.entries.toList()
         ..sort((a, b) => a.value.timestamp.compareTo(b.value.timestamp));
-
-      final entriesToRemove =
-          sortedEntries.take(_memoryCache.length - _maxMemoryCacheSize);
+      
+      final entriesToRemove = sortedEntries.take(_memoryCache.length - _maxMemoryCacheSize);
       for (final entry in entriesToRemove) {
         _memoryCache.remove(entry.key);
       }
@@ -285,13 +283,12 @@ class CacheManager {
       try {
         final expiredKeys = <String>[];
         final allKeys = _sharedPreferences.getKeys();
-
+        
         for (final key in allKeys) {
           try {
             final cachedData = _sharedPreferences.getString(key);
             if (cachedData != null) {
-              final entry = CacheEntry.fromJson(
-                  jsonDecode(cachedData) as Map<String, dynamic>);
+              final entry = CacheEntry.fromJson(jsonDecode(cachedData) as Map<String, dynamic>);
               if (entry.isExpired(_defaultTTL)) {
                 expiredKeys.add(key);
               }
@@ -301,7 +298,7 @@ class CacheManager {
             expiredKeys.add(key);
           }
         }
-
+        
         for (final key in expiredKeys) {
           await _sharedPreferences.remove(key);
           if (kDebugMode) {
@@ -341,15 +338,15 @@ class CacheEntry {
   }
 
   Map<String, dynamic> toJson() => {
-        'data': data,
-        'timestamp': timestamp.millisecondsSinceEpoch,
-        'ttl': ttl.inMilliseconds,
-      };
+    'data': data,
+    'timestamp': timestamp.millisecondsSinceEpoch,
+    'ttl': ttl.inMilliseconds,
+  };
 
   factory CacheEntry.fromJson(Map<String, dynamic> json) => CacheEntry(
-        data: json['data'] as String,
-        timestamp:
-            DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
-        ttl: Duration(milliseconds: json['ttl'] as int),
-      );
+    data: json['data'] as String,
+    timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
+    ttl: Duration(milliseconds: json['ttl'] as int),
+  );
 }
+

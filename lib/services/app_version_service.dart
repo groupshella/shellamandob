@@ -27,7 +27,9 @@ class AppVersionService {
   Future<void> initializeNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings();
+    const iosSettings = DarwinInitializationSettings(
+      
+    );
     const initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
@@ -42,8 +44,7 @@ class AppVersionService {
       // Get current app version
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final String currentVersion = packageInfo.version;
-      final String platform =
-          (!kIsWeb && Platform.isAndroid) ? 'android' : 'ios';
+      final String platform = (!kIsWeb && Platform.isAndroid) ? 'android' : 'ios';
 
       // Make API call
       final dio = dio_pkg.Dio();

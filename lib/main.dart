@@ -272,6 +272,8 @@ void _initializeNonCriticalServices() {
     }
   });
 
+
+
   Future.microtask(() async {
     try {
       // Facebook Auth for Web
@@ -332,7 +334,8 @@ class _MyAppState extends State<MyApp> {
 
         if (address == null) {
           if (kDebugMode) {
-            debugPrint('⚠️ لم يتم العثور على عنوان مخزن');
+            debugPrint(
+                '⚠️ لم يتم العثور على عنوان مخزن');
           }
         } else if (address.zoneIds == null) {
           Get.find<AuthController>().clearSharedAddress();
@@ -463,6 +466,7 @@ class _MyAppState extends State<MyApp> {
             debugPrint('📱 تم الانتقال إلى: $routeName');
           }
 
+
           // LEAK TRACKING: Trigger leak check after route change
           if (kDebugMode) {
             Future.delayed(const Duration(seconds: 5), () {
@@ -479,11 +483,12 @@ class _MyAppState extends State<MyApp> {
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch},
       ),
-      theme:
-          light(color: themeController.lightColor ?? const Color(0xFF31A342)),
-      darkTheme:
-          dark(color: themeController.darkColor ?? const Color(0xFF31A342)),
-      themeMode: themeController.darkTheme ? ThemeMode.dark : ThemeMode.light,
+      theme: light(
+          color: themeController.lightColor ?? const Color(0xFF31A342)),
+      darkTheme: dark(
+          color: themeController.darkColor ?? const Color(0xFF31A342)),
+      themeMode:
+          themeController.darkTheme ? ThemeMode.dark : ThemeMode.light,
       locale: localizeController.locale,
       translations: Messages(languages: widget.languages),
       fallbackLocale: Locale(
@@ -511,9 +516,7 @@ class _MyAppState extends State<MyApp> {
               textScaler: const TextScaler.linear(1),
             ),
             child: Material(
-              color: themeController.darkTheme
-                  ? const Color(0xFF121418)
-                  : Colors.white,
+              color: themeController.darkTheme ? const Color(0xFF121418) : Colors.white,
               child: navigatorChild,
             ),
           ),
@@ -529,3 +532,4 @@ void unawaited(Future<void> future) {
     if (kDebugMode) debugPrint('⚠️ Unawaited future error: $e');
   });
 }
+
