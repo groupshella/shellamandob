@@ -9,7 +9,7 @@ import 'package:sixam_mart/features/language/domain/service/language_service.dar
 import 'package:sixam_mart/features/language/domain/service/language_service_interface.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
-import 'package:sixam_mart/api/api_client.dart';
+import 'package:sixam_mart/core/network/api_client.dart';
 import 'package:sixam_mart/features/address/controllers/address_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/address/domain/repositories/address_repository.dart';
@@ -61,8 +61,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/utils/app_logger.dart';
-import 'package:sixam_mart/common/api/api_call_manager.dart';
-import 'package:sixam_mart/common/api/optimized_api_client.dart';
+import 'package:sixam_mart/core/network/api_call_manager.dart';
+import 'package:sixam_mart/core/network/optimized_api_client.dart';
 
 import 'package:sixam_mart/core/services/pusher_service.dart';
 
