@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/services/app_version_service.dart';
-import 'package:sixam_mart/widgets/update_dialog.dart';
+import 'package:sixam_mart/core/widgets/update_dialog.dart';
 import 'package:sixam_mart/common/utils/app_logger.dart';
 
 class UpdateController extends GetxController with WidgetsBindingObserver {

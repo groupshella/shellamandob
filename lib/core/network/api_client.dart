@@ -379,9 +379,7 @@ class ApiClient extends GetxService {
     }
     final String? tokenToUse = token ?? this.token;
     final String? sanitizedToken =
-        (tokenToUse == null || tokenToUse.isEmpty || tokenToUse == 'null')
-            ? null
-            : tokenToUse;
+        (tokenToUse == null || tokenToUse.isEmpty || tokenToUse == 'null') ? null : tokenToUse;
     if (sanitizedToken != null && sanitizedToken.isNotEmpty) {
       header['Authorization'] = 'Bearer $sanitizedToken';
     } else {
@@ -621,9 +619,7 @@ class ApiClient extends GetxService {
 
   Response<dynamic>? _blockIfInvalidHomeHeaders(
       String uri, Map<String, String> headers,
-      {required String method,
-      required bool syncAttempted,
-      bool omitModuleId = false}) {
+      {required String method, required bool syncAttempted, bool omitModuleId = false}) {
     if (!_isHomeOrStoreApi(uri)) return null;
 
     final String? moduleId = headers[AppConstants.moduleId];
@@ -728,8 +724,7 @@ class ApiClient extends GetxService {
 
       // ⚡ TASK 2: Ensure module-id is ALWAYS sent for Home and Store feature requests
       // This is mandatory for backend's optimized filters
-      if (_isHomeOrStoreApi(uri) &&
-          !omitModuleId &&
+      if (_isHomeOrStoreApi(uri) && !omitModuleId &&
           !finalHeaders.containsKey(AppConstants.moduleId)) {
         // Try to get moduleId from current module
         try {
@@ -801,8 +796,8 @@ class ApiClient extends GetxService {
         }
       }
 
-      final blockedResponse = await _ensureHomeHeadersOrBlock(uri, finalHeaders,
-          method: 'GET', omitModuleId: omitModuleId);
+      final blockedResponse =
+          await _ensureHomeHeadersOrBlock(uri, finalHeaders, method: 'GET', omitModuleId: omitModuleId);
       if (blockedResponse != null) {
         return blockedResponse;
       }

@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -41,7 +42,9 @@ class ApiChecker {
         );
       }
 
-      Get.find<AuthController>().clearSharedData(removeToken: false).then((_) {
+      Get.find<AuthController>()
+          .clearSharedData(removeToken: false)
+          .then((_) {
         Get.offAllNamed<void>(RouteHelper.getInitialRoute());
       });
     } else {
@@ -66,6 +69,8 @@ class ApiChecker {
     if (kDebugMode) {
       debugPrint('🔐 ApiChecker: Handling 401 Unauthorized for $uri');
     }
+
+
 
     // Attempt token refresh if not guest
     if (!AuthHelper.isGuestLoggedIn()) {

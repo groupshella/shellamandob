@@ -45,10 +45,8 @@ class SecureTokenLoader {
     try {
       const MethodChannel channel = MethodChannel('secure_tokens');
 
-      final String liveToken =
-          (await channel.invokeMethod('getLiveToken')) as String;
-      final String testToken =
-          (await channel.invokeMethod('getTestToken')) as String;
+      final String liveToken = (await channel.invokeMethod('getLiveToken')) as String;
+      final String testToken = (await channel.invokeMethod('getTestToken')) as String;
 
       AppConstants.initializeTokens(
         liveToken: liveToken.isNotEmpty ? liveToken : null,
@@ -64,22 +62,21 @@ class SecureTokenLoader {
       final errorString = e.toString();
       if (errorString.contains('TOKEN_NOT_FOUND')) {
         if (kDebugMode) {
-          appLogger.warning(
-              '⚠️ SecureTokenLoader: TOKEN_NOT_FOUND - This is expected in debug builds without BuildConfig tokens');
-          appLogger.debug(
-              '   - Payment tokens will use environment variables or be empty');
-          appLogger.debug(
-              '   - This does not affect app functionality, only payment integration');
+          appLogger.warning('⚠️ SecureTokenLoader: TOKEN_NOT_FOUND - This is expected in debug builds without BuildConfig tokens');
+          appLogger.debug('   - Payment tokens will use environment variables or be empty');
+          appLogger.debug('   - This does not affect app functionality, only payment integration');
         }
       } else {
         if (kDebugMode) {
           appLogger.error('❌ Android token loading failed: $e', e);
         }
       }
-
+      
       // Fallback to environment variables
-      const String liveToken = String.fromEnvironment('MYFATOORAH_LIVE_TOKEN');
-      const String testToken = String.fromEnvironment('MYFATOORAH_TEST_TOKEN');
+      const String liveToken =
+          String.fromEnvironment('MYFATOORAH_LIVE_TOKEN');
+      const String testToken =
+          String.fromEnvironment('MYFATOORAH_TEST_TOKEN');
 
       AppConstants.initializeTokens(
         liveToken: liveToken.isNotEmpty ? liveToken : null,
@@ -93,8 +90,10 @@ class SecureTokenLoader {
     try {
       // iOS implementation would read from Info.plist or Keychain
       // For now, using environment variables as fallback
-      const String liveToken = String.fromEnvironment('MYFATOORAH_LIVE_TOKEN');
-      const String testToken = String.fromEnvironment('MYFATOORAH_TEST_TOKEN');
+      const String liveToken =
+          String.fromEnvironment('MYFATOORAH_LIVE_TOKEN');
+      const String testToken =
+          String.fromEnvironment('MYFATOORAH_TEST_TOKEN');
 
       AppConstants.initializeTokens(
         liveToken: liveToken.isNotEmpty ? liveToken : null,
