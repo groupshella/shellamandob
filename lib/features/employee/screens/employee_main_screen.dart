@@ -9,7 +9,6 @@ import 'employee_home_screen.dart';
 import '../attendance/screens/select_work_zone_screen.dart';
 import '../visits/screens/daily_visits_screen.dart';
 import '../reports/screens/daily_performance_summary_screen.dart';
-import '../reports/widgets/previous_day_evaluation_dialog.dart';
 import '../alerts/controllers/anti_fraud_alerts_controller.dart';
 
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
@@ -34,11 +33,6 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
     if (!Get.isRegistered<AntiFraudAlertsController>()) {
       Get.put(AntiFraudAlertsController(), permanent: true);
     }
-
-    // Show morning evaluation dialog once
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      PreviousDayEvaluationDialog.show(context);
-    });
   }
 
   @override

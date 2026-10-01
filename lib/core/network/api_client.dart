@@ -28,6 +28,7 @@ import 'package:sixam_mart/core/cache/etag_scope_key_builder.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/core/services/pusher_service.dart';
+import 'package:sixam_mart/core/network/mock/mock_network_dispatcher.dart';
 
 bool _responseIndicatesAuthDeferred(Response<dynamic> response) {
   final dynamic raw = response.body;
@@ -681,6 +682,11 @@ class ApiClient extends GetxService {
       dio_pkg.CancelToken? cancelToken,
       String? requestId}) async {
     try {
+      if (MockNetworkDispatcher.isEnabled) {
+        final mockResponse = await MockNetworkDispatcher.dispatch('GET', uri, query: query, headers: headers);
+        if (mockResponse != null) return mockResponse;
+      }
+
       final fullUri = changeBaseUrl ? newUri!.toString() : uri;
       final bool isCouponApplyUri = fullUri.contains('/api/v1/coupon/apply');
       final bool effectiveUseEtag = useEtag && !isCouponApplyUri;
@@ -1144,6 +1150,11 @@ class ApiClient extends GetxService {
       bool alreadyRetriedAuthRefresh = false,
       bool skipAuthDeferredRetry = false}) async {
     try {
+      if (MockNetworkDispatcher.isEnabled) {
+        final mockResponse = await MockNetworkDispatcher.dispatch('POST', uri, body: body, headers: headers);
+        if (mockResponse != null) return mockResponse;
+      }
+
       // ⚠️ CRITICAL: Merge custom headers with default headers to ensure moduleId is always included
       final Map<String, String> finalHeaders = _prepareFinalHeaders(headers);
 
@@ -1277,6 +1288,11 @@ class ApiClient extends GetxService {
       String uri, Map<String, String> body, List<MultipartBody> multipartBody,
       {Map<String, String>? headers, bool handleError = true}) async {
     try {
+      if (MockNetworkDispatcher.isEnabled) {
+        final mockResponse = await MockNetworkDispatcher.dispatch('POST', uri, body: body, headers: headers);
+        if (mockResponse != null) return mockResponse;
+      }
+
       // ⚠️ CRITICAL: Merge custom headers with default headers
       final Map<String, String> finalHeaders = _prepareFinalHeaders(headers);
 
@@ -1355,6 +1371,11 @@ class ApiClient extends GetxService {
     debugPrint('\x1B[35m - formData type: ${formData.runtimeType}\x1B[0m');
 
     try {
+      if (MockNetworkDispatcher.isEnabled) {
+        final mockResponse = await MockNetworkDispatcher.dispatch('POST', uri, body: formData, headers: headers);
+        if (mockResponse != null) return mockResponse;
+      }
+
       // ⚠️ CRITICAL: Merge custom headers with default headers
       final Map<String, dynamic> finalHeaders =
           Map<String, dynamic>.from(_mainHeaders);
@@ -1612,6 +1633,11 @@ class ApiClient extends GetxService {
   Future<Response<dynamic>> putData(String uri, dynamic body,
       {Map<String, String>? headers, bool handleError = true}) async {
     try {
+      if (MockNetworkDispatcher.isEnabled) {
+        final mockResponse = await MockNetworkDispatcher.dispatch('PUT', uri, body: body, headers: headers);
+        if (mockResponse != null) return mockResponse;
+      }
+
       // ⚠️ CRITICAL: Merge custom headers with default headers
       final Map<String, String> finalHeaders = _prepareFinalHeaders(headers);
 
@@ -1710,6 +1736,11 @@ class ApiClient extends GetxService {
   Future<Response<dynamic>> deleteData(String uri,
       {Map<String, String>? headers, bool handleError = true}) async {
     try {
+      if (MockNetworkDispatcher.isEnabled) {
+        final mockResponse = await MockNetworkDispatcher.dispatch('DELETE', uri, headers: headers);
+        if (mockResponse != null) return mockResponse;
+      }
+
       // ⚠️ CRITICAL: Merge custom headers with default headers
       final Map<String, String> finalHeaders = _prepareFinalHeaders(headers);
 

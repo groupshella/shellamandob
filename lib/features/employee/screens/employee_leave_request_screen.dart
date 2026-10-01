@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import '../controllers/employee_vacations_controller.dart';
 
 /// Enum for the vacation / leave request type
 enum LeaveType {
@@ -56,6 +57,7 @@ class _EmployeeLeaveRequestScreenState
 
   final TextEditingController _notesCtrl = TextEditingController();
   String? _attachmentFileName;
+  String? _attachmentFilePath;
   bool _isSubmitting = false;
 
   @override
@@ -125,6 +127,7 @@ class _EmployeeLeaveRequestScreenState
       if (result != null && result.files.isNotEmpty) {
         setState(() {
           _attachmentFileName = result.files.single.name;
+          _attachmentFilePath = result.files.single.path;
         });
       }
     } catch (_) {
@@ -136,13 +139,32 @@ class _EmployeeLeaveRequestScreenState
     if (!_isFormValid || _isSubmitting) return;
 
     setState(() => _isSubmitting = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+
+    final vacationsCtrl = Get.isRegistered<EmployeeVacationsController>()
+        ? Get.find<EmployeeVacationsController>()
+        : Get.put(EmployeeVacationsController(apiClient: Get.find()));
+
+    final typeStr = widget.leaveType == LeaveType.sick ? 'sick_leave' : 'annual_leave';
+
+    final success = await vacationsCtrl.submitLeaveRequest(
+      type: typeStr,
+      startDate: _startDate!,
+      endDate: _endDate!,
+      reason: _notesCtrl.text.trim(),
+      filePath: _attachmentFilePath,
+    );
 
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    // Show Figma success toast (Figma 8976:27106)
-    _showSuccessToast();
+    if (success) {
+      _showSuccessToast();
+    } else {
+      Get.rawSnackbar(
+        message: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى',
+        backgroundColor: const Color(0xFFDC2626),
+      );
+    }
   }
 
   /// Exact Figma success toast (Figma 8976:27106)

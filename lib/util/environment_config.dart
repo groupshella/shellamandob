@@ -24,8 +24,13 @@ import 'package:sixam_mart/common/utils/app_logger.dart';
 enum Environment { development, staging, production, azure }
 
 class EnvironmentConfig {
+  /// Offline Mock Mode Toggle:
+  /// When true, all network requests are intercepted locally with realistic mock data.
+  /// Set to false when backend servers are up and running.
+  static const bool useMockMode = bool.fromEnvironment('MOCK_MODE', defaultValue: false);
+
   static const String _rawEnv =
-      String.fromEnvironment('ENV', defaultValue: 'production');
+      String.fromEnvironment('ENV', defaultValue: 'development');
 
   static const String _rawBaseUrl = String.fromEnvironment('BASE_URL');
 
@@ -65,10 +70,10 @@ class EnvironmentConfig {
   static const Map<Environment, Map<String, String>> _configs = {
     Environment.development: {
       'baseUrl': String.fromEnvironment('DEV_BASE_URL',
-          defaultValue: 'https://shellafood.com'),
+          defaultValue: 'http://192.168.1.4:8000'),
       'webHostedUrl': String.fromEnvironment('DEV_BASE_URL',
-          defaultValue: 'https://shellafood.com'),
-      'description': 'Production Server (https://shellafood.com)',
+          defaultValue: 'http://192.168.1.4:8000'),
+      'description': 'Local Development Server (http://192.168.1.4:8000)',
     },
     Environment.staging: {
       'baseUrl': 'https://shellafood.com',

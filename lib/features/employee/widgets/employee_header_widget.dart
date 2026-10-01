@@ -5,6 +5,7 @@ import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 
 class EmployeeHeaderWidget extends StatelessWidget {
   final VoidCallback? onNotificationTap;
@@ -34,6 +35,12 @@ class EmployeeHeaderWidget extends StatelessWidget {
         }
         final String greeting = name.trim().isNotEmpty ? '${'hello'.tr} $name' : 'hello'.tr;
         final bool hasWarnings = controller.shiftModel.warningCount > 0 || controller.warnings.isNotEmpty;
+        bool hasUnreadNotif = false;
+        if (Get.isRegistered<NotificationController>()) {
+          final notifCtrl = Get.find<NotificationController>();
+          hasUnreadNotif = notifCtrl.hasUnread.value || notifCtrl.hasNotification;
+        }
+        final bool showBadge = hasWarnings || hasUnreadNotif;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -61,8 +68,8 @@ class EmployeeHeaderWidget extends StatelessWidget {
                             size: 22,
                             color: darkText,
                           ),
-                          // Unread notification badge dot if there are warnings or alerts
-                          if (hasWarnings)
+                          // Unread notification badge dot if there are warnings or unread notifications
+                          if (showBadge)
                             Positioned(
                               top: 10,
                               right: 12,

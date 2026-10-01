@@ -56,10 +56,31 @@ class NotificationTypeIcon {
     if (has(['debit', 'used', 'استخدام الرصيد', 'خصم'])) {
       return const NotificationTypeIcon(Icons.payment_outlined, _purple);
     }
-    // Qidha subscription → edit / signature.
-    if (has(['qidha', 'subscription', 'قيدها', 'اشتراك'])) {
-      return const NotificationTypeIcon(Icons.edit_note, _blue);
+    // Recommendation from admin → lightbulb / spark
+    if (has(['recommendation', 'توصية', 'توجيه'])) {
+      return const NotificationTypeIcon(Icons.tips_and_updates_outlined, _blue);
     }
+    // Warning or Alert → warning amber
+    if (has(['warning', 'alert', 'إنذار', 'تنبيه', 'مخالفة'])) {
+      return const NotificationTypeIcon(Icons.warning_amber_rounded, _red);
+    }
+    // Leave status / request → event note
+    if (has(['leave', 'vacation', 'permission', 'إجازة', 'استئذان'])) {
+      return const NotificationTypeIcon(Icons.event_note, _green);
+    }
+    // Contract / agreement → handshake
+    if (has(['contract', 'agreement', 'عقد', 'اتفاقية'])) {
+      return const NotificationTypeIcon(Icons.handshake_outlined, _blue);
+    }
+    // Follow-up → timeline
+    if (has(['followup', 'follow_up', 'متابعة'])) {
+      return const NotificationTypeIcon(Icons.timeline_outlined, _purple);
+    }
+    // Visit → location pin
+    if (has(['visit', 'زيارة', 'ميدانية'])) {
+      return const NotificationTypeIcon(Icons.location_on_outlined, _green);
+    }
+
     // Default.
     return const NotificationTypeIcon(Icons.notifications_outlined, _green);
   }

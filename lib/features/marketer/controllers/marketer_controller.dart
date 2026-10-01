@@ -136,6 +136,7 @@ class MarketerController extends GetxController implements GetxService {
     required String lastName,
     required String phone,
     required String profession,
+    String? documentType,
     XFile? documentFile,
     String? idNumber,
     String? notes,
@@ -149,6 +150,7 @@ class MarketerController extends GetxController implements GetxService {
         'last_name': lastName,
         'phone': phone,
         'profession': profession,
+        if (documentType != null && documentType.isNotEmpty) 'document_type': documentType,
         'id_number': idNumber ?? phone,
         'notes': notes ?? '',
       };

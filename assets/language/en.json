@@ -3415,6 +3415,7 @@
   "vacations_title": "Vacations",
   "apply_request": "Apply Request",
   "previous_leaves": "Previous Leaves",
+  "no_previous_leaves": "No previous leave requests",
   "status_approved": "Approved",
   "status_rejected": "Rejected",
   "status_under_review": "Under Review",

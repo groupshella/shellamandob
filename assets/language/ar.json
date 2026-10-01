@@ -3415,6 +3415,7 @@
   "vacations_title": "الإجازات",
   "apply_request": "تقديم طلب",
   "previous_leaves": "الإجازات السابقة",
+  "no_previous_leaves": "لا توجد طلبات إجازة سابقة",
   "status_approved": "مقبول",
   "status_rejected": "مرفوض",
   "status_under_review": "قيد المراجعة",

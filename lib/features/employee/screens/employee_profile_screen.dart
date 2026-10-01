@@ -353,14 +353,11 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                 v.visitStatus == StoreVisitStatus.completed)
             .length;
 
-        // If StoreVisitsController has no loaded visits yet, fallback to Figma mockup values: 28, 22, 78%
-        final visitsDisplay =
-            totalVisits > 0 ? totalVisits.toString() : '28';
-        final contractsDisplay =
-            contractsSigned > 0 ? contractsSigned.toString() : '22';
+        final visitsDisplay = totalVisits.toString();
+        final contractsDisplay = contractsSigned.toString();
         final successRateDisplay = totalVisits > 0
             ? '${((completedVisits / totalVisits) * 100).round()}%'
-            : '78%';
+            : '0%';
 
         return Container(
           padding: const EdgeInsets.all(16),

@@ -679,16 +679,36 @@ class RouteHelper {
           );
         }),
 
-    GetPage(name: accessLocation, page: () => const NotFound()),
-    GetPage(name: pickMap, page: () => const NotFound()),
+    GetPage(
+        name: accessLocation,
+        page: () => const PageTracker(
+              pageName: 'EmployeeMainScreen',
+              child: MarketerScreen(),
+            )),
+    GetPage(
+        name: pickMap,
+        page: () => const PageTracker(
+              pageName: 'EmployeeMainScreen',
+              child: MarketerScreen(),
+            )),
 
-    GetPage(name: selectLocation, page: () => const NotFound()),
+    GetPage(
+        name: selectLocation,
+        page: () => const PageTracker(
+              pageName: 'EmployeeMainScreen',
+              child: MarketerScreen(),
+            )),
 
     GetPage(name: deliveryAddresses, page: () => const NotFound()),
 
     GetPage(name: addressDetails, page: () => const NotFound()),
 
-    GetPage(name: my_Location, page: () => const NotFound()),
+    GetPage(
+        name: my_Location,
+        page: () => const PageTracker(
+              pageName: 'EmployeeMainScreen',
+              child: MarketerScreen(),
+            )),
 
     //
 

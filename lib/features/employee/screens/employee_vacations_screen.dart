@@ -3,9 +3,10 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'employee_leave_request_screen.dart';
+import '../controllers/employee_vacations_controller.dart';
 
 /// Vacations list & history screen — faithfully matches Figma node 8970:2686 in node 8976:27114 "الأجازات"
-/// Fully responsive to Dark Mode and Light Mode.
+/// Fully responsive to Dark Mode and Light Mode. Connected to live backend truth.
 class EmployeeVacationsScreen extends StatelessWidget {
   const EmployeeVacationsScreen({super.key});
 
@@ -13,6 +14,10 @@ class EmployeeVacationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vacationsCtrl = Get.isRegistered<EmployeeVacationsController>()
+        ? Get.find<EmployeeVacationsController>()
+        : Get.put(EmployeeVacationsController(apiClient: Get.find()));
+
     return GetBuilder<ThemeController>(
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
@@ -49,128 +54,208 @@ class EmployeeVacationsScreen extends StatelessWidget {
                 color: darkText,
               ),
             ),
+            actions: [
+              IconButton(
+                onPressed: () => vacationsCtrl.fetchLeaves(),
+                tooltip: 'refresh'.tr,
+                icon: Icon(
+                  Icons.refresh_rounded,
+                  color: darkText,
+                  size: 22,
+                ),
+              ),
+            ],
           ),
           body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ─── 1. Top Action Cards Row (Figma 8974:3071) ─────────────────
-                  Row(
-                    children: [
-                      // Card 1: إجازة سنوية -> تقديم طلب
-                      Expanded(
-                        child: _buildActionCard(
-                          cardBg: cardBg,
-                          darkText: darkText,
-                          borderColor: borderColor,
-                          title: 'annual_leave'.tr,
-                          onTap: () => Get.to(
-                            () => const EmployeeLeaveRequestScreen(
-                              leaveType: LeaveType.annual,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Card 2: إجازة مرضية -> تقديم طلب
-                      Expanded(
-                        child: _buildActionCard(
-                          cardBg: cardBg,
-                          darkText: darkText,
-                          borderColor: borderColor,
-                          title: 'sick_leave'.tr,
-                          onTap: () => Get.to(
-                            () => const EmployeeLeaveRequestScreen(
-                              leaveType: LeaveType.sick,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // ─── 2. Previous Leaves Container (Figma 8975:3218) ────────────
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: borderColor),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.2)
-                              : const Color(0x0D000000),
-                          blurRadius: 6,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            child: RefreshIndicator(
+              color: _primaryGreen,
+              onRefresh: () => vacationsCtrl.fetchLeaves(),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ─── 1. Top Action Cards Row (Figma 8974:3071) ─────────────────
+                    Row(
                       children: [
-                        Text(
-                          'previous_leaves'.tr,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: darkText,
+                        // Card 1: إجازة سنوية -> تقديم طلب
+                        Expanded(
+                          child: _buildActionCard(
+                            cardBg: cardBg,
+                            darkText: darkText,
+                            borderColor: borderColor,
+                            title: 'annual_leave'.tr,
+                            onTap: () => Get.to(
+                              () => const EmployeeLeaveRequestScreen(
+                                leaveType: LeaveType.annual,
+                              ),
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(width: 12),
 
-                        // Item 1: إجازة سنوية (مقبول)
-                        _buildHistoryItem(
-                          title: 'annual_leave'.tr,
-                          dateAndDuration: '20 Aug — 25 Aug · 5 days',
-                          statusText: 'status_approved'.tr,
-                          statusColor: _primaryGreen,
-                          statusBgColor: isDark
-                              ? const Color(0xFF183B22)
-                              : const Color(0xFFDCFCE7),
-                          darkText: darkText,
-                          subText: subText,
-                        ),
-                        _buildDivider(dividerColor),
-
-                        // Item 2: إجازة مرضية (مرفوض)
-                        _buildHistoryItem(
-                          title: 'sick_leave'.tr,
-                          dateAndDuration: '5 Sep — 6 Sep · 2 days',
-                          statusText: 'status_rejected'.tr,
-                          statusColor: const Color(0xFFDC2626),
-                          statusBgColor: isDark
-                              ? const Color(0xFF3B1818)
-                              : const Color(0xFFFEE2E2),
-                          darkText: darkText,
-                          subText: subText,
-                        ),
-                        _buildDivider(dividerColor),
-
-                        // Item 3: إجازة سنوية (قيد المراجعة)
-                        _buildHistoryItem(
-                          title: 'annual_leave'.tr,
-                          dateAndDuration: '1 Oct — 7 Oct · 6 days',
-                          statusText: 'status_under_review'.tr,
-                          statusColor: const Color(0xFFF59E0B),
-                          statusBgColor: isDark
-                              ? const Color(0xFF3B2E15)
-                              : const Color(0xFFFEF3C7),
-                          darkText: darkText,
-                          subText: subText,
+                        // Card 2: إجازة مرضية -> تقديم طلب
+                        Expanded(
+                          child: _buildActionCard(
+                            cardBg: cardBg,
+                            darkText: darkText,
+                            borderColor: borderColor,
+                            title: 'sick_leave'.tr,
+                            onTap: () => Get.to(
+                              () => const EmployeeLeaveRequestScreen(
+                                leaveType: LeaveType.sick,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  ),
 
-                  const SizedBox(height: 24),
-                ],
+                    const SizedBox(height: 16),
+
+                    // ─── 2. Previous Leaves Container (Figma 8975:3218) ────────────
+                    Container(
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: borderColor),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.2)
+                                : const Color(0x0D000000),
+                            blurRadius: 6,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'previous_leaves'.tr,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: darkText,
+                                ),
+                              ),
+                              GetBuilder<EmployeeVacationsController>(
+                                builder: (ctrl) {
+                                  if (ctrl.leavesList.isEmpty) return const SizedBox.shrink();
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: isDark ? const Color(0xFF2B3240) : const Color(0xFFF2F4F7),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '${ctrl.leavesList.length}',
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: subText,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          GetBuilder<EmployeeVacationsController>(
+                            builder: (ctrl) {
+                              if (ctrl.isLoading) {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 24),
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: _primaryGreen,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              if (ctrl.leavesList.isEmpty) {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 28),
+                                    child: Text(
+                                      'no_previous_leaves'.tr,
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        color: subText,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return Column(
+                                children: ctrl.leavesList.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final item = entry.value;
+
+                                  Color statusColor;
+                                  Color statusBgColor;
+
+                                  if (item.status == 'approved') {
+                                    statusColor = _primaryGreen;
+                                    statusBgColor = isDark
+                                        ? const Color(0xFF183B22)
+                                        : const Color(0xFFDCFCE7);
+                                  } else if (item.status == 'rejected') {
+                                    statusColor = const Color(0xFFDC2626);
+                                    statusBgColor = isDark
+                                        ? const Color(0xFF3B1818)
+                                        : const Color(0xFFFEE2E2);
+                                  } else {
+                                    statusColor = const Color(0xFFF59E0B);
+                                    statusBgColor = isDark
+                                        ? const Color(0xFF3B2E15)
+                                        : const Color(0xFFFEF3C7);
+                                  }
+
+                                  return Column(
+                                    children: [
+                                      if (index > 0) _buildDivider(dividerColor),
+                                      _buildHistoryItem(
+                                        title: item.typeLabel,
+                                        dateAndDuration: item.dateAndDuration,
+                                        statusText: item.statusLabel,
+                                        statusColor: statusColor,
+                                        statusBgColor: statusBgColor,
+                                        darkText: darkText,
+                                        subText: subText,
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ),

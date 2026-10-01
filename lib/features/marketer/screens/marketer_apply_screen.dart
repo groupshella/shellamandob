@@ -1,4 +1,3 @@
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:sixam_mart/features/marketer/screens/marketer_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_success_dialog.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart/util/images.dart';
 
 class MarketerApplyScreen extends StatefulWidget {
   const MarketerApplyScreen({super.key});
@@ -26,11 +26,29 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _professionController = TextEditingController();
+  final TextEditingController _customProfessionController = TextEditingController();
 
-  String _countryCode = '+966';
+  // 1. Profession dropdown options
+  final List<String> _professionList = [
+    'كاشير محل',
+    'مندوب توصيل',
+    'عمل حر',
+    'أخرى',
+  ];
+  String? _selectedProfession;
+
+  // 2. Document type options
+  final List<String> _documentTypes = [
+    'هوية وطنية',
+    'رخصة قيادة',
+    'عقد إيجار',
+  ];
+  String _selectedDocumentType = 'هوية وطنية';
+
+  final String _countryCode = '+966';
   bool _agreedToTerms = false;
   XFile? _selectedFile;
+  String _fileSizeString = '';
 
   @override
   void initState() {
@@ -59,15 +77,30 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
-    _professionController.dispose();
+    _customProfessionController.dispose();
     super.dispose();
+  }
+
+  bool get _isProfessionValid {
+    if (_selectedProfession == null || _selectedProfession!.isEmpty) return false;
+    if (_selectedProfession == 'أخرى') {
+      return _customProfessionController.text.trim().isNotEmpty;
+    }
+    return true;
+  }
+
+  String get _effectiveProfession {
+    if (_selectedProfession == 'أخرى') {
+      return _customProfessionController.text.trim();
+    }
+    return _selectedProfession ?? '';
   }
 
   bool get _isFormValid =>
       _firstNameController.text.trim().isNotEmpty &&
       _lastNameController.text.trim().isNotEmpty &&
       _phoneController.text.trim().isNotEmpty &&
-      _professionController.text.trim().isNotEmpty &&
+      _isProfessionValid &&
       _agreedToTerms;
 
   Future<void> _pickDocument() async {
@@ -79,8 +112,19 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
       imageQuality: 85,
     );
     if (image != null) {
+      String sizeStr = '1.8 MB';
+      try {
+        final length = await image.length();
+        if (length < 1024 * 1024) {
+          sizeStr = '${(length / 1024).toStringAsFixed(1)} KB';
+        } else {
+          sizeStr = '${(length / (1024 * 1024)).toStringAsFixed(1)} MB';
+        }
+      } catch (_) {}
+
       setState(() {
         _selectedFile = image;
+        _fileSizeString = sizeStr;
       });
     }
   }
@@ -209,13 +253,16 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     if (!_isFormValid) return;
 
     final controller = Get.find<MarketerController>();
+    if (controller.isSubmitting) return; // Prevent double-triggering
+
     final fullPhone = '$_countryCode${_phoneController.text.trim()}';
 
     final ok = await controller.apply(
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       phone: fullPhone,
-      profession: _professionController.text.trim(),
+      profession: _effectiveProfession,
+      documentType: _selectedDocumentType,
       documentFile: _selectedFile,
     );
 
@@ -230,7 +277,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
 
       await MarketerSuccessDialog.show(context, onClose: navigateToMarketerScreen);
       navigateToMarketerScreen();
-    } else {
+    } else if (mounted) {
       Get.snackbar(
         'warning'.tr,
         'failed_to_send_application'.tr,
@@ -272,7 +319,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _firstNameController,
-                      hintText: 'enter_first_name_hint'.tr,
+                      hintText: 'ادخل اسم الأول كما هو في الهوية',
                       isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
@@ -283,32 +330,40 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _lastNameController,
-                      hintText: 'enter_last_name_hint'.tr,
+                      hintText: 'ادخل اسم العائلة كما هو في الهوية',
                       isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 16),
 
-                    // Phone Number
+                    // Phone Number with LTR support
                     _buildLabel('phone_number'.tr, isDark),
                     const SizedBox(height: 8),
                     _buildPhoneField(isDark),
                     const SizedBox(height: 16),
 
-                    // Profession
-                    _buildLabel('profession'.tr, isDark),
+                    // 1. Profession Dropdown
+                    _buildLabel('المهنة', isDark),
                     const SizedBox(height: 8),
-                    _buildTextField(
-                      controller: _professionController,
-                      hintText: 'enter_profession_hint'.tr,
-                      isDark: isDark,
-                      onChanged: (_) => setState(() {}),
-                    ),
+                    _buildProfessionDropdown(isDark),
+
+                    // Conditional custom profession if 'أخرى' is selected
+                    if (_selectedProfession == 'أخرى') ...[
+                      const SizedBox(height: 16),
+                      _buildLabel('اذكر مهنتك', isDark),
+                      const SizedBox(height: 8),
+                      _buildTextField(
+                        controller: _customProfessionController,
+                        hintText: 'اذكر وظيفتك',
+                        isDark: isDark,
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ],
                     const SizedBox(height: 20),
 
-                    // Documents Upload
+                    // 2. Documents Section
                     Text(
-                      'documents'.tr,
+                      'المستندات',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
@@ -318,7 +373,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'documents_desc'.tr,
+                      'أرفق صوراً واضحة لمستنداتك مثل الهوية أو عقد الإيجار ، وسمّ كل ملف قبل رفعه',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
@@ -327,7 +382,19 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                         height: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
+
+                    // Selected Document Preview Card (matches Figma mockup 3)
+                    if (_selectedFile != null)
+                      _buildSelectedDocumentCard(isDark),
+
+                    // 2. Document Type Selector (Radio Group)
+                    _buildLabel('اختر نوع المستند', isDark),
+                    const SizedBox(height: 10),
+                    _buildDocumentTypeSelector(isDark),
+                    const SizedBox(height: 14),
+
+                    // Dotted Document Uploader Box
                     _buildDottedDocumentUploader(isDark),
                     const SizedBox(height: 20),
 
@@ -339,10 +406,11 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
               ),
             ),
 
-            // Submit Button
+            // 4. Submit Button with loading state & double-press prevention
             GetBuilder<MarketerController>(
               builder: (c) {
-                final enabled = _isFormValid && !c.isSubmitting;
+                final isSubmitting = c.isSubmitting;
+                final enabled = _isFormValid && !isSubmitting;
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   child: SizedBox(
@@ -351,27 +419,56 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     child: ElevatedButton(
                       onPressed: enabled ? _submit : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: enabled ? _primaryGreen : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
-                        foregroundColor: enabled ? Colors.white : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
-                        disabledBackgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6),
-                        disabledForegroundColor: isDark ? const Color(0xFF6B7280) : const Color(0xFF888888),
+                        backgroundColor: isSubmitting
+                            ? _primaryGreen
+                            : (enabled
+                                ? _primaryGreen
+                                : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6))),
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: isSubmitting
+                            ? _primaryGreen
+                            : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
+                        disabledForegroundColor: isSubmitting
+                            ? Colors.white
+                            : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: c.isSubmitting
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: isSubmitting
+                          ? const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  'جاري الإرسال......',
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             )
                           : Text(
-                              'submit_application'.tr,
-                              style: const TextStyle(
+                              'إرسال الطلب',
+                              style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
+                                color: enabled
+                                    ? Colors.white
+                                    : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
                               ),
                             ),
                     ),
@@ -451,6 +548,71 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
+  // 1. Dropdown for Profession
+  Widget _buildProfessionDropdown(bool isDark) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C2028) : _inputBg,
+        borderRadius: BorderRadius.circular(12),
+        border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButtonFormField<String>(
+          initialValue: _selectedProfession,
+          isExpanded: true,
+          dropdownColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+          ),
+          hint: Text(
+            'اذكر وظيفتك',
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF999999),
+            ),
+          ),
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(vertical: 14),
+          ),
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : _darkText,
+          ),
+          items: _professionList.map((String item) {
+            return DropdownMenuItem<String>(
+              value: item,
+              child: Text(
+                item,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : _darkText,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (String? val) {
+            setState(() {
+              _selectedProfession = val;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  // 3. Phone Field with strictly LTR formatting and Saudi flag
   Widget _buildPhoneField(bool isDark) {
     return Container(
       height: 52,
@@ -459,59 +621,65 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
         borderRadius: BorderRadius.circular(12),
         border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: Row(
           children: [
-            // Selectable Country Code Picker
-            CountryCodePicker(
-              onChanged: (CountryCode countryCode) {
-                setState(() {
-                  _countryCode = countryCode.dialCode ?? '+966';
-                });
-              },
-              initialSelection: 'SA',
-              favorite: const ['+966', 'SA'],
-              showCountryOnly: false,
-              showOnlyCountryWhenClosed: false,
-              alignLeft: false,
-              showFlag: true,
-              showFlagMain: true,
-              showDropDownButton: false,
-              textStyle: TextStyle(
+            // Country dial code +966
+            Text(
+              _countryCode,
+              textDirection: TextDirection.ltr,
+              style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: isDark ? Colors.white : _darkText,
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
+            const SizedBox(width: 6),
+            // Saudi Flag
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: Image.asset(
+                Images.arabic,
+                width: 22,
+                height: 15,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Text('🇸🇦', style: TextStyle(fontSize: 14)),
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Vertical Divider
             Container(
               height: 24,
               width: 1,
               color: isDark ? const Color(0xFF2C3240) : const Color(0xFFD1D5DB),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
+            // Phone Number Input
             Expanded(
               child: TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
+                textAlign: TextAlign.left,
+                textDirection: TextDirection.ltr,
                 onChanged: (_) => setState(() {}),
                 style: TextStyle(
                   fontFamily: 'Tajawal',
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: isDark ? Colors.white : _darkText,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   isDense: true,
                   hintText: '5XXXXXXXX',
+                  hintTextDirection: TextDirection.ltr,
                   hintStyle: TextStyle(
                     fontFamily: 'Tajawal',
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF999999),
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF999999),
                   ),
                   border: InputBorder.none,
                 ),
@@ -523,6 +691,142 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
+  // 2. Uploaded Document Preview Card (Green border, trash button, size)
+  Widget _buildSelectedDocumentCard(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF14241B) : const Color(0xFFF2FBF4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _primaryGreen, width: 1.2),
+      ),
+      child: Row(
+        children: [
+          // Red trash delete button on left
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedFile = null;
+                _fileSizeString = '';
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: const BoxDecoration(
+                color: Color(0x1AE53935),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: Color(0xFFE53935),
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // File name & size in center
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _selectedFile?.name ?? 'اسم الصورة',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : _darkText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _fileSizeString.isNotEmpty
+                      ? 'حجم الصورة $_fileSizeString'
+                      : 'حجم الصورة 2 MB',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF888888),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Document / Image icon on right
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF252B37) : Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB),
+              ),
+            ),
+            child: const Icon(
+              IconlyLight.document,
+              color: _primaryGreen,
+              size: 22,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 2. Document Type Selector (Radio Group matching Figma)
+  Widget _buildDocumentTypeSelector(bool isDark) {
+    return Column(
+      children: _documentTypes.map((type) {
+        final isSelected = _selectedDocumentType == type;
+        return InkWell(
+          onTap: () {
+            setState(() {
+              _selectedDocumentType = type;
+            });
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected
+                          ? (isDark ? Colors.white : _darkText)
+                          : (isDark ? const Color(0xFF6B7280) : const Color(0xFFD1D5DB)),
+                      width: isSelected ? 5.5 : 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  type,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isDark ? Colors.white : _darkText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // Dotted Document Uploader
   Widget _buildDottedDocumentUploader(bool isDark) {
     return GestureDetector(
       onTap: _pickDocument,
@@ -541,32 +845,12 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
           ),
           child: Row(
             children: [
-              if (_selectedFile != null)
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedFile = null;
-                    });
-                  },
-                  icon: const Icon(Icons.close, color: Colors.redAccent, size: 22),
-                )
-              else
-                const Icon(
-                  IconlyLight.plus,
-                  color: _primaryGreen,
-                  size: 22,
-                ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _selectedFile != null
-                          ? _selectedFile!.name
-                          : 'choose_file_and_add'.tr,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      'اختر ملفاً وأضفه',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
@@ -576,7 +860,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'file_upload_hint'.tr,
+                      'برجاء التأكد أن الصورة واضحة وبحد أقصى 2 ميجا.',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 11,
@@ -608,6 +892,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
+  // Terms and conditions checkbox
   Widget _buildTermsCheckbox(bool isDark) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,

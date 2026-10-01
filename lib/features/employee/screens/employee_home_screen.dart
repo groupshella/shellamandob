@@ -9,6 +9,7 @@ import '../widgets/shift_status_card_widget.dart';
 import '../widgets/shift_metrics_grid_widget.dart';
 import '../widgets/employee_warnings_banner.dart';
 import '../widgets/today_visits_summary_widget.dart';
+import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 
 class EmployeeHomeScreen extends StatelessWidget {
   final VoidCallback? onStartShiftPressed;
@@ -36,6 +37,9 @@ class EmployeeHomeScreen extends StatelessWidget {
                 if (Get.isRegistered<EmployeeShiftController>()) {
                   await Get.find<EmployeeShiftController>().loadCurrentShift(notify: true);
                 }
+                if (Get.isRegistered<NotificationController>()) {
+                  await Get.find<NotificationController>().getNotificationList(true);
+                }
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -47,7 +51,7 @@ class EmployeeHomeScreen extends StatelessWidget {
                     EmployeeHeaderWidget(
                       isDark: isDark,
                       onNotificationTap: () {
-                        // Notification routing if needed
+                        Get.toNamed(RouteHelper.getNotificationRoute());
                       },
                     ),
 

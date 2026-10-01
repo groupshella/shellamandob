@@ -89,181 +89,70 @@ class MarketerProductivityController extends GetxController {
       debugPrint('❌ [MarketerProductivityController] error: $e');
     }
 
-    // Fallback Mock Data matching Figma (Node 8949:41978)
-    _initFallbackData();
+    // Genuine empty state when server has no visits or shifts yet
+    _initEmptyData();
     isLoading = false;
     if (notify) update();
   }
 
-  void _initFallbackData() {
+  void _initEmptyData() {
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final formattedDate = DateFormat('EEEE ، d MMMM y', 'ar').format(selectedDate);
     if (viewMode == ProductivityViewMode.daily) {
       dailyData = DailyProductivityModel(
-        date: '2026-09-20',
-        dateFormatted: 'اليوم ، 20 سبتمبر 2026',
+        date: dateFormat.format(selectedDate),
+        dateFormatted: formattedDate,
         kpis: ProductivityKpis(
-          successfulVisits: 12,
-          successfulVisitsText: '12 زيارة',
-          workHours: '7س 40د',
-          workSeconds: 27600,
-          warningsCount: 1,
-          warningsText: '1 إنذار',
-          signedContracts: 2,
-          signedContractsText: '2 اتفاقية',
+          successfulVisits: 0,
+          successfulVisitsText: '0 زيارة',
+          workHours: '00:00',
+          workSeconds: 0,
+          warningsCount: 0,
+          warningsText: '0 إنذار',
+          signedContracts: 0,
+          signedContractsText: '0 اتفاقية',
         ),
         dailyTarget: DailyTargetInfo(
           target: 16,
-          achieved: 12,
-          targetText: '16 / 12',
-          remaining: 4,
-          percentage: 75,
-          subtitle: 'متبقي 4 زيارات — 75%',
+          achieved: 0,
+          targetText: '0 / 16',
+          remaining: 16,
+          percentage: 0,
+          subtitle: 'متبقي 16 زيارات — 0%',
         ),
-        timeline: [
-          TimelineItem(time: '08:15 ص', title: 'بدء الدوام', type: 'shift_start', statusColor: 'gray'),
-          TimelineItem(time: '09:02 ص', title: 'زيارة سوبرماركت النور', subtitle: 'زيارة ناجحة', statusColor: 'green', type: 'visit'),
-          TimelineItem(time: '10:10 ص', title: 'زيارة ماركت المدينة', subtitle: 'زيارة ناجحة', statusColor: 'green', type: 'visit'),
-          TimelineItem(time: '11:05 ص', title: 'توقيع اتفاقية', subtitle: 'تم التوقيع', statusColor: 'green', type: 'contract'),
-          TimelineItem(time: '11:50 ص', title: 'زيارة متجر الهلال', subtitle: 'زيارة غير مكتملة', statusColor: 'orange', type: 'visit'),
-          TimelineItem(time: '02:10 م', title: 'الإنذار الثاني', subtitle: null, statusColor: 'red', type: 'warning'),
-          TimelineItem(time: '03:30 م', title: 'زيارة بقالة الأصالة', subtitle: 'زيارة ناجحة', statusColor: 'green', type: 'visit'),
-          TimelineItem(time: '04:45 م', title: 'إنهاء الدوام', type: 'shift_end', statusColor: 'gray'),
-        ],
-        signedAgreements: [
-          SignedAgreementItem(
-            id: 1,
-            storeName: 'سوبرماركت النور',
-            time: '09:45 ص',
-            status: 'التفعيل جاري',
-            statusType: 'activating',
-            statusColor: 'orange',
-          ),
-          SignedAgreementItem(
-            id: 2,
-            storeName: 'ماركت المدينة',
-            time: '11:50 ص',
-            status: 'تم التوقيع',
-            statusType: 'signed',
-            statusColor: 'green',
-          ),
-        ],
-        upcomingFollowUps: [
-          UpcomingFollowUpItem(
-            id: 101,
-            datetimeText: 'الثلاثاء — 10:00 ص',
-            storeName: 'متجر الهلال',
-            note: 'بانتظار موافقة المالك',
-          ),
-          UpcomingFollowUpItem(
-            id: 102,
-            datetimeText: 'الأربعاء — 11:30 ص',
-            storeName: 'بقالة الرياض',
-            note: 'طلب عرض مختلف',
-          ),
-        ],
+        timeline: [],
+        signedAgreements: [],
+        upcomingFollowUps: [],
       );
     } else {
       periodData = PeriodProductivityModel(
-        startDate: '2026-09-13',
-        endDate: '2026-09-20',
-        dateRangeFormatted: '13 سبتمبر 2026 - 20 سبتمبر 2026',
+        startDate: dateFormat.format(rangeStartDate),
+        endDate: dateFormat.format(rangeEndDate),
+        dateRangeFormatted: '${dateFormat.format(rangeStartDate)} - ${dateFormat.format(rangeEndDate)}',
         targetProgress: DailyTargetInfo(
           target: 16,
-          achieved: 12,
-          targetText: '16 / 12',
-          remaining: 4,
-          percentage: 75,
-          subtitle: 'متبقي 4 زيارات — 75%',
+          achieved: 0,
+          targetText: '0 / 16',
+          remaining: 16,
+          percentage: 0,
+          subtitle: '0%',
         ),
         kpis: PeriodKpis(
-          warningsCount: 4,
-          warningsText: '4 إنذار',
-          workHours: '7س 40د',
-          signedContracts: 2,
-          signedContractsText: '2 اتفاقية',
+          warningsCount: 0,
+          warningsText: '0 إنذار',
+          workHours: '00:00',
+          signedContracts: 0,
+          signedContractsText: '0 اتفاقية',
         ),
-        days: [
-          PeriodDayItem(
-            dayName: 'السبت',
-            date: '2026-09-13',
-            dateFormatted: '13 سبتمبر',
-            visitsCount: 14,
-            contractsCount: 1,
-            warningsCount: 0,
-            details: PeriodDayDetails(
-              successfulVisits: '14 / 16',
-              workHours: '8س 00د',
-              warningsCount: '0 إنذار',
-              contractsCount: '1 اتفاقية',
-            ),
-          ),
-          PeriodDayItem(
-            dayName: 'الأحد',
-            date: '2026-09-14',
-            dateFormatted: '14 سبتمبر',
-            visitsCount: 16,
-            contractsCount: 2,
-            warningsCount: 0,
-            details: PeriodDayDetails(
-              successfulVisits: '16 / 16',
-              workHours: '7س 50د',
-              warningsCount: '0 إنذار',
-              contractsCount: '2 اتفاقية',
-            ),
-          ),
-          PeriodDayItem(
-            dayName: 'الإثنين',
-            date: '2026-09-15',
-            dateFormatted: '15 سبتمبر',
-            visitsCount: 12,
-            contractsCount: 0,
-            warningsCount: 1,
-            details: PeriodDayDetails(
-              successfulVisits: '12 / 16',
-              workHours: '7س 45د',
-              warningsCount: '1 إنذار',
-              contractsCount: '0 اتفاقية',
-            ),
-          ),
-          PeriodDayItem(
-            dayName: 'الثلاثاء',
-            date: '2026-09-16',
-            dateFormatted: '16 سبتمبر',
-            visitsCount: 12,
-            contractsCount: 2,
-            warningsCount: 1,
-            details: PeriodDayDetails(
-              successfulVisits: '12 / 16',
-              workHours: '7س 30د',
-              warningsCount: '1 إنذار',
-              contractsCount: '2 اتفاقية',
-            ),
-          ),
-        ],
-        signedAgreements: [
-          SignedAgreementItem(
-            id: 1,
-            storeName: 'سوبرماركت النور',
-            time: '09:45 ص',
-            status: 'التفعيل جاري',
-            statusType: 'activating',
-            statusColor: 'orange',
-          ),
-          SignedAgreementItem(
-            id: 2,
-            storeName: 'ماركت المدينة',
-            time: '11:50 ص',
-            status: 'تم التوقيع',
-            statusType: 'signed',
-            statusColor: 'green',
-          ),
-        ],
+        days: [],
+        signedAgreements: [],
         periodSummary: PeriodSummaryInfo(
-          totalWorkHours: '31س 10د',
-          totalVisits: 54,
-          totalSignedContracts: 5,
-          totalWarnings: 2,
-          totalDistanceKm: '142 كم',
-          totalScheduledFollowups: 8,
+          totalWorkHours: '00:00',
+          totalVisits: 0,
+          totalSignedContracts: 0,
+          totalWarnings: 0,
+          totalDistanceKm: '0 كم',
+          totalScheduledFollowups: 0,
         ),
       );
     }
