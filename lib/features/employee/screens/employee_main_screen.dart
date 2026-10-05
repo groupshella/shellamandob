@@ -54,29 +54,38 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
           value: overlayStyle,
           child: GetBuilder<EmployeeNavigationController>(
             builder: (navController) {
-              return Scaffold(
-                backgroundColor: bg,
-                body: IndexedStack(
-                  index: navController.currentIndex,
-                  children: [
-                    // Tab 0: الرئيسية (Employee Home Dashboard)
-                    EmployeeHomeScreen(
-                      onStartShiftPressed: () {
-                        Get.to(() => const SelectWorkZoneScreen());
-                      },
-                    ),
+              return PopScope(
+                canPop: navController.currentIndex == 0,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (didPop) return;
+                  if (navController.currentIndex != 0) {
+                    navController.changeIndex(0);
+                  }
+                },
+                child: Scaffold(
+                  backgroundColor: bg,
+                  body: IndexedStack(
+                    index: navController.currentIndex,
+                    children: [
+                      // Tab 0: الرئيسية (Employee Home Dashboard)
+                      EmployeeHomeScreen(
+                        onStartShiftPressed: () {
+                          Get.to(() => const SelectWorkZoneScreen());
+                        },
+                      ),
 
-                    // Tab 1: المواعيد والزيارات اليومية
-                    const DailyVisitsScreen(),
+                      // Tab 1: المواعيد والزيارات اليومية
+                      const DailyVisitsScreen(),
 
-                    // Tab 2: التقارير وملخص نهاية اليوم
-                    const DailyPerformanceSummaryScreen(),
+                      // Tab 2: التقارير وملخص نهاية اليوم
+                      const DailyPerformanceSummaryScreen(),
 
-                    // Tab 3: حسابي (Employee Profile — Figma 8976-27114)
-                    const EmployeeProfileScreen(),
-                  ],
+                      // Tab 3: حسابي (Employee Profile — Figma 8976-27114)
+                      const EmployeeProfileScreen(),
+                    ],
+                  ),
+                  bottomNavigationBar: const EmployeeBottomNavBar(),
                 ),
-                bottomNavigationBar: const EmployeeBottomNavBar(),
               );
             },
           ),

@@ -5,7 +5,8 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/store_visit_model.dart';
 import '../controllers/store_visits_controller.dart';
-import 'daily_visits_screen.dart';
+import '../../../../helper/route_helper.dart';
+import '../../controllers/employee_navigation_controller.dart';
 
 class FollowUpTaskScreen extends StatefulWidget {
   final StoreVisitModel visit;
@@ -274,7 +275,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'schedule_follow_up_step'.tr,
+                  'schedule_next_appointment'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 15,
@@ -397,7 +398,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
 
                 // Field 3: Follow-up notes
                 Text(
-                  'follow_up_notes'.tr,
+                  'follow_up_notes_optional'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
@@ -424,7 +425,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                       color: darkText,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'write_follow_up_notes'.tr,
+                      hintText: 'follow_up_notes_hint'.tr,
                       hintStyle: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
@@ -846,7 +847,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
-              _currentStep == 1 ? 'schedule_follow_up_step'.tr : 'save_and_schedule'.tr,
+              _currentStep == 1 ? 'proceed_to_schedule'.tr : 'schedule_follow_up_btn'.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 16,
@@ -895,6 +896,9 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
       duration: const Duration(seconds: 3),
     );
 
-    Get.offAll(() => const DailyVisitsScreen());
+    if (Get.isRegistered<EmployeeNavigationController>()) {
+      Get.find<EmployeeNavigationController>().changeIndex(1);
+    }
+    Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
   }
 }

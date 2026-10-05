@@ -4,7 +4,7 @@ import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 import '../models/employee_shift_model.dart';
 
-class ShiftStatusCardWidget extends StatelessWidget {
+class ShiftStatusCardWidget extends StatefulWidget {
   final VoidCallback? onStartShift;
   final VoidCallback? onRequestBreak;
   final VoidCallback? onResumeWork;
@@ -20,11 +20,18 @@ class ShiftStatusCardWidget extends StatelessWidget {
     this.isDark,
   });
 
+  @override
+  State<ShiftStatusCardWidget> createState() => _ShiftStatusCardWidgetState();
+}
+
+class _ShiftStatusCardWidgetState extends State<ShiftStatusCardWidget> {
   static const Color _primaryGreen = Color(0xFF30913F);
+  bool _isExpanded = true;
 
   @override
   Widget build(BuildContext context) {
-    final dark = isDark ?? (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
+    final dark = widget.isDark ??
+        (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
     final cardBg = dark ? const Color(0xFF1C2028) : Colors.white;
     final borderColor = dark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
     final darkText = dark ? Colors.white : const Color(0xFF111B18);
@@ -36,6 +43,98 @@ class ShiftStatusCardWidget extends StatelessWidget {
         final isActive = status == ShiftStatus.active;
         final isOnBreak = status == ShiftStatus.onBreak;
 
+        // ── Collapsed / Minimized Compact View ──
+        if (!_isExpanded) {
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: borderColor, width: 1),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0A000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: InkWell(
+              onTap: () => setState(() => _isExpanded = true),
+              borderRadius: BorderRadius.circular(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Status indicator with dot & label
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 9,
+                        height: 9,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _getStatusDotColor(status),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _getStatusTitle(status),
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: darkText,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Middle: Live elapsed work timer & status indicator
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.timer_outlined,
+                        size: 15,
+                        color: isActive ? _primaryGreen : subText,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        status == ShiftStatus.notStarted
+                            ? 'الدوام لم يبدأ'
+                            : controller.formattedWorkTimer,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: isActive ? _primaryGreen : subText,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Expand Chevron button
+                  IconButton(
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 22,
+                      color: subText,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => setState(() => _isExpanded = true),
+                    tooltip: 'توسيع البطاقة',
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // ── Expanded Full View ──
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(16),
@@ -57,12 +156,12 @@ class ShiftStatusCardWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Top Row: Status Title & Dot (Right in RTL) + Pill Badge (Left in RTL)
+              // Top Row: Status Title & Dot + Pill Badge & Collapse Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title + Dot (Child 0 -> Far right in RTL)
+                  // Title + Dot (Right in RTL)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -103,8 +202,26 @@ class ShiftStatusCardWidget extends StatelessWidget {
                     ],
                   ),
 
-                  // Pill Badge (Child 1 -> Far left in RTL)
-                  _buildPillBadge(status, dark),
+                  // Pill Badge + Collapse Chevron (Left in RTL)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildPillBadge(status, dark),
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: () => setState(() => _isExpanded = false),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.keyboard_arrow_up_rounded,
+                            size: 20,
+                            color: subText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -114,7 +231,7 @@ class ShiftStatusCardWidget extends StatelessWidget {
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: onStartShift ?? () => controller.startShift(),
+                    onPressed: widget.onStartShift ?? () => controller.startShift(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryGreen,
                       elevation: 0,
@@ -169,15 +286,16 @@ class ShiftStatusCardWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
 
-                // Active Buttons: طلب الراحة (Right in RTL) & إنهاء الدوام (Left in RTL)
+                // Active Buttons: طلب الراحة & إنهاء الدوام
                 Row(
                   children: [
-                    // طلب الراحة (Green button - Child 0 -> Right in RTL)
                     Expanded(
                       child: SizedBox(
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: controller.isLoading ? null : (onRequestBreak ?? () => controller.requestBreak()),
+                          onPressed: controller.isLoading
+                              ? null
+                              : (widget.onRequestBreak ?? () => controller.requestBreak()),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _primaryGreen,
                             elevation: 0,
@@ -198,15 +316,16 @@ class ShiftStatusCardWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    // إنهاء الدوام
                     Expanded(
                       child: SizedBox(
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: controller.isLoading ? null : (onEndShift ?? () => controller.endShift()),
+                          onPressed: controller.isLoading
+                              ? null
+                              : (widget.onEndShift ?? () => controller.endShift()),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: dark ? const Color(0xFF2B3240) : const Color(0xFFF6F6F6),
+                            backgroundColor:
+                                dark ? const Color(0xFF2B3240) : const Color(0xFFF6F6F6),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -231,7 +350,9 @@ class ShiftStatusCardWidget extends StatelessWidget {
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: controller.isLoading ? null : (onResumeWork ?? () => controller.resumeWork()),
+                    onPressed: controller.isLoading
+                        ? null
+                        : (widget.onResumeWork ?? () => controller.resumeWork()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryGreen,
                       elevation: 0,

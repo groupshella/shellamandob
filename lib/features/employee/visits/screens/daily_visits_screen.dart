@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import '../../../../common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'visit_summary_screen.dart';
 import 'active_store_visit_screen.dart';
+import 'store_visit_map_screen.dart';
 import '../../attendance/screens/select_work_zone_screen.dart';
+import '../../../../helper/route_helper.dart';
+import '../../controllers/employee_navigation_controller.dart';
 
 class DailyVisitsScreen extends StatefulWidget {
   const DailyVisitsScreen({super.key});
@@ -71,6 +74,25 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
         return Scaffold(
           backgroundColor: bg,
           appBar: AppBar(
+            leading: IconButton(
+              onPressed: () {
+                if (Navigator.canPop(context)) {
+                  Get.back();
+                } else if (Get.isRegistered<EmployeeNavigationController>() &&
+                    Get.find<EmployeeNavigationController>().currentIndex != 0) {
+                  Get.find<EmployeeNavigationController>().changeIndex(0);
+                } else {
+                  Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
+                }
+              },
+              icon: Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? IconlyLight.arrowRight2
+                    : IconlyLight.arrowLeft2,
+                color: darkText,
+                size: 22,
+              ),
+            ),
             title: Text(
               _tr('today_visits', 'زيارات اليوم'),
               style: TextStyle(
@@ -85,6 +107,14 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
             scrolledUnderElevation: 0,
             centerTitle: true,
             actions: [
+              IconButton(
+                tooltip: 'عرض الخريطة التفاعلية للزيارات',
+                onPressed: () {
+                  final controller = Get.find<StoreVisitsController>();
+                  Get.to(() => StoreVisitMapScreen(allVisits: controller.allVisits));
+                },
+                icon: const Icon(Icons.map_outlined, color: _primaryGreen),
+              ),
               IconButton(
                 onPressed: () => Get.find<StoreVisitsController>().loadVisits(),
                 icon: Icon(Icons.refresh_rounded, color: btnGreyText),
@@ -411,7 +441,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  visit.address,
+                                  visit.address.isNotEmpty ? visit.address : 'لم يتم تحديد العنوان',
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 12,
@@ -427,6 +457,35 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                                 IconlyLight.location,
                                 size: 14,
                                 color: subText,
+                              ),
+                              const SizedBox(width: 8),
+                              InkWell(
+                                onTap: () => Get.to(() => StoreVisitMapScreen(visit: visit)),
+                                borderRadius: BorderRadius.circular(6),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF1E3A2B) : const Color(0xFFE8F5E9),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.map_rounded, size: 12, color: _primaryGreen),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        'الخريطة والتتبع',
+                                        style: TextStyle(
+                                          fontFamily: 'Tajawal',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: _primaryGreen,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),

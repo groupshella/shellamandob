@@ -6,6 +6,7 @@ import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'visit_photo_documentation_screen.dart';
+import 'store_visit_map_screen.dart';
 
 class ActiveStoreVisitScreen extends StatelessWidget {
   final StoreVisitModel visit;
@@ -16,6 +17,14 @@ class ActiveStoreVisitScreen extends StatelessWidget {
   });
 
   static const Color _primaryGreen = Color(0xFF30913F);
+
+  static String _tr(String key, String fallback) {
+    final res = key.tr;
+    if (res == key || res.isEmpty) {
+      return fallback;
+    }
+    return res;
+  }
 
   String _formatTime(DateTime? dateTime) {
     if (dateTime == null) return '--:--';
@@ -230,7 +239,7 @@ class ActiveStoreVisitScreen extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  visit.address,
+                  visit.address.isNotEmpty ? visit.address : 'لم يتم تحديد العنوان',
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
@@ -238,6 +247,34 @@ class ActiveStoreVisitScreen extends StatelessWidget {
                     color: purpleIconColor,
                   ),
                   overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () => Get.to(() => StoreVisitMapScreen(visit: visit)),
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _primaryGreen,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.map_rounded, size: 13, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text(
+                        'خريطة المتجر',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -268,7 +305,7 @@ class ActiveStoreVisitScreen extends StatelessWidget {
                       Icon(IconlyLight.discovery, size: 14, color: purpleIconColor),
                       const SizedBox(width: 4),
                       Text(
-                        '${visit.distanceKm} ${'km_unit'.tr}',
+                        '${visit.distanceKm} ${_tr('km_unit', 'كم')}',
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
@@ -443,8 +480,8 @@ class ActiveStoreVisitScreen extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   isCriticalTime
-                      ? 'max_visit_time_exceeded'.tr
-                      : '${'remaining_visit_time'.tr} ${controller.remainingMinutes} ${'minute_unit'.tr}',
+                      ? _tr('max_visit_time_exceeded', 'تم تجاوز الحد الأقصى للزيارة')
+                      : '${_tr('remaining_visit_time', 'متبقي')} ${controller.remainingMinutes} ${_tr('minute_unit', 'دقيقة')}',
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 17,
@@ -476,27 +513,27 @@ class ActiveStoreVisitScreen extends StatelessWidget {
         alertBorderColor = const Color(0xFF991B1B);
         titleColor = isDark ? const Color(0xFFF87171) : const Color(0xFF991B1B);
         alertBodyColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFF7F1D1D);
-        defaultTitle = 'critical_alert'.tr;
-        defaultSubtitle = 'active_alert4_subtitle'.tr;
-        defaultDesc = 'active_alert4_desc'.tr;
+        defaultTitle = _tr('critical_alert', 'إنذار حرج');
+        defaultSubtitle = _tr('active_alert4_subtitle', 'تجاوز وقت الزيارة');
+        defaultDesc = _tr('active_alert4_desc', 'تجاوزت وقت الزيارة المحدد بـ 30 دقيقة. يرجى إنهاء وتوثيق الزيارة فوراً.');
         break;
       case 3:
         bgColor = isDark ? const Color(0xFF351A1A) : const Color(0xFFFEF2F2);
         alertBorderColor = const Color(0xFFEF4444);
         titleColor = const Color(0xFFEF4444);
         alertBodyColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFF991B1B);
-        defaultTitle = 'third_alert'.tr;
-        defaultSubtitle = 'active_alert3_subtitle'.tr;
-        defaultDesc = 'active_alert3_desc'.tr;
+        defaultTitle = _tr('third_alert', 'الإنذار الثالث');
+        defaultSubtitle = _tr('active_alert3_subtitle', 'متبقي 5 دقائق');
+        defaultDesc = _tr('active_alert3_desc', 'اقترب موعد انتهاء الزيارة المحددة.');
         break;
       case 2:
         bgColor = isDark ? const Color(0xFF332612) : const Color(0xFFFFFBEB);
         alertBorderColor = const Color(0xFFF59E0B);
         titleColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
         alertBodyColor = isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E);
-        defaultTitle = 'second_alert'.tr;
-        defaultSubtitle = 'active_alert2_subtitle'.tr;
-        defaultDesc = 'active_alert2_desc'.tr;
+        defaultTitle = _tr('second_alert', 'الإنذار الثاني');
+        defaultSubtitle = _tr('active_alert2_subtitle', 'متبقي 10 دقائق');
+        defaultDesc = _tr('active_alert2_desc', 'تبقى 10 دقائق على نهاية الزيارة المحددة.');
         break;
       case 1:
       default:
@@ -504,9 +541,9 @@ class ActiveStoreVisitScreen extends StatelessWidget {
         alertBorderColor = const Color(0xFF3B82F6);
         titleColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
         alertBodyColor = isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF);
-        defaultTitle = 'first_alert'.tr;
-        defaultSubtitle = 'active_alert1_subtitle'.tr;
-        defaultDesc = 'active_alert1_desc'.tr;
+        defaultTitle = _tr('first_alert', 'الإنذار الأول');
+        defaultSubtitle = _tr('active_alert1_subtitle', 'تنبيه الوقت المبدئي');
+        defaultDesc = _tr('active_alert1_desc', 'نصف الوقت المخصص للزيارة قد مضى.');
         break;
     }
 

@@ -69,10 +69,13 @@ class StoreVisitModel {
   final String storeName;
   final String managerName;
   final String phone;
+  final int? storeId;
   final String? interestStatus; // حالة الاهتمام: طلب مهلة, مهتم, مهتم جدًا, يحتاج متابعة, غير مهتم
   final int openingsCount; // عدد الفتحات
   final String crNumber; // رقم السجل التجاري
   final String address;
+  final double? latitude;
+  final double? longitude;
   final String category;
   final double distanceKm;
   final String timeSlot;
@@ -98,10 +101,13 @@ class StoreVisitModel {
     required this.storeName,
     required this.managerName,
     required this.phone,
+    this.storeId,
     this.interestStatus,
     this.openingsCount = 1,
     this.crNumber = '',
     required this.address,
+    this.latitude,
+    this.longitude,
     required this.category,
     this.distanceKm = 0.5,
     required this.timeSlot,
@@ -128,10 +134,13 @@ class StoreVisitModel {
     String? storeName,
     String? managerName,
     String? phone,
+    int? storeId,
     String? interestStatus,
     int? openingsCount,
     String? crNumber,
     String? address,
+    double? latitude,
+    double? longitude,
     String? category,
     double? distanceKm,
     String? timeSlot,
@@ -157,10 +166,13 @@ class StoreVisitModel {
       storeName: storeName ?? this.storeName,
       managerName: managerName ?? this.managerName,
       phone: phone ?? this.phone,
+      storeId: storeId ?? this.storeId,
       interestStatus: interestStatus ?? this.interestStatus,
       openingsCount: openingsCount ?? this.openingsCount,
       crNumber: crNumber ?? this.crNumber,
       address: address ?? this.address,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       category: category ?? this.category,
       distanceKm: distanceKm ?? this.distanceKm,
       timeSlot: timeSlot ?? this.timeSlot,
@@ -181,6 +193,18 @@ class StoreVisitModel {
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
     );
+  }
+
+  bool get hasCoordinates => latitude != null && longitude != null;
+
+  String? get googleMapsUrl {
+    if (hasCoordinates) {
+      return 'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude';
+    }
+    if (address.isNotEmpty) {
+      return 'https://www.google.com/maps/dir/?api=1&destination=${Uri.encodeComponent(address)}';
+    }
+    return null;
   }
 
   String get localizedTimeSlot {
@@ -225,10 +249,15 @@ class StoreVisitModel {
       storeName: json['store_name']?.toString() ?? '',
       managerName: json['manager_name']?.toString() ?? '',
       phone: json['phone']?.toString() ?? '',
+      storeId: json['store_id'] != null
+          ? int.tryParse(json['store_id'].toString())
+          : int.tryParse(json['id']?.toString() ?? ''),
       interestStatus: json['interest_status']?.toString() ?? 'مهتم جدًا',
       openingsCount: int.tryParse('${json['openings_count']}') ?? 1,
       crNumber: json['cr_number']?.toString() ?? '',
       address: json['address']?.toString() ?? '',
+      latitude: json['latitude'] != null ? double.tryParse('${json['latitude']}') : null,
+      longitude: json['longitude'] != null ? double.tryParse('${json['longitude']}') : null,
       category: json['category']?.toString() ?? '',
       distanceKm: double.tryParse('${json['distance_km']}') ?? 0.5,
       timeSlot: json['time_slot']?.toString() ?? '',

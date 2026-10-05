@@ -37,7 +37,12 @@ class AttendanceController extends GetxController implements GetxService {
   XFile? selfieImage;
   final ImagePicker _picker = ImagePicker();
 
-  MarketerShiftService get _service => Get.find<MarketerShiftService>();
+  MarketerShiftService get _service {
+    if (Get.isRegistered<MarketerShiftService>()) {
+      return Get.find<MarketerShiftService>();
+    }
+    return Get.put(MarketerShiftService(apiClient: Get.find()), permanent: true);
+  }
 
   @override
   void onInit() {

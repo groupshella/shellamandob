@@ -40,6 +40,7 @@ import '../features/employee/reports/screens/daily_performance_summary_screen.da
 import '../features/employee/requests/screens/employee_requests_screen.dart';
 import '../features/employee/screens/employee_settings_screen.dart';
 import '../features/employee/screens/employee_profile_screen.dart';
+import '../features/employee/screens/supervisor_recommendations_screen.dart';
 
 class RouteHelper {
   static const String posCheckout = '/pos-checkout';
@@ -134,6 +135,8 @@ class RouteHelper {
   static String getEmployeeSettingsRoute() => employeeSettings;
   static const String employeeProfile = '/employee-profile';
   static String getEmployeeProfileRoute() => employeeProfile;
+  static const String supervisorRecommendations = '/supervisor-recommendations';
+  static String getSupervisorRecommendationsRoute() => supervisorRecommendations;
   static const String messages = '/messages';
   static const String conversation = '/conversation';
   static const String chatSearch = '/chat-search';
@@ -778,6 +781,7 @@ class RouteHelper {
     GetPage(name: employeeRequests, page: () => getRoute(const EmployeeRequestsScreen())),
     GetPage(name: employeeSettings, page: () => getRoute(const EmployeeSettingsScreen())),
     GetPage(name: employeeProfile, page: () => getRoute(const EmployeeProfileScreen())),
+    GetPage(name: supervisorRecommendations, page: () => getRoute(const SupervisorRecommendationsScreen())),
     GetPage(name: messages, page: () => const NotFound()),
     GetPage(name: conversation, page: () => const NotFound()),
 

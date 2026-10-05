@@ -16,6 +16,54 @@ class MockNetworkDispatcher {
   static const int simulatedDelayMs = 300;
 
   // In-memory store for dynamic demo state (persists during the session)
+  static String _mockNafathCode = '54';
+  static DateTime? _mockNafathInitiatedAt;
+
+  static final List<Map<String, dynamic>> _mockMerchantPromos = [
+    {
+      'id': 1,
+      'title_ar': 'باقة التأسيس الماسي للشركاء الجدد',
+      'title_en': 'Diamond Foundation Package for New Partners',
+      'code': 'GROWTH-DIAMOND-2026',
+      'discount_type': 'percent',
+      'discount_value': 50.0,
+      'min_order_amount': 0.0,
+      'badge': 'الأكثر طلباً',
+      'description_ar': 'خصم 50% على عمولة شلة لأول 3 أشهر + دعم فني مخصص وتسويق مجاني للمتجر.',
+      'description_en': '50% off commission for 3 months with dedicated marketing support.',
+      'is_active': true,
+      'valid_until': '2026-12-31',
+    },
+    {
+      'id': 2,
+      'title_ar': 'باقة التوصيل المجاني للعملاء',
+      'title_en': 'Free Delivery for Customers Package',
+      'code': 'FREE-DELIVERY-100',
+      'discount_type': 'fixed',
+      'discount_value': 100.0,
+      'min_order_amount': 50.0,
+      'badge': 'باقة سريعة',
+      'description_ar': 'تغطية كاملة لرسوم التوصيل لأول 100 طلب من المتجر لتحفيز المبيعات الفورية.',
+      'description_en': 'Full coverage for delivery fees on first 100 orders.',
+      'is_active': true,
+      'valid_until': '2026-11-30',
+    },
+    {
+      'id': 3,
+      'title_ar': 'باقة قطاع التموينات والبقالة الذهبية',
+      'title_en': 'Grocery Sector Golden Package',
+      'code': 'GROCERY-PRO-2026',
+      'discount_type': 'percent',
+      'discount_value': 30.0,
+      'min_order_amount': 20.0,
+      'badge': 'موصى به للبقالات',
+      'description_ar': 'عمولة مخفضة 30% مع ربط أجهزة الكاشير ونظام قيدها للدفع الآجل مجاناً.',
+      'description_en': '30% reduced commission with free POS and Qidha integration.',
+      'is_active': true,
+      'valid_until': '2026-12-31',
+    },
+  ];
+
   static final List<Map<String, dynamic>> _mockVisits = [
     {
       'id': 'VST-201',
@@ -28,6 +76,8 @@ class MockNetworkDispatcher {
       'address': 'طريق الأمير محمد بن عبد العزيز، العليا',
       'category': 'بقالة وتموينات',
       'distance_km': 0.3,
+      'latitude': 24.7118,
+      'longitude': 46.6744,
       'time_slot': '09:00 ص - 09:30 ص',
       'pipeline_step': 'contractSigned',
       'visit_status': 'completed',
@@ -47,6 +97,8 @@ class MockNetworkDispatcher {
       'address': 'حي الملقا، طريق أنس بن مالك',
       'category': 'سوبرماركت',
       'distance_km': 0.8,
+      'latitude': 24.8105,
+      'longitude': 46.6215,
       'time_slot': '10:00 ص - 10:30 ص',
       'pipeline_step': 'negotiating',
       'visit_status': 'followUp',
@@ -65,6 +117,8 @@ class MockNetworkDispatcher {
       'address': 'حي طويق، شارع بلال بن رباح',
       'category': 'حلويات ومخابز',
       'distance_km': 1.2,
+      'latitude': 24.5833,
+      'longitude': 46.5412,
       'time_slot': '11:00 ص - 11:30 ص',
       'pipeline_step': 'interested',
       'visit_status': 'scheduled',
@@ -81,6 +135,8 @@ class MockNetworkDispatcher {
       'address': 'حي نمار، طريق ديراب',
       'category': 'لحوم ودواجن',
       'distance_km': 2.1,
+      'latitude': 24.5422,
+      'longitude': 46.6110,
       'time_slot': '12:00 م - 12:30 م',
       'pipeline_step': 'presented',
       'visit_status': 'scheduled',
@@ -97,6 +153,8 @@ class MockNetworkDispatcher {
       'address': 'حي النموذجية، شارع المعذر',
       'category': 'صيدليات',
       'distance_km': 3.5,
+      'latitude': 24.6543,
+      'longitude': 46.6872,
       'time_slot': '01:00 م - 01:30 م',
       'pipeline_step': 'notQualified',
       'visit_status': 'completed',
@@ -110,12 +168,90 @@ class MockNetworkDispatcher {
     'shift_id': 101,
     'zone_id': 1,
     'zone_name': 'غرب الرياض (طويق ونمار)',
-    'started_at': '2026-09-28T08:00:00Z',
-    'start_time_text': '08:00 ص',
-    'worked_seconds': 14400,
+    'started_at': '2026-09-28T08:30:00Z',
+    'start_time_text': '08:30 ص',
+    'worked_seconds': 9300,
+    'worked_time_text': '02:35 ساعة',
+    'overtime_seconds': 1200,
+    'overtime_text': '00:20 ساعة',
+    'approved_leave_seconds': 1800,
+    'approved_leave_text': '00:30 ساعة',
     'target_visits': 16,
     'completed_visits': 12,
   };
+
+  static final List<Map<String, dynamic>> _mockRecommendationsList = [
+    {
+      'id': '1',
+      'supervisor_name': 'اسم المشرف',
+      'supervisor_role': 'مسمى الوظيفة',
+      'supervisor_avatar': 'assets/image/supervisor_avatar.png',
+      'title': 'توصيات خاصة بالمبيعات',
+      'content': 'حاول توضيح آلية عمل شلة ومزاياها قبل الانتقال للتعاقد.\nفي حالة التفاوض، سجل ملاحظات التاجر وحدد موعد متابعة واضح.',
+      'is_read': false,
+      'date_group': 'اليوم',
+      'is_today': true,
+      'time_text': '03:30 م',
+      'created_at': '2026-10-03T15:30:00Z',
+      'is_expanded': true,
+    },
+    {
+      'id': '2',
+      'supervisor_name': 'اسم المشرف',
+      'supervisor_role': 'مسمى الوظيفة',
+      'supervisor_avatar': 'assets/image/supervisor_avatar.png',
+      'title': 'توجيهات يومية',
+      'content': 'التركيز اليوم على المتاجر ذات النشاط الغذائي وتقديم عروض الباقات السنوية لشلة مع التوضيح الفوري لمزايا سرعة التحصيل.',
+      'is_read': true,
+      'date_group': 'اليوم',
+      'is_today': true,
+      'time_text': '03:30 م',
+      'created_at': '2026-10-03T15:30:00Z',
+      'is_expanded': false,
+    },
+    {
+      'id': '3',
+      'supervisor_name': 'اسم المشرف',
+      'supervisor_role': 'مسمى الوظيفة',
+      'supervisor_avatar': 'assets/image/supervisor_avatar.png',
+      'title': 'توصيات لتحسين الأداء',
+      'content': 'حاول توضيح آلية عمل شلة ومزاياها قبل الانتقال للتعاقد.\nفي حالة التفاوض، سجل ملاحظات التاجر وحدد موعد متابعة واضح.',
+      'is_read': true,
+      'date_group': 'الأربعاء 26 ,فبراير , 2026',
+      'is_today': false,
+      'time_text': '03:30 م',
+      'created_at': '2026-02-26T15:30:00Z',
+      'is_expanded': false,
+    },
+    {
+      'id': '4',
+      'supervisor_name': 'اسم المشرف',
+      'supervisor_role': 'مسمى الوظيفة',
+      'supervisor_avatar': 'assets/image/supervisor_avatar.png',
+      'title': 'توصية خاصة بالمبيعات',
+      'content': 'متابعة العملاء الذين أبدوا اهتماماً خلال الأسبوع الماضي وإعادة التواصل معهم قبل نهاية الشهر لإتمام التعاقد.',
+      'is_read': true,
+      'date_group': 'الأربعاء 26 ,فبراير , 2026',
+      'is_today': false,
+      'time_text': '03:30 م',
+      'created_at': '2026-02-26T15:30:00Z',
+      'is_expanded': false,
+    },
+    {
+      'id': '5',
+      'supervisor_name': 'اسم المشرف',
+      'supervisor_role': 'مسمى الوظيفة',
+      'supervisor_avatar': 'assets/image/supervisor_avatar.png',
+      'title': 'توصية خاصة بالمبيعات',
+      'content': 'التأكد من اكتمال مستندات السجل التجاري والهوية قبل رفع طلب انضمام المتجر لتقليص مدة الموافقة.',
+      'is_read': true,
+      'date_group': 'الأربعاء 26 ,فبراير , 2026',
+      'is_today': false,
+      'time_text': '03:30 م',
+      'created_at': '2026-02-26T15:30:00Z',
+      'is_expanded': false,
+    },
+  ];
 
   /// Dispatches any incoming request (GET, POST, PUT, DELETE) to the appropriate mock handler.
   static Future<Response<dynamic>?> dispatch(
@@ -210,12 +346,59 @@ class MockNetworkDispatcher {
 
     // 5. Shift Status & History
     if (path.contains(AppConstants.marketerShiftCurrentUri) || path.contains('/customer/marketer/shift/current')) {
+      final unreadRecs = _mockRecommendationsList.where((r) => r['is_read'] == false).length;
       return Response(statusCode: 200, body: {
         'status': 'success',
         'data': {
           'status': _mockShiftState['status'],
-          'employee': {'name': 'أحمد المسوق الميداني'},
+          'employee': {'name': 'أحمد محمد'},
           'shift': _mockShiftState,
+          'warnings': {
+            'count': 2,
+            'items': [
+              {
+                'id': '1',
+                'title': 'تأخير في تسليم تقرير الزيارة',
+                'date': '10 سبتمبر',
+                'reason': 'تأخر تسليم التقرير عن الموعد المحدد',
+              },
+              {
+                'id': '2',
+                'title': 'مغادرة منطقة العمل بدون إذن',
+                'date': '8 سبتمبر',
+                'reason': 'التواجد خارج النطاق الجغرافي المحدد للوردية',
+              },
+            ],
+          },
+          'recommendations': {
+            'count': _mockRecommendationsList.length,
+            'unread_count': unreadRecs,
+          },
+          'visits_summary': {
+            'total': 3,
+            'completed': 1,
+            'upcoming': 4,
+            'needs_follow_up': 2,
+            'next_visit': {
+              'store_name': 'متجر الفرسان',
+              'address': 'حي العليا، الرياض',
+              'distance_km': 1.2,
+              'time_slot': '09:00 ص',
+            },
+          },
+        },
+      });
+    }
+
+    // 5.1 Supervisor Recommendations List
+    if (path.contains(AppConstants.marketerRecommendationsUri) || path.contains('/customer/marketer/recommendations')) {
+      final unread = _mockRecommendationsList.where((r) => r['is_read'] == false).length;
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'data': {
+          'total': _mockRecommendationsList.length,
+          'unread': unread,
+          'recommendations': _mockRecommendationsList,
         },
       });
     }
@@ -316,8 +499,86 @@ class MockNetworkDispatcher {
         'zone_ids': [1],
       });
     }
-    if (path.contains(AppConstants.checkZoneV2Uri)) {
-      return Response(statusCode: 200, body: {'zone_id': 1, 'zone_ids': [1], 'in_zone': true});
+    // 10. Merchant Promos Library
+    if (path.contains('/customer/marketer/promos') && !path.contains('/activate')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'data': _mockMerchantPromos,
+      });
+    }
+
+    // 10.1 Nafath Check Status (GET)
+    if (path.contains('/nafath/checkStatus') || path.contains('/nafath/check-status')) {
+      final elapsed = _mockNafathInitiatedAt != null
+          ? DateTime.now().difference(_mockNafathInitiatedAt!).inSeconds
+          : 10;
+      final isApproved = elapsed >= 6;
+      return Response(statusCode: 200, body: {
+        'status': isApproved ? 'approved' : 'pending',
+        'national_id': query?['national_id'] ?? '1010982341',
+        'code': _mockNafathCode,
+        'random': _mockNafathCode,
+        'is_approved': isApproved,
+        'can_proceed': isApproved,
+        'full_name_ar': 'عبدالله بن سعد الدوسري (تاجر معتمد)',
+      });
+    }
+
+    // 11. Instant Reward Settings
+    if (path.contains('/customer/marketer/reward-settings')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'contract_signing_reward': 50.0,
+        'qaidha_activation_reward': 30.0,
+        'today_earnings': 240.0,
+        'today_contracts_count': 3,
+        'today_qaidha_count': 3,
+      });
+    }
+
+    // 12. Supervisor Recommendations
+    if (path.contains('/customer/marketer/recommendations')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'data': [
+          {
+            'id': 1,
+            'title': 'التركيز على قطاع التموينات ومحلات البقالة',
+            'content': 'نلاحظ إقبالاً كبيراً على باقة التوصيل في قطاع البقالة، ركز جهود اليوم على المتاجر ذات 2 فتحات أو أكثر.',
+            'supervisor_name': 'م. فهد القرني (مشرف النمو الميداني)',
+            'priority': 'high',
+            'created_at': '2026-10-03T09:00:00Z',
+            'is_read': false,
+          },
+          {
+            'id': 2,
+            'title': 'تفعيل عرض التأسيس الماسي للشركاء الجدد',
+            'content': 'احرص على عرض خصم 50% على عمولة شلة عند توقيع العقد لزيادة نسبة الإغلاق الفوري.',
+            'supervisor_name': 'م. فهد القرني (مشرف النمو الميداني)',
+            'priority': 'normal',
+            'created_at': '2026-10-02T11:30:00Z',
+            'is_read': true,
+          },
+        ]
+      });
+    }
+
+    // 13. Marketer Leaves
+    if (path.contains('/customer/marketer/leaves')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'data': [
+          {
+            'id': 1,
+            'leave_type': 'إجازة اعتيادية',
+            'start_date': '2026-10-10',
+            'end_date': '2026-10-12',
+            'reason': 'ظرف عائلي خاص',
+            'status': 'approved',
+            'status_note': 'معتمد من إدارة العمليات الميدانية',
+          }
+        ]
+      });
     }
 
     // Default Fallback for unmatched GET requests in mock mode
@@ -445,6 +706,21 @@ class MockNetworkDispatcher {
       });
     }
 
+    // 5.1 Recommendations mark as read
+    if (path.contains('/customer/marketer/recommendations') && path.contains('/read')) {
+      final segments = path.split('/');
+      final readIndex = segments.indexOf('read');
+      if (readIndex > 0) {
+        final id = segments[readIndex - 1];
+        for (var rec in _mockRecommendationsList) {
+          if (rec['id'] == id) {
+            rec['is_read'] = true;
+          }
+        }
+      }
+      return Response(statusCode: 200, body: {'status': 'success', 'message': 'تم تحديث حالة القراءة بنجاح'});
+    }
+
     // 6. Store Visits: Create or Complete Visit
     if (path.contains('/customer/marketer/visits') || path.contains(AppConstants.marketerVisitsUri)) {
       if (path.contains('/start')) {
@@ -506,9 +782,96 @@ class MockNetworkDispatcher {
       });
     }
 
-    // 9. Firebase Token register
-    if (path.contains(AppConstants.tokenUri)) {
-      return Response(statusCode: 200, body: {'status': 'success'});
+    // 10. Verify Commercial Register
+    if (path.contains('/customer/marketer/verify-cr')) {
+      final cr = body is Map ? body['cr_number']?.toString() : null;
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'is_valid': true,
+        'cr_number': cr ?? '1010892741',
+        'store_name': 'مؤسسة أضواء التجارة للتجزئة',
+        'is_registered_before': false,
+        'message': 'السجل التجاري سليم ونشط وغير مسجل مسبقاً في شلة.',
+      });
+    }
+
+    // 11. Activate Merchant Promo
+    if (path.contains('/customer/marketer/promos/activate')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'message': 'تم تفعيل العرض الترويجي للمتجر بنجاح وتوثيقه في النظام.',
+      });
+    }
+
+    // 12. Marketer Leaves Submit
+    if (path.contains('/customer/marketer/leaves')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'message': 'تم رفع طلب الإجازة بنجاح إلى المشرف الميداني.',
+      });
+    }
+
+    // 14. Nafath Initiate
+    if (path.contains('/nafath/initiate')) {
+      final randCode = (10 + (DateTime.now().millisecondsSinceEpoch % 90)).toString();
+      _mockNafathCode = randCode;
+      _mockNafathInitiatedAt = DateTime.now();
+      return Response(statusCode: 200, body: {
+        'status': 'sent',
+        'request_id': 'mock-nafath-${DateTime.now().millisecondsSinceEpoch}',
+        'code': randCode,
+        'random': randCode,
+        'message': 'تم إرسال طلب التوثيق عبر نفاذ بنجاح (وضع العرض التجريبي)',
+        'data': {
+          'status': 'pending',
+          'random': randCode,
+          'code': randCode,
+        },
+        'external_response': [
+          {
+            'error': 'Success',
+            'random': randCode,
+            'message': 'Mock Nafath initiated',
+          }
+        ],
+      });
+    }
+
+    // 15. Nafath Sign
+    if (path.contains('/nafath/sign')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'message': 'تم توقيع العقد واعتماده بنجاح',
+      });
+    }
+
+    // 16. Nafath Retry
+    if (path.contains('/nafath/retry')) {
+      final randCode = (10 + (DateTime.now().millisecondsSinceEpoch % 90)).toString();
+      _mockNafathCode = randCode;
+      _mockNafathInitiatedAt = DateTime.now();
+      return Response(statusCode: 200, body: {
+        'status': 'sent',
+        'code': randCode,
+        'random': randCode,
+        'message': 'تمت إعادة محاولة إرسال الرمز بنجاح',
+      });
+    }
+
+    // 17. Nafath Check Status (POST fallback)
+    if (path.contains('/nafath/checkStatus') || path.contains('/nafath/check-status')) {
+      final elapsed = _mockNafathInitiatedAt != null
+          ? DateTime.now().difference(_mockNafathInitiatedAt!).inSeconds
+          : 10;
+      final isApproved = elapsed >= 6;
+      return Response(statusCode: 200, body: {
+        'status': isApproved ? 'approved' : 'pending',
+        'code': _mockNafathCode,
+        'random': _mockNafathCode,
+        'is_approved': isApproved,
+        'can_proceed': isApproved,
+        'full_name_ar': 'عبدالله بن سعد الدوسري (تاجر معتمد)',
+      });
     }
 
     // Default POST success

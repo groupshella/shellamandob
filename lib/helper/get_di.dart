@@ -203,8 +203,8 @@ Future<Map<String, Map<String, String>>> init() async {
       fenix: true);
 
   // Marketer and Update Controllers
-  Get.lazyPut(() => MarketerController(apiClient: Get.find()));
-  Get.lazyPut(() => MarketerShiftService(apiClient: Get.find()));
+  Get.lazyPut(() => MarketerController(apiClient: Get.find()), fenix: true);
+  Get.lazyPut(() => MarketerShiftService(apiClient: Get.find()), fenix: true);
   Get.lazyPut(() => UpdateController());
 
   // ======================================================================================================================

@@ -5,6 +5,8 @@ import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
+import 'store_visit_map_screen.dart';
+import '../widgets/store_visit_embedded_map_widget.dart';
 
 class StoreVisitDetailScreen extends StatefulWidget {
   final StoreVisitModel visit;
@@ -266,6 +268,97 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                             color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 3. Embedded Native Google Map Card
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF30913F).withValues(alpha: 0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.location_on_rounded, color: Color(0xFF30913F), size: 18),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'موقع المتجر على الخريطة',
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : const Color(0xFF111827),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            InkWell(
+                              onTap: () => Get.to(() => StoreVisitMapScreen(visit: visit)),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF30913F).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.open_in_full_rounded, size: 13, color: Color(0xFF30913F)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'تكبير الخريطة',
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF30913F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (visit.address.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            visit.address,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 12,
+                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        StoreVisitEmbeddedMapWidget(visit: visit, height: 160),
                       ],
                     ),
                   ),

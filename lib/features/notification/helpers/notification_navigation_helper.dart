@@ -20,11 +20,29 @@ class NotificationNavigationHelper {
 
     // 1. Marketer Leave / Vacations / Permissions
     if (type == 'leave_status' ||
+        type == 'marketer_leave_status' ||
         type == 'leave' ||
         type == 'vacation' ||
         type == 'permission' ||
         has(['إجازة', 'إجازه', 'استئذان', 'اجازة', 'مرضية', 'سنوية'])) {
       Get.to(() => const EmployeeVacationsScreen());
+      return;
+    }
+
+    // 1.1. Marketer Zone Update (تحديث النطاق الجغرافي)
+    if (type == 'marketer_zone_updated' ||
+        type == 'zone_update' ||
+        type == 'zone' ||
+        has(['نطاق', 'منطقة', 'زون', 'zone'])) {
+      if (Get.isRegistered<EmployeeNavigationController>()) {
+        Get.find<EmployeeNavigationController>().changeIndex(1);
+      }
+      _showDetailDialog(
+        title: title.isNotEmpty ? title : 'تحديث النطاق الجغرافي',
+        description: desc.isNotEmpty ? desc : 'تم تحديث نطاق عملك الميداني من قبل الإدارة.',
+        icon: Icons.map_outlined,
+        iconColor: const Color(0xFF30913F),
+      );
       return;
     }
 

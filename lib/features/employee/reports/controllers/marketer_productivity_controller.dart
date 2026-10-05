@@ -11,12 +11,12 @@ class MarketerProductivityController extends GetxController {
   bool isLoading = false;
   ProductivityViewMode viewMode = ProductivityViewMode.daily;
 
-  DateTime selectedDate = DateTime(2026, 9, 20);
-  DateTime rangeStartDate = DateTime(2026, 9, 13);
-  DateTime rangeEndDate = DateTime(2026, 9, 20);
+  DateTime selectedDate = DateTime.now();
+  DateTime rangeStartDate = DateTime.now().subtract(const Duration(days: 6));
+  DateTime rangeEndDate = DateTime.now();
 
   bool isCalendarOpen = false;
-  int expandedDayIndex = 2; // Default Monday expanded as in Figma
+  int expandedDayIndex = -1;
 
   DailyProductivityModel? dailyData;
   PeriodProductivityModel? periodData;
@@ -24,6 +24,10 @@ class MarketerProductivityController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    final now = DateTime.now();
+    selectedDate = DateTime(now.year, now.month, now.day);
+    rangeEndDate = selectedDate;
+    rangeStartDate = selectedDate.subtract(const Duration(days: 6));
     fetchProductivity();
   }
 

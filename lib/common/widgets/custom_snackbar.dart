@@ -50,54 +50,59 @@ void showCustomSnackBar(String? message,
     final String translatedMessage =
         BackendMessageTranslator.translate(normalizedMessage);
 
-    Get.dialog(
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: 220,
-              maxWidth: Get.width * 0.85,
-              maxHeight: Get.height * 0.7,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+    if (Get.isSnackbarOpen) {
+      Get.closeAllSnackbars();
+    }
+
+    final Color bgColor = isError ? const Color(0xFFEF4444) : const Color(0xFF10B981);
+    final IconData iconData = isError ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded;
+
+    Get.showSnackbar(
+      GetSnackBar(
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.transparent,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.zero,
+        duration: Duration(seconds: showDuration ?? (isError ? 3 : 2)),
+        animationDuration: const Duration(milliseconds: 300),
+        isDismissible: true,
+        dismissDirection: DismissDirection.up,
+        messageText: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: bgColor.withValues(alpha: 0.35),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(isError ? Icons.error : Icons.check_circle,
-                      color: isError ? Colors.red : Colors.green, size: 50),
-                  const SizedBox(height: 20),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: Get.height * 0.35),
-                    child: SingleChildScrollView(
-                      child: Text(
-                        translatedMessage,
-                        style:
-                            const TextStyle(color: Colors.black, fontSize: 16),
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                      ),
-                    ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(iconData, color: Colors.white, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  translatedMessage,
+                  style: const TextStyle(
+                    fontFamily: 'Tajawal',
+                    color: Colors.white,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
                   ),
-                ],
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
-      barrierDismissible: false,
     );
-
-    Future.delayed(Duration(seconds: showDuration ?? 2), () {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-    });
   }
 }
 

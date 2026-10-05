@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import '../controllers/attendance_controller.dart';
+import '../../services/marketer_shift_service.dart';
 import 'attendance_stepper_screen.dart';
 
 class SelectWorkZoneScreen extends StatelessWidget {
@@ -14,6 +15,9 @@ class SelectWorkZoneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<MarketerShiftService>()) {
+      Get.put(MarketerShiftService(apiClient: Get.find()), permanent: true);
+    }
     if (!Get.isRegistered<AttendanceController>()) {
       Get.put(AttendanceController());
     }
