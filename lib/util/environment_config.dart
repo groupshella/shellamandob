@@ -30,7 +30,7 @@ class EnvironmentConfig {
   static const bool useMockMode = bool.fromEnvironment('MOCK_MODE', defaultValue: false);
 
   static const String _rawEnv =
-      String.fromEnvironment('ENV', defaultValue: 'production');
+      String.fromEnvironment('ENV', defaultValue: 'development');
 
   static const String _rawBaseUrl = String.fromEnvironment('BASE_URL');
 
@@ -70,10 +70,10 @@ class EnvironmentConfig {
   static const Map<Environment, Map<String, String>> _configs = {
     Environment.development: {
       'baseUrl': String.fromEnvironment('DEV_BASE_URL',
-          defaultValue: 'http://localhost:8000'),
+          defaultValue: 'http://192.168.1.4:8000'),
       'webHostedUrl': String.fromEnvironment('DEV_BASE_URL',
-          defaultValue: 'http://localhost:8000'),
-      'description': 'Local Development Server (http://localhost:8000)',
+          defaultValue: 'http://192.168.1.4:8000'),
+      'description': 'Local Development Server (http://192.168.1.4:8000)',
     },
     Environment.staging: {
       'baseUrl': 'https://shellafood.com',
