@@ -111,3 +111,12 @@ lib/helper/firebase/firebase_options.dart
 # iOS build output
 /ios/build/
 .gstack/
+
+# ─── سكربتات وتحليلات مؤقتة ───
+scratch_*
+*.tmp
+audit_*.json
+phase3_*.json
+fix_manifest.json
+new_keys_needed.json
+refactoring_plan.md

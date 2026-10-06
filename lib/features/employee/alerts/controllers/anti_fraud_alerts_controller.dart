@@ -66,7 +66,7 @@ class AntiFraudAlertsController extends GetxController {
 
       case AlertLevel.alert3:
         _currentAlertMessage = 'alert3_message'.tr;
-        _showAdvancedDialog();
+        _showAdvancedToast();
         break;
 
       case AlertLevel.criticalAlert4:
@@ -105,80 +105,36 @@ class AntiFraudAlertsController extends GetxController {
     );
   }
 
-  void _showAdvancedDialog() {
-    final ctx = Get.context;
-    final isDark = ctx != null && Theme.of(ctx).brightness == Brightness.dark;
-    final dialogBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final textDark = isDark ? Colors.white : const Color(0xFF111827);
-    final textSub = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF374151);
-
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: dialogBg,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(
-          children: [
-            const Icon(Icons.report_problem_rounded, color: Color(0xFFEF4444), size: 28),
-            const SizedBox(width: 8),
-            Text(
-              'third_alert_advanced'.tr,
-              style: TextStyle(fontFamily: 'Tajawal', fontSize: 17, fontWeight: FontWeight.bold, color: textDark),
-            ),
-          ],
+  void _showAdvancedToast() {
+    Get.snackbar(
+      'third_alert_advanced'.tr,
+      _currentAlertMessage ?? 'one_minute_remaining_penalty'.tr,
+      icon: const Icon(Icons.report_problem_rounded, color: Colors.white, size: 28),
+      backgroundColor: const Color(0xFFEF4444).withValues(alpha: 0.95),
+      colorText: Colors.white,
+      duration: const Duration(seconds: 6),
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(12),
+      borderRadius: 12,
+      isDismissible: true,
+      mainButton: TextButton(
+        onPressed: () {
+          resumeActivity();
+          if (Get.isSnackbarOpen) {
+            Get.closeCurrentSnackbar();
+          }
+        },
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.white.withValues(alpha: 0.2),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _currentAlertMessage ?? '',
-              style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, height: 1.5, color: textSub),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF351A1A) : const Color(0xFFFEF2F2),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFCA5A5)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.timer_off_outlined, color: Color(0xFFEF4444), size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'one_minute_remaining_penalty'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 12,
-                        color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFF991B1B),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        child: Text(
+          'resume_field_work'.tr,
+          style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.bold, fontSize: 12),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              resumeActivity();
-              Get.back();
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFF30913F),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-            child: Text('resume_field_work'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
-      barrierDismissible: false,
     );
   }
 

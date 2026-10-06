@@ -581,8 +581,25 @@ class MockNetworkDispatcher {
       });
     }
 
-    // Default Fallback for unmatched GET requests in mock mode
-    return Response(statusCode: 200, body: {'status': 'success', 'data': []});
+    // 14. Zones and Modules list
+    if (path.contains('/zone/list')) {
+      return Response(statusCode: 200, body: _mockZonesList);
+    }
+    if (path.contains('/module')) {
+      return Response(statusCode: 200, body: _mockModulesList);
+    }
+
+    // Strict 404 Fallback for unmatched GET requests in mock mode
+    debugPrint('⚠️ [MockNetworkDispatcher] 404 Unmatched GET -> $path');
+    return Response(
+      statusCode: 404,
+      statusText: 'Route not mocked: $path',
+      body: {
+        'status': 'error',
+        'message': 'Mock GET route not implemented: $path',
+        'code': 404,
+      },
+    );
   }
 
   // ==========================================
@@ -641,13 +658,13 @@ class MockNetworkDispatcher {
         'message': 'تم تسجيل الدخول بنجاح',
         'is_exist_user': {
           'id': 1001,
-          'name': 'أحمد المسوق الميداني',
+          'name': 'أحمد (أخصائي النمو)',
           'image': '',
         },
         'user': {
           'id': 1001,
           'f_name': 'أحمد',
-          'l_name': 'المسوق الميداني',
+          'l_name': 'أخصائي النمو',
           'phone': '+966501234567',
           'email': 'marketer@shella.com',
         },
@@ -874,19 +891,66 @@ class MockNetworkDispatcher {
       });
     }
 
-    // Default POST success
-    return Response(statusCode: 200, body: {'status': 'success', 'message': 'تم تنفيذ العملية بنجاح'});
+    // 18. Customer Marketer Apply
+    if (path.contains('/customer/marketer/apply')) {
+      return Response(statusCode: 200, body: {
+        'status': 'success',
+        'message': 'تم تقديم طلب أخصائي النمو بنجاح وهو قيد المراجعة',
+        'data': _mockDashboardPayload['data'],
+      });
+    }
+
+    // 19. Customer profile & token utilities
+    if (path.contains(AppConstants.updateProfileUri) || path.contains('/customer/update-profile')) {
+      return Response(statusCode: 200, body: {'status': 'success', 'message': 'تم تحديث الملف الشخصي بنجاح'});
+    }
+    if (path.contains(AppConstants.customerRemoveUri) || path.contains('/customer/remove-account')) {
+      return Response(statusCode: 200, body: {'status': 'success', 'message': 'تم حذف الحساب بنجاح'});
+    }
+    if (path.contains('/customer/cm-firebase-token')) {
+      return Response(statusCode: 200, body: {'status': 'success'});
+    }
+
+    // Strict 404 Fallback for unhandled POST requests in mock mode
+    debugPrint('⚠️ [MockNetworkDispatcher] 404 Unmatched POST -> $path');
+    return Response(
+      statusCode: 404,
+      statusText: 'Route not mocked: $path',
+      body: {
+        'status': 'error',
+        'message': 'Mock POST route not implemented: $path',
+        'code': 404,
+      },
+    );
   }
 
   // ==========================================
   // PUT & DELETE HANDLERS
   // ==========================================
   static Response<dynamic>? _handlePut(String path, String fullUri, dynamic body) {
-    return Response(statusCode: 200, body: {'status': 'success', 'message': 'تم التعديل بنجاح'});
+    debugPrint('⚠️ [MockNetworkDispatcher] 404 Unmatched PUT -> $path');
+    return Response(
+      statusCode: 404,
+      statusText: 'Route not mocked: $path',
+      body: {
+        'status': 'error',
+        'message': 'Mock PUT route not implemented: $path',
+        'code': 404,
+      },
+    );
   }
 
   static Response<dynamic>? _handleDelete(String path, String fullUri) {
-    return Response(statusCode: 200, body: {'status': 'success', 'message': 'تم الحذف بنجاح'});
+    debugPrint('⚠️ [MockNetworkDispatcher] 404 Unmatched DELETE -> $path');
+    return Response(
+      statusCode: 404,
+      statusText: 'Route not mocked: $path',
+      body: {
+        'status': 'error',
+        'message': 'Mock DELETE route not implemented: $path',
+        'code': 404,
+      },
+    );
   }
 
   // ==========================================
@@ -931,7 +995,7 @@ class MockNetworkDispatcher {
     },
     'module': {
       'id': 1,
-      'module_name': 'مندوب شلة',
+      'module_name': 'أخصائي النمو',
       'module_type': 'marketer',
       'theme_id': 1,
       'status': 1,
@@ -942,7 +1006,7 @@ class MockNetworkDispatcher {
   static final List<Map<String, dynamic>> _mockModulesList = [
     {
       'id': 1,
-      'module_name': 'مندوب شلة',
+      'module_name': 'أخصائي النمو',
       'module_type': 'marketer',
       'thumbnail': '',
       'status': 1,
@@ -983,7 +1047,7 @@ class MockNetworkDispatcher {
   static final Map<String, dynamic> _mockUserInfoPayload = {
     'id': 1001,
     'f_name': 'أحمد',
-    'l_name': 'المسوق الميداني',
+    'l_name': 'أخصائي النمو',
     'email': 'marketer@shella.com',
     'phone': '+966501234567',
     'image_full_url': '',
