@@ -27,7 +27,7 @@ class EnvironmentConfig {
   /// Offline Mock Mode Toggle:
   /// When true, all network requests are intercepted locally with realistic mock data.
   /// Set to false when backend servers are up and running.
-  static const bool useMockMode = bool.fromEnvironment('MOCK_MODE', defaultValue: true);
+  static const bool useMockMode = bool.fromEnvironment('MOCK_MODE', defaultValue: false);
 
   static const String _rawEnv =
       String.fromEnvironment('ENV', defaultValue: 'production');
