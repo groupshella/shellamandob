@@ -30,7 +30,7 @@ class EnvironmentConfig {
   static const bool useMockMode = bool.fromEnvironment('MOCK_MODE', defaultValue: false);
 
   static const String _rawEnv =
-      String.fromEnvironment('ENV', defaultValue: 'development');
+      String.fromEnvironment('ENV', defaultValue: 'production');
 
   static const String _rawBaseUrl = String.fromEnvironment('BASE_URL');
 
