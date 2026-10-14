@@ -16,7 +16,16 @@ class StoreVisitsController extends GetxController {
 
   // Daily target constants
   static const int dailyTargetVisits = 16;
-  static const int maxVisitMinutes = 30;
+  static const int baseMaxVisitMinutes = 30;
+  static const int autoExtensionMinutes = 30;
+
+  int _extensionMinutes = 0;
+  int get extensionMinutes => _extensionMinutes;
+
+  bool _isAutoExtended = false;
+  bool get isAutoExtended => _isAutoExtended;
+
+  int get maxVisitMinutes => baseMaxVisitMinutes + _extensionMinutes;
 
   // Active filter tab: 0 = الكل, 1 = مجدول, 2 = مكتمل, 3 = متابعة
   int _selectedFilterIndex = 0;
@@ -496,6 +505,9 @@ class StoreVisitsController extends GetxController {
     _frontPhotoCapturedTime = visit.frontImagePath != null ? DateTime.now() : null;
     _insidePhotoCapturedTime = visit.insideImagePath != null ? DateTime.now() : null;
 
+    _isAutoExtended = visit.isExtended;
+    _extensionMinutes = visit.extendedMinutes;
+
     final diff = now.difference(startedAt).inSeconds;
     _elapsedVisitSeconds = diff.clamp(0, maxVisitMinutes * 60);
     _inactivitySeconds = 0;
@@ -566,6 +578,12 @@ class StoreVisitsController extends GetxController {
     }
     _selectedFollowUpDate = visit.nextFollowUpDate;
     commitmentsController.text = visit.nextFollowUpCommitments ?? '';
+
+    _isAutoExtended = visit.isExtended ||
+        visit.extendedMinutes > 0 ||
+        visit.pipelineStep == StorePipelineStep.negotiating ||
+        visit.pipelineStep == StorePipelineStep.contractSigned;
+    _extensionMinutes = visit.extendedMinutes > 0 ? visit.extendedMinutes : (_isAutoExtended ? autoExtensionMinutes : 0);
 
     final now = DateTime.now();
     final startedAt = visit.startedAt ?? now;
@@ -671,7 +689,68 @@ class StoreVisitsController extends GetxController {
   void setPipelineStep(StorePipelineStep step) {
     _selectedPipelineStep = step;
     registerActivity();
+
+    final isEligibleForAutoExtension = (step == StorePipelineStep.negotiating || step == StorePipelineStep.contractSigned);
+    if (isEligibleForAutoExtension && !_isAutoExtended) {
+      _applyAutoVisitExtension(step);
+    } else {
+      update();
+    }
+  }
+
+  void _applyAutoVisitExtension(StorePipelineStep step) {
+    if (_isAutoExtended) return;
+    _isAutoExtended = true;
+    _extensionMinutes = autoExtensionMinutes;
+
+    if (_activeVisit != null) {
+      _activeVisit = _activeVisit!.copyWith(
+        isExtended: true,
+        extendedMinutes: _extensionMinutes,
+        pipelineStep: step,
+      );
+      final index = _allVisits.indexWhere((v) => v.id == _activeVisit!.id);
+      if (index != -1) {
+        _allVisits[index] = _activeVisit!;
+      }
+
+      _syncExtensionToBackend(step);
+    }
+
+    final message = step == StorePipelineStep.contractSigned
+        ? 'auto_visit_extended_contract'.tr
+        : 'auto_visit_extended_negotiation'.tr;
+
+    Get.showSnackbar(GetSnackBar(
+      message: message,
+      duration: const Duration(seconds: 4),
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: const Color(0xFF163E20),
+      borderRadius: 12,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      icon: const Icon(Icons.timer_outlined, color: Color(0xFF30913F)),
+      shouldIconPulse: true,
+    ));
+
     update();
+  }
+
+  void _syncExtensionToBackend(StorePipelineStep step) async {
+    if (_activeVisit == null) return;
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        await Get.find<ApiClient>().postData(
+          '${AppConstants.marketerVisitsUri}/${_activeVisit!.id}/extend',
+          {
+            'extended_minutes': autoExtensionMinutes,
+            'reason': step.name,
+            'pipeline_step': step.name,
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] syncExtension error: $e');
+    }
   }
 
   void setFollowUpDate(DateTime date) {
@@ -902,6 +981,8 @@ class StoreVisitsController extends GetxController {
             'front_image': updated.frontImagePath,
             'inside_image': updated.insideImagePath,
             'is_qualified': updated.isQualifiedOutcome,
+            'is_extended': updated.isExtended,
+            'extended_minutes': updated.extendedMinutes,
             if (isFollowUpNeeded && updated.nextFollowUpDate != null)
               'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
             if (isFollowUpNeeded)

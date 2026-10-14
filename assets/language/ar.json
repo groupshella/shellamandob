@@ -1814,6 +1814,11 @@
   "pipeline_not_qualified": "غير مؤهل",
   "pipeline_presented": "تم تقديم شلة",
   "pipeline_rejected": "رفض",
+  "auto_visit_extension_success": "تم تمديد وقت الزيارة تلقائياً (+30 دقيقة)",
+  "auto_visit_extended_negotiation": "تم تمديد وقت الزيارة تلقائياً (+30 دقيقة) لمرحلة التفاوض",
+  "auto_visit_extended_contract": "تم تمديد وقت الزيارة تلقائياً (+30 دقيقة) لمرحلة توقيع العقد",
+  "auto_extension_hint": "يتم تمديد وقت الزيارة تلقائياً 30 دقيقة إضافية عند مرحلة التفاوض أو توقيع العقد",
+  "max_visit_extended_badge": "تمديد تلقائي (+30 دقيقة) • الحد الأقصى 60 دقيقة",
   "place_order": "الدفع ثم تتبع الطلب",
   "place_your_address_to_discover_services": "ضع عنوانك لتكتشف خدماتنا بسهولة",
   "please_accept_privacy_policy_trams_conditions_refund_policy_first": "يرجى قبول سياسة الخصوصية والترام والشروط وسياسة استرداد الأموال",
@@ -3651,5 +3656,14 @@
   "date_label": "التاريخ",
   "follow_up_notes_optional": "ملاحظات المتابعة (اختياري)",
   "follow_up_notes_hint": "أضف أي ملاحظات مفيدة...",
-  "schedule_follow_up_btn": "جدولة المتابعة"
+  "schedule_follow_up_btn": "جدولة المتابعة",
+  "chat_with_admin_title": "تواصل مع الإدارة / المشرف",
+  "field_support_online": "متصل الآن • الدعم الميداني",
+  "admin_management_title": "إدارة شلة",
+  "no_messages_yet": "لا توجد رسائل بعد",
+  "start_conversation_with_admin": "يمكنك بدء محادثة مباشرة مع المشرف المسؤول للحصول على الدعم الميداني الفوري.",
+  "type_message_hint": "اكتب رسالة للمشرف...",
+  "camera_option": "الكاميرا",
+  "gallery_option": "معرض الصور",
+  "chat_with_admin_btn": "تواصل مع الإدارة"
 }

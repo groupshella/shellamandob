@@ -1814,6 +1814,11 @@
   "pipeline_not_qualified": "Not Qualified",
   "pipeline_presented": "Shella Presented",
   "pipeline_rejected": "Rejected",
+  "auto_visit_extension_success": "Visit time automatically extended (+30 min)",
+  "auto_visit_extended_negotiation": "Visit time automatically extended (+30 min) for negotiation stage",
+  "auto_visit_extended_contract": "Visit time automatically extended (+30 min) for contract signing stage",
+  "auto_extension_hint": "Visit duration is automatically extended by 30 mins during negotiation or contract signing",
+  "max_visit_extended_badge": "Auto-extended (+30 min) • Max duration 60 mins",
   "place_order": "Place Order",
   "place_your_address_to_discover_services": "Set your address to discover our services easily",
   "please_accept_privacy_policy_trams_conditions_refund_policy_first": "Please accept Privacy Policy, Trams & Conditions and Refund Policy",
@@ -3651,5 +3656,14 @@
   "date_label": "Date",
   "follow_up_notes_optional": "Follow-up Notes (Optional)",
   "follow_up_notes_hint": "Add any useful notes...",
-  "schedule_follow_up_btn": "Schedule Follow-up"
+  "schedule_follow_up_btn": "Schedule Follow-up",
+  "chat_with_admin_title": "Chat with Admin / Supervisor",
+  "field_support_online": "Online • Field Support",
+  "admin_management_title": "Shella Admin",
+  "no_messages_yet": "No messages yet",
+  "start_conversation_with_admin": "Start a direct conversation with your supervisor for instant field support.",
+  "type_message_hint": "Type a message to supervisor...",
+  "camera_option": "Camera",
+  "gallery_option": "Gallery",
+  "chat_with_admin_btn": "Chat with Admin"
 }

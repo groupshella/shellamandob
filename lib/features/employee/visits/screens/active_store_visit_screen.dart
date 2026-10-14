@@ -469,13 +469,25 @@ class ActiveStoreVisitScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Text(
-                  'max_visit_duration_hint'.tr,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 11,
-                    color: subTextColor,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (controller.isAutoExtended) ...[
+                      const Icon(Icons.verified_outlined, size: 13, color: _primaryGreen),
+                      const SizedBox(width: 4),
+                    ],
+                    Text(
+                      controller.isAutoExtended
+                          ? 'max_visit_extended_badge'.tr
+                          : 'max_visit_duration_hint'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 11,
+                        fontWeight: controller.isAutoExtended ? FontWeight.w700 : FontWeight.normal,
+                        color: controller.isAutoExtended ? _primaryGreen : subTextColor,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 3),
                 Text(
