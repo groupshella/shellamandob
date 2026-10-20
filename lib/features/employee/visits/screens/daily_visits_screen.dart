@@ -296,7 +296,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                       ),
                     ),
 
-                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 96)),
                 ],
               ),
             );

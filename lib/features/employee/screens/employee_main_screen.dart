@@ -64,27 +64,41 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
                 },
                 child: Scaffold(
                   backgroundColor: bg,
-                  body: IndexedStack(
-                    index: navController.currentIndex,
+                  body: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      // Tab 0: الرئيسية (Employee Home Dashboard)
-                      EmployeeHomeScreen(
-                        onStartShiftPressed: () {
-                          Get.to(() => const SelectWorkZoneScreen());
-                        },
+                      IndexedStack(
+                        index: navController.currentIndex,
+                        children: [
+                          // Tab 0: الرئيسية (Employee Home Dashboard)
+                          EmployeeHomeScreen(
+                            onStartShiftPressed: () {
+                              Get.to(() => const SelectWorkZoneScreen());
+                            },
+                          ),
+
+                          // Tab 1: المواعيد والزيارات اليومية
+                          const DailyVisitsScreen(),
+
+                          // Tab 2: التقارير وملخص نهاية اليوم
+                          const DailyPerformanceSummaryScreen(),
+
+                          // Tab 3: حسابي (Employee Profile — Figma 8976-27114)
+                          const EmployeeProfileScreen(),
+                        ],
                       ),
-
-                      // Tab 1: المواعيد والزيارات اليومية
-                      const DailyVisitsScreen(),
-
-                      // Tab 2: التقارير وملخص نهاية اليوم
-                      const DailyPerformanceSummaryScreen(),
-
-                      // Tab 3: حسابي (Employee Profile — Figma 8976-27114)
-                      const EmployeeProfileScreen(),
+                      if (!GetPlatform.isDesktop)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: EmployeeBottomNavBar(
+                            selectedIndex: navController.currentIndex,
+                            onTap: (index) => navController.changeIndex(index),
+                          ),
+                        ),
                     ],
                   ),
-                  bottomNavigationBar: const EmployeeBottomNavBar(),
                 ),
               );
             },
