@@ -205,7 +205,13 @@ class StoreVisitsController extends GetxController {
   bool isVerifyingCr = false;
   Map<String, dynamic>? crVerificationResult;
 
-  Future<void> verifyCommercialRegister(String crNumber) async {
+  void clearCrVerification() {
+    crVerificationResult = null;
+    isVerifyingCr = false;
+    update();
+  }
+
+  Future<bool> verifyCommercialRegister(String crNumber) async {
     final cleanCr = crNumber.replaceAll(RegExp(r'\D'), '');
     if (cleanCr.length != 10) {
       crVerificationResult = {
@@ -214,7 +220,7 @@ class StoreVisitsController extends GetxController {
         'message': 'رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة',
       };
       update();
-      return;
+      return false;
     }
 
     isVerifyingCr = true;
@@ -236,21 +242,24 @@ class StoreVisitsController extends GetxController {
               isError: true,
               showDuration: 4,
             );
+            return false;
           } else {
             showCustomSnackBar(
               crVerificationResult!['message'] ?? 'السجل التجاري صالح ومتحقق منه وجاهز للربط',
               isError: false,
               showDuration: 2,
             );
+            return true;
           }
         } else {
           final msg = response.body?['message'] ?? 'السجل التجاري مسجل مسبقاً أو غير صالح';
           crVerificationResult = {
             'is_valid': false,
-            'is_already_registered': true,
+            'is_already_registered': response.body?['is_already_registered'] ?? true,
             'message': msg,
           };
           showCustomSnackBar(msg.toString(), isError: true, showDuration: 4);
+          return false;
         }
       } else {
         crVerificationResult = {
@@ -258,6 +267,7 @@ class StoreVisitsController extends GetxController {
           'is_already_registered': false,
           'message': 'السجل التجاري صالح ومتحقق منه وجاهز للربط',
         };
+        return true;
       }
     } catch (e) {
       crVerificationResult = {
@@ -266,6 +276,7 @@ class StoreVisitsController extends GetxController {
         'message': 'تعذر التحقق من السجل التجاري في الوقت الحالي',
       };
       showCustomSnackBar('تعذر التحقق من السجل التجاري، يرجى المحاولة لاحقاً', isError: true);
+      return false;
     } finally {
       isVerifyingCr = false;
       update();

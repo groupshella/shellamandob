@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import '../../../../common/controllers/theme_controller.dart';
@@ -60,6 +61,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         controller.phoneController.text = widget.visit.phone;
         controller.openingsController.text = widget.visit.openingsCount.toString();
         controller.crNumberController.text = widget.visit.crNumber;
+        controller.clearCrVerification();
+        final initialCr = widget.visit.crNumber.replaceAll(RegExp(r'\D'), '');
+        if (initialCr.length == 10) {
+          controller.verifyCommercialRegister(initialCr);
+        }
         controller.commitmentsController.text = widget.visit.nextFollowUpCommitments ?? '';
         controller.confidentialNotesController.text = widget.visit.confidentialNotes ?? '';
         controller.setPipelineStep(widget.visit.pipelineStep);
@@ -295,9 +301,14 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                       CrScannerDialog.show(
                                         context,
                                         onCrDetected: (cr) {
-                                          controller.crNumberController.text = cr;
+                                          final clean = cr.replaceAll(RegExp(r'\D'), '');
+                                          controller.crNumberController.text = clean;
                                           _syncInputsToController(controller);
-                                          controller.verifyCommercialRegister(cr);
+                                          if (clean.length == 10) {
+                                            controller.verifyCommercialRegister(clean);
+                                          } else {
+                                            controller.clearCrVerification();
+                                          }
                                         },
                                       );
                                     },
@@ -334,12 +345,20 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                               label: '',
                               controller: controller.crNumberController,
                               hintText: '1010XXXXXX',
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
                               readOnly: !_isEditable,
                               initialValue: currentVisit.crNumber,
                               onChanged: (val) {
                                 _syncInputsToController(controller);
-                                if (val.trim().length == 10) {
-                                  controller.verifyCommercialRegister(val.trim());
+                                final clean = val.replaceAll(RegExp(r'\D'), '');
+                                if (clean.length == 10) {
+                                  controller.verifyCommercialRegister(clean);
+                                } else {
+                                  controller.clearCrVerification();
                                 }
                               },
                               darkText: darkText,
@@ -358,7 +377,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                   ],
                                 ),
                               )
-                            else if (controller.crVerificationResult != null)
+                            else if (controller.crVerificationResult != null &&
+                                controller.crNumberController.text.trim().replaceAll(RegExp(r'\D'), '').length == 10)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Container(
@@ -850,6 +870,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     required TextEditingController controller,
     required String hintText,
     TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
     bool readOnly = false,
     String? initialValue,
     required ValueChanged<String> onChanged,
@@ -864,20 +885,23 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: darkText,
+        if (label.isNotEmpty) ...[
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: darkText,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
+          const SizedBox(height: 6),
+        ],
         TextField(
           controller: controller,
           readOnly: readOnly,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           onChanged: onChanged,
           style: TextStyle(
             fontFamily: 'Tajawal',
@@ -1451,47 +1475,47 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final enteredCr = controller.crNumberController.text.trim();
                   final cleanCr = enteredCr.replaceAll(RegExp(r'\D'), '');
 
-                  // If signing contract, CR is mandatory, must be 10 digits, and not duplicate
-                  if (isContract) {
-                    if (cleanCr.isEmpty) {
-                      showCustomSnackBar('يرجى إدخال أو مسح رقم السجل التجاري لتوقيع العقد', isError: true);
-                      return;
-                    }
-                    if (cleanCr.length != 10) {
-                      showCustomSnackBar('رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة', isError: true);
-                      return;
-                    }
-                    if (controller.crVerificationResult != null &&
-                        (controller.crVerificationResult!['is_valid'] == false ||
-                         controller.crVerificationResult!['is_already_registered'] == true)) {
-                      showCustomSnackBar(
-                        controller.crVerificationResult!['message'] ?? 'لا يمكن توقيع العقد: السجل التجاري مكرر ومسجل بالفعل لمتجر آخر',
-                        isError: true,
-                        showDuration: 4,
-                      );
-                      return;
-                    }
-                  } else if (cleanCr.isNotEmpty) {
-                    // If entered CR is duplicate even in non-contract
-                    if (controller.crVerificationResult != null &&
-                        controller.crVerificationResult!['is_already_registered'] == true) {
-                      showCustomSnackBar(
-                        controller.crVerificationResult!['message'] ?? 'السجل التجاري مسجل بالفعل لمتجر آخر',
-                        isError: true,
-                        showDuration: 4,
-                      );
-                      return;
-                    }
+                  // Mandatory CR Validation: Must be entered, 10 digits, and verified
+                  if (cleanCr.isEmpty) {
+                    showCustomSnackBar('يرجى إدخال أو مسح رقم السجل التجاري أولاً للمتابعة', isError: true);
+                    return;
+                  }
+
+                  if (cleanCr.length != 10) {
+                    showCustomSnackBar('رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة', isError: true);
+                    return;
+                  }
+
+                  if (controller.isVerifyingCr) {
+                    showCustomSnackBar('جاري التحقق من صحة السجل التجاري، يرجى الانتظار...', isError: false);
+                    return;
+                  }
+
+                  // If not yet verified for this 10-digit number, perform verification now
+                  if (controller.crVerificationResult == null) {
+                    final isOk = await controller.verifyCommercialRegister(cleanCr);
+                    if (!isOk) return;
+                  }
+
+                  // Final check on verification result
+                  final bool isValid = controller.crVerificationResult?['is_valid'] == true &&
+                      controller.crVerificationResult?['is_already_registered'] != true;
+
+                  if (!isValid) {
+                    final msg = controller.crVerificationResult?['message']?.toString() ??
+                        'رقم السجل التجاري غير صالح أو مسجل بالفعل لمتجر آخر';
+                    showCustomSnackBar(msg, isError: true, showDuration: 4);
+                    return;
                   }
 
                   // Save all current form fields to the active visit model
                   final updatedVisit = currentVisit.copyWith(
                     openingsCount: int.tryParse(controller.openingsController.text) ?? currentVisit.openingsCount,
-                    crNumber: cleanCr.isNotEmpty ? cleanCr : controller.crNumberController.text,
+                    crNumber: cleanCr,
                     managerName: controller.managerNameController.text,
                     phone: controller.phoneController.text,
                     pipelineStep: controller.selectedPipelineStep,
