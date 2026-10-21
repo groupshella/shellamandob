@@ -396,6 +396,9 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
               controller.resumeVisit(visit);
               Get.to(() => ActiveStoreVisitScreen(visit: visit));
             } else {
+              if (!controller.canStartVisit(showWarning: true)) {
+                return;
+              }
               _showStartVisitConfirmationBottomSheet(
                 context,
                 visit,
@@ -688,6 +691,9 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
       height: 44,
       child: ElevatedButton(
         onPressed: () {
+          if (!controller.canStartVisit(showWarning: true)) {
+            return;
+          }
           _showStartVisitConfirmationBottomSheet(
             context,
             visit,
@@ -787,10 +793,12 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.pop(bottomSheetContext);
-                    controller.startVisit(visit);
-                    Get.to(() => ActiveStoreVisitScreen(visit: visit));
+                    final success = await controller.startVisit(visit);
+                    if (success) {
+                      Get.to(() => ActiveStoreVisitScreen(visit: visit));
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryGreen,

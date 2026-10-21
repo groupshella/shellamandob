@@ -802,13 +802,23 @@ class MockNetworkDispatcher {
     // 10. Verify Commercial Register
     if (path.contains('/customer/marketer/verify-cr')) {
       final cr = body is Map ? body['cr_number']?.toString() : null;
+      if (cr == '1010000000' || cr == '1010111111') {
+        return Response(statusCode: 422, body: {
+          'status': 'error',
+          'is_valid': false,
+          'is_already_registered': true,
+          'cr_number': cr,
+          'existing_store_name': 'سوبرماركت التميز المركزي',
+          'message': 'السجل التجاري ($cr) مسجل بالفعل لمتجر: سوبرماركت التميز المركزي. لا يُسمح بتكرار السجل التجاري لتفادي تضارب العقود.',
+        });
+      }
       return Response(statusCode: 200, body: {
         'status': 'success',
         'is_valid': true,
         'cr_number': cr ?? '1010892741',
-        'store_name': 'مؤسسة أضواء التجارة للتجزئة',
-        'is_registered_before': false,
-        'message': 'السجل التجاري سليم ونشط وغير مسجل مسبقاً في شلة.',
+        'is_already_registered': false,
+        'existing_store_name': null,
+        'message': 'السجل التجاري سليم ونشط وجاهز للربط وغير مسجل مسبقاً في شلة.',
       });
     }
 

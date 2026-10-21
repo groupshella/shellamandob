@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import '../../../../common/controllers/theme_controller.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/not_closing_reason.dart';
 import '../models/store_visit_model.dart';
@@ -1451,10 +1452,46 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               height: 48,
               child: ElevatedButton(
                 onPressed: () {
+                  final enteredCr = controller.crNumberController.text.trim();
+                  final cleanCr = enteredCr.replaceAll(RegExp(r'\D'), '');
+
+                  // If signing contract, CR is mandatory, must be 10 digits, and not duplicate
+                  if (isContract) {
+                    if (cleanCr.isEmpty) {
+                      showCustomSnackBar('يرجى إدخال أو مسح رقم السجل التجاري لتوقيع العقد', isError: true);
+                      return;
+                    }
+                    if (cleanCr.length != 10) {
+                      showCustomSnackBar('رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة', isError: true);
+                      return;
+                    }
+                    if (controller.crVerificationResult != null &&
+                        (controller.crVerificationResult!['is_valid'] == false ||
+                         controller.crVerificationResult!['is_already_registered'] == true)) {
+                      showCustomSnackBar(
+                        controller.crVerificationResult!['message'] ?? 'لا يمكن توقيع العقد: السجل التجاري مكرر ومسجل بالفعل لمتجر آخر',
+                        isError: true,
+                        showDuration: 4,
+                      );
+                      return;
+                    }
+                  } else if (cleanCr.isNotEmpty) {
+                    // If entered CR is duplicate even in non-contract
+                    if (controller.crVerificationResult != null &&
+                        controller.crVerificationResult!['is_already_registered'] == true) {
+                      showCustomSnackBar(
+                        controller.crVerificationResult!['message'] ?? 'السجل التجاري مسجل بالفعل لمتجر آخر',
+                        isError: true,
+                        showDuration: 4,
+                      );
+                      return;
+                    }
+                  }
+
                   // Save all current form fields to the active visit model
                   final updatedVisit = currentVisit.copyWith(
                     openingsCount: int.tryParse(controller.openingsController.text) ?? currentVisit.openingsCount,
-                    crNumber: controller.crNumberController.text,
+                    crNumber: cleanCr.isNotEmpty ? cleanCr : controller.crNumberController.text,
                     managerName: controller.managerNameController.text,
                     phone: controller.phoneController.text,
                     pipelineStep: controller.selectedPipelineStep,
