@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import '../../../../common/controllers/theme_controller.dart';
+import '../../../../common/widgets/custom_snackbar.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/not_closing_reason.dart';
 import '../models/store_visit_model.dart';
@@ -10,6 +12,7 @@ import '../widgets/merchant_promo_library_bottom_sheet.dart';
 import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
 import '../widgets/store_visit_embedded_map_widget.dart';
+import '../../../chat/screens/chat_screen.dart';
 
 class VisitSummaryScreen extends StatefulWidget {
   final StoreVisitModel visit;
@@ -58,6 +61,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         controller.phoneController.text = widget.visit.phone;
         controller.openingsController.text = widget.visit.openingsCount.toString();
         controller.crNumberController.text = widget.visit.crNumber;
+        controller.clearCrVerification();
+        final initialCr = widget.visit.crNumber.replaceAll(RegExp(r'\D'), '');
+        if (initialCr.length == 10) {
+          controller.verifyCommercialRegister(initialCr);
+        }
         controller.commitmentsController.text = widget.visit.nextFollowUpCommitments ?? '';
         controller.confidentialNotesController.text = widget.visit.confidentialNotes ?? '';
         controller.setPipelineStep(widget.visit.pipelineStep);
@@ -209,6 +217,16 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (!widget.isReadOnly && (currentVisit.visitStatus == StoreVisitStatus.inProgress || controller.activeVisit != null))
+                      _buildLiveTimerCard(
+                        controller: controller,
+                        isDark: isDark,
+                        cardBg: cardBg,
+                        borderColor: borderColor,
+                        darkText: darkText,
+                        subText: subText,
+                      ),
+
                     // موقع المتجر على الخريطة
                     _buildSectionHeader('موقع وعنوان المتجر', darkText),
                     const SizedBox(height: 8),
@@ -283,9 +301,14 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                       CrScannerDialog.show(
                                         context,
                                         onCrDetected: (cr) {
-                                          controller.crNumberController.text = cr;
+                                          final clean = cr.replaceAll(RegExp(r'\D'), '');
+                                          controller.crNumberController.text = clean;
                                           _syncInputsToController(controller);
-                                          controller.verifyCommercialRegister(cr);
+                                          if (clean.length == 10) {
+                                            controller.verifyCommercialRegister(clean);
+                                          } else {
+                                            controller.clearCrVerification();
+                                          }
                                         },
                                       );
                                     },
@@ -322,12 +345,20 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                               label: '',
                               controller: controller.crNumberController,
                               hintText: '1010XXXXXX',
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
                               readOnly: !_isEditable,
                               initialValue: currentVisit.crNumber,
                               onChanged: (val) {
                                 _syncInputsToController(controller);
-                                if (val.trim().length == 10) {
-                                  controller.verifyCommercialRegister(val.trim());
+                                final clean = val.replaceAll(RegExp(r'\D'), '');
+                                if (clean.length == 10) {
+                                  controller.verifyCommercialRegister(clean);
+                                } else {
+                                  controller.clearCrVerification();
                                 }
                               },
                               darkText: darkText,
@@ -346,7 +377,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                   ],
                                 ),
                               )
-                            else if (controller.crVerificationResult != null)
+                            else if (controller.crVerificationResult != null &&
+                                controller.crNumberController.text.trim().replaceAll(RegExp(r'\D'), '').length == 10)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Container(
@@ -838,6 +870,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     required TextEditingController controller,
     required String hintText,
     TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
     bool readOnly = false,
     String? initialValue,
     required ValueChanged<String> onChanged,
@@ -852,20 +885,23 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: darkText,
+        if (label.isNotEmpty) ...[
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: darkText,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
+          const SizedBox(height: 6),
+        ],
         TextField(
           controller: controller,
           readOnly: readOnly,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           onChanged: onChanged,
           style: TextStyle(
             fontFamily: 'Tajawal',
@@ -1173,17 +1209,46 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 width: isSelected ? 1.4 : 1.0,
               ),
             ),
-            child: Text(
-              step.localizedLabel,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: textCol,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    step.localizedLabel,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11.5,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: textCol,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (step == StorePipelineStep.negotiating || step == StorePipelineStep.contractSigned) ...[
+                  const SizedBox(width: 3),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (isDark ? const Color(0xFF163E20) : const Color(0xFFD1FAE5))
+                          : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E8F0)),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '+30د',
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? _primaryGreen : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ),
@@ -1337,36 +1402,71 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Frame 7: تقرير سري Button
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () => _showConfidentialReportBottomSheet(
-                  context,
-                  controller,
-                  currentVisit,
-                  isDark: isDark,
-                  cardBg: cardBg,
-                  darkText: darkText,
-                  inputFill: inputFill,
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
-                  elevation: 0,
-                  side: BorderSide(color: borderColor, width: 1),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: Text(
-                  'confidential_report_title'.tr,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: darkText,
+            // Action Buttons Row: تقرير سري + تواصل مع الإدارة
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Get.to(() => const ChatScreen()),
+                      icon: const Icon(Icons.phone_in_talk_rounded, size: 17, color: Color(0xFF16A34A)),
+                      label: Text(
+                        ('chat_with_admin_btn'.tr.isNotEmpty && 'chat_with_admin_btn'.tr != 'chat_with_admin_btn')
+                            ? 'chat_with_admin_btn'.tr
+                            : 'تواصل مع الإدارة',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: darkText,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4),
+                        elevation: 0,
+                        side: BorderSide(
+                          color: isDark ? const Color(0xFF225B2F) : const Color(0xFFDCFCE7),
+                          width: 1,
+                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () => _showConfidentialReportBottomSheet(
+                        context,
+                        controller,
+                        currentVisit,
+                        isDark: isDark,
+                        cardBg: cardBg,
+                        darkText: darkText,
+                        inputFill: inputFill,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                        elevation: 0,
+                        side: BorderSide(color: borderColor, width: 1),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'confidential_report_title'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: darkText,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
 
@@ -1375,11 +1475,47 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final enteredCr = controller.crNumberController.text.trim();
+                  final cleanCr = enteredCr.replaceAll(RegExp(r'\D'), '');
+
+                  // Mandatory CR Validation: Must be entered, 10 digits, and verified
+                  if (cleanCr.isEmpty) {
+                    showCustomSnackBar('يرجى إدخال أو مسح رقم السجل التجاري أولاً للمتابعة', isError: true);
+                    return;
+                  }
+
+                  if (cleanCr.length != 10) {
+                    showCustomSnackBar('رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة', isError: true);
+                    return;
+                  }
+
+                  if (controller.isVerifyingCr) {
+                    showCustomSnackBar('جاري التحقق من صحة السجل التجاري، يرجى الانتظار...', isError: false);
+                    return;
+                  }
+
+                  // If not yet verified for this 10-digit number, perform verification now
+                  if (controller.crVerificationResult == null) {
+                    final isOk = await controller.verifyCommercialRegister(cleanCr);
+                    if (!isOk) return;
+                  }
+
+                  // Final check on verification result
+                  final bool isValid = controller.crVerificationResult?['is_valid'] == true &&
+                      controller.crVerificationResult?['is_already_registered'] != true;
+
+                  if (!isValid) {
+                    final msg = controller.crVerificationResult?['message']?.toString() ??
+                        'رقم السجل التجاري غير صالح أو مسجل بالفعل لمتجر آخر';
+                    showCustomSnackBar(msg, isError: true, showDuration: 4);
+                    return;
+                  }
+
                   // Save all current form fields to the active visit model
                   final updatedVisit = currentVisit.copyWith(
                     openingsCount: int.tryParse(controller.openingsController.text) ?? currentVisit.openingsCount,
-                    crNumber: controller.crNumberController.text,
+                    crNumber: cleanCr,
                     managerName: controller.managerNameController.text,
                     phone: controller.phoneController.text,
                     pipelineStep: controller.selectedPipelineStep,
@@ -1627,6 +1763,152 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildLiveTimerCard({
+    required StoreVisitsController controller,
+    required bool isDark,
+    required Color cardBg,
+    required Color borderColor,
+    required Color darkText,
+    required Color subText,
+  }) {
+    final isExtended = controller.isAutoExtended;
+    final remainingMin = controller.remainingMinutes;
+    final isCritical = controller.remainingVisitSeconds <= 0;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isExtended
+            ? (isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9))
+            : cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isExtended
+              ? _primaryGreen.withValues(alpha: 0.6)
+              : borderColor,
+          width: isExtended ? 1.3 : 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: isExtended
+                      ? _primaryGreen.withValues(alpha: 0.18)
+                      : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  isExtended ? Icons.verified_outlined : Icons.timer_outlined,
+                  size: 20,
+                  color: isExtended ? _primaryGreen : (isCritical ? const Color(0xFFEF4444) : _primaryGreen),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isExtended
+                              ? 'auto_visit_extension_success'.tr
+                              : 'visit_timer_title'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isExtended ? _primaryGreen : darkText,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isCritical
+                                ? const Color(0xFFFEE2E2)
+                                : (isExtended ? _primaryGreen.withValues(alpha: 0.2) : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6))),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            isCritical
+                                ? 'max_visit_time_exceeded'.tr
+                                : '${'remaining_visit_time'.tr} $remainingMin ${'minute_unit'.tr}',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: isCritical
+                                  ? const Color(0xFFDC2626)
+                                  : (isExtended ? _primaryGreen : darkText),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      isExtended
+                          ? '${'max_visit_extended_badge'.tr} • ${'elapsed_label'.tr} ${controller.formattedVisitTime}'
+                          : '${'max_visit_duration_hint'.tr} • ${'elapsed_label'.tr} ${controller.formattedVisitTime}',
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 11,
+                        color: subText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (!isExtended) ...[
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF252B37) : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 13, color: subText),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'auto_extension_hint'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 10.5,
+                        color: subText,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

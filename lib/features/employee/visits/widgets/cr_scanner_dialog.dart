@@ -401,13 +401,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                       }
                       Navigator.pop(context);
                     } else {
-                      Get.snackbar(
-                        'تنبيه',
-                        'يرجى إدخال أو مسح رقم السجل أولاً',
-                        backgroundColor: const Color(0xFFEF4444),
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.TOP,
-                      );
+                      showCustomSnackBar('يرجى إدخال أو مسح رقم السجل أولاً', isError: true);
                     }
                   },
                   style: ElevatedButton.styleFrom(
