@@ -36,6 +36,10 @@ class EmployeeShiftController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     loadCurrentShift();
+    // Ping as soon as the app is open, regardless of shift state, so the
+    // admin dashboard can show every marketer who has the app open right
+    // now (colored red/"stopped" until they actually start a shift).
+    _startLocationPing();
   }
 
   @override
@@ -46,26 +50,25 @@ class EmployeeShiftController extends GetxController implements GetxService {
     super.onClose();
   }
 
-  /// Live location: only while the app is open and a shift is active/on break
-  /// (foreground only, no background tracking). Pings every 60s so the admin
-  /// dashboard can show a live map of marketers currently on shift.
-  void _startLocationPing() {
-    _locationPingTimer?.cancel();
-    _locationPingTimer = Timer.periodic(const Duration(seconds: 60), (_) async {
-      try {
-        final pos = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-        );
-        await _service.pingLocation(lat: pos.latitude, lng: pos.longitude);
-      } catch (e) {
-        debugPrint('❌ [EmployeeShiftController] location ping error: $e');
-      }
-    });
+  /// Live location: foreground-only (no background tracking), running the
+  /// whole time this controller is alive (i.e. the app is open) regardless
+  /// of shift state, so the admin dashboard can show every marketer who has
+  /// the app open right now. Pings immediately, then every 60s.
+  Future<void> _sendLocationPingOnce() async {
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+      );
+      await _service.pingLocation(lat: pos.latitude, lng: pos.longitude);
+    } catch (e) {
+      debugPrint('❌ [EmployeeShiftController] location ping error: $e');
+    }
   }
 
-  void _stopLocationPing() {
+  void _startLocationPing() {
     _locationPingTimer?.cancel();
-    _locationPingTimer = null;
+    _sendLocationPingOnce();
+    _locationPingTimer = Timer.periodic(const Duration(seconds: 60), (_) => _sendLocationPingOnce());
   }
 
   /// Load current active shift from server truth
@@ -190,11 +193,9 @@ class EmployeeShiftController extends GetxController implements GetxService {
         if (mappedStatus == ShiftStatus.active || mappedStatus == ShiftStatus.onBreak) {
           _startPolling();
           _startTimer();
-          _startLocationPing();
         } else {
           _stopPolling();
           _tickerTimer?.cancel();
-          _stopLocationPing();
         }
 
         if (notify) update();
@@ -270,7 +271,6 @@ class EmployeeShiftController extends GetxController implements GetxService {
         );
         _startTimer();
         _startPolling();
-        _startLocationPing();
         update();
         loadCurrentShift(notify: true);
         return true;
@@ -359,7 +359,6 @@ class EmployeeShiftController extends GetxController implements GetxService {
       if (res.statusCode == 200) {
         _tickerTimer?.cancel();
         _stopPolling();
-        _stopLocationPing();
         _shiftModel = _shiftModel.copyWith(
           status: ShiftStatus.notStarted,
           actualWorkSeconds: 0,
