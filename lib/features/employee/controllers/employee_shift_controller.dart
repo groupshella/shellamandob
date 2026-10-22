@@ -56,6 +56,21 @@ class EmployeeShiftController extends GetxController implements GetxService {
   /// the app open right now. Pings immediately, then every 60s.
   Future<void> _sendLocationPingOnce() async {
     try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        debugPrint('❌ [EmployeeShiftController] location services disabled');
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        debugPrint('❌ [EmployeeShiftController] location permission not granted: $permission');
+        return;
+      }
+
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
       );
