@@ -118,6 +118,12 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // Crashlytics mapping-file upload makes a DNS lookup that hangs for
+            // hours on this network; test builds don't need deobfuscated crashes.
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
         }
 
         debug {
