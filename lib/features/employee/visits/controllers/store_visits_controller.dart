@@ -9,14 +9,25 @@ import '../models/store_visit_model.dart';
 import '../models/merchant_promo_model.dart';
 import '../models/not_closing_reason.dart';
 import '../../controllers/employee_shift_controller.dart';
+import '../../models/employee_shift_model.dart';
 import '../../alerts/controllers/anti_fraud_alerts_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 
 class StoreVisitsController extends GetxController {
   final ImagePicker _picker = ImagePicker();
 
   // Daily target constants
   static const int dailyTargetVisits = 16;
-  static const int maxVisitMinutes = 30;
+  static const int baseMaxVisitMinutes = 30;
+  static const int autoExtensionMinutes = 30;
+
+  int _extensionMinutes = 0;
+  int get extensionMinutes => _extensionMinutes;
+
+  bool _isAutoExtended = false;
+  bool get isAutoExtended => _isAutoExtended;
+
+  int get maxVisitMinutes => baseMaxVisitMinutes + _extensionMinutes;
 
   // Active filter tab: 0 = الكل, 1 = مجدول, 2 = مكتمل, 3 = متابعة
   int _selectedFilterIndex = 0;
@@ -199,7 +210,8 @@ class StoreVisitsController extends GetxController {
     if (cleanCr.length != 10) {
       crVerificationResult = {
         'is_valid': false,
-        'message': 'رقم السجل التجاري يجب أن يتكون من 10 أرقام',
+        'is_already_registered': false,
+        'message': 'رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة',
       };
       update();
       return;
@@ -217,26 +229,43 @@ class StoreVisitsController extends GetxController {
         );
         if (response.statusCode == 200 && response.body != null) {
           crVerificationResult = Map<String, dynamic>.from(response.body);
+          if (crVerificationResult?['is_already_registered'] == true) {
+            crVerificationResult!['is_valid'] = false;
+            showCustomSnackBar(
+              crVerificationResult!['message'] ?? 'السجل التجاري مسجل بالفعل لمتجر آخر',
+              isError: true,
+              showDuration: 4,
+            );
+          } else {
+            showCustomSnackBar(
+              crVerificationResult!['message'] ?? 'السجل التجاري صالح ومتحقق منه وجاهز للربط',
+              isError: false,
+              showDuration: 2,
+            );
+          }
         } else {
+          final msg = response.body?['message'] ?? 'السجل التجاري مسجل مسبقاً أو غير صالح';
           crVerificationResult = {
-            'is_valid': true,
-            'is_already_registered': false,
-            'message': response.body?['message'] ?? 'السجل التجاري صالح ومتحقق منه',
+            'is_valid': false,
+            'is_already_registered': true,
+            'message': msg,
           };
+          showCustomSnackBar(msg.toString(), isError: true, showDuration: 4);
         }
       } else {
         crVerificationResult = {
           'is_valid': true,
           'is_already_registered': false,
-          'message': 'السجل التجاري صالح ومتحقق منه',
+          'message': 'السجل التجاري صالح ومتحقق منه وجاهز للربط',
         };
       }
     } catch (e) {
       crVerificationResult = {
-        'is_valid': true,
+        'is_valid': false,
         'is_already_registered': false,
-        'message': 'تم التحقق من صيغة السجل التجاري بنجاح',
+        'message': 'تعذر التحقق من السجل التجاري في الوقت الحالي',
       };
+      showCustomSnackBar('تعذر التحقق من السجل التجاري، يرجى المحاولة لاحقاً', isError: true);
     } finally {
       isVerifyingCr = false;
       update();
@@ -453,64 +482,89 @@ class StoreVisitsController extends GetxController {
     update();
   }
 
-  // Start a store visit
-  Future<void> startVisit(StoreVisitModel visit) async {
-    final now = DateTime.now();
-    final startedAt = visit.startedAt ?? now;
-
-    _activeVisit = visit.copyWith(
-      visitStatus: StoreVisitStatus.inProgress,
-      startedAt: startedAt,
-    );
-
-    // Populate controllers
-    storeNameController.text = visit.storeName;
-    managerNameController.text = visit.managerName;
-    phoneController.text = visit.phone;
-    openingsController.text = visit.openingsCount.toString();
-    crNumberController.text = visit.crNumber;
-    _selectedPipelineStep = visit.pipelineStep;
-    _frontImagePath = visit.frontImagePath;
-    _insideImagePath = visit.insideImagePath;
-    final initialObstacle = visit.obstaclesNotes;
-    if (initialObstacle != null && initialObstacle.isNotEmpty) {
-      if (predefinedObstacles.contains(initialObstacle)) {
-        _selectedObstacle = initialObstacle;
-        otherReasonController.clear();
-      } else {
-        _selectedObstacle = 'سبب آخر';
-        otherReasonController.text = initialObstacle;
+  // Validation check before starting any visit
+  bool canStartVisit({bool showWarning = true}) {
+    if (Get.isRegistered<EmployeeShiftController>()) {
+      final shiftCtrl = Get.find<EmployeeShiftController>();
+      if (shiftCtrl.status != ShiftStatus.active) {
+        if (showWarning) {
+          showCustomSnackBar(
+            'يرجى تسجيل الحضور وبدء الدوام الرسمي أولاً من الشاشة الرئيسية لبدء الزيارات الميدانية.',
+            isError: true,
+            showDuration: 4,
+          );
+        }
+        return false;
       }
-      obstaclesController.text = initialObstacle;
-    } else {
-      _selectedObstacle = null;
-      otherReasonController.clear();
-      obstaclesController.clear();
     }
-    _selectedClosingReason = visit.closingReason;
-    reasonNotMetController.clear();
-    reasonRejectedController.clear();
-    reasonDisqualifiedController.clear();
-    confidentialTitleController.clear();
-    _selectedInterestStatus = 'interested';
-    _frontPhotoCapturedTime = visit.frontImagePath != null ? DateTime.now() : null;
-    _insidePhotoCapturedTime = visit.insideImagePath != null ? DateTime.now() : null;
+    return true;
+  }
 
-    final diff = now.difference(startedAt).inSeconds;
-    _elapsedVisitSeconds = diff.clamp(0, maxVisitMinutes * 60);
-    _inactivitySeconds = 0;
-
-    // Update in all visits list immediately
-    final index = _allVisits.indexWhere((v) => v.id == visit.id);
-    if (index != -1) {
-      _allVisits[index] = _activeVisit!;
+  // Start a store visit with exception handling & null safety guards
+  Future<bool> startVisit(StoreVisitModel visit) async {
+    if (!canStartVisit(showWarning: true)) {
+      return false;
     }
 
-    _startVisitTimer();
-    update();
-
-    // Call backend API in background
     try {
+      final now = DateTime.now();
+      final startedAt = visit.startedAt ?? now;
+
+      _activeVisit = visit.copyWith(
+        visitStatus: StoreVisitStatus.inProgress,
+        startedAt: startedAt,
+      );
+
+      // Populate controllers safely
+      storeNameController.text = visit.storeName;
+      managerNameController.text = visit.managerName;
+      phoneController.text = visit.phone;
+      openingsController.text = visit.openingsCount.toString();
+      crNumberController.text = visit.crNumber;
+      _selectedPipelineStep = visit.pipelineStep;
+      _frontImagePath = visit.frontImagePath;
+      _insideImagePath = visit.insideImagePath;
+      final initialObstacle = visit.obstaclesNotes;
+      if (initialObstacle != null && initialObstacle.isNotEmpty) {
+        if (predefinedObstacles.contains(initialObstacle)) {
+          _selectedObstacle = initialObstacle;
+          otherReasonController.clear();
+        } else {
+          _selectedObstacle = 'سبب آخر';
+          otherReasonController.text = initialObstacle;
+        }
+        obstaclesController.text = initialObstacle;
+      } else {
+        _selectedObstacle = null;
+        otherReasonController.clear();
+        obstaclesController.clear();
+      }
+      _selectedClosingReason = visit.closingReason;
+      reasonNotMetController.clear();
+      reasonRejectedController.clear();
+      reasonDisqualifiedController.clear();
+      confidentialTitleController.clear();
+      _selectedInterestStatus = 'interested';
+      _frontPhotoCapturedTime = visit.frontImagePath != null ? DateTime.now() : null;
+      _insidePhotoCapturedTime = visit.insideImagePath != null ? DateTime.now() : null;
+
+      _isAutoExtended = visit.isExtended;
+      _extensionMinutes = visit.extendedMinutes;
+
+      final diff = now.difference(startedAt).inSeconds;
+      _elapsedVisitSeconds = diff.clamp(0, maxVisitMinutes * 60);
+      _inactivitySeconds = 0;
+
+      // Update in all visits list immediately
+      final index = _allVisits.indexWhere((v) => v.id == visit.id);
+      if (index != -1) {
+        _allVisits[index] = _activeVisit!;
+      }
+
+      _startVisitTimer();
+      update();
+
+      // Call backend API with safety check
       if (Get.isRegistered<ApiClient>()) {
         final res = await Get.find<ApiClient>().postData(
           '${AppConstants.marketerVisitsUri}/${visit.id}/start',
@@ -527,10 +581,40 @@ class StoreVisitsController extends GetxController {
               update();
             }
           }
+          showCustomSnackBar(
+            'تم بدء الزيارة بنجاح وتفعيل العداد والموقع',
+            isError: false,
+            showDuration: 2,
+          );
+          return true;
+        } else {
+          // Server error / rejection (e.g. shift not active)
+          final errorMsg = res.body?['message'] ?? 'يجب تسجيل الحضور وبدء الدوام الرسمي أولاً قبل بدء أي زيارة ميدانية.';
+          _visitTimer?.cancel();
+          _activeVisit = null;
+          update();
+          showCustomSnackBar(errorMsg.toString(), isError: true, showDuration: 4);
+          return false;
         }
       }
+
+      showCustomSnackBar(
+        'تم بدء الزيارة بنجاح وتفعيل العداد والموقع',
+        isError: false,
+        showDuration: 2,
+      );
+      return true;
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] startVisit api error: $e');
+      _visitTimer?.cancel();
+      _activeVisit = null;
+      update();
+      showCustomSnackBar(
+        'حدث خطأ غير متوقع أثناء بدء الزيارة. يرجى التأكد من تسجيل الدوام والمحاولة مرة أخرى.',
+        isError: true,
+        showDuration: 4,
+      );
+      return false;
     }
   }
 
@@ -566,6 +650,12 @@ class StoreVisitsController extends GetxController {
     }
     _selectedFollowUpDate = visit.nextFollowUpDate;
     commitmentsController.text = visit.nextFollowUpCommitments ?? '';
+
+    _isAutoExtended = visit.isExtended ||
+        visit.extendedMinutes > 0 ||
+        visit.pipelineStep == StorePipelineStep.negotiating ||
+        visit.pipelineStep == StorePipelineStep.contractSigned;
+    _extensionMinutes = visit.extendedMinutes > 0 ? visit.extendedMinutes : (_isAutoExtended ? autoExtensionMinutes : 0);
 
     final now = DateTime.now();
     final startedAt = visit.startedAt ?? now;
@@ -671,7 +761,68 @@ class StoreVisitsController extends GetxController {
   void setPipelineStep(StorePipelineStep step) {
     _selectedPipelineStep = step;
     registerActivity();
+
+    final isEligibleForAutoExtension = (step == StorePipelineStep.negotiating || step == StorePipelineStep.contractSigned);
+    if (isEligibleForAutoExtension && !_isAutoExtended) {
+      _applyAutoVisitExtension(step);
+    } else {
+      update();
+    }
+  }
+
+  void _applyAutoVisitExtension(StorePipelineStep step) {
+    if (_isAutoExtended) return;
+    _isAutoExtended = true;
+    _extensionMinutes = autoExtensionMinutes;
+
+    if (_activeVisit != null) {
+      _activeVisit = _activeVisit!.copyWith(
+        isExtended: true,
+        extendedMinutes: _extensionMinutes,
+        pipelineStep: step,
+      );
+      final index = _allVisits.indexWhere((v) => v.id == _activeVisit!.id);
+      if (index != -1) {
+        _allVisits[index] = _activeVisit!;
+      }
+
+      _syncExtensionToBackend(step);
+    }
+
+    final message = step == StorePipelineStep.contractSigned
+        ? 'auto_visit_extended_contract'.tr
+        : 'auto_visit_extended_negotiation'.tr;
+
+    Get.showSnackbar(GetSnackBar(
+      message: message,
+      duration: const Duration(seconds: 4),
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: const Color(0xFF163E20),
+      borderRadius: 12,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      icon: const Icon(Icons.timer_outlined, color: Color(0xFF30913F)),
+      shouldIconPulse: true,
+    ));
+
     update();
+  }
+
+  void _syncExtensionToBackend(StorePipelineStep step) async {
+    if (_activeVisit == null) return;
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        await Get.find<ApiClient>().postData(
+          '${AppConstants.marketerVisitsUri}/${_activeVisit!.id}/extend',
+          {
+            'extended_minutes': autoExtensionMinutes,
+            'reason': step.name,
+            'pipeline_step': step.name,
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] syncExtension error: $e');
+    }
   }
 
   void setFollowUpDate(DateTime date) {
@@ -885,7 +1036,7 @@ class StoreVisitsController extends GetxController {
     // Call backend API and await
     try {
       if (Get.isRegistered<ApiClient>()) {
-        await Get.find<ApiClient>().postData(
+        final res = await Get.find<ApiClient>().postData(
           '${AppConstants.marketerVisitsUri}/$finishedVisitId/complete',
           {
             'store_name': updated.storeName,
@@ -902,15 +1053,29 @@ class StoreVisitsController extends GetxController {
             'front_image': updated.frontImagePath,
             'inside_image': updated.insideImagePath,
             'is_qualified': updated.isQualifiedOutcome,
+            'is_extended': updated.isExtended,
+            'extended_minutes': updated.extendedMinutes,
             if (isFollowUpNeeded && updated.nextFollowUpDate != null)
               'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
             if (isFollowUpNeeded)
               'next_follow_up_commitments': updated.nextFollowUpCommitments,
           },
         );
+
+        if (res.statusCode == 200) {
+          showCustomSnackBar(
+            'تم توثيق وإنهاء الزيارة بنجاح ومزامنتها مع الإدارة',
+            isError: false,
+            showDuration: 2,
+          );
+        } else {
+          final errorMsg = res.body?['message'] ?? 'حدث خطأ أثناء توثيق الزيارة في الخادم';
+          showCustomSnackBar(errorMsg.toString(), isError: true, showDuration: 4);
+        }
       }
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] completeVisit api error: $e');
+      showCustomSnackBar('تعذر الاتصال بالخادم، تم حفظ البيانات محلياً', isError: true);
     }
 
     // Update main shift metrics if controller exists

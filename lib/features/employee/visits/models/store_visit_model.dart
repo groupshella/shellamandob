@@ -93,6 +93,8 @@ class StoreVisitModel {
   final String? contractSignaturePath;
   final bool onboardingCompleted;
   final int durationMinutes;
+  final bool isExtended;
+  final int extendedMinutes;
   final DateTime? startedAt;
   final DateTime? completedAt;
 
@@ -125,6 +127,8 @@ class StoreVisitModel {
     this.contractSignaturePath,
     this.onboardingCompleted = false,
     this.durationMinutes = 0,
+    this.isExtended = false,
+    this.extendedMinutes = 0,
     this.startedAt,
     this.completedAt,
   });
@@ -158,6 +162,8 @@ class StoreVisitModel {
     String? contractSignaturePath,
     bool? onboardingCompleted,
     int? durationMinutes,
+    bool? isExtended,
+    int? extendedMinutes,
     DateTime? startedAt,
     DateTime? completedAt,
   }) {
@@ -190,6 +196,8 @@ class StoreVisitModel {
       contractSignaturePath: contractSignaturePath ?? this.contractSignaturePath,
       onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
       durationMinutes: durationMinutes ?? this.durationMinutes,
+      isExtended: isExtended ?? this.isExtended,
+      extendedMinutes: extendedMinutes ?? this.extendedMinutes,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
     );
@@ -280,6 +288,16 @@ class StoreVisitModel {
       confidentialNotes: json['confidential_notes']?.toString(),
       contractSignaturePath: json['contract_signature_path']?.toString(),
       durationMinutes: int.tryParse('${json['duration_minutes']}') ?? 0,
+      isExtended: json['is_extended'] == 1 ||
+          json['is_extended'] == true ||
+          step == StorePipelineStep.negotiating ||
+          step == StorePipelineStep.contractSigned,
+      extendedMinutes: int.tryParse('${json['extended_minutes']}') ??
+          (json['is_extended'] == 1 || json['is_extended'] == true ||
+                  step == StorePipelineStep.negotiating ||
+                  step == StorePipelineStep.contractSigned
+              ? 30
+              : 0),
       startedAt: json['started_at'] != null ? DateTime.tryParse('${json['started_at']}') : null,
       completedAt: json['completed_at'] != null ? DateTime.tryParse('${json['completed_at']}') : null,
     );

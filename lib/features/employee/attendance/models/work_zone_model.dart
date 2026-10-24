@@ -1,3 +1,9 @@
+class WorkZonePolygonPoint {
+  final double latitude;
+  final double longitude;
+  const WorkZonePolygonPoint(this.latitude, this.longitude);
+}
+
 class WorkZoneModel {
   final int id;
   final String name;
@@ -6,6 +12,8 @@ class WorkZoneModel {
   final double latitude;
   final double longitude;
   final double radiusMeters;
+  final bool isAvailable;
+  final List<WorkZonePolygonPoint> polygon;
 
   const WorkZoneModel({
     required this.id,
@@ -15,6 +23,8 @@ class WorkZoneModel {
     this.latitude = 24.7136,
     this.longitude = 46.6753,
     this.radiusMeters = 1000,
+    this.isAvailable = true,
+    this.polygon = const [],
   });
 
   WorkZoneModel copyWith({
@@ -25,6 +35,8 @@ class WorkZoneModel {
     double? latitude,
     double? longitude,
     double? radiusMeters,
+    bool? isAvailable,
+    List<WorkZonePolygonPoint>? polygon,
   }) {
     return WorkZoneModel(
       id: id ?? this.id,
@@ -34,11 +46,38 @@ class WorkZoneModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       radiusMeters: radiusMeters ?? this.radiusMeters,
+      isAvailable: isAvailable ?? this.isAvailable,
+      polygon: polygon ?? this.polygon,
     );
   }
 
+  /// Centroid of the polygon (simple average), used to center the map when
+  /// the zone has a real polygon but no explicit lat/lng.
+  double get polygonCenterLat =>
+      polygon.isEmpty ? latitude : polygon.map((p) => p.latitude).reduce((a, b) => a + b) / polygon.length;
+  double get polygonCenterLng =>
+      polygon.isEmpty ? longitude : polygon.map((p) => p.longitude).reduce((a, b) => a + b) / polygon.length;
+
   factory WorkZoneModel.fromJson(Map<String, dynamic> json, {int? lockedZoneId}) {
     final int id = int.tryParse('${json['id']}') ?? 0;
+
+    List<WorkZonePolygonPoint> parsedPolygon = const [];
+    final rawPolygon = json['polygon'];
+    if (rawPolygon is Map && rawPolygon['type'] == 'Polygon') {
+      final coords = rawPolygon['coordinates'];
+      if (coords is List && coords.isNotEmpty && coords.first is List) {
+        // GeoJSON order is [lng, lat] -> flip to LatLng(lat, lng).
+        parsedPolygon = (coords.first as List)
+            .whereType<List>()
+            .where((pt) => pt.length >= 2)
+            .map((pt) => WorkZonePolygonPoint(
+                  double.tryParse('${pt[1]}') ?? 0,
+                  double.tryParse('${pt[0]}') ?? 0,
+                ))
+            .toList();
+      }
+    }
+
     return WorkZoneModel(
       id: id,
       name: (json['name'] ?? json['zone_name'] ?? 'منطقة $id').toString(),
@@ -47,6 +86,8 @@ class WorkZoneModel {
       latitude: double.tryParse('${json['latitude'] ?? json['lat'] ?? 24.6500}') ?? 24.6500,
       longitude: double.tryParse('${json['longitude'] ?? json['lng'] ?? 46.6000}') ?? 46.6000,
       radiusMeters: double.tryParse('${json['radius_meters'] ?? json['radius'] ?? 1200}') ?? 1200,
+      isAvailable: json['is_available'] is bool ? json['is_available'] as bool : true,
+      polygon: parsedPolygon,
     );
   }
 
@@ -59,6 +100,7 @@ class WorkZoneModel {
       'latitude': latitude,
       'longitude': longitude,
       'radius_meters': radiusMeters,
+      'is_available': isAvailable,
     };
   }
 

@@ -85,7 +85,7 @@ class PeriodProductivityView extends StatelessWidget {
                 innerBorderColor,
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 96),
             ],
           ),
         );

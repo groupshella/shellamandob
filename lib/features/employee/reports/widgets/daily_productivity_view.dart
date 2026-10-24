@@ -49,7 +49,7 @@ class DailyProductivityView extends StatelessWidget {
               // 5. Upcoming Follow-ups (المتابعات القادمة)
               _buildUpcomingFollowUpsSection(data.upcomingFollowUps, cardBg, borderColor, textColor, subTextColor, innerItemBg),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 96),
             ],
           ),
         );

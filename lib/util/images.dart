@@ -590,7 +590,7 @@ class Images {
   static const String status_up = 'assets/image/status-up.png';
   static const String message_question = 'assets/image/message-question.png';
   static const String messages_v2 = 'assets/image/messages_v2.png';
-  static const String navProfileActive = 'assets/image/profile_v2_active.png';
+  static const String navProfileActiv = 'assets/image/profile_v2_active.png';
   static const String no_favourit = 'assets/image/no_favourit.png';
   static const String edit_avatar = 'assets/image/edit_avatar.png';
   static const String active_navbag = 'assets/image/active_navbag.png';
@@ -623,4 +623,16 @@ class Images {
   static const String quidhaWalletIcon = 'assets/image/quidha_wallet.png';
   static const String receiptAddIcon = 'assets/image/receipt-add.png';
   static const String archive = 'assets/image/archive.png';
+
+  // Figma Bottom Navigation Bar (Same navbar component - identical to Captain App)
+  static const String navHomeActive = 'assets/image/nav_home_active.png';
+  static const String navHomeInactive = 'assets/image/nav_home_inactive.png';
+  static const String navBoxActive = 'assets/image/nav_box_active.png';
+  static const String navBoxInactive = 'assets/image/nav_box_inactive.png';
+  static const String navReceiptActive = 'assets/image/nav_receipt_active.png';
+  static const String navReceiptInactive = 'assets/image/nav_receipt_inactive.png';
+  static const String navQrActive = 'assets/image/nav_qr_active.png';
+  static const String navQrInactive = 'assets/image/nav_qr_inactive.png';
+  static const String navProfileActive = 'assets/image/nav_profile_active.png';
+  static const String navProfileInactive = 'assets/image/nav_profile_inactive.png';
 }

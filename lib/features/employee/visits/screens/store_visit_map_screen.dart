@@ -651,8 +651,11 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                         controller.resumeVisit(visit);
                         Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: false));
                       } else {
-                        controller.startVisit(visit);
-                        Get.to(() => ActiveStoreVisitScreen(visit: visit));
+                        controller.startVisit(visit).then((success) {
+                          if (success) {
+                            Get.to(() => ActiveStoreVisitScreen(visit: visit));
+                          }
+                        });
                       }
                     },
                     style: ElevatedButton.styleFrom(

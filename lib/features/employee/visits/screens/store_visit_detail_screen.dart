@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'contract_signing_screen.dart';
@@ -41,7 +42,23 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
         final controller = Get.find<StoreVisitsController>();
         if (!widget.isReadOnly && widget.visit.visitStatus != StoreVisitStatus.completed) {
           if (controller.activeVisit?.id != widget.visit.id) {
-            controller.startVisit(widget.visit);
+            if (controller.canStartVisit(showWarning: false)) {
+              controller.startVisit(widget.visit);
+            } else {
+              // Populate fields safely without starting timer
+              controller.storeNameController.text = widget.visit.storeName;
+              controller.managerNameController.text = widget.visit.managerName;
+              controller.phoneController.text = widget.visit.phone;
+              controller.openingsController.text = widget.visit.openingsCount.toString();
+              controller.crNumberController.text = widget.visit.crNumber;
+              controller.obstaclesController.text = widget.visit.obstaclesNotes ?? '';
+              controller.confidentialNotesController.text = widget.visit.confidentialNotes ?? '';
+              showCustomSnackBar(
+                'يرجى تسجيل بدء الدوام أولاً من الشاشة الرئيسية لتفعيل توثيق الزيارة والعداد.',
+                isError: true,
+                showDuration: 4,
+              );
+            }
           }
         } else {
           // Read-only viewing: populate fields without overriding active visit timer

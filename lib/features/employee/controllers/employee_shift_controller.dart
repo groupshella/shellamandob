@@ -23,6 +23,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
 
   Timer? _tickerTimer;
   Timer? _pollingTimer;
+  Timer? _locationPingTimer;
 
   MarketerShiftService get _service {
     if (Get.isRegistered<MarketerShiftService>()) {
@@ -35,13 +36,54 @@ class EmployeeShiftController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     loadCurrentShift();
+    // Ping as soon as the app is open, regardless of shift state, so the
+    // admin dashboard can show every marketer who has the app open right
+    // now (colored red/"stopped" until they actually start a shift).
+    _startLocationPing();
   }
 
   @override
   void onClose() {
     _tickerTimer?.cancel();
     _pollingTimer?.cancel();
+    _locationPingTimer?.cancel();
     super.onClose();
+  }
+
+  /// Live location: foreground-only (no background tracking), running the
+  /// whole time this controller is alive (i.e. the app is open) regardless
+  /// of shift state, so the admin dashboard can show every marketer who has
+  /// the app open right now. Pings immediately, then every 60s.
+  Future<void> _sendLocationPingOnce() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        debugPrint('❌ [EmployeeShiftController] location services disabled');
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        debugPrint('❌ [EmployeeShiftController] location permission not granted: $permission');
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+      );
+      await _service.pingLocation(lat: pos.latitude, lng: pos.longitude);
+    } catch (e) {
+      debugPrint('❌ [EmployeeShiftController] location ping error: $e');
+    }
+  }
+
+  void _startLocationPing() {
+    _locationPingTimer?.cancel();
+    _sendLocationPingOnce();
+    _locationPingTimer = Timer.periodic(const Duration(seconds: 60), (_) => _sendLocationPingOnce());
   }
 
   /// Load current active shift from server truth

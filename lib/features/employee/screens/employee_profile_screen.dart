@@ -172,7 +172,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       isDark: isDark,
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 96),
                   ],
                 ),
               ),

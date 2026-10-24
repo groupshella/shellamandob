@@ -231,6 +231,7 @@ class AppConstants {
   static const String marketerShiftEndUri = '/api/v1/customer/marketer/shift/end';
   static const String marketerShiftCurrentUri = '/api/v1/customer/marketer/shift/current';
   static const String marketerShiftHistoryUri = '/api/v1/customer/marketer/shift/history';
+  static const String marketerLocationPingUri = '/api/v1/customer/marketer/location/ping';
   static const String marketerDashboardUri = '/api/v1/customer/marketer/dashboard';
   static const String marketerApplyUri = '/api/v1/customer/marketer/apply';
   static const String marketerVisitsUri = '/api/v1/customer/marketer/visits';
