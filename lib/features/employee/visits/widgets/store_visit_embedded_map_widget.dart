@@ -96,7 +96,7 @@ class StoreVisitEmbeddedMapWidget extends StatelessWidget {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  visit.address.isNotEmpty ? visit.address : 'موقع المتجر المحدد',
+                                  visit.address.isNotEmpty ? visit.address : 'specified_store_location'.tr,
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 11,
@@ -126,11 +126,11 @@ class StoreVisitEmbeddedMapWidget extends StatelessWidget {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.fullscreen_rounded, size: 16, color: Colors.white),
-                              SizedBox(width: 4),
+                            children: [
+                              const Icon(Icons.fullscreen_rounded, size: 16, color: Colors.white),
+                              const SizedBox(width: 4),
                               Text(
-                                'الخريطة الكاملة',
+                                'full_map'.tr,
                                 style: TextStyle(
                                   fontFamily: 'Tajawal',
                                   fontSize: 11,

@@ -30,7 +30,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     Get.find<NotificationController>().getNotificationList(true);
   }
 
-  bool get _isArabic => Get.locale?.languageCode == 'ar';
 
   Future<void> _refresh() async {
     await Get.find<NotificationController>().getNotificationList(true);
@@ -56,7 +55,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               size: 20, color: Theme.of(context).textTheme.bodyLarge?.color),
           onPressed: () => Get.back<void>(),
         ),
-        title: Text(_isArabic ? 'الإشعارات' : 'Notifications',
+        title: Text('notification'.tr,
             style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
         actions: [
           GetBuilder<NotificationController>(builder: (c) {
@@ -65,7 +64,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             return TextButton(
               onPressed: () => _markAllRead(c),
               child: Text(
-                _isArabic ? 'تحديد الكل كمقروء' : 'Mark all read',
+                'mark_all_read'.tr,
                 style: robotoMedium.copyWith(
                     color: Theme.of(context).primaryColor,
                     fontSize: Dimensions.fontSizeSmall),
@@ -100,9 +99,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               const SizedBox(height: Dimensions.paddingSizeLarge),
               Center(
                 child: Text(
-                  _isArabic
-                      ? 'لا يوجد لديك إشعارات\nفي الوقت الحالي'
-                      : 'You have no notifications\nat the moment',
+                  'no_notifications_title'.tr,
                   textAlign: TextAlign.center,
                   style: robotoBold.copyWith(
                       fontSize: Dimensions.fontSizeLarge, height: 1.5),
@@ -185,13 +182,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
     String label(String key) {
       switch (key) {
         case 'today':
-          return _isArabic ? 'اليوم' : 'Today';
+          return 'time_bucket_today'.tr;
         case 'week':
-          return _isArabic ? 'هذا الأسبوع' : 'This week';
+          return 'time_bucket_week'.tr;
         case 'month':
-          return _isArabic ? 'هذا الشهر' : 'This month';
+          return 'time_bucket_month'.tr;
         default:
-          return _isArabic ? 'أقدم' : 'Older';
+          return 'time_bucket_older'.tr;
       }
     }
 

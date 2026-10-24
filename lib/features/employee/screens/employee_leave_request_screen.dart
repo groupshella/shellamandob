@@ -161,7 +161,7 @@ class _EmployeeLeaveRequestScreenState
       _showSuccessToast();
     } else {
       Get.rawSnackbar(
-        message: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى',
+        message: 'leave_request_error'.tr,
         backgroundColor: const Color(0xFFDC2626),
       );
     }
@@ -552,7 +552,7 @@ class _EmployeeLeaveRequestScreenState
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'برجاء التأكد أن الحد أقصى 5 ميجا pdf, jpg, png',
+                    'max_attachment_size_notice'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 11,

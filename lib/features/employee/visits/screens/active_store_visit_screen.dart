@@ -239,7 +239,7 @@ class ActiveStoreVisitScreen extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  visit.address.isNotEmpty ? visit.address : 'لم يتم تحديد العنوان',
+                  visit.address.isNotEmpty ? visit.address : 'not_specified_address'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
@@ -261,12 +261,12 @@ class ActiveStoreVisitScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.map_rounded, size: 13, color: Colors.white),
-                      SizedBox(width: 4),
+                    children: [
+                      const Icon(Icons.map_rounded, size: 13, color: Colors.white),
+                      const SizedBox(width: 4),
                       Text(
-                        'خريطة المتجر',
-                        style: TextStyle(
+                        'store_map_label'.tr,
+                        style: const TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,

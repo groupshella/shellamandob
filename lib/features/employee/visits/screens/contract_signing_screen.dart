@@ -43,7 +43,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   Timer? _pollTimer;
   int _waitingSecondsRemaining = 90;
   bool _isCheckingStatus = false;
-  String _statusMessage = 'بانتظار قيام التاجر بفتح تطبيق نفاذ واختيار الرقم لتأكيد الهوية...';
+  String _statusMessage = 'waiting_merchant_nafath_open'.tr;
   String? _errorMessage;
 
   @override
@@ -116,7 +116,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
       _currentStage = ContractFlowStage.waiting;
       _waitingSecondsRemaining = 90;
       _isCheckingStatus = false;
-      _statusMessage = 'بانتظار قيام التاجر بفتح تطبيق نفاذ وتأكيد الرقم ($_nafathCode)...';
+      _statusMessage = 'waiting_merchant_nafath_code'.trParams({'code': _nafathCode});
     });
 
     // Realistic countdown timer (every 1 second)
@@ -131,7 +131,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
         _pollTimer?.cancel();
         setState(() {
           _waitingSecondsRemaining = 0;
-          _errorMessage = 'انتهت مهلة التحقق عبر نفاذ دون استلام تأكيد من التاجر.';
+          _errorMessage = 'nafath_timeout_no_confirmation'.tr;
           _currentStage = ContractFlowStage.failed;
         });
       }
@@ -172,7 +172,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
             if (mounted) {
               setState(() {
                 _isCheckingStatus = false;
-                _errorMessage = 'تم رفض طلب التوثيق من قبل التاجر أو منصة نفاذ.';
+                _errorMessage = 'nafath_rejected_by_merchant'.tr;
                 _currentStage = ContractFlowStage.failed;
               });
             }
@@ -181,7 +181,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
             // Still pending in Nafath
             if (mounted && isManual) {
               setState(() {
-                _statusMessage = 'الطلب ما زال قيد الانتظار في تطبيق نفاذ برمز ($_nafathCode). يرجى تذكير التاجر بالموافقة.';
+                _statusMessage = 'nafath_still_waiting'.trParams({'code': _nafathCode});
               });
             }
           }
@@ -830,7 +830,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'رقم التحقق في نفاذ: ',
+                    'nafath_verification_number'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 14,
@@ -873,7 +873,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                 const Icon(Icons.timer_outlined, size: 16, color: _primaryGreen),
                 const SizedBox(width: 6),
                 Text(
-                  'الوقت المتبقي: $_waitingSecondsRemaining ثانية',
+                  'remaining_time_seconds'.trParams({'seconds': '$_waitingSecondsRemaining'}),
                   style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 14,
@@ -940,7 +940,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                       )
                     : const Icon(Icons.refresh_rounded, size: 20, color: Colors.white),
                 label: Text(
-                  _isCheckingStatus ? 'جاري الفحص...' : 'فحص حالة التوثيق الآن',
+                  _isCheckingStatus ? 'checking_status'.tr : 'check_nafath_status_now'.tr,
                   style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 15,
@@ -992,8 +992,8 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
             TextButton.icon(
               onPressed: _applyContractSuccess,
               icon: const Icon(Icons.verified_outlined, size: 16, color: Color(0xFF10B981)),
-              label: const Text(
-                'محاكاة موافقة التاجر في نفاذ (اختبار سريع)',
+              label: Text(
+                'quick_test_simulate_nafath'.tr,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 12,
@@ -1158,7 +1158,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
               const SizedBox(height: 10),
 
               Text(
-                _errorMessage ?? 'تعذر إتمام المصادقة عبر نفاذ في الوقت المحدد. يرجى إعادة المحاولة.',
+                _errorMessage ?? 'nafath_timeout_retry'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Tajawal',

@@ -324,7 +324,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'موقع المتجر على الخريطة',
+                                  'store_location_on_map'.tr,
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 13,
@@ -343,11 +343,11 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
-                                  children: const [
-                                    Icon(Icons.open_in_full_rounded, size: 13, color: Color(0xFF30913F)),
-                                    SizedBox(width: 4),
+                                  children: [
+                                    const Icon(Icons.open_in_full_rounded, size: 13, color: Color(0xFF30913F)),
+                                    const SizedBox(width: 4),
                                     Text(
-                                      'تكبير الخريطة',
+                                      'expand_map'.tr,
                                       style: TextStyle(
                                         fontFamily: 'Tajawal',
                                         fontSize: 11,

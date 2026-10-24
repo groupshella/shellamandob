@@ -966,8 +966,8 @@ class _DeliveryManRegistrationScreenState
                                                                   .paddingSizeExtraSmall),
                                                         ),
                                                         items: zoneList,
-                                                        child: const Text(
-                                                            'أختر العنوان'),
+                                                        child: Text(
+                                                            'select_address_dm'.tr),
                                                       ),
                                                     )
                                                   : const Center(
@@ -1033,15 +1033,15 @@ class _DeliveryManRegistrationScreenState
                                                                   .paddingSizeExtraSmall),
                                                         ),
                                                         items: vehicleList,
-                                                        child: const Text(
-                                                            'وسيلة التوصيل'),
+                                                        child: Text(
+                                                            'delivery_vehicle'.tr),
                                                       ),
                                                     )
                                                   : deliverymanRegistrationController
                                                               .vehicles !=
                                                           null
                                                       ? Text(
-                                                          'لا توجد مركبات متاحة',
+                                                          'no_vehicles_available_dm'.tr,
                                                           style: robotoRegular.copyWith(
                                                               color: Theme.of(context)
                                                                   .colorScheme

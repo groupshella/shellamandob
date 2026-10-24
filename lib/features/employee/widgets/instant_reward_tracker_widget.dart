@@ -71,7 +71,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'مكافآت اليوم:',
+                        'today_rewards_colon'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 13,
@@ -81,7 +81,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        '${controller.todayEarnings.toStringAsFixed(0)} ر.س',
+                        '${controller.todayEarnings.toStringAsFixed(0)} ${'sar_currency_symbol'.tr}',
                         style: const TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 13.5,
@@ -106,7 +106,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                           ),
                         ),
                         child: Text(
-                          'عقود: ${controller.todayContractsCount}',
+                          '${'contracts'.tr}: ${controller.todayContractsCount}',
                           style: const TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 11,
@@ -126,7 +126,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                           ),
                         ),
                         child: Text(
-                          'تفعيل: ${controller.todayQaidhaCount}',
+                          '${'activation'.tr}: ${controller.todayQaidhaCount}',
                           style: const TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 11,
@@ -191,7 +191,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'عداد مكافآت التأسيس الفورية',
+                            'instant_establishment_rewards_counter'.tr,
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 15,
@@ -201,7 +201,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'تحديث لحظي ومباشر مع كل تعاقد وتفعيل',
+                            'realtime_update_notice'.tr,
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 11,
@@ -270,7 +270,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'أرباح ومكافآت اليوم',
+                          'today_earnings_and_rewards'.tr,
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 12,
@@ -294,7 +294,7 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'ر.س',
+                              'sar_currency_symbol'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
@@ -323,8 +323,8 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                             ),
                           ),
                           const SizedBox(width: 6),
-                          const Text(
-                            'مباشر',
+                          Text(
+                            'direct_badge'.tr,
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 11,
@@ -347,10 +347,10 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                   Expanded(
                     child: _buildRewardSubCard(
                       dark: dark,
-                      title: 'توقيع العقد',
-                      rate: '+${controller.contractSigningReward.toStringAsFixed(0)} ر.س',
+                      title: 'contract_signing_task'.tr,
+                      rate: '+${controller.contractSigningReward.toStringAsFixed(0)} ${'sar_currency_symbol'.tr}',
                       count: controller.todayContractsCount,
-                      countLabel: 'عقد اليوم',
+                      countLabel: 'contracts_today'.tr,
                       icon: IconlyLight.document,
                       accentColor: const Color(0xFF2563EB),
                     ),
@@ -361,10 +361,10 @@ class _InstantRewardTrackerWidgetState extends State<InstantRewardTrackerWidget>
                   Expanded(
                     child: _buildRewardSubCard(
                       dark: dark,
-                      title: 'تفعيل قيدها / عروض',
-                      rate: '+${controller.qaidhaActivationReward.toStringAsFixed(0)} ر.س',
+                      title: 'qaidha_activation_task'.tr,
+                      rate: '+${controller.qaidhaActivationReward.toStringAsFixed(0)} ${'sar_currency_symbol'.tr}',
                       count: controller.todayQaidhaCount,
-                      countLabel: 'تفعيل اليوم',
+                      countLabel: 'activations_today'.tr,
                       icon: IconlyLight.discount,
                       accentColor: const Color(0xFFD97706),
                     ),

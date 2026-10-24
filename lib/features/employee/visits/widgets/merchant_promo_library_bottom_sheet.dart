@@ -88,7 +88,7 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
                             const Icon(Icons.local_offer_rounded, size: 20, color: _primaryGreen),
                             const SizedBox(width: 8),
                             Text(
-                              'مكتبة العروض الجاهزة للتاجر',
+                              'merchant_promo_library'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
@@ -100,7 +100,7 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'عروض حصرية لدعم إغلاق التعاقد مع: $storeName',
+                          'promo_library_exclusive_subtitle'.trParams({'store': storeName}),
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 12,
@@ -130,7 +130,7 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Center(
                     child: Text(
-                      'لا توجد عروض متاحة حالياً',
+                      'no_promos_available_now'.tr,
                       style: TextStyle(fontFamily: 'Tajawal', color: subText),
                     ),
                   ),
@@ -161,8 +161,8 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
                           );
                           if (success) {
                             Get.snackbar(
-                              'تم تفعيل العرض بنجاح',
-                              'تم ربط عرض (${promo.titleAr}) بمتجر $storeName',
+                              'promo_activated_success'.tr,
+                              'promo_linked_to_store'.trParams({'promo': promo.titleAr, 'store': storeName}),
                               backgroundColor: const Color(0xFFE8F5E9),
                               colorText: _primaryGreen,
                               snackPosition: SnackPosition.TOP,
@@ -290,7 +290,7 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    isActivated ? 'تم تفعيل العرض للمتجر ✓' : 'تفعيل العرض للمتجر الآن',
+                    isActivated ? '${'promo_activated_for_store'.tr} ✓' : 'activate_promo_for_store_now'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 13,

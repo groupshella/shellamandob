@@ -38,8 +38,8 @@ class NotificationNavigationHelper {
         Get.find<EmployeeNavigationController>().changeIndex(1);
       }
       _showDetailDialog(
-        title: title.isNotEmpty ? title : 'تحديث النطاق الجغرافي',
-        description: desc.isNotEmpty ? desc : 'تم تحديث نطاق عملك الميداني من قبل الإدارة.',
+        title: title.isNotEmpty ? title : 'zone_update'.tr,
+        description: desc.isNotEmpty ? desc : 'zone_updated_by_admin'.tr,
         icon: Icons.map_outlined,
         iconColor: const Color(0xFF30913F),
       );
@@ -49,7 +49,7 @@ class NotificationNavigationHelper {
     // 2. Recommendations from Admin
     if (type == 'recommendation' || has(['توصية', 'توصيه', 'توجيه'])) {
       _showDetailDialog(
-        title: title.isNotEmpty ? title : 'توصية إدارية',
+        title: title.isNotEmpty ? title : 'admin_recommendation'.tr,
         description: desc,
         icon: Icons.tips_and_updates_outlined,
         iconColor: const Color(0xFF2F73C8),
@@ -60,7 +60,7 @@ class NotificationNavigationHelper {
     // 3. Warnings / Alerts
     if (type == 'warning' || type == 'alert' || has(['إنذار', 'انذار', 'تنبيه', 'مخالفة'])) {
       _showDetailDialog(
-        title: title.isNotEmpty ? title : 'تنبيه إداري',
+        title: title.isNotEmpty ? title : 'admin_alert'.tr,
         description: desc,
         icon: Icons.warning_amber_rounded,
         iconColor: const Color(0xFFD64545),
@@ -94,7 +94,7 @@ class NotificationNavigationHelper {
     // 6. Generic Detail Dialog for other notifications
     if (title.isNotEmpty || desc.isNotEmpty) {
       _showDetailDialog(
-        title: title.isNotEmpty ? title : 'إشعار',
+        title: title.isNotEmpty ? title : 'notification'.tr,
         description: desc,
         icon: Icons.notifications_outlined,
         iconColor: const Color(0xFF30913F),
@@ -161,8 +161,8 @@ class NotificationNavigationHelper {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onPressed: () => Get.back<void>(),
-                  child: const Text(
-                    'إغلاق',
+                  child: Text(
+                    'close'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 15,

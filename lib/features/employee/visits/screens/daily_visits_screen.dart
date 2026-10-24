@@ -444,7 +444,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  visit.address.isNotEmpty ? visit.address : 'لم يتم تحديد العنوان',
+                                  visit.address.isNotEmpty ? visit.address : 'not_specified_address'.tr,
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 12,
@@ -478,7 +478,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                                       Icon(Icons.map_rounded, size: 12, color: _primaryGreen),
                                       const SizedBox(width: 3),
                                       Text(
-                                        'الخريطة والتتبع',
+                                        'map_and_tracking'.tr,
                                         style: TextStyle(
                                           fontFamily: 'Tajawal',
                                           fontSize: 10,

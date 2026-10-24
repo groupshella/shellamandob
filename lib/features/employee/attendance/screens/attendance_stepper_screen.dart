@@ -270,7 +270,7 @@ class AttendanceStepperScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'continue_label'.tr.isNotEmpty ? 'continue_label'.tr : 'continue'.tr,
+                  'continue_label'.tr,
                   style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,
@@ -482,7 +482,7 @@ class AttendanceStepperScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'continue_label'.tr.isNotEmpty ? 'continue_label'.tr : 'continue'.tr,
+                  'continue_label'.tr,
                   style: const TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 16,

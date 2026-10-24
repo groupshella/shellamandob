@@ -28,13 +28,13 @@ class Succsessflycreated extends StatelessWidget {
             Image.asset(Images.logo, height: size.height / 4),
             SizedBox(height: size_16(context)),
             Text(
-              'تم إنشاء الحساب بنجاح',
+              'account_created_successfully'.tr,
               style: font18Green500W(context),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: size_16(context)),
             Text(
-              'يمكنك تصفح التطبيق الــآن مع اخر العروض والخصومات',
+              'browse_app_with_offers'.tr,
               style: font14Grey400W(context),
               textAlign: TextAlign.center,
             ),

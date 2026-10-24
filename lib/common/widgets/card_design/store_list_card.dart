@@ -202,7 +202,7 @@ class StoreListCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Flexible(
                           child: Text(
-                            '$deliveryTime دقيقة',
+                            '$deliveryTime ${'min'.tr}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             softWrap: false,
@@ -268,8 +268,8 @@ class StoreListCard extends StatelessWidget {
   /// Returns null when unknown (0 / no coordinates) so nothing is shown.
   static String? _distanceText(double metres) {
     if (metres <= 0) return null;
-    if (metres < 1000) return '${metres.round()} م';
-    return '${(metres / 1000).toStringAsFixed(1)} كم';
+    if (metres < 1000) return '${metres.round()} ${'meter_short'.tr}';
+    return '${(metres / 1000).toStringAsFixed(1)} ${'km_short'.tr}';
   }
 
   /// "خصم 45% على 250" (percent) or "خصم 45 على 250" (amount). The "على {min}"

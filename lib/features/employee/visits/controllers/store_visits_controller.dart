@@ -275,7 +275,7 @@ class StoreVisitsController extends GetxController {
         'is_already_registered': false,
         'message': 'تعذر التحقق من السجل التجاري في الوقت الحالي',
       };
-      showCustomSnackBar('تعذر التحقق من السجل التجاري، يرجى المحاولة لاحقاً', isError: true);
+      showCustomSnackBar('cr_verification_failed_try_later'.tr, isError: true);
       return false;
     } finally {
       isVerifyingCr = false;
@@ -693,7 +693,7 @@ class StoreVisitsController extends GetxController {
       if (!AntiFraudAlertsController.disableInactivityAlertsInTest) {
         if (_inactivitySeconds == inactivityThresholdSeconds) {
           addAlertLog(
-            title: 'تنبيه أول',
+            title: 'first_warning'.tr,
             time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
             level: 1,
           );
@@ -703,7 +703,7 @@ class StoreVisitsController extends GetxController {
           _syncAlertToBackend(1, 'تنبيه أول', 'يبدو أنك لم تتحرك نحو المتجر المستهدف');
         } else if (_inactivitySeconds == inactivityThresholdSeconds + 180) { // +3 min
           addAlertLog(
-            title: 'تنبيه ثاني',
+            title: 'second_warning'.tr,
             time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
             level: 2,
           );
@@ -713,7 +713,7 @@ class StoreVisitsController extends GetxController {
           _syncAlertToBackend(2, 'تنبيه ثاني', 'لم يتم رصد تقدم كافٍ نحو المتجر');
         } else if (_inactivitySeconds == inactivityThresholdSeconds + 360) { // +6 min
           addAlertLog(
-            title: 'تنبيه ثالث',
+            title: 'third_warning'.tr,
             time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
             level: 3,
           );
@@ -723,7 +723,7 @@ class StoreVisitsController extends GetxController {
           _syncAlertToBackend(3, 'تنبيه ثالث', 'تم تسجيل عدم نشاط مستمر أثناء الجولة');
         } else if (_inactivitySeconds >= inactivityThresholdSeconds + 540) { // +9 min -> critical
           addAlertLog(
-            title: 'تنبيه حرج',
+            title: 'critical_warning'.tr,
             time: DateFormat('HH:mm a', 'ar').format(DateTime.now()),
             level: 4,
           );
@@ -1086,7 +1086,7 @@ class StoreVisitsController extends GetxController {
       }
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] completeVisit api error: $e');
-      showCustomSnackBar('تعذر الاتصال بالخادم، تم حفظ البيانات محلياً', isError: true);
+      showCustomSnackBar('server_connection_failed_saved_locally'.tr, isError: true);
     }
 
     // Update main shift metrics if controller exists

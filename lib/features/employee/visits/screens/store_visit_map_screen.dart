@@ -96,7 +96,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
           infoWindow: InfoWindow(
             title: v.storeName,
-            snippet: v.address.isNotEmpty ? v.address : 'موقع المتجر المحدد',
+            snippet: v.address.isNotEmpty ? v.address : 'specified_store_location'.tr,
           ),
         ),
       );
@@ -301,7 +301,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      _selectedVisit?.storeName ?? 'خريطة زيارات المندوب',
+                                      _selectedVisit?.storeName ?? 'marketer_visits_map'.tr,
                                       style: TextStyle(
                                         fontFamily: 'Tajawal',
                                         fontSize: 14,
@@ -313,8 +313,8 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                                     ),
                                     Text(
                                       widget.allVisits != null
-                                          ? 'إجمالي الزيارات: ${widget.allVisits!.length}'
-                                          : 'موقع المتجر المحدد',
+                                          ? 'total_visits_colon'.trParams({'count': widget.allVisits!.length.toString()})
+                                          : 'specified_store_location'.tr,
                                       style: TextStyle(
                                         fontFamily: 'Tajawal',
                                         fontSize: 11,
@@ -342,7 +342,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                     // Center on Store
                     _buildFloatingRoundBtn(
                       icon: Icons.store_mall_directory_rounded,
-                      tooltip: 'موقع المتجر',
+                      tooltip: 'store_location'.tr,
                       cardBg: cardBg,
                       darkText: darkText,
                       onTap: _animateCameraToStore,
@@ -370,7 +370,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                                 color: _currentPosition != null ? _primaryGreen : darkText,
                                 size: 20,
                               ),
-                        tooltip: 'موقعي الحالي',
+                        tooltip: 'my_current_location'.tr,
                         onPressed: () {
                           if (_currentPosition == null) {
                             _requestGpsPosition();
@@ -385,7 +385,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                     // Fit Both
                     _buildFloatingRoundBtn(
                       icon: Icons.zoom_out_map_rounded,
-                      tooltip: 'عرض المسافة كاملة',
+                      tooltip: 'show_full_distance'.tr,
                       cardBg: cardBg,
                       darkText: darkText,
                       onTap: _fitBothPositions,
@@ -448,8 +448,8 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
     required bool isDark,
   }) {
     final distText = _liveDistanceKm != null
-        ? '${_liveDistanceKm!.toStringAsFixed(1)} كم من موقعك'
-        : '${visit.distanceKm} كم';
+        ? '${_liveDistanceKm!.toStringAsFixed(1)} ${'km_from_your_location'.tr}'
+        : '${visit.distanceKm} ${'km_short'.tr}';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -500,7 +500,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            visit.address.isNotEmpty ? visit.address : 'لم يتم تسجيل العنوان بدقة',
+                            visit.address.isNotEmpty ? visit.address : 'address_not_recorded_accurately'.tr,
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 12,
@@ -593,11 +593,11 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.phone_in_talk_rounded, size: 14, color: _primaryGreen),
-                        SizedBox(width: 4),
+                      children: [
+                        const Icon(Icons.phone_in_talk_rounded, size: 14, color: _primaryGreen),
+                        const SizedBox(width: 4),
                         Text(
-                          'اتصال',
+                          'call_action'.tr,
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 11,
@@ -621,12 +621,12 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
               // Copy address button
               if (visit.address.isNotEmpty)
                 IconButton(
-                  tooltip: 'نسخ العنوان',
+                  tooltip: 'copy_address'.tr,
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: visit.address));
                     Get.snackbar(
-                      'تم النسخ',
-                      'تم نسخ عنوان المتجر للحافظة',
+                      'copied'.tr,
+                      'store_address_copied_to_clipboard'.tr,
                       snackPosition: SnackPosition.BOTTOM,
                       duration: const Duration(seconds: 2),
                     );
@@ -667,10 +667,10 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                     ),
                     child: Text(
                       visit.visitStatus == StoreVisitStatus.inProgress
-                          ? 'متابعة الزيارة الحالية'
+                          ? 'continue_current_visit'.tr
                           : visit.visitStatus == StoreVisitStatus.completed
-                              ? 'عرض تفاصيل الزيارة'
-                              : 'بدء الزيارة الآن',
+                              ? 'view_visit_details'.tr
+                              : 'start_visit_now'.tr,
                       style: const TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,

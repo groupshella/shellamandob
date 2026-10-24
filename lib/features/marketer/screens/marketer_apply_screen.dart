@@ -319,7 +319,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _firstNameController,
-                      hintText: 'ادخل اسم الأول كما هو في الهوية',
+                      hintText: 'enter_first_name_as_id'.tr,
                       isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
@@ -330,7 +330,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     const SizedBox(height: 8),
                     _buildTextField(
                       controller: _lastNameController,
-                      hintText: 'ادخل اسم العائلة كما هو في الهوية',
+                      hintText: 'enter_last_name_as_id'.tr,
                       isDark: isDark,
                       onChanged: (_) => setState(() {}),
                     ),
@@ -343,18 +343,18 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     const SizedBox(height: 16),
 
                     // 1. Profession Dropdown
-                    _buildLabel('المهنة', isDark),
+                    _buildLabel('profession'.tr, isDark),
                     const SizedBox(height: 8),
                     _buildProfessionDropdown(isDark),
 
                     // Conditional custom profession if 'أخرى' is selected
                     if (_selectedProfession == 'أخرى') ...[
                       const SizedBox(height: 16),
-                      _buildLabel('اذكر مهنتك', isDark),
+                      _buildLabel('state_your_profession'.tr, isDark),
                       const SizedBox(height: 8),
                       _buildTextField(
                         controller: _customProfessionController,
-                        hintText: 'اذكر وظيفتك',
+                        hintText: 'state_your_job'.tr,
                         isDark: isDark,
                         onChanged: (_) => setState(() {}),
                       ),
@@ -363,7 +363,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
 
                     // 2. Documents Section
                     Text(
-                      'المستندات',
+                      'documents_section_title'.tr,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
@@ -373,7 +373,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'أرفق صوراً واضحة لمستنداتك مثل الهوية أو عقد الإيجار ، وسمّ كل ملف قبل رفعه',
+                      'documents_section_desc'.tr,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 13,
@@ -389,7 +389,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                       _buildSelectedDocumentCard(isDark),
 
                     // 2. Document Type Selector (Radio Group)
-                    _buildLabel('اختر نوع المستند', isDark),
+                    _buildLabel('select_document_type'.tr, isDark),
                     const SizedBox(height: 10),
                     _buildDocumentTypeSelector(isDark),
                     const SizedBox(height: 14),
@@ -437,7 +437,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                         ),
                       ),
                       child: isSubmitting
-                          ? const Row(
+                          ?  Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
@@ -450,7 +450,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  'جاري الإرسال......',
+                                  'sending'.tr,
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 16,
@@ -461,7 +461,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                               ],
                             )
                           : Text(
-                              'إرسال الطلب',
+                              'submit_request'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 16,
@@ -731,7 +731,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _selectedFile?.name ?? 'اسم الصورة',
+                  _selectedFile?.name ?? 'image_name'.tr,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -850,7 +850,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'اختر ملفاً وأضفه',
+                      'choose_file_and_add'.tr,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
@@ -860,7 +860,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'برجاء التأكد أن الصورة واضحة وبحد أقصى 2 ميجا.',
+                      'ensure_image_clear_max_2mb'.tr,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 11,

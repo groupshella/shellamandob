@@ -43,7 +43,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
   void _simulateDemoScan([String demoCr = '1010892741']) async {
     setState(() {
       _isProcessing = true;
-      _statusMessage = 'جاري تحليل المستند واستخراج رقم السجل التجاري...';
+      _statusMessage = 'ocr_analyzing_doc'.tr;
     });
 
     await Future.delayed(const Duration(milliseconds: 600));
@@ -53,7 +53,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
       _manualConfirmController.text = demoCr;
       _isProcessing = false;
       _isSuccess = true;
-      _statusMessage = 'تم قراءة واستخراج السجل التجاري بنجاح!';
+      _statusMessage = 'ocr_extracted_success'.tr;
     });
 
     widget.onCrDetected(demoCr);
@@ -64,7 +64,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
     await Future.delayed(const Duration(milliseconds: 400));
     if (mounted) {
       Navigator.pop(context);
-      showCustomSnackBar('تم استخراج وتعبئة السجل التجاري آلياً: $demoCr', isError: false);
+      showCustomSnackBar('cr_extracted_and_filled_auto'.trParams({'cr': demoCr}), isError: false);
     }
   }
 
@@ -82,7 +82,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
       setState(() {
         _scannedImage = File(image.path);
         _isProcessing = true;
-        _statusMessage = 'جاري قراءة وتحليل المستند بالذكاء الاصطناعي (OCR)...';
+        _statusMessage = 'ocr_reading_ai'.tr;
       });
 
       // Extract 10-digit Saudi Commercial Register using OCR pattern heuristics
@@ -94,7 +94,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
           _manualConfirmController.text = extractedCr;
           _isProcessing = false;
           _isSuccess = true;
-          _statusMessage = 'تم التعرف على رقم السجل بنجاح!';
+          _statusMessage = 'ocr_recognized_success'.tr;
         });
 
         // Trigger auto-fill callback & verification
@@ -106,14 +106,14 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
         await Future.delayed(const Duration(milliseconds: 450));
         if (mounted) {
           Navigator.pop(context);
-          showCustomSnackBar('تم استخراج وتعبئة السجل التجاري آلياً: $extractedCr', isError: false);
+          showCustomSnackBar('cr_extracted_and_filled_auto'.trParams({'cr': extractedCr}), isError: false);
         }
       } else {
         if (!mounted) return;
         setState(() {
           _isProcessing = false;
           _isSuccess = false;
-          _statusMessage = 'لم يتم العثور على رقم سجل مكون من 10 أرقام تلقائياً، يمكنك إدخاله يدوياً أو استخدام النموذج التجريبي.';
+          _statusMessage = 'ocr_no_10_digits_found'.tr;
         });
       }
     } catch (e) {
@@ -122,9 +122,9 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
         _isProcessing = false;
         _isSuccess = false;
         if (source == ImageSource.camera) {
-          _statusMessage = 'تعذر تشغيل كاميرا المحاكي. يمكنك اختيار صورة من المعرض أو تجربة النموذج الاختباري.';
+          _statusMessage = 'ocr_camera_failed_try_gallery'.tr;
         } else {
-          _statusMessage = 'حدث خطأ أثناء معالجة الصورة. يمكنك تجربة النموذج الاختباري أو إدخال الرقم يدوياً.';
+          _statusMessage = 'ocr_processing_error'.tr;
         }
       });
     }
@@ -173,7 +173,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'مسح السجل التجاري (OCR)',
+                    'cr_scan_ocr_title'.tr,
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 16,
@@ -189,7 +189,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
               ),
               const SizedBox(height: 6),
               Text(
-                'وجه الكاميرا نحو شهادة السجل التجاري أو لوحة المحل لقراءة الرقم آلياً.',
+                'cr_scan_instruction'.tr,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 12,
@@ -237,7 +237,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                             Icon(Icons.document_scanner_outlined, size: 44, color: _primaryGreen.withValues(alpha: 0.8)),
                             const SizedBox(height: 8),
                             Text(
-                              'اضغط لاختيار أو التقاط صورة السجل',
+                              'cr_scan_choose_or_capture'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 12,
@@ -258,7 +258,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                     child: OutlinedButton.icon(
                       onPressed: _isProcessing ? null : () => _pickAndScan(ImageSource.camera),
                       icon: const Icon(Icons.camera_alt_rounded, size: 18),
-                      label: const Text('الكاميرا', style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
+                      label: Text('camera_source'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: _primaryGreen,
                         side: const BorderSide(color: _primaryGreen),
@@ -272,7 +272,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                     child: OutlinedButton.icon(
                       onPressed: _isProcessing ? null : () => _pickAndScan(ImageSource.gallery),
                       icon: const Icon(Icons.photo_library_rounded, size: 18),
-                      label: const Text('المعرض', style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
+                      label: Text('gallery_source'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: subText,
                         side: BorderSide(color: borderColor),
@@ -303,7 +303,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                       const Icon(Icons.flash_on_rounded, size: 16, color: _primaryGreen),
                       const SizedBox(width: 6),
                       Text(
-                        'مسح نموذج اختباري سريع (1010892741)',
+                        'scan_demo_cr_model'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 11.5,
@@ -369,7 +369,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                   color: darkText,
                 ),
                 decoration: InputDecoration(
-                  labelText: 'رقم السجل التجاري (10 أرقام)',
+                  labelText: 'cr_number_10_digits'.tr,
                   labelStyle: TextStyle(fontFamily: 'Tajawal', color: _primaryGreen),
                   counterText: '',
                   hintText: '1010XXXXXX',
@@ -401,7 +401,7 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                       }
                       Navigator.pop(context);
                     } else {
-                      showCustomSnackBar('يرجى إدخال أو مسح رقم السجل أولاً', isError: true);
+                      showCustomSnackBar('please_enter_or_scan_cr_first'.tr, isError: true);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -409,9 +409,9 @@ class _CrScannerDialogState extends State<CrScannerDialog> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text(
-                    'تأكيد واستخدام هذا الرقم',
-                    style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+                  child: Text(
+                    'cr_scan_confirm_use'.tr,
+                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
                   ),
                 ),
               ),

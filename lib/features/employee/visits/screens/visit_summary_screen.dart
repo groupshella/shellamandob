@@ -40,41 +40,50 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
   late bool _isEditable;
 
   List<_InterestOptionItem> get _interestOptions => [
-    _InterestOptionItem(key: 'requested_grace_period', label: 'requested_grace_period'.tr),
-    _InterestOptionItem(key: 'interested', label: 'interested'.tr),
-    _InterestOptionItem(key: 'very_interested', label: 'very_interested'.tr),
-    _InterestOptionItem(key: 'needs_follow_up', label: 'needs_follow_up'.tr),
-    _InterestOptionItem(key: 'not_interested', label: 'not_interested'.tr),
-  ];
+        _InterestOptionItem(
+            key: 'requested_grace_period', label: 'requested_grace_period'.tr),
+        _InterestOptionItem(key: 'interested', label: 'interested'.tr),
+        _InterestOptionItem(
+            key: 'very_interested', label: 'very_interested'.tr),
+        _InterestOptionItem(
+            key: 'needs_follow_up', label: 'needs_follow_up'.tr),
+        _InterestOptionItem(key: 'not_interested', label: 'not_interested'.tr),
+      ];
 
   bool _isObstaclesDropdownOpen = false;
 
   @override
   void initState() {
     super.initState();
-    _isEditable = !widget.isReadOnly || widget.visit.visitStatus == StoreVisitStatus.followUp;
+    _isEditable = !widget.isReadOnly ||
+        widget.visit.visitStatus == StoreVisitStatus.followUp;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.isRegistered<StoreVisitsController>()) {
         final controller = Get.find<StoreVisitsController>();
         controller.storeNameController.text = widget.visit.storeName;
         controller.managerNameController.text = widget.visit.managerName;
         controller.phoneController.text = widget.visit.phone;
-        controller.openingsController.text = widget.visit.openingsCount.toString();
+        controller.openingsController.text =
+            widget.visit.openingsCount.toString();
         controller.crNumberController.text = widget.visit.crNumber;
         controller.clearCrVerification();
         final initialCr = widget.visit.crNumber.replaceAll(RegExp(r'\D'), '');
         if (initialCr.length == 10) {
           controller.verifyCommercialRegister(initialCr);
         }
-        controller.commitmentsController.text = widget.visit.nextFollowUpCommitments ?? '';
-        controller.confidentialNotesController.text = widget.visit.confidentialNotes ?? '';
+        controller.commitmentsController.text =
+            widget.visit.nextFollowUpCommitments ?? '';
+        controller.confidentialNotesController.text =
+            widget.visit.confidentialNotes ?? '';
         controller.setPipelineStep(widget.visit.pipelineStep);
-        if (widget.visit.interestStatus != null && widget.visit.interestStatus!.isNotEmpty) {
+        if (widget.visit.interestStatus != null &&
+            widget.visit.interestStatus!.isNotEmpty) {
           controller.setInterestStatus(widget.visit.interestStatus!);
         }
         final existingObstacle = widget.visit.obstaclesNotes;
         if (existingObstacle != null && existingObstacle.isNotEmpty) {
-          if (StoreVisitsController.predefinedObstacles.contains(existingObstacle)) {
+          if (StoreVisitsController.predefinedObstacles
+              .contains(existingObstacle)) {
             controller.setSelectedObstacle(existingObstacle);
           } else {
             controller.setSelectedObstacle('سبب آخر');
@@ -85,8 +94,10 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         }
         if (widget.visit.closingReason != null) {
           controller.reasonNotMetController.text = widget.visit.closingReason!;
-          controller.reasonRejectedController.text = widget.visit.closingReason!;
-          controller.reasonDisqualifiedController.text = widget.visit.closingReason!;
+          controller.reasonRejectedController.text =
+              widget.visit.closingReason!;
+          controller.reasonDisqualifiedController.text =
+              widget.visit.closingReason!;
         }
       }
     });
@@ -101,15 +112,22 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     return GetBuilder<ThemeController>(
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
-        final screenBg = isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
+        final screenBg =
+            isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
         final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
         final darkText = isDark ? Colors.white : const Color(0xFF111B18);
-        final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-        final inputFill = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
-        final selectedBg = isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB);
-        final unselectedBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
-        final unselectedBorder = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
+        final subText =
+            isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final inputFill =
+            isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+        final selectedBg =
+            isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB);
+        final unselectedBg =
+            isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+        final unselectedBorder =
+            isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+        final borderColor =
+            isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
 
         return GetBuilder<StoreVisitsController>(
           init: Get.isRegistered<StoreVisitsController>()
@@ -117,8 +135,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               : Get.put(StoreVisitsController(), permanent: true),
           autoRemove: false,
           builder: (controller) {
-            final currentVisit = widget.isReadOnly ? widget.visit : (controller.activeVisit ?? widget.visit);
-            final isContract = controller.selectedPipelineStep == StorePipelineStep.contractSigned;
+            final currentVisit = widget.isReadOnly
+                ? widget.visit
+                : (controller.activeVisit ?? widget.visit);
+            final isContract = controller.selectedPipelineStep ==
+                StorePipelineStep.contractSigned;
 
             return Scaffold(
               backgroundColor: screenBg,
@@ -127,7 +148,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 elevation: 0.5,
                 centerTitle: true,
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
+                  icon:
+                      Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
                   onPressed: () => Get.back(),
                 ),
                 title: Text(
@@ -142,17 +164,28 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 actions: [
                   if (currentVisit.visitStatus == StoreVisitStatus.followUp)
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF3B1F56) : const Color(0xFFDFD3F5),
+                        color: isDark
+                            ? const Color(0xFF3B1F56)
+                            : const Color(0xFFDFD3F5),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isDark ? const Color(0xFF7861A6) : const Color(0xFFC7B3E8)),
+                        border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF7861A6)
+                                : const Color(0xFFC7B3E8)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.schedule_rounded, size: 14, color: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6)),
+                          Icon(Icons.schedule_rounded,
+                              size: 14,
+                              color: isDark
+                                  ? const Color(0xFFC084FC)
+                                  : const Color(0xFF7861A6)),
                           const SizedBox(width: 4),
                           Text(
                             'needs_follow_up'.tr,
@@ -160,25 +193,36 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                               fontFamily: 'Tajawal',
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6),
+                              color: isDark
+                                  ? const Color(0xFFC084FC)
+                                  : const Color(0xFF7861A6),
                             ),
                           ),
                         ],
                       ),
                     )
-                  else if (currentVisit.visitStatus == StoreVisitStatus.completed)
+                  else if (currentVisit.visitStatus ==
+                      StoreVisitStatus.completed)
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB),
+                        color: isDark
+                            ? const Color(0xFF163E20)
+                            : const Color(0xFFEBFEEB),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isDark ? const Color(0xFF2E7D32) : const Color(0xFFB8F2BD)),
+                        border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF2E7D32)
+                                : const Color(0xFFB8F2BD)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.check_circle_rounded, size: 14, color: _primaryGreen),
+                          const Icon(Icons.check_circle_rounded,
+                              size: 14, color: _primaryGreen),
                           const SizedBox(width: 4),
                           Text(
                             'completed_visit_badge'.tr,
@@ -199,7 +243,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           _isEditable = true;
                         });
                       },
-                      icon: const Icon(Icons.edit_outlined, size: 16, color: _primaryGreen),
+                      icon: const Icon(Icons.edit_outlined,
+                          size: 16, color: _primaryGreen),
                       label: Text(
                         'edit'.tr,
                         style: const TextStyle(
@@ -213,11 +258,15 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 ],
               ),
               body: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (!widget.isReadOnly && (currentVisit.visitStatus == StoreVisitStatus.inProgress || controller.activeVisit != null))
+                    if (!widget.isReadOnly &&
+                        (currentVisit.visitStatus ==
+                                StoreVisitStatus.inProgress ||
+                            controller.activeVisit != null))
                       _buildLiveTimerCard(
                         controller: controller,
                         isDark: isDark,
@@ -228,7 +277,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       ),
 
                     // موقع المتجر على الخريطة
-                    _buildSectionHeader('موقع وعنوان المتجر', darkText),
+                    _buildSectionHeader('store_location_and_address'.tr, darkText),
                     const SizedBox(height: 8),
                     _buildCardContainer(
                       cardBg: cardBg,
@@ -237,7 +286,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         if (currentVisit.address.isNotEmpty) ...[
                           Row(
                             children: [
-                              const Icon(IconlyLight.location, size: 16, color: _primaryGreen),
+                              const Icon(IconlyLight.location,
+                                  size: 16, color: _primaryGreen),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -254,7 +304,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           ),
                           const SizedBox(height: 10),
                         ],
-                        StoreVisitEmbeddedMapWidget(visit: currentVisit, height: 160),
+                        StoreVisitEmbeddedMapWidget(
+                            visit: currentVisit, height: 160),
                       ],
                     ),
                     const SizedBox(height: 18),
@@ -301,11 +352,14 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                       CrScannerDialog.show(
                                         context,
                                         onCrDetected: (cr) {
-                                          final clean = cr.replaceAll(RegExp(r'\D'), '');
-                                          controller.crNumberController.text = clean;
+                                          final clean =
+                                              cr.replaceAll(RegExp(r'\D'), '');
+                                          controller.crNumberController.text =
+                                              clean;
                                           _syncInputsToController(controller);
                                           if (clean.length == 10) {
-                                            controller.verifyCommercialRegister(clean);
+                                            controller.verifyCommercialRegister(
+                                                clean);
                                           } else {
                                             controller.clearCrVerification();
                                           }
@@ -314,19 +368,27 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                     },
                                     borderRadius: BorderRadius.circular(8),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 3),
                                       decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB),
+                                        color: isDark
+                                            ? const Color(0xFF163E20)
+                                            : const Color(0xFFEBFEEB),
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: const Color(0xFF30913F).withValues(alpha: 0.3)),
+                                        border: Border.all(
+                                            color: const Color(0xFF30913F)
+                                                .withValues(alpha: 0.3)),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.qr_code_scanner_rounded, size: 14, color: Color(0xFF30913F)),
-                                          SizedBox(width: 4),
+                                          const Icon(
+                                              Icons.qr_code_scanner_rounded,
+                                              size: 14,
+                                              color: Color(0xFF30913F)),
+                                          const SizedBox(width: 4),
                                           Text(
-                                            'مسح بالكاميرا (OCR)',
+                                            'cr_scan_ocr_title'.tr,
                                             style: TextStyle(
                                               fontFamily: 'Tajawal',
                                               fontSize: 11,
@@ -371,44 +433,85 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Row(
                                   children: [
-                                    const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF30913F))),
+                                    const SizedBox(
+                                        width: 12,
+                                        height: 12,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Color(0xFF30913F))),
                                     const SizedBox(width: 6),
-                                    Text('جاري التحقق من صحة السجل التجاري...', style: TextStyle(fontFamily: 'Tajawal', fontSize: 11, color: subText)),
+                                    Text('verifying_cr_in_progress'.tr,
+                                        style: TextStyle(
+                                            fontFamily: 'Tajawal',
+                                            fontSize: 11,
+                                            color: subText)),
                                   ],
                                 ),
                               )
                             else if (controller.crVerificationResult != null &&
-                                controller.crNumberController.text.trim().replaceAll(RegExp(r'\D'), '').length == 10)
+                                controller.crNumberController.text
+                                        .trim()
+                                        .replaceAll(RegExp(r'\D'), '')
+                                        .length ==
+                                    10)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: (controller.crVerificationResult!['is_valid'] == true && controller.crVerificationResult!['is_already_registered'] != true)
-                                        ? (isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB))
-                                        : (isDark ? const Color(0xFF2B2520) : const Color(0xFFFFFBEB)),
+                                    color: (controller.crVerificationResult![
+                                                    'is_valid'] ==
+                                                true &&
+                                            controller.crVerificationResult![
+                                                    'is_already_registered'] !=
+                                                true)
+                                        ? (isDark
+                                            ? const Color(0xFF163E20)
+                                            : const Color(0xFFEBFEEB))
+                                        : (isDark
+                                            ? const Color(0xFF2B2520)
+                                            : const Color(0xFFFFFBEB)),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
                                     children: [
                                       Icon(
-                                        (controller.crVerificationResult!['is_valid'] == true && controller.crVerificationResult!['is_already_registered'] != true)
+                                        (controller.crVerificationResult![
+                                                        'is_valid'] ==
+                                                    true &&
+                                                controller.crVerificationResult![
+                                                        'is_already_registered'] !=
+                                                    true)
                                             ? Icons.verified_rounded
                                             : Icons.warning_amber_rounded,
                                         size: 14,
-                                        color: (controller.crVerificationResult!['is_valid'] == true && controller.crVerificationResult!['is_already_registered'] != true)
+                                        color: (controller.crVerificationResult![
+                                                        'is_valid'] ==
+                                                    true &&
+                                                controller.crVerificationResult![
+                                                        'is_already_registered'] !=
+                                                    true)
                                             ? const Color(0xFF30913F)
                                             : const Color(0xFFD97706),
                                       ),
                                       const SizedBox(width: 6),
                                       Expanded(
                                         child: Text(
-                                          controller.crVerificationResult!['message']?.toString() ?? '',
+                                          controller.crVerificationResult![
+                                                      'message']
+                                                  ?.toString() ??
+                                              '',
                                           style: TextStyle(
                                             fontFamily: 'Tajawal',
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
-                                            color: (controller.crVerificationResult!['is_valid'] == true && controller.crVerificationResult!['is_already_registered'] != true)
+                                            color: (controller.crVerificationResult![
+                                                            'is_valid'] ==
+                                                        true &&
+                                                    controller.crVerificationResult![
+                                                            'is_already_registered'] !=
+                                                        true)
                                                 ? const Color(0xFF30913F)
                                                 : const Color(0xFFD97706),
                                           ),
@@ -441,14 +544,21 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: isDark
-                                ? [const Color(0xFF1B3822), const Color(0xFF162A1E)]
-                                : [const Color(0xFFE8F5E9), const Color(0xFFF1F8F5)],
+                                ? [
+                                    const Color(0xFF1B3822),
+                                    const Color(0xFF162A1E)
+                                  ]
+                                : [
+                                    const Color(0xFFE8F5E9),
+                                    const Color(0xFFF1F8F5)
+                                  ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: const Color(0xFF30913F).withValues(alpha: 0.4),
+                            color:
+                                const Color(0xFF30913F).withValues(alpha: 0.4),
                           ),
                         ),
                         child: Row(
@@ -460,7 +570,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                 color: const Color(0xFF30913F),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.card_giftcard_rounded, color: Colors.white, size: 22),
+                              child: const Icon(Icons.card_giftcard_rounded,
+                                  color: Colors.white, size: 22),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -470,7 +581,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        'مكتبة العروض الجاهزة للتاجر',
+                                        'merchant_promo_library'.tr,
                                         style: TextStyle(
                                           fontFamily: 'Tajawal',
                                           fontSize: 13.5,
@@ -480,21 +591,27 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                       ),
                                       const SizedBox(width: 6),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFF30913F),
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
                                         ),
-                                        child: const Text(
-                                          'جديد',
-                                          style: TextStyle(fontFamily: 'Tajawal', fontSize: 9.5, color: Colors.white, fontWeight: FontWeight.bold),
+                                        child: Text(
+                                          'new_badge'.tr,
+                                          style: const TextStyle(
+                                              fontFamily: 'Tajawal',
+                                              fontSize: 9.5,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'تفعيل عروض وخصومات فورية لدعم إغلاق العقد',
+                                    'instant_promos_enable_desc'.tr,
                                     style: TextStyle(
                                       fontFamily: 'Tajawal',
                                       fontSize: 11,
@@ -504,7 +621,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                 ],
                               ),
                             ),
-                            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: subText),
+                            Icon(Icons.arrow_forward_ios_rounded,
+                                size: 14, color: subText),
                           ],
                         ),
                       ),
@@ -641,15 +759,21 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         ),
 
                         // Dynamic Banner for Contract Signed (Figma Container 8945:22738)
-                        if (controller.selectedPipelineStep == StorePipelineStep.contractSigned) ...[
+                        if (controller.selectedPipelineStep ==
+                            StorePipelineStep.contractSigned) ...[
                           const SizedBox(height: 14),
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF163E20).withValues(alpha: 0.5) : const Color(0xFFEBFEEB),
+                              color: isDark
+                                  ? const Color(0xFF163E20)
+                                      .withValues(alpha: 0.5)
+                                  : const Color(0xFFEBFEEB),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: _primaryGreen, width: 1),
+                              border:
+                                  Border.all(color: _primaryGreen, width: 1),
                             ),
                             child: Text(
                               'complete_form_to_sign_hint'.tr,
@@ -657,25 +781,36 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF166534),
+                                color: isDark
+                                    ? const Color(0xFF4ADE80)
+                                    : const Color(0xFF166534),
                               ),
                             ),
                           ),
                         ],
 
                         // Dynamic Banner for Follow-up Stages (Figma Container 8943:1938, 8943:22632, etc.)
-                        if (controller.selectedPipelineStep == StorePipelineStep.interested ||
-                            controller.selectedPipelineStep == StorePipelineStep.presented ||
-                            controller.selectedPipelineStep == StorePipelineStep.negotiating ||
-                            controller.selectedPipelineStep == StorePipelineStep.gracePeriod) ...[
+                        if (controller.selectedPipelineStep ==
+                                StorePipelineStep.interested ||
+                            controller.selectedPipelineStep ==
+                                StorePipelineStep.presented ||
+                            controller.selectedPipelineStep ==
+                                StorePipelineStep.negotiating ||
+                            controller.selectedPipelineStep ==
+                                StorePipelineStep.gracePeriod) ...[
                           const SizedBox(height: 14),
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF163E20).withValues(alpha: 0.5) : const Color(0xFFEBFEEB),
+                              color: isDark
+                                  ? const Color(0xFF163E20)
+                                      .withValues(alpha: 0.5)
+                                  : const Color(0xFFEBFEEB),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: _primaryGreen, width: 1),
+                              border:
+                                  Border.all(color: _primaryGreen, width: 1),
                             ),
                             child: Text(
                               'auto_schedule_follow_up_hint'.tr,
@@ -683,14 +818,17 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF166534),
+                                color: isDark
+                                    ? const Color(0xFF4ADE80)
+                                    : const Color(0xFF166534),
                               ),
                             ),
                           ),
                         ],
 
                         // Conditional reason when 'لم تتم المقابلة' is selected (Figma Node 8942:1746 & 8945:23023)
-                        if (controller.selectedPipelineStep == StorePipelineStep.notMet) ...[
+                        if (controller.selectedPipelineStep ==
+                            StorePipelineStep.notMet) ...[
                           const SizedBox(height: 14),
                           _buildInputField(
                             label: 'reason_for_not_meeting'.tr,
@@ -698,7 +836,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             hintText: 'enter_reason_hint'.tr,
                             readOnly: !_isEditable,
                             initialValue: currentVisit.closingReason,
-                            onChanged: (_) => _syncInputsToController(controller),
+                            onChanged: (_) =>
+                                _syncInputsToController(controller),
                             darkText: darkText,
                             inputFill: inputFill,
                             isDark: isDark,
@@ -706,7 +845,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         ],
 
                         // Conditional reason when 'رفض' is selected (Figma Node 8945:22775)
-                        if (controller.selectedPipelineStep == StorePipelineStep.rejected) ...[
+                        if (controller.selectedPipelineStep ==
+                            StorePipelineStep.rejected) ...[
                           const SizedBox(height: 14),
                           _buildInputField(
                             label: 'reason_for_rejection'.tr,
@@ -714,7 +854,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             hintText: 'enter_reason_hint'.tr,
                             readOnly: !_isEditable,
                             initialValue: currentVisit.closingReason,
-                            onChanged: (_) => _syncInputsToController(controller),
+                            onChanged: (_) =>
+                                _syncInputsToController(controller),
                             darkText: darkText,
                             inputFill: inputFill,
                             isDark: isDark,
@@ -722,7 +863,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         ],
 
                         // Conditional reason when 'غير مؤهل' is selected (Figma Node 8945:22818)
-                        if (controller.selectedPipelineStep == StorePipelineStep.notQualified) ...[
+                        if (controller.selectedPipelineStep ==
+                            StorePipelineStep.notQualified) ...[
                           const SizedBox(height: 14),
                           _buildInputField(
                             label: 'reason_for_disqualification'.tr,
@@ -730,7 +872,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             hintText: 'enter_reason_hint'.tr,
                             readOnly: !_isEditable,
                             initialValue: currentVisit.closingReason,
-                            onChanged: (_) => _syncInputsToController(controller),
+                            onChanged: (_) =>
+                                _syncInputsToController(controller),
                             darkText: darkText,
                             inputFill: inputFill,
                             isDark: isDark,
@@ -770,7 +913,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                     ),
 
                     // Display Confidential Report if exists
-                    if (currentVisit.confidentialNotes != null && currentVisit.confidentialNotes!.isNotEmpty) ...[
+                    if (currentVisit.confidentialNotes != null &&
+                        currentVisit.confidentialNotes!.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       _buildSectionHeader('confidential_report'.tr, darkText),
                       const SizedBox(height: 8),
@@ -778,14 +922,19 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF252B37) : Colors.white,
+                          color:
+                              isDark ? const Color(0xFF252B37) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: isDark ? const Color(0xFF854D0E) : const Color(0xFFFEF08A)),
+                          border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF854D0E)
+                                  : const Color(0xFFFEF08A)),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(IconlyLight.shieldDone, color: Color(0xFFCA8A04), size: 20),
+                            const Icon(IconlyLight.shieldDone,
+                                color: Color(0xFFCA8A04), size: 20),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
@@ -793,7 +942,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                 style: TextStyle(
                                   fontFamily: 'Tajawal',
                                   fontSize: 13,
-                                  color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF854D0E),
+                                  color: isDark
+                                      ? const Color(0xFFFDE68A)
+                                      : const Color(0xFF854D0E),
                                   height: 1.4,
                                 ),
                               ),
@@ -917,8 +1068,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               color: Color(0xFF9CA3AF),
             ),
             filled: true,
-            fillColor: readOnly ? (isDark ? const Color(0xFF1E232D) : const Color(0xFFF9FAFB)) : inputFill,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            fillColor: readOnly
+                ? (isDark ? const Color(0xFF1E232D) : const Color(0xFFF9FAFB))
+                : inputFill,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -948,7 +1102,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     final isSelected = controller.selectedInterestStatus == option.key ||
         controller.selectedInterestStatus == option.label;
     return InkWell(
-      onTap: !_isEditable ? null : () => controller.setInterestStatus(option.label),
+      onTap: !_isEditable
+          ? null
+          : () => controller.setInterestStatus(option.label),
       borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
@@ -1017,7 +1173,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               color: inputFill,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: _isObstaclesDropdownOpen ? _primaryGreen : Colors.transparent,
+                color: _isObstaclesDropdownOpen
+                    ? _primaryGreen
+                    : Colors.transparent,
                 width: 1.2,
               ),
             ),
@@ -1038,7 +1196,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                   ),
                 ),
                 Icon(
-                  _isObstaclesDropdownOpen ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                  _isObstaclesDropdownOpen
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
                   color: const Color(0xFF6B7280),
                   size: 22,
                 ),
@@ -1055,7 +1215,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             decoration: BoxDecoration(
               color: cardBg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB), width: 1),
+              border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF2B3240)
+                      : const Color(0xFFE5E7EB),
+                  width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
@@ -1066,9 +1230,10 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             ),
             child: Column(
               children: NotClosingReason.values.map((reason) {
-                final isCurrent = controller.selectedNotClosingReason == reason ||
-                    controller.selectedClosingReason == reason.key ||
-                    selected == reason.label;
+                final isCurrent =
+                    controller.selectedNotClosingReason == reason ||
+                        controller.selectedClosingReason == reason.key ||
+                        selected == reason.label;
                 final isLast = reason == NotClosingReason.values.last;
                 return InkWell(
                   onTap: () {
@@ -1079,21 +1244,28 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                     _syncInputsToController(controller);
                   },
                   borderRadius: BorderRadius.vertical(
-                    top: reason == NotClosingReason.values.first ? const Radius.circular(12) : Radius.zero,
+                    top: reason == NotClosingReason.values.first
+                        ? const Radius.circular(12)
+                        : Radius.zero,
                     bottom: isLast ? const Radius.circular(12) : Radius.zero,
                   ),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: isCurrent
-                          ? (isDark ? const Color(0xFF163E20).withValues(alpha: 0.4) : const Color(0xFFF0FDF4))
+                          ? (isDark
+                              ? const Color(0xFF163E20).withValues(alpha: 0.4)
+                              : const Color(0xFFF0FDF4))
                           : Colors.transparent,
                       border: isLast
                           ? null
                           : Border(
                               bottom: BorderSide(
-                                color: isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6),
+                                color: isDark
+                                    ? const Color(0xFF2B3240)
+                                    : const Color(0xFFF3F4F6),
                                 width: 1,
                               ),
                             ),
@@ -1107,13 +1279,15 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 13,
-                              fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                              fontWeight:
+                                  isCurrent ? FontWeight.w700 : FontWeight.w500,
                               color: isCurrent ? _primaryGreen : darkText,
                             ),
                           ),
                         ),
                         if (isCurrent)
-                          const Icon(Icons.check_circle_rounded, color: _primaryGreen, size: 18),
+                          const Icon(Icons.check_circle_rounded,
+                              color: _primaryGreen, size: 18),
                       ],
                     ),
                   ),
@@ -1179,19 +1353,18 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     Widget buildStageButton(StorePipelineStep step) {
       final isSelected = activeStep == step;
       final isRejected = step == StorePipelineStep.rejected;
-      final rejectedBg = isDark ? const Color(0xFF4C1D24) : const Color(0xFFFEECEC);
+      final rejectedBg =
+          isDark ? const Color(0xFF4C1D24) : const Color(0xFFFEECEC);
       const rejectedBorder = Color(0xFFE02D3C);
       const rejectedText = Color(0xFFE02D3C);
 
-      final bg = isSelected
-          ? (isRejected ? rejectedBg : selectedBg)
-          : unselectedBg;
+      final bg =
+          isSelected ? (isRejected ? rejectedBg : selectedBg) : unselectedBg;
       final border = isSelected
           ? (isRejected ? rejectedBorder : _primaryGreen)
           : unselectedBorder;
-      final textCol = isSelected
-          ? (isRejected ? rejectedText : _primaryGreen)
-          : darkText;
+      final textCol =
+          isSelected ? (isRejected ? rejectedText : _primaryGreen) : darkText;
 
       return Expanded(
         child: InkWell(
@@ -1220,30 +1393,41 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                     style: TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 11.5,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
                       color: textCol,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (step == StorePipelineStep.negotiating || step == StorePipelineStep.contractSigned) ...[
+                if (step == StorePipelineStep.negotiating ||
+                    step == StorePipelineStep.contractSigned) ...[
                   const SizedBox(width: 3),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? (isDark ? const Color(0xFF163E20) : const Color(0xFFD1FAE5))
-                          : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E8F0)),
+                          ? (isDark
+                              ? const Color(0xFF163E20)
+                              : const Color(0xFFD1FAE5))
+                          : (isDark
+                              ? const Color(0xFF252B37)
+                              : const Color(0xFFE2E8F0)),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      '+30د',
+                      '+30${'minutes_short'.tr}',
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? _primaryGreen : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                        color: isSelected
+                            ? _primaryGreen
+                            : (isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B)),
                       ),
                     ),
                   ),
@@ -1313,11 +1497,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () => Get.to(() => ContractSigningScreen(visit: currentVisit)),
+                    onPressed: () => Get.to(
+                        () => ContractSigningScreen(visit: currentVisit)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryGreen,
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     child: Text(
                       'contract_details'.tr,
@@ -1344,7 +1530,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryGreen,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
                     'edit_and_save_data'.tr,
@@ -1364,9 +1551,12 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 child: ElevatedButton(
                   onPressed: () => Get.back(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                    backgroundColor: isDark
+                        ? const Color(0xFF252B37)
+                        : const Color(0xFFF3F4F6),
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
                     'done_back_to_visits'.tr,
@@ -1410,11 +1600,10 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () => Get.to(() => const ChatScreen()),
-                      icon: const Icon(Icons.phone_in_talk_rounded, size: 17, color: Color(0xFF16A34A)),
+                      icon: const Icon(Icons.phone_in_talk_rounded,
+                          size: 17, color: Color(0xFF16A34A)),
                       label: Text(
-                        ('chat_with_admin_btn'.tr.isNotEmpty && 'chat_with_admin_btn'.tr != 'chat_with_admin_btn')
-                            ? 'chat_with_admin_btn'.tr
-                            : 'تواصل مع الإدارة',
+                        'chat_with_admin_btn'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 13,
@@ -1423,13 +1612,18 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4),
+                        backgroundColor: isDark
+                            ? const Color(0xFF163E20)
+                            : const Color(0xFFF0FDF4),
                         elevation: 0,
                         side: BorderSide(
-                          color: isDark ? const Color(0xFF225B2F) : const Color(0xFFDCFCE7),
+                          color: isDark
+                              ? const Color(0xFF225B2F)
+                              : const Color(0xFFDCFCE7),
                           width: 1,
                         ),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
@@ -1449,10 +1643,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         inputFill: inputFill,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                        backgroundColor: isDark
+                            ? const Color(0xFF252B37)
+                            : const Color(0xFFF3F4F6),
                         elevation: 0,
                         side: BorderSide(color: borderColor, width: 1),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
                         'confidential_report_title'.tr,
@@ -1481,50 +1678,67 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
 
                   // Mandatory CR Validation: Must be entered, 10 digits, and verified
                   if (cleanCr.isEmpty) {
-                    showCustomSnackBar('يرجى إدخال أو مسح رقم السجل التجاري أولاً للمتابعة', isError: true);
+                    showCustomSnackBar(
+                        'please_enter_or_scan_cr_to_continue'.tr,
+                        isError: true);
                     return;
                   }
 
                   if (cleanCr.length != 10) {
-                    showCustomSnackBar('رقم السجل التجاري يجب أن يتكون من 10 أرقام صحيحة', isError: true);
+                    showCustomSnackBar(
+                        'cr_number_must_be_10_digits'.tr,
+                        isError: true);
                     return;
                   }
 
                   if (controller.isVerifyingCr) {
-                    showCustomSnackBar('جاري التحقق من صحة السجل التجاري، يرجى الانتظار...', isError: false);
+                    showCustomSnackBar(
+                        'verifying_cr_please_wait'.tr,
+                        isError: false);
                     return;
                   }
 
                   // If not yet verified for this 10-digit number, perform verification now
                   if (controller.crVerificationResult == null) {
-                    final isOk = await controller.verifyCommercialRegister(cleanCr);
+                    final isOk =
+                        await controller.verifyCommercialRegister(cleanCr);
                     if (!isOk) return;
                   }
 
                   // Final check on verification result
-                  final bool isValid = controller.crVerificationResult?['is_valid'] == true &&
-                      controller.crVerificationResult?['is_already_registered'] != true;
+                  final bool isValid = controller
+                              .crVerificationResult?['is_valid'] ==
+                          true &&
+                      controller
+                              .crVerificationResult?['is_already_registered'] !=
+                          true;
 
                   if (!isValid) {
-                    final msg = controller.crVerificationResult?['message']?.toString() ??
-                        'رقم السجل التجاري غير صالح أو مسجل بالفعل لمتجر آخر';
+                    final msg = controller.crVerificationResult?['message']
+                            ?.toString() ??
+                        'cr_invalid_or_already_registered'.tr;
                     showCustomSnackBar(msg, isError: true, showDuration: 4);
                     return;
                   }
 
                   // Save all current form fields to the active visit model
                   final updatedVisit = currentVisit.copyWith(
-                    openingsCount: int.tryParse(controller.openingsController.text) ?? currentVisit.openingsCount,
+                    openingsCount:
+                        int.tryParse(controller.openingsController.text) ??
+                            currentVisit.openingsCount,
                     crNumber: cleanCr,
                     managerName: controller.managerNameController.text,
                     phone: controller.phoneController.text,
                     pipelineStep: controller.selectedPipelineStep,
                     interestStatus: controller.selectedInterestStatus,
-                    nextFollowUpCommitments: controller.commitmentsController.text,
+                    nextFollowUpCommitments:
+                        controller.commitmentsController.text,
                     obstaclesNotes: controller.obstaclesController.text,
-                    closingReason: controller.selectedPipelineStep == StorePipelineStep.notMet
+                    closingReason: controller.selectedPipelineStep ==
+                            StorePipelineStep.notMet
                         ? controller.reasonNotMetController.text
-                        : (controller.selectedPipelineStep == StorePipelineStep.rejected
+                        : (controller.selectedPipelineStep ==
+                                StorePipelineStep.rejected
                             ? controller.reasonRejectedController.text
                             : controller.reasonDisqualifiedController.text),
                   );
@@ -1538,7 +1752,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _primaryGreen,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text(
                   'follow_up_to_visit_result_btn'.tr,
@@ -1577,7 +1792,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bool hasContent = controller.confidentialNotesController.text.trim().isNotEmpty ||
+            final bool hasContent = controller.confidentialNotesController.text
+                    .trim()
+                    .isNotEmpty ||
                 controller.confidentialTitleController.text.trim().isNotEmpty;
 
             return Padding(
@@ -1599,7 +1816,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         height: 4,
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                          color: isDark
+                              ? const Color(0xFF374151)
+                              : const Color(0xFFE5E7EB),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -1666,7 +1885,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             color: Color(0xFF707784),
                           ),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
                         ),
                       ),
                     ),
@@ -1731,7 +1951,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             colorText: Colors.white,
                             margin: const EdgeInsets.all(16),
                             borderRadius: 12,
-                            icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+                            icon: const Icon(Icons.check_circle_outline,
+                                color: Colors.white),
                             duration: const Duration(seconds: 3),
                           );
                           _syncInputsToController(controller);
@@ -1739,7 +1960,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: hasContent
                               ? _primaryGreen
-                              : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
+                              : (isDark
+                                  ? const Color(0xFF252B37)
+                                  : const Color(0xFFE2E4E6)),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -1751,7 +1974,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             fontFamily: 'Tajawal',
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: hasContent ? Colors.white : const Color(0xFF555555),
+                            color: hasContent
+                                ? Colors.white
+                                : const Color(0xFF555555),
                           ),
                         ),
                       ),
@@ -1787,9 +2012,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             : cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isExtended
-              ? _primaryGreen.withValues(alpha: 0.6)
-              : borderColor,
+          color:
+              isExtended ? _primaryGreen.withValues(alpha: 0.6) : borderColor,
           width: isExtended ? 1.3 : 1.0,
         ),
         boxShadow: [
@@ -1811,14 +2035,18 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 decoration: BoxDecoration(
                   color: isExtended
                       ? _primaryGreen.withValues(alpha: 0.18)
-                      : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6)),
+                      : (isDark
+                          ? const Color(0xFF252B37)
+                          : const Color(0xFFF3F4F6)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
                 child: Icon(
                   isExtended ? Icons.verified_outlined : Icons.timer_outlined,
                   size: 20,
-                  color: isExtended ? _primaryGreen : (isCritical ? const Color(0xFFEF4444) : _primaryGreen),
+                  color: isExtended
+                      ? _primaryGreen
+                      : (isCritical ? const Color(0xFFEF4444) : _primaryGreen),
                 ),
               ),
               const SizedBox(width: 10),
@@ -1841,11 +2069,16 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: isCritical
                                 ? const Color(0xFFFEE2E2)
-                                : (isExtended ? _primaryGreen.withValues(alpha: 0.2) : (isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6))),
+                                : (isExtended
+                                    ? _primaryGreen.withValues(alpha: 0.2)
+                                    : (isDark
+                                        ? const Color(0xFF252B37)
+                                        : const Color(0xFFF3F4F6))),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -1886,7 +2119,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF252B37) : const Color(0xFFF8FAFC),
+                color:
+                    isDark ? const Color(0xFF252B37) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
