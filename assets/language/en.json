@@ -3496,6 +3496,7 @@
   "visit_store_title": "Visit Store",
   "work_zone_locked": "Work zone locked",
   "choose_zone_before_tour": "Select area before starting tour",
+  "only_enabled_zones_available": "Zones shown in gray are not available yet",
   "must_be_within_specified_range": "You must be within the specified range to start work.",
   "planned_visits": "planned visits",
   "continue_to_attendance": "Continue to attendance",

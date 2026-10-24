@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import '../controllers/attendance_controller.dart';
+import '../models/work_zone_model.dart';
 import '../../services/marketer_shift_service.dart';
 import 'attendance_stepper_screen.dart';
 
@@ -27,7 +29,6 @@ class SelectWorkZoneScreen extends StatelessWidget {
     final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
     final selectedCardBg = isDark ? const Color(0xFF1B3822) : const Color(0xFFF1FBF2);
     final borderColor = isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB);
-    final radioBorder = isDark ? const Color(0xFF4B5563) : const Color(0xFFD1D5DB);
     final textDark = isDark ? Colors.white : _darkText;
     final textSub = isDark ? const Color(0xFF9CA3AF) : _subText;
 
@@ -112,89 +113,72 @@ class SelectWorkZoneScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // List of zones
+                      // Map: available zones highlighted green & tappable,
+                      // unavailable ones shown gray and not selectable.
                       Expanded(
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          itemCount: controller.zones.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
-                          itemBuilder: (context, index) {
-                            final zone = controller.zones[index];
-                            final isSelected = controller.selectedZone?.id == zone.id;
-
-                            return InkWell(
-                              onTap: controller.isZoneLocked
-                                  ? null
-                                  : () => controller.selectZone(zone),
-                              borderRadius: BorderRadius.circular(14),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? selectedCardBg : cardBg,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: isSelected ? _primaryGreen : borderColor,
-                                    width: isSelected ? 1.5 : 1,
+                        child: Stack(
+                          children: [
+                            _ZoneMap(
+                              zones: controller.zones,
+                              selectedZone: controller.selectedZone,
+                              isZoneLocked: controller.isZoneLocked,
+                              onZoneTap: controller.selectZone,
+                            ),
+                            if (controller.zones.any((z) => !z.isAvailable))
+                              Positioned(
+                                top: 12,
+                                right: 12,
+                                left: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: cardBg.withValues(alpha: 0.95),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: borderColor),
+                                  ),
+                                  child: Text(
+                                    'only_enabled_zones_available'.tr,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 12,
+                                      color: textSub,
+                                    ),
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // Radio circle (Left in RTL)
-                                    Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: isSelected ? _primaryGreen : radioBorder,
-                                          width: 2,
+                              ),
+                            if (controller.selectedZone != null)
+                              Positioned(
+                                bottom: 12,
+                                right: 12,
+                                left: 12,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: selectedCardBg,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: _primaryGreen.withValues(alpha: 0.4)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.location_on_rounded, color: _primaryGreen, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          '${controller.selectedZone!.name} · ${controller.selectedZone!.plannedVisits} ${'planned_visits'.tr}',
+                                          style: const TextStyle(
+                                            fontFamily: 'Tajawal',
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            color: _primaryGreen,
+                                          ),
                                         ),
                                       ),
-                                      child: isSelected
-                                          ? Center(
-                                              child: Container(
-                                                width: 10,
-                                                height: 10,
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: _primaryGreen,
-                                                ),
-                                              ),
-                                            )
-                                          : null,
-                                    ),
-
-                                    // Zone details (Right in RTL)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          zone.name,
-                                          style: TextStyle(
-                                            fontFamily: 'Tajawal',
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: isSelected ? _primaryGreen : textDark,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${zone.plannedVisits} ${'planned_visits'.tr}',
-                                          style: TextStyle(
-                                            fontFamily: 'Tajawal',
-                                            fontSize: 12,
-                                            color: textSub,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            );
-                          },
+                          ],
                         ),
                       ),
 
@@ -391,5 +375,97 @@ class SelectWorkZoneScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Renders every zone as a polygon: available zones in green and tappable,
+/// unavailable ones in gray and inert. Replaces the old plain list.
+class _ZoneMap extends StatefulWidget {
+  final List<WorkZoneModel> zones;
+  final WorkZoneModel? selectedZone;
+  final bool isZoneLocked;
+  final void Function(WorkZoneModel zone) onZoneTap;
+
+  const _ZoneMap({
+    required this.zones,
+    required this.selectedZone,
+    required this.isZoneLocked,
+    required this.onZoneTap,
+  });
+
+  @override
+  State<_ZoneMap> createState() => _ZoneMapState();
+}
+
+class _ZoneMapState extends State<_ZoneMap> {
+  GoogleMapController? _mapController;
+  bool _didFitBounds = false;
+
+  static const Color _availableFill = Color(0x4D30913F);
+  static const Color _availableFillDim = Color(0x2630913F);
+  static const Color _availableStroke = Color(0xFF30913F);
+  static const Color _unavailableFill = Color(0x33667085);
+  static const Color _unavailableStroke = Color(0xFF98A2B3);
+
+  @override
+  Widget build(BuildContext context) {
+    final zonesWithPolygon = widget.zones.where((z) => z.polygon.length >= 3).toList();
+
+    final polygons = <Polygon>{
+      for (final zone in zonesWithPolygon)
+        Polygon(
+          polygonId: PolygonId('zone_${zone.id}'),
+          points: zone.polygon.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+          fillColor: zone.isAvailable
+              ? (widget.selectedZone?.id == zone.id ? _availableFill : _availableFillDim)
+              : _unavailableFill,
+          strokeColor: zone.isAvailable ? _availableStroke : _unavailableStroke,
+          strokeWidth: zone.isAvailable && widget.selectedZone?.id == zone.id ? 3 : 2,
+          consumeTapEvents: zone.isAvailable && !widget.isZoneLocked,
+          onTap: (zone.isAvailable && !widget.isZoneLocked) ? () => widget.onZoneTap(zone) : null,
+        ),
+    };
+
+    final LatLng center = widget.selectedZone != null
+        ? LatLng(widget.selectedZone!.polygonCenterLat, widget.selectedZone!.polygonCenterLng)
+        : zonesWithPolygon.isNotEmpty
+            ? LatLng(zonesWithPolygon.first.polygonCenterLat, zonesWithPolygon.first.polygonCenterLng)
+            : const LatLng(24.7136, 46.6753);
+
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(target: center, zoom: 11),
+      polygons: polygons,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      onMapCreated: (c) {
+        _mapController = c;
+        _maybeFitBounds(zonesWithPolygon);
+      },
+    );
+  }
+
+  void _maybeFitBounds(List<WorkZoneModel> zonesWithPolygon) {
+    if (_didFitBounds || zonesWithPolygon.isEmpty) return;
+    _didFitBounds = true;
+
+    double? minLat, maxLat, minLng, maxLng;
+    for (final zone in zonesWithPolygon) {
+      for (final p in zone.polygon) {
+        minLat = (minLat == null || p.latitude < minLat) ? p.latitude : minLat;
+        maxLat = (maxLat == null || p.latitude > maxLat) ? p.latitude : maxLat;
+        minLng = (minLng == null || p.longitude < minLng) ? p.longitude : minLng;
+        maxLng = (maxLng == null || p.longitude > maxLng) ? p.longitude : maxLng;
+      }
+    }
+    if (minLat == null || maxLat == null || minLng == null || maxLng == null) return;
+
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+    Future.delayed(const Duration(milliseconds: 250), () {
+      _mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 60));
+    });
   }
 }

@@ -3496,6 +3496,7 @@
   "visit_store_title": "زيارة متجر",
   "work_zone_locked": "تم قفل منطقة العمل",
   "choose_zone_before_tour": "اختر المنطقة قبل بدء الجولة",
+  "only_enabled_zones_available": "المناطق الملوّنة باللون الرمادي غير متاحة حالياً",
   "must_be_within_specified_range": "يجب أن تكون داخل النطاق المحدد لبدء الدوام.",
   "planned_visits": "زيارات مخططة",
   "continue_to_attendance": "متابعة إلى تسجيل الحضور",
