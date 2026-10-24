@@ -78,7 +78,7 @@ class AttendanceController extends GetxController implements GetxService {
             selectedZone = match;
           }
         } else if (zones.isNotEmpty && selectedZone == null) {
-          selectedZone = zones.first;
+          selectedZone = zones.firstWhereOrNull((z) => z.isAvailable) ?? zones.first;
         }
       }
     } catch (e) {
@@ -172,7 +172,7 @@ class AttendanceController extends GetxController implements GetxService {
   }
 
   void selectZone(WorkZoneModel zone) {
-    if (!isZoneLocked) {
+    if (!isZoneLocked && zone.isAvailable) {
       selectedZone = zone;
       userLocation ??= LatLng(zone.latitude, zone.longitude);
       update();
