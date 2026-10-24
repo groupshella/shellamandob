@@ -165,6 +165,26 @@ class MarketerShiftService {
     }
   }
 
+  /// POST /api/v1/customer/marketer/location/ping
+  Future<Response> pingLocation({
+    required double lat,
+    required double lng,
+  }) async {
+    try {
+      return await apiClient.postData(
+        AppConstants.marketerLocationPingUri,
+        {
+          'lat': lat,
+          'lng': lng,
+        },
+        handleError: false,
+      );
+    } catch (e) {
+      debugPrint('❌ [MarketerShiftService] pingLocation error: $e');
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
+
   /// GET /api/v1/customer/marketer/shift/current
   Future<Response> getCurrentShift() async {
     try {
