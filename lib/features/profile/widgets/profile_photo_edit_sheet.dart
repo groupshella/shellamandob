@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -83,13 +83,19 @@ class _ProfilePhotoEditSheetState extends State<ProfilePhotoEditSheet> {
     }
   }
 
-  Future<void> _changePhoto() async {
+  void _changePhoto() {
     Get.back<void>();
-    final XFile? file =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    if (file != null) {
-      Get.find<ProfileController>().setPickedFile(file);
-    }
+    showImageSourceBottomSheet(
+      context: context,
+      onSourceSelected: (source) {
+        pickImageSafely(
+          source: source,
+          onPicked: (file) {
+            Get.find<ProfileController>().setPickedFile(file);
+          },
+        );
+      },
+    );
   }
 
   void _removePhoto() {
@@ -101,10 +107,11 @@ class _ProfilePhotoEditSheetState extends State<ProfilePhotoEditSheet> {
   @override
   Widget build(BuildContext context) {
     final double circleSize = MediaQuery.of(context).size.width * 0.5;
+    final Color titleColor = Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF2D3633);
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.wtColor,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: SafeArea(
@@ -117,9 +124,9 @@ class _ProfilePhotoEditSheetState extends State<ProfilePhotoEditSheet> {
                 InkWell(
                   onTap: () => Get.back<void>(),
                   customBorder: const CircleBorder(),
-                  child: const Padding(
-                    padding: EdgeInsets.all(4),
-                    child: Icon(Icons.close, size: 22, color: _titleColor),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(Icons.close, size: 22, color: titleColor),
                   ),
                 ),
                 Expanded(
@@ -130,7 +137,7 @@ class _ProfilePhotoEditSheetState extends State<ProfilePhotoEditSheet> {
                       fontFamily: 'Tajawal',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: _titleColor,
+                      color: titleColor,
                     ),
                   ),
                 ),
@@ -291,3 +298,184 @@ class _ProfilePhotoEditSheetState extends State<ProfilePhotoEditSheet> {
     );
   }
 }
+
+/// Displays a theme-aware bottom sheet allowing the user to select between
+/// Camera and Gallery.
+void showImageSourceBottomSheet({
+  required BuildContext context,
+  required Function(ImageSource source) onSourceSelected,
+  String? title,
+}) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isDismissible: true,
+    builder: (ctx) {
+      final theme = Theme.of(ctx);
+      final isDark = theme.brightness == Brightness.dark;
+      return Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF333333) : const Color(0xFFEAECF0),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Text(
+                title ?? 'pf_change_photo'.tr,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.bodyLarge?.color,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _ImageSourceTile(
+                    icon: Icons.camera_alt_rounded,
+                    label: 'camera_source'.tr,
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      onSourceSelected(ImageSource.camera);
+                    },
+                  ),
+                  _ImageSourceTile(
+                    icon: Icons.photo_library_rounded,
+                    label: 'gallery_source'.tr,
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      onSourceSelected(ImageSource.gallery);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _ImageSourceTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ImageSourceTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: 120,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: isDark ? theme.colorScheme.surface : const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? const Color(0xFF333333) : const Color(0xFFEAECF0),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: AppColors.primaryColor, size: 24),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: theme.textTheme.bodyLarge?.color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Safely picks an image from the given [source]. If the camera is not available
+/// (e.g. on Android emulators throwing PlatformException(no_available_camera)),
+/// it gracefully falls back to [ImageSource.gallery] without crashing.
+Future<void> pickImageSafely({
+  required ImageSource source,
+  required Function(XFile file) onPicked,
+}) async {
+  try {
+    final XFile? file = await ImagePicker().pickImage(
+      source: source,
+      maxWidth: 1000,
+      maxHeight: 1000,
+      imageQuality: 85,
+    );
+    if (file != null) {
+      onPicked(file);
+    }
+  } on PlatformException catch (e) {
+    debugPrint('ImagePicker PlatformException: ${e.code} - ${e.message}');
+    if (source == ImageSource.camera) {
+      try {
+        final XFile? file = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1000,
+          maxHeight: 1000,
+          imageQuality: 85,
+        );
+        if (file != null) {
+          onPicked(file);
+        }
+      } catch (fallbackError) {
+        debugPrint('ImagePicker Gallery fallback error: $fallbackError');
+      }
+    }
+  } catch (e) {
+    debugPrint('ImagePicker error: $e');
+    try {
+      final XFile? file = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1000,
+        maxHeight: 1000,
+        imageQuality: 85,
+      );
+      if (file != null) {
+        onPicked(file);
+      }
+    } catch (_) {}
+  }
+}
+

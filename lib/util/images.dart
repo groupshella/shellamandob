@@ -635,4 +635,5 @@ class Images {
   static const String navQrInactive = 'assets/image/nav_qr_inactive.png';
   static const String navProfileActive = 'assets/image/nav_profile_active.png';
   static const String navProfileInactive = 'assets/image/nav_profile_inactive.png';
+  static const String leaveStatusHourglass = 'assets/image/leave_status_hourglass.png';
 }

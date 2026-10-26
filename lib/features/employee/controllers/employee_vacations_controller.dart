@@ -15,6 +15,8 @@ class MarketerLeaveModel {
   final int days;
   final String? reason;
   final String? rejectReason;
+  final String? attachment;
+  final String? createdAt;
 
   MarketerLeaveModel({
     required this.id,
@@ -28,6 +30,8 @@ class MarketerLeaveModel {
     this.days = 1,
     this.reason,
     this.rejectReason,
+    this.attachment,
+    this.createdAt,
   });
 
   factory MarketerLeaveModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +47,43 @@ class MarketerLeaveModel {
       days: json['days'] is int ? json['days'] : int.tryParse('${json['days']}') ?? 1,
       reason: json['reason']?.toString(),
       rejectReason: json['reject_reason']?.toString(),
+      attachment: json['attachment']?.toString(),
+      createdAt: json['created_at']?.toString(),
+    );
+  }
+}
+
+class MarketerLeaveQuotaModel {
+  final int annualTotal;
+  final int annualUsed;
+  final int annualRemaining;
+  final bool annualExhausted;
+  final int sickTotal;
+  final int sickUsed;
+  final int sickRemaining;
+  final bool sickExhausted;
+
+  MarketerLeaveQuotaModel({
+    required this.annualTotal,
+    required this.annualUsed,
+    required this.annualRemaining,
+    required this.annualExhausted,
+    required this.sickTotal,
+    required this.sickUsed,
+    required this.sickRemaining,
+    required this.sickExhausted,
+  });
+
+  factory MarketerLeaveQuotaModel.fromJson(Map<String, dynamic> json) {
+    return MarketerLeaveQuotaModel(
+      annualTotal: int.tryParse('${json['annual_total']}') ?? 21,
+      annualUsed: int.tryParse('${json['annual_used']}') ?? 0,
+      annualRemaining: int.tryParse('${json['annual_remaining']}') ?? 21,
+      annualExhausted: json['annual_exhausted'] == true || json['annual_exhausted'] == 1,
+      sickTotal: int.tryParse('${json['sick_total']}') ?? 30,
+      sickUsed: int.tryParse('${json['sick_used']}') ?? 0,
+      sickRemaining: int.tryParse('${json['sick_remaining']}') ?? 30,
+      sickExhausted: json['sick_exhausted'] == true || json['sick_exhausted'] == 1,
     );
   }
 }
@@ -57,8 +98,17 @@ class EmployeeVacationsController extends GetxController implements GetxService 
   bool _isSubmitting = false;
   bool get isSubmitting => _isSubmitting;
 
+  String? _lastErrorMessage;
+  String? get lastErrorMessage => _lastErrorMessage;
+
   List<MarketerLeaveModel> _leavesList = [];
   List<MarketerLeaveModel> get leavesList => _leavesList;
+
+  MarketerLeaveQuotaModel? _quota;
+  MarketerLeaveQuotaModel? get quota => _quota;
+
+  bool get isAnnualLeaveExhausted => _quota?.annualExhausted ?? false;
+  bool get isSickLeaveExhausted => _quota?.sickExhausted ?? false;
 
   @override
   void onInit() {
@@ -80,6 +130,12 @@ class EmployeeVacationsController extends GetxController implements GetxService 
         } else {
           _leavesList = [];
         }
+
+        if (response.body['quota'] is Map) {
+          _quota = MarketerLeaveQuotaModel.fromJson(
+            Map<String, dynamic>.from(response.body['quota']),
+          );
+        }
       } else {
         _leavesList = [];
       }
@@ -92,7 +148,7 @@ class EmployeeVacationsController extends GetxController implements GetxService 
     }
   }
 
-  Future<bool> submitLeaveRequest({
+  Future<MarketerLeaveModel?> submitLeaveRequest({
     required String type,
     required DateTime startDate,
     required DateTime endDate,
@@ -100,6 +156,7 @@ class EmployeeVacationsController extends GetxController implements GetxService 
     String? filePath,
   }) async {
     _isSubmitting = true;
+    _lastErrorMessage = null;
     update();
     try {
       final Map<String, String> fields = {
@@ -130,14 +187,23 @@ class EmployeeVacationsController extends GetxController implements GetxService 
         await fetchLeaves();
         _isSubmitting = false;
         update();
-        return true;
+
+        if (response.body != null && response.body['data'] is Map) {
+          return MarketerLeaveModel.fromJson(Map<String, dynamic>.from(response.body['data']));
+        }
+        return _leavesList.isNotEmpty ? _leavesList.first : null;
+      } else {
+        if (response.body != null && response.body['message'] != null) {
+          _lastErrorMessage = response.body['message'].toString();
+        }
       }
     } catch (e) {
       debugPrint('Error submitting leave: $e');
+      _lastErrorMessage = e.toString();
     } finally {
       _isSubmitting = false;
       update();
     }
-    return false;
+    return null;
   }
 }

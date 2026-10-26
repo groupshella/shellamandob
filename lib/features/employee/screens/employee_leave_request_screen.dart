@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'employee_leave_status_screen.dart';
 import '../controllers/employee_vacations_controller.dart';
 
 /// Enum for the vacation / leave request type
@@ -146,7 +148,7 @@ class _EmployeeLeaveRequestScreenState
 
     final typeStr = widget.leaveType == LeaveType.sick ? 'sick_leave' : 'annual_leave';
 
-    final success = await vacationsCtrl.submitLeaveRequest(
+    final createdLeave = await vacationsCtrl.submitLeaveRequest(
       type: typeStr,
       startDate: _startDate!,
       endDate: _endDate!,
@@ -157,18 +159,17 @@ class _EmployeeLeaveRequestScreenState
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    if (success) {
-      _showSuccessToast();
+    if (createdLeave != null) {
+      _showSuccessToast(createdLeave);
     } else {
-      Get.rawSnackbar(
-        message: 'leave_request_error'.tr,
-        backgroundColor: const Color(0xFFDC2626),
+      showCustomSnackBar(
+        vacationsCtrl.lastErrorMessage ?? 'leave_request_error'.tr,
       );
     }
   }
 
   /// Exact Figma success toast (Figma 8976:27106)
-  void _showSuccessToast() {
+  void _showSuccessToast(MarketerLeaveModel leave) {
     final isDark = Get.find<ThemeController>().darkTheme;
 
     Get.rawSnackbar(
@@ -219,7 +220,7 @@ class _EmployeeLeaveRequestScreenState
 
     Future.delayed(const Duration(milliseconds: 1400), () {
       if (mounted) {
-        Get.back();
+        Get.off(() => EmployeeLeaveStatusScreen(leave: leave));
       }
     });
   }

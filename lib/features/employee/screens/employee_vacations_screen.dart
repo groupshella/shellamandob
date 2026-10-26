@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'employee_leave_request_screen.dart';
+import 'employee_leave_status_screen.dart';
 import '../controllers/employee_vacations_controller.dart';
 
 /// Vacations list & history screen — faithfully matches Figma node 8970:2686 in node 8976:27114 "الأجازات"
@@ -76,40 +78,54 @@ class EmployeeVacationsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ─── 1. Top Action Cards Row (Figma 8974:3071) ─────────────────
-                    Row(
-                      children: [
-                        // Card 1: إجازة سنوية -> تقديم طلب
-                        Expanded(
-                          child: _buildActionCard(
-                            cardBg: cardBg,
-                            darkText: darkText,
-                            borderColor: borderColor,
-                            title: 'annual_leave'.tr,
-                            onTap: () => Get.to(
-                              () => const EmployeeLeaveRequestScreen(
-                                leaveType: LeaveType.annual,
+                    GetBuilder<EmployeeVacationsController>(
+                      builder: (vacCtrl) {
+                        final isAnnualExhausted = vacCtrl.isAnnualLeaveExhausted;
+                        return Row(
+                          children: [
+                            // Card 1: إجازة سنوية -> تقديم طلب / تم الانتهاء من إجازاتك
+                            Expanded(
+                              child: _buildActionCard(
+                                cardBg: isAnnualExhausted
+                                    ? (isDark ? const Color(0xFF1E232B) : const Color(0xFFF9FAFB))
+                                    : cardBg,
+                                darkText: darkText,
+                                borderColor: borderColor,
+                                title: 'annual_leave'.tr,
+                                isExhausted: isAnnualExhausted,
+                                isDark: isDark,
+                                onTap: () {
+                                  if (isAnnualExhausted) {
+                                    showCustomSnackBar('annual_leaves_quota_exhausted_snack'.tr);
+                                  } else {
+                                    Get.to(() => const EmployeeLeaveRequestScreen(
+                                      leaveType: LeaveType.annual,
+                                    ));
+                                  }
+                                },
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
+                            const SizedBox(width: 12),
 
-                        // Card 2: إجازة مرضية -> تقديم طلب
-                        Expanded(
-                          child: _buildActionCard(
-                            cardBg: cardBg,
-                            darkText: darkText,
-                            borderColor: borderColor,
-                            title: 'sick_leave'.tr,
-                            onTap: () => Get.to(
-                              () => const EmployeeLeaveRequestScreen(
-                                leaveType: LeaveType.sick,
+                            // Card 2: إجازة مرضية -> تقديم طلب
+                            Expanded(
+                              child: _buildActionCard(
+                                cardBg: cardBg,
+                                darkText: darkText,
+                                borderColor: borderColor,
+                                title: 'sick_leave'.tr,
+                                isExhausted: false,
+                                isDark: isDark,
+                                onTap: () => Get.to(
+                                  () => const EmployeeLeaveRequestScreen(
+                                    leaveType: LeaveType.sick,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ],
+                          ],
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -242,6 +258,9 @@ class EmployeeVacationsScreen extends StatelessWidget {
                                         statusBgColor: statusBgColor,
                                         darkText: darkText,
                                         subText: subText,
+                                        onTap: () => Get.to(
+                                          () => EmployeeLeaveStatusScreen(leave: item),
+                                        ),
                                       ),
                                     ],
                                   );
@@ -264,13 +283,15 @@ class EmployeeVacationsScreen extends StatelessWidget {
     );
   }
 
-  /// Top leave application card (Figma 8974:3076 / 8974:3081)
+  /// Top leave application card (Figma 8974:3076 / 8974:3081 / 9480:92821)
   Widget _buildActionCard({
     required Color cardBg,
     required Color darkText,
     required Color borderColor,
     required String title,
     required VoidCallback onTap,
+    required bool isDark,
+    bool isExhausted = false,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
@@ -295,7 +316,9 @@ class EmployeeVacationsScreen extends StatelessWidget {
               fontFamily: 'Tajawal',
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: darkText,
+              color: isExhausted
+                  ? (isDark ? const Color(0xFF6B7280) : const Color(0xFF98A2B3))
+                  : darkText,
             ),
           ),
           const SizedBox(height: 16),
@@ -306,7 +329,9 @@ class EmployeeVacationsScreen extends StatelessWidget {
               height: 32,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: _primaryGreen,
+                color: isExhausted
+                    ? (isDark ? const Color(0xFF2C3240) : const Color(0xFFEAECF0))
+                    : _primaryGreen,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -314,20 +339,24 @@ class EmployeeVacationsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'apply_request'.tr,
-                    style: const TextStyle(
+                    isExhausted ? 'completed_your_leaves'.tr : 'apply_request'.tr,
+                    style: TextStyle(
                       fontFamily: 'Tajawal',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isExhausted
+                          ? (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF667085))
+                          : Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: Colors.white,
-                    size: 11,
-                  ),
+                  if (!isExhausted) ...[
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Colors.white,
+                      size: 11,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -346,54 +375,59 @@ class EmployeeVacationsScreen extends StatelessWidget {
     required Color statusBgColor,
     required Color darkText,
     required Color subText,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: darkText,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: darkText,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  dateAndDuration,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 11,
-                    color: subText,
+                  const SizedBox(height: 3),
+                  Text(
+                    dateAndDuration,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      color: subText,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusBgColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              statusText,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: statusColor,
+                ],
               ),
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusBgColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                statusText,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: statusColor,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

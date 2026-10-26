@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 import 'package:sixam_mart/common/widgets/custom_text_field.dart';
@@ -444,12 +443,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     Get.to(() => const DeleteAccountScreen());
   }
 
-  Future<void> _pickProfilePhoto(ProfileController pc) async {
-    final XFile? file =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    if (file != null) {
-      pc.setPickedFile(file);
-    }
+  void _pickProfilePhoto(ProfileController pc) {
+    showImageSourceBottomSheet(
+      context: context,
+      title: 'upload_photo'.tr,
+      onSourceSelected: (source) {
+        pickImageSafely(
+          source: source,
+          onPicked: (file) {
+            pc.setPickedFile(file);
+          },
+        );
+      },
+    );
   }
 
   // ─────────────────────────────── Field widgets ─────────────────────────────
