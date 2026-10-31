@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/features/auth/domain/reposotories/auth_repository_interface.dart';
 import 'package:sixam_mart/util/environment_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sixam_mart/features/auth/helper/qr_referral_token_storage.dart';
 
 /// Controller for the in-app "Coupon Marketer" feature.
 /// Talks to the backend endpoints:
@@ -140,11 +142,22 @@ class MarketerController extends GetxController implements GetxService {
     XFile? documentFile,
     String? idNumber,
     String? notes,
+    String? supervisorCode,
+    String? marketerType,
   }) async {
     _isSubmitting = true;
     update();
     bool ok = false;
     try {
+      // Auto-extract supervisor / referral code from QR / deep link storage in the background
+      String? storedRefToken;
+      if (Get.isRegistered<SharedPreferences>()) {
+        storedRefToken = QrReferralTokenStorage(Get.find<SharedPreferences>()).getStoredToken();
+      }
+      final String? finalSupervisorCode = (supervisorCode != null && supervisorCode.trim().isNotEmpty)
+          ? supervisorCode.trim()
+          : storedRefToken;
+
       final Map<String, String> body = {
         'first_name': firstName,
         'last_name': lastName,
@@ -153,6 +166,9 @@ class MarketerController extends GetxController implements GetxService {
         if (documentType != null && documentType.isNotEmpty) 'document_type': documentType,
         'id_number': idNumber ?? phone,
         'notes': notes ?? '',
+        if (finalSupervisorCode != null && finalSupervisorCode.isNotEmpty) 'supervisor_code': finalSupervisorCode,
+        if (finalSupervisorCode != null && finalSupervisorCode.isNotEmpty) 'referral_code': finalSupervisorCode,
+        if (marketerType != null && marketerType.isNotEmpty) 'marketer_type': marketerType,
       };
 
       Response response;
@@ -173,6 +189,9 @@ class MarketerController extends GetxController implements GetxService {
 
       if (response.statusCode == 200) {
         ok = true;
+        if (Get.isRegistered<SharedPreferences>()) {
+          await QrReferralTokenStorage(Get.find<SharedPreferences>()).clearToken();
+        }
         if (response.body != null && response.body is Map) {
           final resData = response.body as Map<String, dynamic>;
           final dynamic token = resData['token'];
