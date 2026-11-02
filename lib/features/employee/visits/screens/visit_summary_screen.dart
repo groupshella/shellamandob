@@ -12,6 +12,8 @@ import '../widgets/merchant_promo_library_bottom_sheet.dart';
 import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
 import '../widgets/store_visit_embedded_map_widget.dart';
+import '../widgets/decision_maker_card_widget.dart';
+import '../widgets/store_contacts_section_widget.dart';
 import '../../../chat/screens/chat_screen.dart';
 
 class VisitSummaryScreen extends StatefulWidget {
@@ -71,6 +73,10 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         if (initialCr.length == 10) {
           controller.verifyCommercialRegister(initialCr);
         }
+        final sId = widget.visit.storeId ?? int.tryParse(widget.visit.id) ?? 0;
+        if (sId > 0) {
+          controller.loadStoreContacts(sId);
+        }
         controller.commitmentsController.text =
             widget.visit.nextFollowUpCommitments ?? '';
         controller.confidentialNotesController.text =
@@ -115,19 +121,19 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         final screenBg =
             isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
         final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-        final darkText = isDark ? Colors.white : const Color(0xFF111B18);
+        final darkText = isDark ? Colors.white : const Color(0xFF111827);
         final subText =
             isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
         final inputFill =
-            isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+            isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
         final selectedBg =
-            isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB);
+            isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4);
         final unselectedBg =
-            isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+            isDark ? const Color(0xFF252B37) : Colors.white;
         final unselectedBorder =
             isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
         final borderColor =
-            isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
+            isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
 
         return GetBuilder<StoreVisitsController>(
           init: Get.isRegistered<StoreVisitsController>()
@@ -259,7 +265,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               ),
               body: SingleChildScrollView(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -330,81 +336,12 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           isDark: isDark,
                         ),
                         const SizedBox(height: 12),
-                        // CR Number with OCR Scanner button
+                        // CR Number with Unified OCR Scanner suffix & label
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'cr_number'.tr,
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: darkText,
-                                  ),
-                                ),
-                                if (_isEditable)
-                                  InkWell(
-                                    onTap: () {
-                                      CrScannerDialog.show(
-                                        context,
-                                        onCrDetected: (cr) {
-                                          final clean =
-                                              cr.replaceAll(RegExp(r'\D'), '');
-                                          controller.crNumberController.text =
-                                              clean;
-                                          _syncInputsToController(controller);
-                                          if (clean.length == 10) {
-                                            controller.verifyCommercialRegister(
-                                                clean);
-                                          } else {
-                                            controller.clearCrVerification();
-                                          }
-                                        },
-                                      );
-                                    },
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? const Color(0xFF163E20)
-                                            : const Color(0xFFEBFEEB),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color: const Color(0xFF30913F)
-                                                .withValues(alpha: 0.3)),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                              Icons.qr_code_scanner_rounded,
-                                              size: 14,
-                                              color: Color(0xFF30913F)),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            'cr_scan_ocr_title'.tr,
-                                            style: TextStyle(
-                                              fontFamily: 'Tajawal',
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700,
-                                              color: Color(0xFF30913F),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
                             _buildInputField(
-                              label: '',
+                              label: 'cr_number'.tr,
                               controller: controller.crNumberController,
                               hintText: '1010XXXXXX',
                               keyboardType: TextInputType.number,
@@ -426,6 +363,64 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                               darkText: darkText,
                               inputFill: inputFill,
                               isDark: isDark,
+                              suffixIcon: _isEditable
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                                      child: InkWell(
+                                        onTap: () {
+                                          CrScannerDialog.show(
+                                            context,
+                                            onCrDetected: (cr) {
+                                              final clean =
+                                                  cr.replaceAll(RegExp(r'\D'), '');
+                                              controller.crNumberController.text =
+                                                  clean;
+                                              _syncInputsToController(controller);
+                                              if (clean.length == 10) {
+                                                controller.verifyCommercialRegister(
+                                                    clean);
+                                              } else {
+                                                controller.clearCrVerification();
+                                              }
+                                            },
+                                          );
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? const Color(0xFF163E20)
+                                                : const Color(0xFFEBFEEB),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                                color: const Color(0xFF30913F)
+                                                    .withValues(alpha: 0.3)),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                  Icons.qr_code_scanner_rounded,
+                                                  size: 15,
+                                                  color: Color(0xFF30913F)),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                'cr_scan_ocr_title'.tr,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Tajawal',
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF30913F),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : null,
                             ),
                             // Verification Status Result
                             if (controller.isVerifyingCr)
@@ -468,11 +463,21 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                                 true)
                                         ? (isDark
                                             ? const Color(0xFF163E20)
-                                            : const Color(0xFFEBFEEB))
+                                            : const Color(0xFFF0FDF4))
                                         : (isDark
                                             ? const Color(0xFF2B2520)
                                             : const Color(0xFFFFFBEB)),
                                     borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: (controller.crVerificationResult![
+                                                      'is_valid'] ==
+                                                  true &&
+                                              controller.crVerificationResult![
+                                                      'is_already_registered'] !=
+                                                  true)
+                                          ? _primaryGreen.withValues(alpha: 0.25)
+                                          : const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                                    ),
                                   ),
                                   child: Row(
                                     children: [
@@ -542,24 +547,19 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: isDark
-                                ? [
-                                    const Color(0xFF1B3822),
-                                    const Color(0xFF162A1E)
-                                  ]
-                                : [
-                                    const Color(0xFFE8F5E9),
-                                    const Color(0xFFF1F8F5)
-                                  ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          color: cardBg,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color:
-                                const Color(0xFF30913F).withValues(alpha: 0.4),
+                            color: borderColor,
+                            width: 1.0,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           children: [
@@ -662,6 +662,14 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           isDark: isDark,
                         ),
                       ],
+                    ),
+
+                    // [R03] سجل جهات اتصال المتجر والتدريب والموافقة
+                    StoreContactsSectionWidget(
+                      controller: controller,
+                      visit: currentVisit,
+                      isDark: isDark,
+                      readOnly: !_isEditable,
                     ),
 
                     const SizedBox(height: 16),
@@ -829,6 +837,12 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         // Conditional reason when 'لم تتم المقابلة' is selected (Figma Node 8942:1746 & 8945:23023)
                         if (controller.selectedPipelineStep ==
                             StorePipelineStep.notMet) ...[
+                          DecisionMakerCardWidget(
+                            controller: controller,
+                            visit: currentVisit,
+                            isDark: isDark,
+                            readOnly: !_isEditable,
+                          ),
                           const SizedBox(height: 14),
                           _buildInputField(
                             label: 'reason_for_not_meeting'.tr,
@@ -1028,6 +1042,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     required Color darkText,
     required Color inputFill,
     required bool isDark,
+    Widget? suffixIcon,
   }) {
     if (readOnly && controller.text.isEmpty && initialValue != null) {
       controller.text = initialValue;
@@ -1073,16 +1088,23 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 : inputFill,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            suffixIcon: suffixIcon,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
+                width: 0.8,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
+                width: 0.8,
+              ),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: _primaryGreen, width: 1.5),
             ),
           ),
@@ -1576,19 +1598,10 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: cardBg,
-        border: Border(top: BorderSide(color: borderColor, width: 1)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08000000),
-            blurRadius: 10,
-            offset: Offset(0, -4),
-          ),
-        ],
-      ),
+      color: Colors.transparent,
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 6),
       child: SafeArea(
+        top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1597,42 +1610,36 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 48,
-                    child: ElevatedButton.icon(
+                    height: 46,
+                    child: OutlinedButton.icon(
                       onPressed: () => Get.to(() => const ChatScreen()),
                       icon: const Icon(Icons.phone_in_talk_rounded,
-                          size: 17, color: Color(0xFF16A34A)),
+                          size: 16, color: _primaryGreen),
                       label: Text(
                         'chat_with_admin_btn'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
                           color: darkText,
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
+                      style: OutlinedButton.styleFrom(
                         backgroundColor: isDark
-                            ? const Color(0xFF163E20)
-                            : const Color(0xFFF0FDF4),
-                        elevation: 0,
-                        side: BorderSide(
-                          color: isDark
-                              ? const Color(0xFF225B2F)
-                              : const Color(0xFFDCFCE7),
-                          width: 1,
-                        ),
+                            ? const Color(0xFF252B37)
+                            : Colors.white,
+                        side: BorderSide(color: borderColor, width: 1),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   child: SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
+                    height: 46,
+                    child: OutlinedButton(
                       onPressed: () => _showConfidentialReportBottomSheet(
                         context,
                         controller,
@@ -1642,11 +1649,10 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         darkText: darkText,
                         inputFill: inputFill,
                       ),
-                      style: ElevatedButton.styleFrom(
+                      style: OutlinedButton.styleFrom(
                         backgroundColor: isDark
                             ? const Color(0xFF252B37)
-                            : const Color(0xFFF3F4F6),
-                        elevation: 0,
+                            : Colors.white,
                         side: BorderSide(color: borderColor, width: 1),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -1655,8 +1661,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         'confidential_report_title'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
                           color: darkText,
                         ),
                       ),
@@ -2007,14 +2013,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isExtended
-            ? (isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9))
-            : cardBg,
+        color: cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color:
-              isExtended ? _primaryGreen.withValues(alpha: 0.6) : borderColor,
-          width: isExtended ? 1.3 : 1.0,
+          color: isExtended ? _primaryGreen.withValues(alpha: 0.5) : borderColor,
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
@@ -2054,8 +2057,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      alignment: WrapAlignment.spaceBetween,
                       children: [
                         Text(
                           isExtended

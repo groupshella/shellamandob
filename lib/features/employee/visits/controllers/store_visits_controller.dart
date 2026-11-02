@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import '../models/store_visit_model.dart';
+import '../models/store_contact_model.dart';
 import '../models/merchant_promo_model.dart';
 import '../models/not_closing_reason.dart';
+import '../domain/models/contract_activation_model.dart';
 import '../../controllers/employee_shift_controller.dart';
 import '../../models/employee_shift_model.dart';
 import '../../alerts/controllers/anti_fraud_alerts_controller.dart';
@@ -79,6 +81,26 @@ class StoreVisitsController extends GetxController {
   final TextEditingController obstaclesController = TextEditingController();
   final TextEditingController otherReasonController = TextEditingController();
   final TextEditingController confidentialNotesController = TextEditingController();
+
+  // R02: Decision Maker fields ('العامل موجود والمالك غائب')
+  final TextEditingController decisionMakerNameController = TextEditingController();
+  final TextEditingController decisionMakerPhoneController = TextEditingController();
+  String? _selectedDecisionMakerBestTime;
+  String? get selectedDecisionMakerBestTime => _selectedDecisionMakerBestTime;
+  String? _selectedInterviewedPersonRole;
+  String? get selectedInterviewedPersonRole => _selectedInterviewedPersonRole;
+
+  void setDecisionMakerBestTime(String? time) {
+    _selectedDecisionMakerBestTime = time;
+    registerActivity();
+    update();
+  }
+
+  void setInterviewedPersonRole(String? role) {
+    _selectedInterviewedPersonRole = role;
+    registerActivity();
+    update();
+  }
 
   // Dynamic conditional controllers
   final TextEditingController reasonNotMetController = TextEditingController();
@@ -637,6 +659,10 @@ class StoreVisitsController extends GetxController {
     phoneController.text = visit.phone;
     openingsController.text = visit.openingsCount.toString();
     crNumberController.text = visit.crNumber;
+    decisionMakerNameController.text = visit.decisionMakerName ?? '';
+    decisionMakerPhoneController.text = visit.decisionMakerPhone ?? '';
+    _selectedDecisionMakerBestTime = visit.decisionMakerBestTime;
+    _selectedInterviewedPersonRole = visit.interviewedPersonRole;
     _selectedPipelineStep = visit.pipelineStep;
     _frontImagePath = visit.frontImagePath;
     _insideImagePath = visit.insideImagePath;
@@ -941,29 +967,43 @@ class StoreVisitsController extends GetxController {
   }
 
   // Finish visit logic with qualification evaluation & backend API sync
-  Future<bool> submitAndFinishVisit({StoreVisitModel? targetVisit}) async {
+  Future<bool> submitAndFinishVisit({
+    StoreVisitModel? targetVisit,
+    bool isNafathVerified = false,
+  }) async {
     final baseVisit = targetVisit ?? _activeVisit;
     if (baseVisit == null) return false;
 
-    final bool isContractSigned = (_selectedPipelineStep == StorePipelineStep.contractSigned ||
+    final bool isContractStep = (_selectedPipelineStep == StorePipelineStep.contractSigned ||
         baseVisit.pipelineStep == StorePipelineStep.contractSigned);
+
+    // A contract visit is ONLY officially completed when Nafath verification is confirmed successful!
+    final bool isContractOfficiallyCompleted = isContractStep && isNafathVerified;
 
     final bool isDisqualifiedOrRejected = (_selectedPipelineStep == StorePipelineStep.rejected ||
         _selectedPipelineStep == StorePipelineStep.notQualified);
 
-    final bool isFollowUpNeeded = !isContractSigned &&
+    final bool isFollowUpNeeded = !isContractOfficiallyCompleted &&
         !isDisqualifiedOrRejected &&
         (_selectedPipelineStep == StorePipelineStep.gracePeriod ||
             _selectedPipelineStep == StorePipelineStep.negotiating ||
             _selectedPipelineStep == StorePipelineStep.interested ||
             _selectedFollowUpDate != null);
 
-    // Outcome logic: qualified if contract signed or minimum conditions met
-    final bool isQualified = isContractSigned ||
-        ((_selectedPipelineStep != StorePipelineStep.notMet &&
+    // Outcome logic: qualified if contract signed and nafath verified, or minimum conditions met
+    final bool isQualified = isContractOfficiallyCompleted ||
+        (!isContractStep &&
+            (_selectedPipelineStep != StorePipelineStep.notMet &&
                 _selectedPipelineStep != StorePipelineStep.rejected &&
                 _selectedPipelineStep != StorePipelineStep.notQualified) &&
             (_frontImagePath != null || _insideImagePath != null || baseVisit.frontImagePath != null));
+
+    // Status: if it's a contract step but Nafath is NOT yet verified, it MUST stay inProgress (pending verification)!
+    final StoreVisitStatus finalVisitStatus = isFollowUpNeeded
+        ? StoreVisitStatus.followUp
+        : (isContractStep && !isNafathVerified
+            ? StoreVisitStatus.inProgress
+            : StoreVisitStatus.completed);
 
     String? effectiveClosingReason = _selectedClosingReason ?? baseVisit.closingReason;
     String effectiveOtherDetails = otherReasonController.text.trim().isNotEmpty
@@ -1008,8 +1048,12 @@ class StoreVisitsController extends GetxController {
       phone: effectivePhone,
       openingsCount: effectiveOpenings,
       crNumber: effectiveCrNumber,
+      decisionMakerName: decisionMakerNameController.text.trim().isNotEmpty ? decisionMakerNameController.text.trim() : baseVisit.decisionMakerName,
+      decisionMakerPhone: decisionMakerPhoneController.text.trim().isNotEmpty ? decisionMakerPhoneController.text.trim() : baseVisit.decisionMakerPhone,
+      decisionMakerBestTime: _selectedDecisionMakerBestTime ?? baseVisit.decisionMakerBestTime,
+      interviewedPersonRole: _selectedInterviewedPersonRole ?? baseVisit.interviewedPersonRole,
       pipelineStep: _selectedPipelineStep != StorePipelineStep.notMet ? _selectedPipelineStep : baseVisit.pipelineStep,
-      visitStatus: isFollowUpNeeded ? StoreVisitStatus.followUp : StoreVisitStatus.completed,
+      visitStatus: finalVisitStatus,
       isQualifiedOutcome: isQualified,
       frontImagePath: _frontImagePath ?? baseVisit.frontImagePath,
       insideImagePath: _insideImagePath ?? baseVisit.insideImagePath,
@@ -1055,8 +1099,14 @@ class StoreVisitsController extends GetxController {
             'phone': updated.phone,
             'openings_count': updated.openingsCount,
             'cr_number': updated.crNumber,
+            'decision_maker_name': updated.decisionMakerName,
+            'decision_maker_phone': updated.decisionMakerPhone,
+            'decision_maker_best_time': updated.decisionMakerBestTime,
+            'interviewed_person_role': updated.interviewedPersonRole,
             'pipeline_step': updated.pipelineStep.name,
-            'visit_status': updated.visitStatus == StoreVisitStatus.followUp ? 'follow_up' : 'completed',
+            'visit_status': updated.visitStatus == StoreVisitStatus.followUp
+                ? 'follow_up'
+                : (updated.visitStatus == StoreVisitStatus.inProgress ? 'in_progress' : 'completed'),
             'obstacles_notes': updated.obstaclesNotes,
             'closing_reason': updated.closingReason,
             'closing_reason_other_details': updated.closingReasonOtherDetails,
@@ -1089,11 +1139,243 @@ class StoreVisitsController extends GetxController {
       showCustomSnackBar('server_connection_failed_saved_locally'.tr, isError: true);
     }
 
-    // Update main shift metrics if controller exists
-    if (Get.isRegistered<EmployeeShiftController>()) {
+    // Update main shift metrics only if visit is truly completed
+    if (finalVisitStatus == StoreVisitStatus.completed && Get.isRegistered<EmployeeShiftController>()) {
       Get.find<EmployeeShiftController>().recordVisitCompleted(isQualified);
     }
 
     return true;
+  }
+
+  // =========================================================================
+  // Contract Activation State & Methods (R01)
+  // =========================================================================
+  ContractActivationModel? currentActivation;
+  bool isActivationLoading = false;
+  List<ContractActivationModel> inActivationContracts = [];
+
+  Future<void> loadContractActivation(int storeId, {String? contractNumber}) async {
+    isActivationLoading = true;
+    update();
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final query = contractNumber != null ? '?contract_number=$contractNumber' : '';
+        final res = await Get.find<ApiClient>().getData('${AppConstants.contractActivationUri}/$storeId/activation$query');
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          currentActivation = ContractActivationModel.fromJson(Map<String, dynamic>.from(res.body['data']));
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadContractActivation error: $e');
+    } finally {
+      isActivationLoading = false;
+      update();
+    }
+  }
+
+  Future<bool> updateContractActivationItem(int storeId, String key, String status, {dynamic value, XFile? photoFile}) async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        Response res;
+        if (photoFile != null) {
+          List<MultipartBody> multipart = [
+            MultipartBody('photo', photoFile),
+          ];
+          res = await Get.find<ApiClient>().postMultipartData(
+            '${AppConstants.contractActivationUri}/$storeId/activation/item',
+            {'key': key, 'status': status, if (value != null) 'value': value.toString()},
+            multipart,
+          );
+        } else {
+          res = await Get.find<ApiClient>().postData(
+            '${AppConstants.contractActivationUri}/$storeId/activation/item',
+            {'key': key, 'status': status, if (value != null) 'value': value},
+          );
+        }
+
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          currentActivation = ContractActivationModel.fromJson(Map<String, dynamic>.from(res.body['data']));
+          update();
+          showCustomSnackBar('checklist_item_updated_success'.tr, isError: false);
+          return true;
+        } else {
+          final msg = res.body?['message'] ?? 'checklist_item_updated_failed'.tr;
+          showCustomSnackBar(msg.toString(), isError: true);
+          return false;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] updateContractActivationItem error: $e');
+      showCustomSnackBar('server_connection_failed'.tr, isError: true);
+    }
+    return false;
+  }
+
+  Future<bool> reportContractActivationIssue(int storeId, String notes) async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().postData(
+          '${AppConstants.contractActivationUri}/$storeId/activation/report-issue',
+          {'notes': notes},
+        );
+        if (res.statusCode == 200) {
+          showCustomSnackBar('issue_reported_success'.tr, isError: false);
+          return true;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] reportContractActivationIssue error: $e');
+    }
+    return false;
+  }
+
+  Future<void> loadInActivationContracts() async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData('${AppConstants.contractActivationUri}/in-activation');
+        if (res.statusCode == 200 && res.body != null && res.body['data'] is List) {
+          inActivationContracts = (res.body['data'] as List)
+              .map((i) => ContractActivationModel.fromJson(Map<String, dynamic>.from(i)))
+              .toList();
+          update();
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadInActivationContracts error: $e');
+    }
+  }
+
+  // Dynamic Commercial Contract Legal Clauses
+  List<Map<String, dynamic>> dynamicContractClauses = [];
+  bool isLoadingContractClauses = false;
+
+
+  // [R03] Store Contacts Registry & WhatsApp Consent
+  List<StoreContactModel> storeContacts = [];
+  bool isLoadingContacts = false;
+
+  Future<void> loadStoreContacts(int storeId) async {
+    try {
+      isLoadingContacts = true;
+      update();
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData('/api/v1/customer/marketer/stores/$storeId/contacts');
+        if (res.statusCode == 200 && res.body != null && res.body['data'] is List) {
+          storeContacts = (res.body['data'] as List)
+              .map((c) => StoreContactModel.fromJson(Map<String, dynamic>.from(c)))
+              .toList();
+          update();
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadStoreContacts error: $e');
+    } finally {
+      isLoadingContacts = false;
+      update();
+    }
+  }
+
+  Future<bool> addStoreContact({
+    required int storeId,
+    required String name,
+    required String role,
+    required String phone,
+    String? nationality,
+    String preferredLanguage = 'ar',
+    bool whatsappConsent = true,
+    int? marketerVisitId,
+    String? notes,
+  }) async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final body = {
+          'name': name,
+          'role': role,
+          'phone': phone,
+          if (nationality != null) 'nationality': nationality,
+          'preferred_language': preferredLanguage,
+          'whatsapp_consent': whatsappConsent,
+          if (marketerVisitId != null) 'marketer_visit_id': marketerVisitId,
+          if (notes != null) 'notes': notes,
+        };
+        final res = await Get.find<ApiClient>().postData('/api/v1/customer/marketer/stores/$storeId/contacts', body);
+        if (res.statusCode == 200 || res.statusCode == 201) {
+          if (res.body != null && res.body['data'] != null) {
+            final newContact = StoreContactModel.fromJson(Map<String, dynamic>.from(res.body['data']));
+            storeContacts.insert(0, newContact);
+          } else {
+            // Local fallback
+            storeContacts.insert(0, StoreContactModel(
+              storeId: storeId,
+              name: name,
+              role: role,
+              phone: phone,
+              nationality: nationality,
+              preferredLanguage: preferredLanguage,
+              whatsappConsent: whatsappConsent,
+              consentAt: whatsappConsent ? DateTime.now() : null,
+              notes: notes,
+            ));
+          }
+          update();
+          showCustomSnackBar('contact_added_success'.tr, isError: false);
+          return true;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] addStoreContact error: $e');
+    }
+    // Optimistic fallback for offline/local continuity
+    storeContacts.insert(0, StoreContactModel(
+      storeId: storeId,
+      name: name,
+      role: role,
+      phone: phone,
+      nationality: nationality,
+      preferredLanguage: preferredLanguage,
+      whatsappConsent: whatsappConsent,
+      consentAt: whatsappConsent ? DateTime.now() : null,
+      notes: notes,
+    ));
+    update();
+    showCustomSnackBar('contact_added_success'.tr, isError: false);
+    return true;
+  }
+
+  Future<bool> deleteStoreContact(int contactId) async {
+    try {
+      storeContacts.removeWhere((c) => c.id == contactId);
+      update();
+      if (Get.isRegistered<ApiClient>()) {
+        await Get.find<ApiClient>().deleteData('/api/v1/customer/marketer/contacts/$contactId');
+      }
+      showCustomSnackBar('contact_deleted_success'.tr, isError: false);
+      return true;
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] deleteStoreContact error: $e');
+    }
+    return false;
+  }
+
+  Future<void> loadContractTemplateClauses() async {
+    try {
+      isLoadingContractClauses = true;
+      update();
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData('${AppConstants.contractActivationUri}/template-clauses');
+        if (res.statusCode == 200 && res.body != null && res.body['data'] is List) {
+          dynamicContractClauses = (res.body['data'] as List)
+              .map((e) => Map<String, dynamic>.from(e))
+              .where((c) => c['is_active'] != false)
+              .toList();
+          update();
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadContractTemplateClauses error: $e');
+    } finally {
+      isLoadingContractClauses = false;
+      update();
+    }
   }
 }
