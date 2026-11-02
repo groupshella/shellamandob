@@ -10,9 +10,15 @@ import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_success_dialog.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/util/images.dart';
+import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sixam_mart/features/auth/helper/qr_referral_token_storage.dart';
 
 class MarketerApplyScreen extends StatefulWidget {
-  const MarketerApplyScreen({super.key});
+  final String? marketerType;
+  const MarketerApplyScreen({super.key, this.marketerType});
 
   @override
   State<MarketerApplyScreen> createState() => _MarketerApplyScreenState();
@@ -27,6 +33,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _customProfessionController = TextEditingController();
+  final TextEditingController _referenceCodeController = TextEditingController();
 
   // 1. Profession dropdown options
   final List<String> _professionList = [
@@ -53,6 +60,14 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   @override
   void initState() {
     super.initState();
+    // Prefill reference code from QR / deep link token storage if available
+    if (Get.isRegistered<SharedPreferences>()) {
+      final qrToken = QrReferralTokenStorage(Get.find<SharedPreferences>()).getStoredToken();
+      if (qrToken != null && qrToken.isNotEmpty) {
+        _referenceCodeController.text = qrToken;
+      }
+    }
+
     // Prefill from user profile if available
     if (Get.isRegistered<ProfileController>()) {
       final user = Get.find<ProfileController>().userInfoModel;
@@ -78,6 +93,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     _lastNameController.dispose();
     _phoneController.dispose();
     _customProfessionController.dispose();
+    _referenceCodeController.dispose();
     super.dispose();
   }
 
@@ -252,10 +268,49 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   Future<void> _submit() async {
     if (!_isFormValid) return;
 
-    final controller = Get.find<MarketerController>();
-    if (controller.isSubmitting) return; // Prevent double-triggering
-
     final fullPhone = '$_countryCode${_phoneController.text.trim()}';
+
+    if (!AuthHelper.isLoggedIn()) {
+      final authController = Get.find<AuthController>();
+      if (authController.isLoading) return;
+
+      final result = await authController.sendOtp(phone: fullPhone);
+      if (!mounted) return;
+
+      if (result.success) {
+        final pendingData = {
+          'firstName': _firstNameController.text.trim(),
+          'lastName': _lastNameController.text.trim(),
+          'phone': fullPhone,
+          'profession': _effectiveProfession,
+          'documentType': _selectedDocumentType,
+          'idPhotoPath': _selectedFile?.path,
+          'supervisorCode': _referenceCodeController.text.trim(),
+          'marketerType': widget.marketerType ?? 'freelance',
+        };
+
+        Get.toNamed(
+          RouteHelper.getOtpVerificationRoute(),
+          arguments: {
+            'phone': fullPhone,
+            'cooldown': result.retryAfterSeconds ?? result.cooldownSeconds,
+            'expires': result.expiresInSeconds,
+            'pending_marketer_data': pendingData,
+          },
+        );
+      } else {
+        Get.snackbar(
+          'warning'.tr,
+          (result.message != null && result.message!.isNotEmpty) ? result.message! : 'failed_to_send_application'.tr,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+      }
+      return;
+    }
+
+    final controller = Get.find<MarketerController>();
+    if (controller.isSubmitting) return;
 
     final ok = await controller.apply(
       firstName: _firstNameController.text.trim(),
@@ -264,6 +319,8 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
       profession: _effectiveProfession,
       documentType: _selectedDocumentType,
       documentFile: _selectedFile,
+      supervisorCode: _referenceCodeController.text.trim(),
+      marketerType: widget.marketerType ?? 'freelance',
     );
 
     if (ok && mounted) {
@@ -277,13 +334,6 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
 
       await MarketerSuccessDialog.show(context, onClose: navigateToMarketerScreen);
       navigateToMarketerScreen();
-    } else if (mounted) {
-      Get.snackbar(
-        'warning'.tr,
-        'failed_to_send_application'.tr,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
     }
   }
 
@@ -303,6 +353,51 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      margin: const EdgeInsets.only(bottom: 14),
+                      decoration: BoxDecoration(
+                        color: widget.marketerType == 'growth_specialist'
+                            ? (isDark ? const Color(0xFF16291C) : const Color(0xFFEBFEEB))
+                            : (isDark ? const Color(0xFF262016) : const Color(0xFFFFF9EB)),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: widget.marketerType == 'growth_specialist'
+                              ? const Color(0xFF30913F)
+                              : const Color(0xFFD97706),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            widget.marketerType == 'growth_specialist'
+                                ? Icons.business_center
+                                : Icons.campaign,
+                            size: 18,
+                            color: widget.marketerType == 'growth_specialist'
+                                ? const Color(0xFF30913F)
+                                : const Color(0xFFD97706),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              widget.marketerType == 'growth_specialist'
+                                  ? 'applying_as_specialist_badge'.tr
+                                  : 'applying_as_freelance_badge'.tr,
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: widget.marketerType == 'growth_specialist'
+                                    ? const Color(0xFF30913F)
+                                    : const Color(0xFFD97706),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     Text(
                       'steps_to_become_marketer'.tr,
                       style: TextStyle(
@@ -398,6 +493,17 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     _buildDottedDocumentUploader(isDark),
                     const SizedBox(height: 20),
 
+                    // Reference / Supervisor Code (Optional)
+                    _buildLabel('reference_code_optional'.tr, isDark, isRequired: false),
+                    const SizedBox(height: 8),
+                    _buildTextField(
+                      controller: _referenceCodeController,
+                      hintText: 'enter_reference_code_hint'.tr,
+                      isDark: isDark,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 20),
+
                     // Terms and conditions checkbox
                     _buildTermsCheckbox(isDark),
                     const SizedBox(height: 24),
@@ -409,70 +515,68 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
             // 4. Submit Button with loading state & double-press prevention
             GetBuilder<MarketerController>(
               builder: (c) {
-                final isSubmitting = c.isSubmitting;
-                final enabled = _isFormValid && !isSubmitting;
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: SizedBox(
-                    height: 50,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: enabled ? _submit : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isSubmitting
-                            ? _primaryGreen
-                            : (enabled
+                return GetBuilder<AuthController>(
+                  builder: (auth) {
+                    final isSubmitting = c.isSubmitting || auth.isLoading;
+                    final enabled = _isFormValid && !isSubmitting;
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: enabled ? _submit : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isSubmitting
                                 ? _primaryGreen
-                                : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6))),
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: isSubmitting
-                            ? _primaryGreen
-                            : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
-                        disabledForegroundColor: isSubmitting
-                            ? Colors.white
-                            : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: isSubmitting
-                          ?  Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  'sending'.tr,
+                                : (enabled
+                                    ? _primaryGreen
+                                    : (isDark ? const Color(0xFF2A2D35) : const Color(0xFFE5E7EB))),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: isSubmitting
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'sending'.tr,
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Text(
+                                  'submit_request'.tr,
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                    color: enabled
+                                        ? Colors.white
+                                        : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
                                   ),
                                 ),
-                              ],
-                            )
-                          : Text(
-                              'submit_request'.tr,
-                              style: TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: enabled
-                                    ? Colors.white
-                                    : (isDark ? const Color(0xFF6B7280) : const Color(0xFF888888)),
-                              ),
-                            ),
-                    ),
-                  ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -482,7 +586,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     );
   }
 
-  Widget _buildLabel(String text, bool isDark) {
+  Widget _buildLabel(String text, bool isDark, {bool isRequired = true}) {
     return Text.rich(
       TextSpan(
         children: [
@@ -495,15 +599,16 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
               color: isDark ? Colors.white : _darkText,
             ),
           ),
-          const TextSpan(
-            text: ' *',
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
+          if (isRequired)
+            const TextSpan(
+              text: ' *',
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -516,9 +621,9 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     required bool isDark,
   }) {
     return Container(
-      height: 52,
+      height: 56,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C2028) : _inputBg,
+        color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8),
         borderRadius: BorderRadius.circular(12),
         border: isDark ? Border.all(color: const Color(0xFF2C3240)) : null,
       ),
@@ -551,7 +656,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   // 1. Dropdown for Profession
   Widget _buildProfessionDropdown(bool isDark) {
     return Container(
-      height: 52,
+      height: 56,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C2028) : _inputBg,
         borderRadius: BorderRadius.circular(12),
@@ -615,7 +720,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   // 3. Phone Field with strictly LTR formatting and Saudi flag
   Widget _buildPhoneField(bool isDark) {
     return Container(
-      height: 52,
+      height: 56,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C2028) : _inputBg,
         borderRadius: BorderRadius.circular(12),

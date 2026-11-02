@@ -8,6 +8,7 @@ import '../models/store_visit_model.dart';
 import 'visit_summary_screen.dart';
 import 'active_store_visit_screen.dart';
 import 'store_visit_map_screen.dart';
+import 'contract_signing_screen.dart';
 import '../../attendance/screens/select_work_zone_screen.dart';
 import '../../../../helper/route_helper.dart';
 import '../../controllers/employee_navigation_controller.dart';
@@ -367,7 +368,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
     required Color btnGreyText,
     required Color darkText,
   }) {
-    final statusConfig = _getStatusConfig(visit.visitStatus, isDark);
+    final statusConfig = _getVisitStatusConfig(visit, isDark);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -387,7 +388,10 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
           onTap: () {
-            if (visit.visitStatus == StoreVisitStatus.completed) {
+            if (visit.pipelineStep == StorePipelineStep.contractSigned && visit.visitStatus != StoreVisitStatus.completed) {
+              controller.resumeVisit(visit);
+              Get.to(() => ContractSigningScreen(visit: visit));
+            } else if (visit.visitStatus == StoreVisitStatus.completed) {
               Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: true));
             } else if (visit.visitStatus == StoreVisitStatus.followUp) {
               controller.resumeVisit(visit);
@@ -849,6 +853,17 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
         );
       },
     );
+  }
+
+  _StatusConfig _getVisitStatusConfig(StoreVisitModel visit, bool isDark) {
+    if (visit.pipelineStep == StorePipelineStep.contractSigned && visit.visitStatus != StoreVisitStatus.completed) {
+      return _StatusConfig(
+        label: _tr('contract_verification_pending', 'قيد توثيق العقد'),
+        textColor: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+        backgroundColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+      );
+    }
+    return _getStatusConfig(visit.visitStatus, isDark);
   }
 
   _StatusConfig _getStatusConfig(StoreVisitStatus status, bool isDark) {

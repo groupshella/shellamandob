@@ -7,7 +7,7 @@ import 'package:sixam_mart/features/language/controllers/language_controller.dar
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/features/marketer/screens/marketer_apply_screen.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_role_selection_screen.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -99,13 +99,13 @@ class WelcomeScreen extends StatelessWidget {
                 if (AppConstants.isMarketerApp) ...[
                   const SizedBox(height: Dimensions.paddingSizeDefault),
                   CustomButton(
-                    buttonText: 'join_as_new_coupon_marketer'.tr,
+                    buttonText: 'join_shella_team'.tr,
                     isBold: true,
                     fontFamily: 'Tajawal',
                     fontSize: 15,
                     color: const Color(0xFFEBFEEB),
                     textColor: const Color(0xFF30913F),
-                    onPressed: () => Get.to(() => const MarketerApplyScreen()),
+                    onPressed: () => Get.to(() => const MarketerRoleSelectionScreen()),
                   ),
                 ],
                 const SizedBox(height: Dimensions.paddingSizeLarge),

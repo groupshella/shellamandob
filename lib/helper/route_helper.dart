@@ -5,6 +5,8 @@ import 'package:sixam_mart/common/performance/page_tracker.dart';
 import 'package:sixam_mart/features/profile/domain/models/update_user_model.dart';
 import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_screen.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_intro_screen.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_role_selection_screen.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
@@ -120,6 +122,8 @@ class RouteHelper {
   static const String loyalty = '/loyalty';
   static const String referAndEarn = '/refer-and-earn';
   static const String marketer = '/marketer';
+  static const String marketerRoleSelection = '/marketer-role-selection';
+  static String getMarketerRoleSelectionRoute() => marketerRoleSelection;
   static const String employeeMain = '/employee-main';
   static String getEmployeeMainRoute() => employeeMain;
   static const String selectWorkZone = '/select-work-zone';
@@ -607,6 +611,9 @@ class RouteHelper {
               phone: data['phone']?.toString() ?? '',
               cooldownSeconds: data['cooldown'] is int ? data['cooldown'] as int : 120,
               expiresInSeconds: data['expires'] is int ? data['expires'] as int : 600,
+              pendingMarketerData: data['pending_marketer_data'] is Map<String, dynamic>
+                  ? data['pending_marketer_data'] as Map<String, dynamic>
+                  : null,
             ),
           );
         }),
@@ -774,6 +781,8 @@ class RouteHelper {
 
     GetPage(name: loyalty, page: () => const NotFound()),
     GetPage(name: marketer, page: () => getRoute(const MarketerScreen())),
+    GetPage(name: '/marketer-intro', page: () => getRoute(const MarketerIntroScreen())),
+    GetPage(name: marketerRoleSelection, page: () => getRoute(const MarketerRoleSelectionScreen())),
     GetPage(name: employeeMain, page: () => getRoute(const EmployeeMainScreen())),
     GetPage(name: selectWorkZone, page: () => getRoute(const SelectWorkZoneScreen())),
     GetPage(name: attendanceStepper, page: () => getRoute(const AttendanceStepperScreen())),

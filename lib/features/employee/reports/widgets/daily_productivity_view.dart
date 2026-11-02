@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/marketer_productivity_model.dart';
 import '../../visits/screens/daily_visits_screen.dart';
 
+/// Daily Productivity View faithfully matching Figma Frame 8949:41979
+/// Specifications:
+/// - 4 KPI Cards: Two rows, each with 2 distinct cards (width: 168px, height: 68px, borderRadius: 18px, boxShadow: 0px 1px 6px rgba(0,0,0,0.05)).
+/// - Daily Target Card: borderRadius 18px, badge "16 / 12" in #E8F5E9 (#30913F 12px Bold), Progress Bar (height: 8px, borderRadius: 4px), Subtitle (12px #555555).
+/// - Day Timeline Card: borderRadius 18px, title "تفاصيل اليوم" (13px Bold), continuous dashed/solid vertical track with timeline steps.
+/// - Signed Agreements Card: borderRadius 18px, title "الاتفاقيات الموقعة" (13px Bold), badge statuses.
+/// - Upcoming Follow-ups Card: borderRadius 18px, title "المتابعات القادمة" (13px Bold) + "عرض الكل".
 class DailyProductivityView extends StatelessWidget {
   final DailyProductivityModel data;
 
@@ -15,9 +23,9 @@ class DailyProductivityView extends StatelessWidget {
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
         final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
+        final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
         final textColor = isDark ? Colors.white : const Color(0xFF111B18);
-        final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555);
         final dividerColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
         final innerItemBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
 
@@ -26,27 +34,27 @@ class DailyProductivityView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Top 4 KPI Cards Grid
-              _buildKpiGrid(data.kpis, cardBg, borderColor, dividerColor, subTextColor),
+              // 1. Top 4 Individual KPI Cards Grid (Figma Frame 2085665812)
+              _buildKpiGrid(data.kpis, cardBg, borderColor, subTextColor, isDark),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // 2. Daily Target Progress Card (الهدف اليومي)
+              // 2. Daily Target Progress Card (Figma 8954:2309 - borderRadius: 18px)
               _buildDailyTargetCard(data.dailyTarget, cardBg, borderColor, textColor, subTextColor, isDark),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
-              // 3. Day Timeline (تفاصيل اليوم)
+              // 3. Day Timeline (Figma 8954:2715 - تفاصيل اليوم)
               _buildTimelineSection(data.timeline, cardBg, borderColor, textColor, subTextColor, isDark),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
-              // 4. Signed Agreements (الاتفاقيات الموقعة)
-              _buildSignedAgreementsSection(data.signedAgreements, cardBg, borderColor, textColor, subTextColor, dividerColor),
+              // 4. Signed Agreements (Figma 8954:2814 - الاتفاقيات الموقعة)
+              _buildSignedAgreementsSection(data.signedAgreements, cardBg, borderColor, textColor, subTextColor, dividerColor, isDark),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
-              // 5. Upcoming Follow-ups (المتابعات القادمة)
+              // 5. Upcoming Follow-ups (Figma 8954:2834 - المتابعات القادمة)
               _buildUpcomingFollowUpsSection(data.upcomingFollowUps, cardBg, borderColor, textColor, subTextColor, innerItemBg),
 
               const SizedBox(height: 96),
@@ -57,118 +65,172 @@ class DailyProductivityView extends StatelessWidget {
     );
   }
 
-  // 1. Top 4 KPI Grid matching Figma Frame 2085665812
+  // 1. Top 4 KPI Cards (Figma Frame 2085665812 - 2 rows of 2 separate 18px rounded cards)
   Widget _buildKpiGrid(
     ProductivityKpis kpis,
     Color cardBg,
     Color borderColor,
-    Color dividerColor,
     Color subTextColor,
+    bool isDark,
   ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 1),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Column(
-        children: [
-          // Row 1: الزيارات الناجحة & ساعات العمل
-          Row(
-            children: [
-              Expanded(
-                child: _buildKpiItem(
-                  title: 'successful_visits_label'.tr,
-                  value: kpis.successfulVisitsText,
-                  valueColor: const Color(0xFF30913F),
-                  subTextColor: subTextColor,
-                ),
+    return Column(
+      children: [
+        // Row 1: ساعات العمل & الزيارات الناجحة
+        Row(
+          children: [
+            Expanded(
+              child: _buildIndividualKpiCard(
+                title: 'successful_visits_label'.tr,
+                value: kpis.successfulVisitsText,
+                valueColor: const Color(0xFF30913F),
+                cardBg: cardBg,
+                borderColor: borderColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+                iconData: IconlyLight.tickSquare,
+                iconColor: const Color(0xFF30913F),
+                iconBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
               ),
-              Container(width: 1, height: 44, color: dividerColor),
-              Expanded(
-                child: _buildKpiItem(
-                  title: 'work_hours_label'.tr,
-                  value: kpis.workHours,
-                  valueColor: const Color(0xFF30913F),
-                  subTextColor: subTextColor,
-                ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildIndividualKpiCard(
+                title: 'work_hours_label'.tr,
+                value: kpis.workHours,
+                valueColor: const Color(0xFF30913F),
+                cardBg: cardBg,
+                borderColor: borderColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+                iconData: IconlyLight.timeCircle,
+                iconColor: const Color(0xFF30913F),
+                iconBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
               ),
-            ],
-          ),
-          Divider(height: 20, thickness: 1, color: dividerColor),
-          // Row 2: الإنذارات & الاتفاقيات الموقعة
-          Row(
-            children: [
-              Expanded(
-                child: _buildKpiItem(
-                  title: 'warnings_label'.tr,
-                  value: kpis.warningsText,
-                  valueColor: const Color(0xFFDC2626),
-                  subTextColor: subTextColor,
-                  icon: const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFDC2626)),
-                ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // Row 2: الإنذارات & الاتفاقيات الموقعة
+        Row(
+          children: [
+            Expanded(
+              child: _buildIndividualKpiCard(
+                title: 'warnings_label'.tr,
+                value: kpis.warningsText,
+                valueColor: const Color(0xFFDC2626),
+                cardBg: cardBg,
+                borderColor: borderColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+                iconData: IconlyBold.danger,
+                iconColor: const Color(0xFFDC2626),
+                iconBg: isDark ? const Color(0xFF3B1818) : const Color(0xFFFEE2E2),
               ),
-              Container(width: 1, height: 44, color: dividerColor),
-              Expanded(
-                child: _buildKpiItem(
-                  title: 'signed_agreements_label'.tr,
-                  value: kpis.signedContractsText,
-                  valueColor: const Color(0xFF7861A6),
-                  subTextColor: subTextColor,
-                ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildIndividualKpiCard(
+                title: 'signed_agreements_label'.tr,
+                value: kpis.signedContractsText,
+                valueColor: const Color(0xFF7861A6),
+                cardBg: cardBg,
+                borderColor: borderColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+                iconData: IconlyLight.document,
+                iconColor: const Color(0xFF7861A6),
+                iconBg: isDark ? const Color(0xFF2C203E) : const Color(0xFFF3E8FF),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildKpiItem({
+  Widget _buildIndividualKpiCard({
     required String title,
     required String value,
     required Color valueColor,
+    required Color cardBg,
+    required Color borderColor,
     required Color subTextColor,
-    Widget? icon,
+    required bool isDark,
+    required IconData iconData,
+    required Color iconColor,
+    required Color iconBg,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      height: 68,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 11,
-              color: subTextColor,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: subTextColor,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: valueColor,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: valueColor,
-                ),
-              ),
-              if (icon != null) ...[
-                const SizedBox(width: 4),
-                icon,
-              ],
-            ],
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              iconData,
+              size: 18,
+              color: iconColor,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // 2. Daily Target Progress Card
+  // 2. Daily Target Progress Card (Figma Container 8954:2309 - 18px rounded)
   Widget _buildDailyTargetCard(
     DailyTargetInfo target,
     Color cardBg,
@@ -182,10 +244,17 @@ class DailyProductivityView extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -196,28 +265,35 @@ class DailyProductivityView extends StatelessWidget {
                 'daily_target_label'.tr,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: textColor,
                 ),
               ),
-              Text(
-                target.targetText,
-                style: const TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF30913F),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  target.targetText,
+                  style: const TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF30913F),
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              minHeight: 7,
+              minHeight: 8,
               backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE5E7EB),
               valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
             ),
@@ -228,6 +304,7 @@ class DailyProductivityView extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 12,
+              fontWeight: FontWeight.w500,
               color: subTextColor,
             ),
           ),
@@ -236,7 +313,7 @@ class DailyProductivityView extends StatelessWidget {
     );
   }
 
-  // 3. Day Timeline (تفاصيل اليوم)
+  // 3. Day Timeline (Figma Container 8954:2715 - 18px rounded)
   Widget _buildTimelineSection(
     List<TimelineItem> timeline,
     Color cardBg,
@@ -248,8 +325,15 @@ class DailyProductivityView extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -259,22 +343,33 @@ class DailyProductivityView extends StatelessWidget {
             'day_details_label'.tr,
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
               color: textColor,
             ),
           ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: timeline.length,
-            itemBuilder: (context, index) {
-              final item = timeline[index];
-              final isLast = (index == timeline.length - 1);
-              return _buildTimelineRow(item, isLast, textColor, subTextColor, isDark);
-            },
-          ),
+          const SizedBox(height: 14),
+          if (timeline.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: Text(
+                  'no_activity_today'.tr,
+                  style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: subTextColor),
+                ),
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: timeline.length,
+              itemBuilder: (context, index) {
+                final item = timeline[index];
+                final isLast = index == timeline.length - 1;
+                return _buildTimelineRow(item, isLast, textColor, subTextColor, isDark);
+              },
+            ),
         ],
       ),
     );
@@ -287,29 +382,22 @@ class DailyProductivityView extends StatelessWidget {
     Color subTextColor,
     bool isDark,
   ) {
-    Color dotColor = const Color(0xFF9CA3AF);
-    if (item.statusColor == 'green') dotColor = const Color(0xFF30913F);
-    if (item.statusColor == 'orange') dotColor = const Color(0xFFF59E0B);
-    if (item.statusColor == 'red') dotColor = const Color(0xFFDC2626);
+    Color dotColor = const Color(0xFF30913F);
+    if (item.type == 'warning') {
+      dotColor = const Color(0xFFDC2626);
+    } else if (item.type == 'contract') {
+      dotColor = const Color(0xFF7861A6);
+    } else if (item.type == 'incomplete') {
+      dotColor = const Color(0xFFF59E0B);
+    } else if (item.type == 'shift') {
+      dotColor = const Color(0xFF6B7280);
+    }
 
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Time column
-          SizedBox(
-            width: 58,
-            child: Text(
-              item.time,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 11,
-                color: subTextColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          // Vertical line and indicator dot
+          // Timeline indicator (Dot + Line)
           Column(
             children: [
               Container(
@@ -323,51 +411,49 @@ class DailyProductivityView extends StatelessWidget {
               if (!isLast)
                 Expanded(
                   child: Container(
-                    width: 2,
-                    color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
+                    width: 1,
+                    color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                    margin: const EdgeInsets.symmetric(vertical: 3),
                   ),
                 ),
             ],
           ),
           const SizedBox(width: 12),
-          // Title & optional badge
+          // Content
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 18),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Text(
-                      item.title,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                      ),
+                  Text(
+                    item.time,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: subTextColor,
                     ),
                   ),
-                  if (item.subtitle != null) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: item.statusColor == 'green'
-                            ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
-                            : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        item.subtitle!,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: item.statusColor == 'green'
-                              ? const Color(0xFF16A34A)
-                              : const Color(0xFFD97706),
-                        ),
+                  const SizedBox(height: 2),
+                  Text(
+                    item.title,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                    ),
+                  ),
+                  if (item.subtitle != null && item.subtitle!.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      item.subtitle!,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 11,
+                        color: dotColor,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -380,7 +466,7 @@ class DailyProductivityView extends StatelessWidget {
     );
   }
 
-  // 4. Signed Agreements (الاتفاقيات الموقعة)
+  // 4. Signed Agreements (Figma Container 8954:2814 - 18px rounded)
   Widget _buildSignedAgreementsSection(
     List<SignedAgreementItem> agreements,
     Color cardBg,
@@ -388,12 +474,20 @@ class DailyProductivityView extends StatelessWidget {
     Color textColor,
     Color subTextColor,
     Color dividerColor,
+    bool isDark,
   ) {
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 0.8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -403,76 +497,85 @@ class DailyProductivityView extends StatelessWidget {
             'signed_agreements_label'.tr,
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
               color: textColor,
             ),
           ),
           const SizedBox(height: 12),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: agreements.length,
-            separatorBuilder: (_, __) => Divider(height: 16, thickness: 0.8, color: dividerColor),
-            itemBuilder: (context, index) {
-              final a = agreements[index];
-              final isGreen = a.statusColor == 'green';
-              final isDark = Theme.of(context).brightness == Brightness.dark || Get.find<ThemeController>().darkTheme;
-
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        a.storeName,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: textColor,
+          if (agreements.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: Text(
+                  'no_contracts_today'.tr,
+                  style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: subTextColor),
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: agreements.length,
+              separatorBuilder: (_, __) => Divider(height: 18, color: dividerColor),
+              itemBuilder: (context, index) {
+                final a = agreements[index];
+                final isGreen = a.status.contains('تم') || a.status.contains('مكتمل');
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          a.storeName,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: textColor,
+                          ),
                         ),
+                        const SizedBox(height: 2),
+                        Text(
+                          a.time,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 11,
+                            color: subTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isGreen
+                            ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
+                            : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        a.time,
+                      child: Text(
+                        a.status,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 11,
-                          color: subTextColor,
+                          fontWeight: FontWeight.w700,
+                          color: isGreen ? const Color(0xFF16A34A) : const Color(0xFFD97706),
                         ),
                       ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isGreen
-                          ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
-                          : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
-                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: Text(
-                      a.status,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: isGreen ? const Color(0xFF16A34A) : const Color(0xFFD97706),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                  ],
+                );
+              },
+            ),
         ],
       ),
     );
   }
 
-  // 5. Upcoming Follow-ups (المتابعات القادمة)
+  // 5. Upcoming Follow-ups (Figma Container 8954:2834 - 18px rounded)
   Widget _buildUpcomingFollowUpsSection(
     List<UpcomingFollowUpItem> followUps,
     Color cardBg,
@@ -484,8 +587,15 @@ class DailyProductivityView extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 0.8),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 6,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -498,7 +608,7 @@ class DailyProductivityView extends StatelessWidget {
                 'upcoming_follow_ups_label'.tr,
                 style: TextStyle(
                   fontFamily: 'Tajawal',
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: textColor,
                 ),
@@ -520,56 +630,67 @@ class DailyProductivityView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: followUps.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (context, index) {
-              final f = followUps[index];
-              return Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: innerItemBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: borderColor),
+          if (followUps.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: Text(
+                  'no_followups_scheduled'.tr,
+                  style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: subTextColor),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      f.datetimeText,
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF3B82F6),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: followUps.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final f = followUps[index];
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: innerItemBg,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: borderColor),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        f.datetimeText,
+                        style: const TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF3B82F6),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      f.storeName,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: textColor,
+                      const SizedBox(height: 4),
+                      Text(
+                        f.storeName,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      f.note,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 11,
-                        color: subTextColor,
+                      const SizedBox(height: 2),
+                      Text(
+                        f.note,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 11,
+                          color: subTextColor,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                    ],
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );

@@ -129,90 +129,102 @@ class EmployeeBottomNavBar extends StatelessWidget {
             ? Colors.white.withValues(alpha: 0.55)
             : const Color(0xFF111B18).withValues(alpha: 0.55);
 
-        return GetBuilder<EmployeeNavigationController>(
-          builder: (navCtrl) {
-            final int currentIndex = selectedIndex ?? navCtrl.currentIndex;
-            final ValueChanged<int> onSelect = onTap ?? (idx) => navCtrl.changeIndex(idx);
-
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: bottomPadding > 0 ? bottomPadding + 4 : 16,
+        Widget buildNav(int currentIndex, ValueChanged<int> onSelect) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: bottomPadding > 0 ? bottomPadding + 4 : 16,
+            ),
+            child: Container(
+              height: _barHeight,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(_barHeight),
+                boxShadow: barShadow,
               ),
-              child: Container(
-                height: _barHeight,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(_barHeight),
-                  boxShadow: barShadow,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(_barHeight),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: barColor,
-                        borderRadius: BorderRadius.circular(_barHeight),
-                        border: Border.all(color: borderColor, width: 1),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: _innerPadding),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final int count = navItems.length;
-                          final double gap = count > 1
-                              ? (constraints.maxWidth - (_slotWidth * count)) / (count - 1)
-                              : 0;
-                          final int safeIndex = currentIndex.clamp(0, count - 1);
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(_barHeight),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: barColor,
+                      borderRadius: BorderRadius.circular(_barHeight),
+                      border: Border.all(color: borderColor, width: 1),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: _innerPadding),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final int count = navItems.length;
+                        final double gap = count > 1
+                            ? (constraints.maxWidth - (_slotWidth * count)) / (count - 1)
+                            : 0;
+                        final int safeIndex = currentIndex.clamp(0, count - 1);
 
-                          return Stack(
-                            alignment: AlignmentDirectional.centerStart,
-                            children: [
-                              // Sliding active pill
-                              AnimatedPositionedDirectional(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOutCubic,
-                                start: safeIndex * (_slotWidth + gap),
-                                top: (constraints.maxHeight - _slotHeight) / 2,
-                                width: _slotWidth,
-                                height: _slotHeight,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: pillColor,
-                                    borderRadius: BorderRadius.circular(200),
-                                  ),
+                        return Stack(
+                          alignment: AlignmentDirectional.centerStart,
+                          children: [
+                            // Sliding active pill
+                            AnimatedPositionedDirectional(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOutCubic,
+                              start: safeIndex * (_slotWidth + gap),
+                              top: (constraints.maxHeight - _slotHeight) / 2,
+                              width: _slotWidth,
+                              height: _slotHeight,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: pillColor,
+                                  borderRadius: BorderRadius.circular(200),
                                 ),
                               ),
+                            ),
 
-                              // Icons row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: List.generate(count, (index) {
-                                  final item = navItems[index];
-                                  final bool isSelected = index == safeIndex;
-                                  return _FloatingNavItemWidget(
-                                    item: item,
-                                    isSelected: isSelected,
-                                    activeColor: activeIconColor,
-                                    inactiveColor: inactiveIconColor,
-                                    onTap: () {
-                                      HapticFeedback.selectionClick();
-                                      onSelect(index);
-                                    },
-                                  );
-                                }),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                            // Icons row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(count, (index) {
+                                final item = navItems[index];
+                                final bool isSelected = index == safeIndex;
+                                return _FloatingNavItemWidget(
+                                  item: item,
+                                  isSelected: isSelected,
+                                  activeColor: activeIconColor,
+                                  inactiveColor: inactiveIconColor,
+                                  onTap: () {
+                                    HapticFeedback.selectionClick();
+                                    onSelect(index);
+                                  },
+                                );
+                              }),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
               ),
-            );
-          },
-        );
+            ),
+          );
+        }
+
+        if (selectedIndex != null) {
+          return buildNav(selectedIndex!, onTap ?? (_) {});
+        }
+
+        if (Get.isRegistered<EmployeeNavigationController>()) {
+          return GetBuilder<EmployeeNavigationController>(
+            builder: (navCtrl) {
+              return buildNav(
+                navCtrl.currentIndex,
+                onTap ?? (idx) => navCtrl.changeIndex(idx),
+              );
+            },
+          );
+        }
+
+        return buildNav(0, onTap ?? (_) {});
       },
     );
   }

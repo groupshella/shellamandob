@@ -3904,5 +3904,8 @@
   "no_contacts_registered_yet": "No additional contacts registered for this store yet",
   "delete_contact": "Delete Contact",
   "whatsapp_consent_verified": "Verified consent to receive WhatsApp and training messages",
-  "edit_contact": "Edit Info"
+  "edit_contact": "Edit Info",
+  "no_contracts_today": "No signed agreements today",
+  "no_followups_scheduled": "No upcoming follow-ups scheduled",
+  "no_activity_today": "No activity recorded today"
 }

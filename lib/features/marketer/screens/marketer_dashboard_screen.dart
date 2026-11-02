@@ -1,3 +1,4 @@
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
@@ -9,7 +10,6 @@ import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dar
 import 'package:sixam_mart/features/marketer/screens/marketer_commissions_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
-import 'package:sixam_mart/features/employee/screens/employee_profile_screen.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -28,11 +28,15 @@ class MarketerDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
 
-    return Scaffold(
+        return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
-      bottomNavigationBar: Container(
+      bottomNavigationBar: (isRoot || !Get.find<MarketerController>().isGrowthSpecialist)
+          ? null
+          : Container(
         color: isDark ? const Color(0xFF1C2028) : Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: SafeArea(
@@ -73,26 +77,9 @@ class MarketerDashboardScreen extends StatelessWidget {
             Column(
               children: [
                 MarketerHeader(
-                  title: isRoot
-                      ? 'my_account_and_marketer'.tr
-                      : 'voucher_marketer'.tr,
+                  title: 'voucher_marketer'.tr,
                   showBackButton: !isRoot,
-                  trailing: GestureDetector(
-                    onTap: () => Get.to(() => const EmployeeProfileScreen()),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        IconlyLight.setting,
-                        size: 20,
-                        color: isDark ? Colors.white : const Color(0xFF111B18),
-                      ),
-                    ),
-                  ),
+                  trailing: null,
                 ),
                 Expanded(
                   child: GetBuilder<MarketerController>(
@@ -101,8 +88,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                         color: _primaryGreen,
                         onRefresh: c.loadDashboard,
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
+                          padding: EdgeInsets.fromLTRB(16, 10, 16, isRoot ? 90 : 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -126,11 +112,7 @@ class MarketerDashboardScreen extends StatelessWidget {
 
                               // 4. Recent Commissions Card
                               _buildRecentCommissionsCard(c, isDark),
-                              const SizedBox(height: 16),
-
-                              // 5. Settings Quick Card
-                              _buildSettingsQuickCard(isDark),
-                              const SizedBox(height: 70),
+                              const SizedBox(height: 80),
                             ],
                           ),
                         ),
@@ -143,7 +125,7 @@ class MarketerDashboardScreen extends StatelessWidget {
 
             // Floating Support Button (Matching Figma: Circular 56x56 at Bottom Left)
             Positioned(
-              bottom: 20,
+              bottom: isRoot ? 85 : 20,
               left: 20,
               child: GestureDetector(
                 onTap: () => Get.toNamed(RouteHelper.getSupportRoute()),
@@ -177,6 +159,8 @@ class MarketerDashboardScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 
@@ -1179,162 +1163,105 @@ class MarketerDashboardScreen extends StatelessWidget {
       builder: (profileCtrl) {
         final userInfo = profileCtrl.userInfoModel;
         final name = userInfo != null
-            ? '${userInfo.fName ?? ''} ${userInfo.lName ?? ''}'.trim()
-            : 'certified_marketer'.tr;
+            ? ' '.trim()
+            : 'certified_freelance_marketer'.tr;
         final phone = userInfo?.phone ?? '';
         final imageUrl = userInfo?.imageFullUrl ?? '';
 
-        return InkWell(
-          onTap: () => Get.to(() => const EmployeeProfileScreen()),
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                  color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-            ),
-            child: Row(
-              children: [
-                ClipOval(
-                  child: imageUrl.isNotEmpty
-                      ? CustomImage(
-                          image: imageUrl,
-                          height: 44,
-                          width: 44,
-                          placeholder: Images.guestIcon,
-                        )
-                      : Container(
-                          height: 44,
-                          width: 44,
-                          decoration: BoxDecoration(
-                            color: _primaryGreen.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            IconlyBold.profile,
-                            size: 22,
-                            color: _primaryGreen,
-                          ),
+        final isFreelance = Get.isRegistered<MarketerController>() &&
+            Get.find<MarketerController>().isFreelance;
+        final roleBadge = isFreelance
+            ? 'certified_freelance_marketer'.tr
+            : 'certified_marketer'.tr;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+                color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
+          ),
+          child: Row(
+            children: [
+              ClipOval(
+                child: imageUrl.isNotEmpty
+                    ? CustomImage(
+                        image: imageUrl,
+                        height: 44,
+                        width: 44,
+                        placeholder: Images.guestIcon,
+                      )
+                    : Container(
+                        height: 44,
+                        width: 44,
+                        decoration: BoxDecoration(
+                          color: _primaryGreen.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name.isNotEmpty ? name : 'shella_agent'.tr,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : _darkText,
+                        child: const Icon(
+                          IconlyBold.profile,
+                          size: 22,
+                          color: _primaryGreen,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        phone.isNotEmpty ? phone : 'certified_marketer'.tr,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 12,
-                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                        ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name.isNotEmpty ? name : 'shella_agent'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : _darkText,
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF252B37) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(IconlyLight.setting,
-                          size: 16, color: _primaryGreen),
-                      const SizedBox(width: 4),
-                      Text(
-                        'settings'.tr,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : _darkText,
-                        ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      phone.isNotEmpty ? phone : roleBadge,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 12,
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF162D1D) : const Color(0xFFEBFEEB),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                      color: isDark ? const Color(0xFF225B2E) : const Color(0xFFC3ECC8)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.check_circle_rounded,
+                        size: 15, color: _primaryGreen),
+                    const SizedBox(width: 4),
+                    Text(
+                      roleBadge,
+                      style: const TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: _primaryGreen,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSettingsQuickCard(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'app_and_account_settings'.tr,
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : _darkText,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'app_and_account_settings_desc'.tr,
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 12,
-              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-            ),
-          ),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: () => Get.to(() => const EmployeeProfileScreen()),
-            icon: const Icon(IconlyLight.setting, size: 18),
-            label: Text(
-              'open_settings'.tr,
-              style: const TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? const Color(0xFF252B37) : Colors.white,
-              foregroundColor: _primaryGreen,
-              elevation: 0,
-              side: BorderSide(
-                  color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

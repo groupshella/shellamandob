@@ -3904,5 +3904,8 @@
   "no_contacts_registered_yet": "لم يتم تسجيل جهات اتصال إضافية لهذا المتجر بعد",
   "delete_contact": "حذف جهة الاتصال",
   "whatsapp_consent_verified": "تم توثيق الموافقة على استلام رسائل الواتساب والتدريب",
-  "edit_contact": "تعديل البيانات"
+  "edit_contact": "تعديل البيانات",
+  "no_contracts_today": "لا توجد اتفاقيات موقعة اليوم",
+  "no_followups_scheduled": "لا توجد متابعات قادمة مجدولة",
+  "no_activity_today": "لا توجد نشاطات مسجلة اليوم"
 }

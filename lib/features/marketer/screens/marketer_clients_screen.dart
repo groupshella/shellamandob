@@ -1,3 +1,4 @@
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
@@ -23,9 +24,11 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
 
-    return GetBuilder<LocalizationController>(
+        return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
           backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
@@ -216,7 +219,7 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
                               )
                             : ListView.separated(
                                 physics: const AlwaysScrollableScrollPhysics(),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                padding: EdgeInsets.fromLTRB(16, 12, 16, widget.isRoot ? 90 : 12),
                                 itemCount: filtered.length,
                                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                                 itemBuilder: (context, index) {
@@ -232,6 +235,8 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
             ),
           ),
         );
+      },
+    );
       },
     );
   }

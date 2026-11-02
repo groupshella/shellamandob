@@ -8,6 +8,7 @@ import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
+import 'contract_activation_screen.dart';
 import '../../../../helper/route_helper.dart';
 import '../../controllers/employee_navigation_controller.dart';
 
@@ -61,6 +62,12 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
     final idPad = widget.visit.id.padLeft(4, '0');
     _contractNumber = '#CTR-${now.year}-$idPad';
     _generateRandomNafathCode();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<StoreVisitsController>()) {
+        Get.find<StoreVisitsController>().loadContractTemplateClauses();
+      }
+    });
   }
 
   void _generateRandomNafathCode() {
@@ -337,50 +344,78 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
 
             const SizedBox(height: 14),
 
-            // Clauses 1 to 5 from Figma
-            _buildClauseItem(
-              number: '1',
-              title: 'clause_1_title'.tr,
-              content: 'clause_1_content'.tr,
-              cardBg: cardBg,
-              bodyDark: bodyDark,
-              subText: subText,
-            ),
-            const SizedBox(height: 12),
-            _buildClauseItem(
-              number: '2',
-              title: 'clause_2_title'.tr,
-              content: 'clause_2_content'.tr,
-              cardBg: cardBg,
-              bodyDark: bodyDark,
-              subText: subText,
-            ),
-            const SizedBox(height: 12),
-            _buildClauseItem(
-              number: '3',
-              title: 'clause_3_title'.tr,
-              content: 'clause_3_content'.tr,
-              cardBg: cardBg,
-              bodyDark: bodyDark,
-              subText: subText,
-            ),
-            const SizedBox(height: 12),
-            _buildClauseItem(
-              number: '4',
-              title: 'clause_4_title'.tr,
-              content: 'clause_4_content'.tr,
-              cardBg: cardBg,
-              bodyDark: bodyDark,
-              subText: subText,
-            ),
-            const SizedBox(height: 12),
-            _buildClauseItem(
-              number: '5',
-              title: 'clause_5_title'.tr,
-              content: 'clause_5_content'.tr,
-              cardBg: cardBg,
-              bodyDark: bodyDark,
-              subText: subText,
+            // Dynamic Clauses from Admin API Settings
+            GetBuilder<StoreVisitsController>(
+              builder: (visitsCtrl) {
+                final clauses = visitsCtrl.dynamicContractClauses;
+                if (clauses.isNotEmpty) {
+                  final isAr = Get.locale?.languageCode == 'ar';
+                  return Column(
+                    children: clauses.asMap().entries.map((entry) {
+                      final idx = entry.key + 1;
+                      final c = entry.value;
+                      final title = isAr
+                          ? (c['title_ar']?.toString() ?? c['title_en']?.toString() ?? '')
+                          : (c['title_en']?.toString() ?? c['title_ar']?.toString() ?? '');
+                      final content = isAr
+                          ? (c['content_ar']?.toString() ?? c['content_en']?.toString() ?? '')
+                          : (c['content_en']?.toString() ?? c['content_ar']?.toString() ?? '');
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _buildClauseItem(
+                          number: '$idx',
+                          title: title,
+                          content: content,
+                          cardBg: cardBg,
+                          bodyDark: bodyDark,
+                          subText: subText,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }
+
+                // Fallback default clauses from translation files
+                return Column(
+                  children: [
+                    _buildClauseItem(
+                      number: '1',
+                      title: 'clause_1_title'.tr,
+                      content: 'clause_1_content'.tr,
+                      cardBg: cardBg,
+                      bodyDark: bodyDark,
+                      subText: subText,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildClauseItem(
+                      number: '2',
+                      title: 'clause_2_title'.tr,
+                      content: 'clause_2_content'.tr,
+                      cardBg: cardBg,
+                      bodyDark: bodyDark,
+                      subText: subText,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildClauseItem(
+                      number: '3',
+                      title: 'clause_3_title'.tr,
+                      content: 'clause_3_content'.tr,
+                      cardBg: cardBg,
+                      bodyDark: bodyDark,
+                      subText: subText,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildClauseItem(
+                      number: '4',
+                      title: 'clause_4_title'.tr,
+                      content: 'clause_4_content'.tr,
+                      cardBg: cardBg,
+                      bodyDark: bodyDark,
+                      subText: subText,
+                    ),
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 16),
@@ -1076,7 +1111,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
 
               const Spacer(),
 
-              // Primary Action Button: بدء الزيارة التالية
+              // Primary Action Button: متابعة تفعيل المتجر
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -1085,13 +1120,15 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                     if (Get.isRegistered<StoreVisitsController>()) {
                       final controller = Get.find<StoreVisitsController>();
                       controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      await controller.submitAndFinishVisit(targetVisit: widget.visit);
+                      await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
                       await controller.loadVisits();
                     }
-                    if (Get.isRegistered<EmployeeNavigationController>()) {
-                      Get.find<EmployeeNavigationController>().changeIndex(1);
-                    }
-                    Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
+                    final targetStoreId = widget.visit.storeId ?? (int.tryParse(widget.visit.id) ?? 0);
+                    Get.to(() => ContractActivationScreen(
+                      storeId: targetStoreId,
+                      storeName: widget.visit.storeName,
+                      contractNumber: _contractNumber,
+                    ));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryGreen,
@@ -1099,12 +1136,46 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
-                    'start_next_visit'.tr,
+                    'track_store_activation'.tr,
                     style: const TextStyle(
                       fontFamily: 'Tajawal',
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Secondary Action Button: بدء الزيارة التالية
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    if (Get.isRegistered<StoreVisitsController>()) {
+                      final controller = Get.find<StoreVisitsController>();
+                      controller.setPipelineStep(StorePipelineStep.contractSigned);
+                      await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
+                      await controller.loadVisits();
+                    }
+                    if (Get.isRegistered<EmployeeNavigationController>()) {
+                      Get.find<EmployeeNavigationController>().changeIndex(1);
+                    }
+                    Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: _primaryGreen),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    'start_next_visit'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: _primaryGreen,
                     ),
                   ),
                 ),

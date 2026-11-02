@@ -34,12 +34,6 @@ class _LanguageSelectScreenState extends State<LanguageSelectScreen> {
     if (code == 'en') {
       return 'English';
     }
-    if (code == 'bn') {
-      return 'বাংলা (Bengali)';
-    }
-    if (code == 'es') {
-      return 'Español (Spanish)';
-    }
     return AppConstants.languages[index].languageName ?? '';
   }
 

@@ -8,8 +8,8 @@ import 'package:sixam_mart/util/environment_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/auth/helper/qr_referral_token_storage.dart';
 
-/// Controller for the in-app "Coupon Marketer" feature.
-/// Talks to the backend endpoints:
+///   Controller for the in-app "Coupon Marketer" feature.
+///   Talks to the backend endpoints:
 ///   GET  /api/v1/customer/marketer/dashboard
 ///   POST /api/v1/customer/marketer/apply
 class MarketerController extends GetxController implements GetxService {
@@ -37,6 +37,9 @@ class MarketerController extends GetxController implements GetxService {
 
   /// none | pending | approved | rejected | suspended
   String get status => (_data?['marketer_status'] ?? 'none').toString();
+  String get marketerType => (_data?['marketer_type'] ?? '').toString();
+  bool get isGrowthSpecialist => marketerType == 'growth_specialist';
+  bool get isFreelance => marketerType == 'freelance' || (!isGrowthSpecialist && status == 'approved');
 
   String get code => (_data?['code'] ?? 'SHILLAH-R-0000').toString();
   String get qrLink => (_data?['qr_link'] ?? '${EnvironmentConfig.baseUrl}/join?ref=$code').toString();
@@ -187,6 +190,7 @@ class MarketerController extends GetxController implements GetxService {
         );
       }
 
+      debugPrint('🔍 [MarketerController] apply response: statusCode=${response.statusCode}, body=${response.body}, statusText=${response.statusText}');
       if (response.statusCode == 200) {
         ok = true;
         if (Get.isRegistered<SharedPreferences>()) {
@@ -205,6 +209,18 @@ class MarketerController extends GetxController implements GetxService {
           }
         }
         await loadDashboard();
+      } else {
+        String? errorMsg;
+        if (response.body is Map) {
+          final resData = response.body as Map;
+          errorMsg = resData['message']?.toString() ?? resData['error']?.toString();
+        }
+        Get.snackbar(
+          'warning'.tr,
+          (errorMsg != null && errorMsg.isNotEmpty) ? errorMsg : 'failed_to_send_application'.tr,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
       debugPrint('Marketer apply error: $e');

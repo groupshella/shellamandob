@@ -1343,16 +1343,10 @@ class ApiClient extends GetxService {
         if (i.isNotEmpty) dioFormData.fields.add(MapEntry(s, i));
       });
 
-      final dynamic dioMultipartResp = await _fallbackDio.post<dynamic>(
-        appBaseUrl + uri,
-        data: dioFormData,
-        options: dio_pkg.Options(
-          headers: finalHeaders,
-          validateStatus: (s) => s != null,
-        ),
-      );
-      return _handleDioFallbackResponse(dioMultipartResp, uri, handleError);
-    } catch (e) {
+      return await postFormData(uri, dioFormData, headers: headers, handleError: handleError);
+    } catch (e, stack) {
+      debugPrint('❌ [ApiClient] postMultipartData EXCEPTION: $e');
+      debugPrint('Stack: $stack');
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
   }

@@ -821,12 +821,13 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: bottomBg,
         border: Border(top: BorderSide(color: borderColor, width: 1)),
       ),
       child: SafeArea(
+        top: false,
         child: SizedBox(
           width: double.infinity,
           height: 48,
@@ -850,7 +851,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
               _currentStep == 1 ? 'proceed_to_schedule'.tr : 'schedule_follow_up_btn'.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: isButtonActive ? Colors.white : subText,
               ),

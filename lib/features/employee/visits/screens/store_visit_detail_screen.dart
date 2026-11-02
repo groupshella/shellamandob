@@ -8,6 +8,7 @@ import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
 import 'store_visit_map_screen.dart';
 import '../widgets/store_visit_embedded_map_widget.dart';
+import '../widgets/decision_maker_card_widget.dart';
 
 class StoreVisitDetailScreen extends StatefulWidget {
   final StoreVisitModel visit;
@@ -659,6 +660,15 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                     ),
                   ),
 
+                  // R02: Decision Maker Card when notMet (العامل موجود والمالك غائب)
+                  if (controller.selectedPipelineStep == StorePipelineStep.notMet)
+                    DecisionMakerCardWidget(
+                      controller: controller,
+                      visit: visit,
+                      isDark: isDark,
+                      readOnly: widget.isReadOnly,
+                    ),
+
                   const SizedBox(height: 16),
 
                   // 7. Next Follow-up & Commitments & Obstacles
@@ -938,22 +948,41 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                       ),
                     )
                   else ...[
-                    // 10. Finish & Submit Button: [إنهاء الزيارة وإرسال التقرير]
-                    ElevatedButton.icon(
-                      onPressed: () => _handleFinishVisit(context, controller, visit),
-                      icon: const Icon(Icons.send_rounded, size: 20),
-                      label: Text(
-                        'finish_visit_and_submit'.tr,
-                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                    // 10. Primary Action: If contractSigned, lead to Nafath signing flow first!
+                    if (controller.selectedPipelineStep == StorePipelineStep.contractSigned)
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Get.to(() => ContractSigningScreen(visit: visit));
+                        },
+                        icon: const Icon(Icons.verified_outlined, size: 20),
+                        label: const Text(
+                          'متابعة توثيق العقد عبر نفاذ',
+                          style: TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF30913F),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 3,
+                        ),
+                      )
+                    else
+                      ElevatedButton.icon(
+                        onPressed: () => _handleFinishVisit(context, controller, visit),
+                        icon: const Icon(Icons.send_rounded, size: 20),
+                        label: Text(
+                          'finish_visit_and_submit'.tr,
+                          style: const TextStyle(fontFamily: 'Tajawal', fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF30913F),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 3,
+                        ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF30913F),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 3,
-                      ),
-                    ),
                   ],
 
                   const SizedBox(height: 12),
@@ -1144,6 +1173,18 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
   }
 
   Future<void> _handleFinishVisit(BuildContext context, StoreVisitsController controller, StoreVisitModel visit) async {
+    if (controller.selectedPipelineStep == StorePipelineStep.contractSigned) {
+      Get.to(() => ContractSigningScreen(visit: visit));
+      Get.snackbar(
+        'توثيق العقد مطلوب',
+        'يرجى إتمام توثيق العقد عبر نفاذ أولاً لإنهاء الزيارة بنجاح',
+        backgroundColor: const Color(0xFFF59E0B),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
     if (controller.frontImagePath == null && controller.insideImagePath == null) {
       Get.snackbar(
         'photo_doc_required_snack_title'.tr,

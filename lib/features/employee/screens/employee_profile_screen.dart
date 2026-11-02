@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
@@ -63,6 +65,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     return GetBuilder<ThemeController>(
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
+        final isFreelance = Get.isRegistered<MarketerController>() && Get.find<MarketerController>().isFreelance;
         final bg = isDark ? const Color(0xFF121418) : const Color(0xFFF6F5F8);
         final cardBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFFFFFFF);
         final darkText = isDark ? Colors.white : const Color(0xFF111B18);
@@ -119,16 +122,30 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       cardBg: cardBg,
                       darkText: darkText,
                       avatarBg: avatarBg,
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ─── 2. Monthly Performance Card (Figma 8960:72043) ─────────────
-                    _buildMonthlyPerformanceCard(
-                      cardBg: cardBg,
-                      darkText: darkText,
                       isDark: isDark,
+                      isFreelance: isFreelance,
                     ),
+
+                    // ─── Freelance Referral Card (For Freelance Marketers) ─────────
+                    if (isFreelance && Get.isRegistered<MarketerController>()) ...[
+                      const SizedBox(height: 12),
+                      _buildFreelanceReferralCard(
+                        cardBg: cardBg,
+                        darkText: darkText,
+                        isDark: isDark,
+                        code: Get.find<MarketerController>().code,
+                      ),
+                    ],
+
+                    // ─── 2. Monthly Performance Card (Only for Employees) ─────────────
+                    if (!isFreelance) ...[
+                      const SizedBox(height: 12),
+                      _buildMonthlyPerformanceCard(
+                        cardBg: cardBg,
+                        darkText: darkText,
+                        isDark: isDark,
+                      ),
+                    ],
 
                     const SizedBox(height: 12),
 
@@ -141,6 +158,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       dividerColor: dividerColor,
                       arrowColor: arrowColor,
                       themeCtrl: themeCtrl,
+                      isFreelance: isFreelance,
                     ),
 
                     const SizedBox(height: 12),
@@ -155,13 +173,14 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       arrowColor: arrowColor,
                     ),
 
-                    const SizedBox(height: 12),
-
-                    // ─── 5. Marketer Mode Card (Figma 9054:69573) ────────────────────
-                    _buildMarketerModeCard(
-                      context: context,
-                      isDark: isDark,
-                    ),
+                    // ─── 5. Marketer Mode Card (Only for Employees) ────────────────────
+                    if (!isFreelance) ...[
+                      const SizedBox(height: 12),
+                      _buildMarketerModeCard(
+                        context: context,
+                        isDark: isDark,
+                      ),
+                    ],
 
                     const SizedBox(height: 12),
 
@@ -189,6 +208,8 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     required Color cardBg,
     required Color darkText,
     required Color avatarBg,
+    required bool isDark,
+    required bool isFreelance,
   }) {
     final bool isLoggedIn = AuthHelper.isLoggedIn();
 
@@ -282,40 +303,74 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    InkWell(
-                      onTap: () async {
-                        if (isLoggedIn) {
-                          await Get.toNamed(
-                              RouteHelper.getUpdateProfileRoute());
-                          profileCtrl.getUserInfo(forceRefresh: true);
-                        } else {
-                          Get.toNamed(RouteHelper.getSignInRoute(
-                              RouteHelper.employeeProfile));
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(6),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            isLoggedIn
-                                ? 'account_settings'.tr
-                                : 'login_or_create_account'.tr,
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: darkText,
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        InkWell(
+                          onTap: () async {
+                            if (isLoggedIn) {
+                              await Get.toNamed(
+                                  RouteHelper.getUpdateProfileRoute());
+                              profileCtrl.getUserInfo(forceRefresh: true);
+                            } else {
+                              Get.toNamed(RouteHelper.getSignInRoute(
+                                  RouteHelper.employeeProfile));
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(6),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                isLoggedIn
+                                    ? 'account_settings'.tr
+                                    : 'login_or_create_account'.tr,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: darkText,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                IconlyLight.setting,
+                                color: darkText,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isFreelance)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF162D1D) : const Color(0xFFEBFEEB),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF225B2E) : const Color(0xFFC3ECC8),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.check_circle_rounded, size: 13, color: _primaryGreen),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'certified_freelance_marketer'.tr,
+                                  style: const TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: _primaryGreen,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          Icon(
-                            IconlyLight.setting,
-                            color: darkText,
-                            size: 18,
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -532,6 +587,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     required Color dividerColor,
     required Color arrowColor,
     required ThemeController themeCtrl,
+    required bool isFreelance,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -547,27 +603,29 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
       ),
       child: Column(
         children: [
-          // 1. الإجازات -> Navigates to EmployeeVacationsScreen
-          _buildRowItem(
-            icon: Icons.work_outline_rounded,
-            title: 'vacations_title'.tr,
-            darkText: darkText,
-            subText: subText,
-            arrowColor: arrowColor,
-            onTap: () => Get.to(() => const EmployeeVacationsScreen()),
-          ),
-          _buildDivider(dividerColor),
+          // 1. الإجازات -> Navigates to EmployeeVacationsScreen (Only for Employees)
+          if (!isFreelance) ...[
+            _buildRowItem(
+              icon: Icons.work_outline_rounded,
+              title: 'vacations_title'.tr,
+              darkText: darkText,
+              subText: subText,
+              arrowColor: arrowColor,
+              onTap: () => Get.to(() => const EmployeeVacationsScreen()),
+            ),
+            _buildDivider(dividerColor),
 
-          // 2. الموقع الجغرافي
-          _buildRowItem(
-            icon: IconlyLight.location,
-            title: 'geographic_location'.tr,
-            darkText: darkText,
-            subText: subText,
-            arrowColor: arrowColor,
-            onTap: () => Get.toNamed(RouteHelper.getSelectWorkZoneRoute()),
-          ),
-          _buildDivider(dividerColor),
+            // 2. الموقع الجغرافي
+            _buildRowItem(
+              icon: IconlyLight.location,
+              title: 'geographic_location'.tr,
+              darkText: darkText,
+              subText: subText,
+              arrowColor: arrowColor,
+              onTap: () => Get.toNamed(RouteHelper.getSelectWorkZoneRoute()),
+            ),
+            _buildDivider(dividerColor),
+          ],
 
           // 3. اللغة -> Opens Language Select Screen
           GetBuilder<LocalizationController>(
@@ -575,9 +633,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
               final langCode = locCtrl.locale.languageCode;
               final langSub = langCode == 'ar'
                   ? 'العربية (المملكة العربية السعودية)'
-                  : (langCode == 'en'
-                      ? 'English (US)'
-                      : (langCode == 'es' ? 'Español' : 'বাংলা'));
+                  : 'English (US)';
 
               return _buildRowItem(
                 icon: Icons.translate_rounded,
@@ -592,7 +648,21 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
           ),
           _buildDivider(dividerColor),
 
-          // 4. تفعيل الوضع الداكن -> Toggle Switch bound to ThemeController
+          // 4. شروط وسياسة العمولات (For Freelance Marketers)
+          if (isFreelance) ...[
+            _buildRowItem(
+              icon: IconlyLight.document,
+              title: 'commission_terms_policy'.tr,
+              subtitle: 'commission_terms_subtitle'.tr,
+              darkText: darkText,
+              subText: subText,
+              arrowColor: arrowColor,
+              onTap: () => _showCommissionTermsDialog(context, darkText, cardBg),
+            ),
+            _buildDivider(dividerColor),
+          ],
+
+          // 5. تفعيل الوضع الداكن -> Toggle Switch bound to ThemeController
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
@@ -624,6 +694,155 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFreelanceReferralCard({
+    required Color cardBg,
+    required Color darkText,
+    required bool isDark,
+    required String code,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 8.9,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF162D1D) : const Color(0xFFEBFEEB),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.qr_code_2_rounded, color: _primaryGreen, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'marketer_code_label'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 12,
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF707784),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  code,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                    color: darkText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: code));
+              showCustomSnackBar('code_copied_success'.tr, isError: false);
+            },
+            icon: const Icon(IconlyLight.document, size: 16),
+            label: Text(
+              'copy'.tr,
+              style: const TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFEBFEEB),
+              foregroundColor: _primaryGreen,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCommissionTermsDialog(BuildContext context, Color darkText, Color cardBg) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(IconlyLight.document, color: _primaryGreen, size: 24),
+                const SizedBox(width: 10),
+                Text(
+                  'commission_terms_policy'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: darkText,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "• ${'commission_rule_1'.tr}\n\n• ${'commission_rule_2'.tr}\n\n• ${'commission_rule_3'.tr}",
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 14,
+                height: 1.5,
+                color: darkText,
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _primaryGreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(
+                  'close'.tr,
+                  style: const TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 

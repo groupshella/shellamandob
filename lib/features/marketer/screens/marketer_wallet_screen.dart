@@ -1,3 +1,4 @@
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
@@ -22,9 +23,11 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
 
-    return GetBuilder<LocalizationController>(
+        return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
           backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
@@ -105,17 +108,21 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'available_balance_withdraw'.tr,
-                                    style: const TextStyle(
-                                      fontFamily: 'Tajawal',
-                                      fontSize: 14,
-                                      color: Color(0xFFD1FAE5),
-                                      fontWeight: FontWeight.w600,
+                                  Expanded(
+                                    child: Text(
+                                      'available_balance_withdraw'.tr,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 14,
+                                        color: Color(0xFFD1FAE5),
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
@@ -374,6 +381,7 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
                           );
                         },
                       ),
+                    SizedBox(height: widget.isRoot ? 90 : 20),
                   ],
                 ),
               ),
@@ -382,6 +390,8 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
         ),
       ),
     );
+          },
+        );
       },
     );
   }

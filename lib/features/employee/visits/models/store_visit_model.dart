@@ -68,6 +68,10 @@ class StoreVisitModel {
   final String id;
   final String storeName;
   final String managerName;
+  final String? decisionMakerName;
+  final String? decisionMakerPhone;
+  final String? decisionMakerBestTime; // morning, noon, afternoon, evening
+  final String? interviewedPersonRole; // worker, cashier, branch_manager, other
   final String phone;
   final int? storeId;
   final String? interestStatus; // حالة الاهتمام: طلب مهلة, مهتم, مهتم جدًا, يحتاج متابعة, غير مهتم
@@ -102,6 +106,10 @@ class StoreVisitModel {
     required this.id,
     required this.storeName,
     required this.managerName,
+    this.decisionMakerName,
+    this.decisionMakerPhone,
+    this.decisionMakerBestTime,
+    this.interviewedPersonRole,
     required this.phone,
     this.storeId,
     this.interestStatus,
@@ -137,6 +145,10 @@ class StoreVisitModel {
     String? id,
     String? storeName,
     String? managerName,
+    String? decisionMakerName,
+    String? decisionMakerPhone,
+    String? decisionMakerBestTime,
+    String? interviewedPersonRole,
     String? phone,
     int? storeId,
     String? interestStatus,
@@ -171,6 +183,10 @@ class StoreVisitModel {
       id: id ?? this.id,
       storeName: storeName ?? this.storeName,
       managerName: managerName ?? this.managerName,
+      decisionMakerName: decisionMakerName ?? this.decisionMakerName,
+      decisionMakerPhone: decisionMakerPhone ?? this.decisionMakerPhone,
+      decisionMakerBestTime: decisionMakerBestTime ?? this.decisionMakerBestTime,
+      interviewedPersonRole: interviewedPersonRole ?? this.interviewedPersonRole,
       phone: phone ?? this.phone,
       storeId: storeId ?? this.storeId,
       interestStatus: interestStatus ?? this.interestStatus,
@@ -248,7 +264,7 @@ class StoreVisitModel {
       }
     }
 
-    if (step == StorePipelineStep.contractSigned) {
+    if (step == StorePipelineStep.contractSigned && statusStr != 'in_progress' && statusStr != 'inprogress') {
       status = StoreVisitStatus.completed;
     }
 
@@ -256,6 +272,10 @@ class StoreVisitModel {
       id: json['id']?.toString() ?? '',
       storeName: json['store_name']?.toString() ?? '',
       managerName: json['manager_name']?.toString() ?? '',
+      decisionMakerName: json['decision_maker_name']?.toString(),
+      decisionMakerPhone: json['decision_maker_phone']?.toString(),
+      decisionMakerBestTime: json['decision_maker_best_time']?.toString(),
+      interviewedPersonRole: json['interviewed_person_role']?.toString(),
       phone: json['phone']?.toString() ?? '',
       storeId: json['store_id'] != null
           ? int.tryParse(json['store_id'].toString())

@@ -11,6 +11,10 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_screen.dart';
+import 'package:sixam_mart/features/marketer/widgets/marketer_success_dialog.dart';
 
 /// Headline text color from the design system — hsba(162, 37%, 11%).
 const Color _kHeadlineColor = Color(0xFF121C19);
@@ -22,11 +26,13 @@ class OtpVerificationScreen extends StatefulWidget {
   final String phone;
   final int cooldownSeconds;
   final int expiresInSeconds;
+  final Map<String, dynamic>? pendingMarketerData;
   const OtpVerificationScreen({
     super.key,
     required this.phone,
     this.cooldownSeconds = 120,
     this.expiresInSeconds = 600,
+    this.pendingMarketerData,
   });
 
   @override
@@ -89,9 +95,69 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       return;
     }
     if (result.success) {
+      if (widget.pendingMarketerData != null) {
+        final data = widget.pendingMarketerData!;
+        // Auto-register if new user
+        if (!result.isExisted) {
+          final String firstName = data['firstName']?.toString() ?? '';
+          final String lastName = data['lastName']?.toString() ?? '';
+          final String fullName = '$firstName $lastName'.trim();
+          final String? supCode = data['supervisorCode']?.toString();
+
+          final regResponse = await authController.registerV2(
+            name: fullName.isNotEmpty ? fullName : 'Marketer Applicant',
+            phone: widget.phone,
+            registrationToken: result.registrationToken ?? authController.registrationToken,
+            refCode: (supCode != null && supCode.isNotEmpty) ? supCode : null,
+          );
+          if (!regResponse.isSuccess) {
+            setState(() {
+              _errorText = mapOtpAuthError(regResponse.message, regResponse.message);
+            });
+            return;
+          }
+        }
+
+        // Apply as marketer now that user is authenticated
+        final marketerController = Get.find<MarketerController>();
+        final String? docPath = data['idPhotoPath']?.toString();
+        final XFile? docFile = (docPath != null && docPath.isNotEmpty) ? XFile(docPath) : null;
+
+        final ok = await marketerController.apply(
+          firstName: data['firstName']?.toString() ?? '',
+          lastName: data['lastName']?.toString() ?? '',
+          phone: widget.phone,
+          profession: data['profession']?.toString() ?? '',
+          documentType: data['documentType']?.toString() ?? 'هوية وطنية',
+          documentFile: docFile,
+          supervisorCode: data['supervisorCode']?.toString(),
+          marketerType: data['marketerType']?.toString() ?? 'freelance',
+        );
+
+        if (ok && mounted) {
+          bool navigated = false;
+          void navigateToMarketerScreen() {
+            if (!navigated) {
+              navigated = true;
+              Get.offAll(() => const MarketerScreen());
+            }
+          }
+
+          if (mounted) {
+            await MarketerSuccessDialog.show(context, onClose: navigateToMarketerScreen);
+          }
+          navigateToMarketerScreen();
+          return;
+        } else if (mounted) {
+          return;
+        }
+      }
+
       if (result.isExisted) {
-        Get.find<LocationController>()
-            .navigateToLocationScreen(context, 'sign-in', offNamed: true);
+        if (mounted) {
+          Get.find<LocationController>()
+              .navigateToLocationScreen(context, 'sign-in', offNamed: true);
+        }
       } else {
         Get.toNamed(RouteHelper.getCreateAccountRoute());
       }
@@ -269,17 +335,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 // Bottom-pinned actions.
                 GetBuilder<AuthController>(builder: (authController) {
-                  return CustomButton(
-                    buttonText: 'continue_action'.tr,
-                    isBold: true,
-                    fontFamily: 'Tajawal',
-                    fontSize: 16,
-                    textHeight: 1.6,
-                    textColor: Colors.white,
-                    isLoading: authController.isLoading,
-                    onPressed:
-                        _otp.length < 6 ? null : () => _verify(authController),
-                  );
+                  return GetBuilder<MarketerController>(builder: (marketerController) {
+                    final bool isBusy = authController.isLoading || marketerController.isSubmitting;
+                    return CustomButton(
+                      buttonText: 'continue_action'.tr,
+                      isBold: true,
+                      fontFamily: 'Tajawal',
+                      fontSize: 16,
+                      textHeight: 1.6,
+                      textColor: Colors.white,
+                      isLoading: isBusy,
+                      onPressed: (_otp.length < 6 || isBusy)
+                          ? null
+                          : () => _verify(authController),
+                    );
+                  });
                 }),
                 const SizedBox(height: Dimensions.paddingSizeLarge),
                 Center(

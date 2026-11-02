@@ -1,3 +1,4 @@
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
@@ -34,9 +35,11 @@ class MarketerProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final isDark = themeCtrl.darkTheme;
 
-    return GetBuilder<LocalizationController>(
+        return GetBuilder<LocalizationController>(
       builder: (locCtrl) {
         return Scaffold(
           backgroundColor: isDark ? const Color(0xFF121418) : const Color(0xFFF9FAFB),
@@ -283,12 +286,14 @@ class MarketerProfileScreen extends StatelessWidget {
                   backgroundColor: isDark ? const Color(0xFF2A1515) : Colors.white,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: isRoot ? 90 : 20),
             ],
           ),
         ),
       ),
     );
+          },
+        );
       },
     );
   }

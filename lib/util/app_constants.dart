@@ -236,6 +236,7 @@ class AppConstants {
   static const String marketerApplyUri = '/api/v1/customer/marketer/apply';
   static const String marketerVisitsUri = '/api/v1/customer/marketer/visits';
   static const String marketerVisitsStoreUri = '/api/v1/customer/marketer/visits/store';
+  static const String contractActivationUri = '/api/v1/customer/marketer/contracts';
   static const String marketerProductivityUri = '/api/v1/customer/marketer/productivity';
   static const String marketerRecommendationsUri = '/api/v1/customer/marketer/recommendations';
 
@@ -681,16 +682,6 @@ class AppConstants {
         languageName: 'English',
         countryCode: 'US',
         languageCode: 'en'),
-    LanguageModel(
-        imageUrl: Images.bangla,
-        languageName: 'বাংলা',
-        countryCode: 'BD',
-        languageCode: 'bn'),
-    LanguageModel(
-        imageUrl: Images.spanish,
-        languageName: 'Español',
-        countryCode: 'ES',
-        languageCode: 'es'),
   ];
 
   static List<String> joinDropdown = [
