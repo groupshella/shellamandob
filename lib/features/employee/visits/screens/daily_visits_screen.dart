@@ -109,7 +109,25 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
             centerTitle: true,
             actions: [
               IconButton(
-                tooltip: 'عرض الخريطة التفاعلية للزيارات',
+                tooltip: _tr('add_new_visit', 'إضافة زيارة ميدانية'),
+                onPressed: () {
+                  final controller = Get.find<StoreVisitsController>();
+                  _showAddVisitBottomSheet(
+                    context: context,
+                    controller: controller,
+                    cardBg: cardBg,
+                    darkText: darkText,
+                    subText: subText,
+                    borderColor: borderColor,
+                    btnGreyBg: btnGreyBg,
+                    btnGreyText: btnGreyText,
+                    isDark: isDark,
+                  );
+                },
+                icon: const Icon(Icons.add_circle_outline_rounded, color: _primaryGreen),
+              ),
+              IconButton(
+                tooltip: _tr('interactive_visits_map', 'عرض الخريطة التفاعلية للزيارات'),
                 onPressed: () {
                   final controller = Get.find<StoreVisitsController>();
                   Get.to(() => StoreVisitMapScreen(allVisits: controller.allVisits));
@@ -122,189 +140,233 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
               ),
             ],
           ),
-      body: SafeArea(
-        child: GetBuilder<StoreVisitsController>(
-          builder: (controller) {
-            final visits = controller.allVisits;
-            final currentDate = DateFormat('EEEE، d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
+          body: SafeArea(
+            child: GetBuilder<StoreVisitsController>(
+              builder: (controller) {
+                final visits = controller.allVisits;
+                final currentDate = DateFormat('EEEE، d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
 
-            return RefreshIndicator(
-              color: _primaryGreen,
-              onRefresh: () => controller.loadVisits(),
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                slivers: [
-                  // 1. Top Summary Header Card (Figma Container 8903:32637)
-                  SliverToBoxAdapter(
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        border: Border(
-                          bottom: BorderSide(color: borderColor, width: 0.8),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Title: زيارات منطقة غرب الرياض
-                          Text(
-                            _tr('visits_in_zone', 'زيارات منطقة @zone', {'zone': controller.zoneName}),
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: headingText,
-                              height: 1.3,
+                return RefreshIndicator(
+                  color: _primaryGreen,
+                  onRefresh: () => controller.loadVisits(),
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    slivers: [
+                      // 1. Top Summary Header Card (Figma Container 8903:32637)
+                      SliverToBoxAdapter(
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            border: Border(
+                              bottom: BorderSide(color: borderColor, width: 0.8),
                             ),
                           ),
-                          const SizedBox(height: 4),
-
-                          // Subtitle: الأحد، 14 سبتمبر 2025
-                          Text(
-                            currentDate,
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: dateText,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-
-                          // 3 Metric Counter Boxes in a Row
-                          Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // 1. المخططة (Right in RTL / start)
-                              Expanded(
-                                child: _buildCounterBox(
-                                  count: controller.scheduledVisitsCount,
-                                  label: _tr('scheduled_label', 'المخططة'),
-                                  valueColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6),
-                                  bgColor: counterBg,
-                                  borderColor: counterBorder,
-                                  labelColor: dateText,
+                              // Title: زيارات منطقة غرب الرياض
+                              Text(
+                                _tr('visits_in_zone', 'زيارات منطقة @zone', {'zone': controller.zoneName}),
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: headingText,
+                                  height: 1.3,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(height: 4),
 
-                              // 2. مكتملة (Center)
-                              Expanded(
-                                child: _buildCounterBox(
-                                  count: controller.completedVisitsCount,
-                                  label: _tr('completed', 'مكتملة'),
-                                  valueColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF22C55E),
-                                  bgColor: counterBg,
-                                  borderColor: counterBorder,
-                                  labelColor: dateText,
+                              // Subtitle: الأحد، 14 سبتمبر 2025
+                              Text(
+                                currentDate,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: dateText,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(height: 14),
 
-                              // 3. متابعة (Left in RTL / end)
-                              Expanded(
-                                child: _buildCounterBox(
-                                  count: controller.followUpVisitsCount,
-                                  label: _tr('follow_up_label', 'متابعة'),
-                                  valueColor: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6),
-                                  bgColor: counterBg,
-                                  borderColor: counterBorder,
-                                  labelColor: dateText,
-                                ),
+                              // 3 Metric Counter Boxes in a Row
+                              Row(
+                                children: [
+                                  // 1. المخططة (Right in RTL / start)
+                                  Expanded(
+                                    child: _buildCounterBox(
+                                      count: controller.scheduledVisitsCount,
+                                      label: _tr('scheduled_label', 'المخططة'),
+                                      valueColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6),
+                                      bgColor: counterBg,
+                                      borderColor: counterBorder,
+                                      labelColor: dateText,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+
+                                  // 2. مكتملة (Center)
+                                  Expanded(
+                                    child: _buildCounterBox(
+                                      count: controller.completedVisitsCount,
+                                      label: _tr('completed', 'مكتملة'),
+                                      valueColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF22C55E),
+                                      bgColor: counterBg,
+                                      borderColor: counterBorder,
+                                      labelColor: dateText,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+
+                                  // 3. متابعة (Left in RTL / end)
+                                  Expanded(
+                                    child: _buildCounterBox(
+                                      count: controller.followUpVisitsCount,
+                                      label: _tr('follow_up_label', 'متابعة'),
+                                      valueColor: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6),
+                                      bgColor: counterBg,
+                                      borderColor: counterBorder,
+                                      labelColor: dateText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+
+                              // Action Buttons Row: طلب تغيير المنطقة + إضافة زيارة
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 46,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Get.to(() => const SelectWorkZoneScreen());
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: btnGreyBg,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          _tr('request_zone_change', 'طلب تغيير المنطقة'),
+                                          style: TextStyle(
+                                            fontFamily: 'Tajawal',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: btnGreyText,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  SizedBox(
+                                    height: 46,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        _showAddVisitBottomSheet(
+                                          context: context,
+                                          controller: controller,
+                                          cardBg: cardBg,
+                                          darkText: darkText,
+                                          subText: subText,
+                                          borderColor: borderColor,
+                                          btnGreyBg: btnGreyBg,
+                                          btnGreyText: btnGreyText,
+                                          isDark: isDark,
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: isDark ? const Color(0xFF1E3A2B) : const Color(0xFFE8F5E9),
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          side: BorderSide(color: _primaryGreen.withValues(alpha: 0.35)),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.add_rounded, size: 18, color: _primaryGreen),
+                                      label: Text(
+                                        _tr('add_new_visit_short', 'إضافة زيارة'),
+                                        style: const TextStyle(
+                                          fontFamily: 'Tajawal',
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: _primaryGreen,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                        ),
+                      ),
 
-                          // Action Button: طلب تغيير المنطقة
-                          SizedBox(
-                            height: 46,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Get.to(() => const SelectWorkZoneScreen());
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: btnGreyBg,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                _tr('request_zone_change', 'طلب تغيير المنطقة'),
-                                style: TextStyle(
-                                  fontFamily: 'Tajawal',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: btnGreyText,
-                                ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+                      // 2. Visits Cards List
+                      if (controller.isLoading && visits.isEmpty)
+                        const SliverFillRemaining(
+                          child: Center(
+                            child: CircularProgressIndicator(color: _primaryGreen),
+                          ),
+                        )
+                      else if (visits.isEmpty)
+                        SliverFillRemaining(
+                          child: Center(
+                            child: Text(
+                              _tr('no_visits_found', 'لا توجد زيارات متاحة حالياً'),
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 14,
+                                color: dateText,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        )
+                      else
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final visit = visits[index];
+                                final isFirstUpcoming = visit.visitStatus == StoreVisitStatus.scheduled &&
+                                    visits.where((v) => v.visitStatus == StoreVisitStatus.scheduled).firstOrNull?.id == visit.id;
 
-                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-                  // 2. Visits Cards List
-                  if (controller.isLoading && visits.isEmpty)
-                    const SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator(color: _primaryGreen),
-                      ),
-                    )
-                  else if (visits.isEmpty)
-                    SliverFillRemaining(
-                      child: Center(
-                        child: Text(
-                          _tr('no_visits_found', 'لا توجد زيارات متاحة حالياً'),
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 14,
-                            color: dateText,
+                                return _buildVisitCard(
+                                  context: context,
+                                  visit: visit,
+                                  controller: controller,
+                                  isPrimaryAction: isFirstUpcoming || visit.visitStatus == StoreVisitStatus.inProgress,
+                                  isDark: isDark,
+                                  cardBg: cardBg,
+                                  headingText: headingText,
+                                  subText: subText,
+                                  btnGreyBg: btnGreyBg,
+                                  btnGreyText: btnGreyText,
+                                  darkText: darkText,
+                                );
+                              },
+                              childCount: visits.length,
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  else
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final visit = visits[index];
-                            final isFirstUpcoming = visit.visitStatus == StoreVisitStatus.scheduled &&
-                                visits.where((v) => v.visitStatus == StoreVisitStatus.scheduled).firstOrNull?.id == visit.id;
 
-                            return _buildVisitCard(
-                              context: context,
-                              visit: visit,
-                              controller: controller,
-                              isPrimaryAction: isFirstUpcoming || visit.visitStatus == StoreVisitStatus.inProgress,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              headingText: headingText,
-                              subText: subText,
-                              btnGreyBg: btnGreyBg,
-                              btnGreyText: btnGreyText,
-                              darkText: darkText,
-                            );
-                          },
-                          childCount: visits.length,
-                        ),
-                      ),
-                    ),
-
-                  const SliverToBoxAdapter(child: SizedBox(height: 96)),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
+                      const SliverToBoxAdapter(child: SizedBox(height: 96)),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
       },
     );
   }
@@ -421,85 +483,27 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Row 1: Header with Store Name + Address (Start) & Status Badge (End)
+                // Row 1: Header with Store Name + Status Badge
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Store Info (Start in RTL)
+                    // Store Name (Start in RTL)
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            visit.storeName,
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: headingText,
-                              height: 1.3,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  visit.address.isNotEmpty ? visit.address : 'not_specified_address'.tr,
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: subText,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                IconlyLight.location,
-                                size: 14,
-                                color: subText,
-                              ),
-                              const SizedBox(width: 8),
-                              InkWell(
-                                onTap: () => Get.to(() => StoreVisitMapScreen(visit: visit)),
-                                borderRadius: BorderRadius.circular(6),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: isDark ? const Color(0xFF1E3A2B) : const Color(0xFFE8F5E9),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.map_rounded, size: 12, color: _primaryGreen),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        'map_and_tracking'.tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Tajawal',
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: _primaryGreen,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      child: Text(
+                        visit.storeName,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: headingText,
+                          height: 1.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
 
                     // Status Badge (End in RTL)
                     Container(
@@ -521,28 +525,89 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
 
-                // Row 2: Metadata (Distance & Time Slot)
+                // Row 2: Address with leading pin icon + Map & Tracking pill aligned cleanly
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      IconlyLight.location,
+                      size: 14,
+                      color: subText,
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        visit.address.isNotEmpty
+                            ? visit.address
+                            : _tr('not_specified_address', 'العنوان غير محدد'),
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: subText,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: () => Get.to(() => StoreVisitMapScreen(visit: visit)),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E3A2B) : const Color(0xFFE8F5E9),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.map_rounded, size: 12, color: _primaryGreen),
+                            const SizedBox(width: 4),
+                            Text(
+                              _tr('map_and_tracking', 'الخريطة والتتبع'),
+                              style: const TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: _primaryGreen,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                // Row 3: Metadata (Distance & Time Slot) with leading icons
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Distance
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Icon(
+                          IconlyLight.discovery,
+                          size: 14,
+                          color: subText,
+                        ),
+                        const SizedBox(width: 4),
                         Text(
                           '${visit.distanceKm} ${_tr('distance_km', 'كم')}',
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             color: subText,
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          IconlyLight.discovery,
-                          size: 14,
-                          color: subText,
                         ),
                       ],
                     ),
@@ -552,19 +617,22 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          visit.localizedTimeSlot,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            color: subText,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
                         Icon(
                           IconlyLight.timeCircle,
                           size: 14,
                           color: subText,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          visit.localizedTimeSlot.trim().isNotEmpty
+                              ? visit.localizedTimeSlot
+                              : _tr('flexible_time', 'طوال اليوم'),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: subText,
+                          ),
                         ),
                       ],
                     ),
@@ -573,7 +641,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
 
                 const SizedBox(height: 14),
 
-                // Row 3: Action Button (بدء الزيارة / متابعة الزيارة / عرض التقرير)
+                // Row 4: Action Button (بدء الزيارة / متابعة الزيارة / عرض التقرير)
                 _buildCardActionButton(
                   context: context,
                   visit: visit,
@@ -850,6 +918,272 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showAddVisitBottomSheet({
+    required BuildContext context,
+    required StoreVisitsController controller,
+    required Color cardBg,
+    required Color darkText,
+    required Color subText,
+    required Color borderColor,
+    required Color btnGreyBg,
+    required Color btnGreyText,
+    required bool isDark,
+  }) {
+    final storeNameCtrl = TextEditingController();
+    final managerNameCtrl = TextEditingController();
+    final phoneCtrl = TextEditingController();
+    final addressCtrl = TextEditingController(text: controller.zoneName);
+    String selectedTimeSlot = '09:00 ص - 12:00 م';
+    final timeSlots = [
+      '09:00 ص - 12:00 م',
+      '12:00 م - 03:00 م',
+      '04:00 م - 08:00 م',
+      '08:00 م - 11:00 م',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cardBg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            final inputFill = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
+
+            InputDecoration fieldDecoration(String hint, IconData icon) {
+              return InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 13,
+                  color: subText,
+                ),
+                prefixIcon: Icon(icon, size: 18, color: subText),
+                filled: true,
+                fillColor: inputFill,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: _primaryGreen, width: 1.4),
+                ),
+              );
+            }
+
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                16,
+                20,
+                MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      _tr('add_new_visit', 'إضافة زيارة ميدانية جديدة'),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _tr('add_new_visit_subtitle', 'أدخل بيانات المتجر لجدولة الزيارة ضمن خطة اليوم'),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13,
+                        color: subText,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Store Name
+                    TextField(
+                      controller: storeNameCtrl,
+                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
+                      decoration: fieldDecoration(
+                        _tr('store_name_required_hint', 'اسم المتجر (مطلوب)'),
+                        Icons.storefront_outlined,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Address
+                    TextField(
+                      controller: addressCtrl,
+                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
+                      decoration: fieldDecoration(
+                        _tr('store_address_hint', 'العنوان أو الحي (مثال: غرب الرياض - ظهرة لبن)'),
+                        IconlyLight.location,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Manager Name & Phone in a Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: managerNameCtrl,
+                            style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
+                            decoration: fieldDecoration(
+                              _tr('manager_name_optional', 'اسم المسؤول'),
+                              IconlyLight.profile,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: phoneCtrl,
+                            keyboardType: TextInputType.phone,
+                            style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
+                            decoration: fieldDecoration(
+                              _tr('phone_optional', 'رقم الجوال'),
+                              IconlyLight.call,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Time Slot Selector
+                    Text(
+                      _tr('visit_time_slot_label', 'الفترة الزمنية للزيارة'),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: timeSlots.map((slot) {
+                        final isSelected = selectedTimeSlot == slot;
+                        return InkWell(
+                          onTap: () => setSheetState(() => selectedTimeSlot = slot),
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? _primaryGreen.withValues(alpha: 0.14)
+                                  : inputFill,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSelected ? _primaryGreen : borderColor,
+                                width: isSelected ? 1.4 : 1.0,
+                              ),
+                            ),
+                            child: Text(
+                              slot,
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                color: isSelected ? _primaryGreen : subText,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Save Button
+                    GetBuilder<StoreVisitsController>(
+                      builder: (ctrl) {
+                        return SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: ctrl.isCreatingVisit
+                                ? null
+                                : () async {
+                                    if (storeNameCtrl.text.trim().isEmpty) {
+                                      return;
+                                    }
+                                    final ok = await ctrl.createStoreVisit(
+                                      storeName: storeNameCtrl.text,
+                                      managerName: managerNameCtrl.text,
+                                      phone: phoneCtrl.text,
+                                      address: addressCtrl.text,
+                                      timeSlot: selectedTimeSlot,
+                                    );
+                                    if (ok && sheetCtx.mounted) {
+                                      Navigator.pop(sheetCtx);
+                                    }
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _primaryGreen,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: ctrl.isCreatingVisit
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.4,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    _tr('save_and_schedule_visit', 'حفظ وجدولة الزيارة'),
+                                    style: const TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );

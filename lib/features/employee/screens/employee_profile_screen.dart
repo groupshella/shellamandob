@@ -625,6 +625,32 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
               onTap: () => Get.toNamed(RouteHelper.getSelectWorkZoneRoute()),
             ),
             _buildDivider(dividerColor),
+
+            // شبكتي (المسوقين المشرف عليهم)
+            _buildRowItem(
+              icon: IconlyLight.user3,
+              title: 'my_network'.tr,
+              subtitle: 'my_network_subtitle'.tr,
+              darkText: darkText,
+              subText: subText,
+              arrowColor: arrowColor,
+              onTap: () => Get.toNamed(RouteHelper.getMyNetworkRoute()),
+            ),
+            _buildDivider(dividerColor),
+
+            // [R01] قائمة تفعيل العقد والـ 30 يوماً
+            _buildRowItem(
+              icon: IconlyLight.document,
+              title: 'تفعيل المتجر (قائمة تفعيل العقد 30 يوماً)',
+              subtitle: 'متابعة بنود تفعيل المتجر والعداد التنازلي',
+              darkText: darkText,
+              subText: subText,
+              arrowColor: arrowColor,
+              onTap: () => Get.toNamed(RouteHelper.getStoresInActivationListRoute()),
+            ),
+            _buildDivider(dividerColor),
+
+
           ],
 
           // 3. اللغة -> Opens Language Select Screen

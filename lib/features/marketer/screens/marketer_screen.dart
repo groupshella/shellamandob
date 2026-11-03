@@ -5,6 +5,7 @@ import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_intro_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_pending_screen.dart';
+import 'package:sixam_mart/features/marketer/screens/marketer_freelance_offer_screen.dart';
 
 /// In-app "Coupon Marketer" entry screen.
 /// Dynamically renders:
@@ -43,6 +44,10 @@ class _MarketerScreenState extends State<MarketerScreen> {
               child: CircularProgressIndicator(color: _primaryGreen),
             ),
           );
+        }
+
+        if (controller.isRejectedSpecialistOfferedFreelance) {
+          return const MarketerFreelanceOfferScreen();
         }
 
         switch (controller.status) {

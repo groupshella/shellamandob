@@ -1,3 +1,8 @@
+import 'package:sixam_mart/features/employee/visits/screens/stores_in_activation_list_screen.dart';
+import 'package:sixam_mart/features/employee/visits/models/store_visit_model.dart';
+import 'package:sixam_mart/features/employee/visits/screens/visit_summary_screen.dart';
+import 'package:sixam_mart/features/employee/visits/screens/contract_activation_screen.dart';
+import 'package:sixam_mart/features/employee/network/screens/my_network_screen.dart';
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 import 'dart:convert';
@@ -142,6 +147,14 @@ class RouteHelper {
   static String getEmployeeProfileRoute() => employeeProfile;
   static const String supervisorRecommendations = '/supervisor-recommendations';
   static String getSupervisorRecommendationsRoute() => supervisorRecommendations;
+  static const String myNetwork = '/my-network';
+  static String getMyNetworkRoute() => myNetwork;
+  static const String storesInActivationList = '/stores-in-activation-list';
+  static String getStoresInActivationListRoute() => storesInActivationList;
+  static const String r01ContractActivation = '/r01-contract-activation';
+  static String getR01ContractActivationRoute() => r01ContractActivation;
+  static const String r02r03VisitSummary = '/r02-r03-visit-summary';
+  static String getR02R03VisitSummaryRoute() => r02r03VisitSummary;
   static const String messages = '/messages';
   static const String conversation = '/conversation';
   static const String chatSearch = '/chat-search';
@@ -792,6 +805,31 @@ class RouteHelper {
     GetPage(name: employeeSettings, page: () => getRoute(const EmployeeSettingsScreen())),
     GetPage(name: employeeProfile, page: () => getRoute(const EmployeeProfileScreen())),
     GetPage(name: supervisorRecommendations, page: () => getRoute(const SupervisorRecommendationsScreen())),
+    GetPage(name: myNetwork, page: () => getRoute(const MyNetworkScreen())),
+    GetPage(name: storesInActivationList, page: () => getRoute(const StoresInActivationListScreen())),
+    GetPage(name: r01ContractActivation, page: () => getRoute(const ContractActivationScreen(
+      storeId: 1,
+      storeName: 'شاورما وسناك سبارك',
+      contractNumber: 'SH-2026-9921',
+    ))),
+    GetPage(name: r02r03VisitSummary, page: () => getRoute(VisitSummaryScreen(
+      visit: StoreVisitModel(
+        id: '7',
+        storeName: 'مطعم ومخبوزات الطازج الذهبي',
+        address: 'حي الياسمين - طريق الملك أنس',
+        phone: '0501234567',
+        managerName: 'أبو فهد القحطاني',
+        decisionMakerName: 'الشيخ عبد الله الدوسري (صاحب المتجر)',
+        decisionMakerPhone: '0501234567',
+        decisionMakerBestTime: 'evening',
+        interviewedPersonRole: 'cashier',
+        category: 'مطاعم وكافيهات',
+        timeSlot: 'مساءً 8م - 11م',
+        pipelineStep: StorePipelineStep.interested,
+        visitStatus: StoreVisitStatus.followUp,
+      ),
+      isReadOnly: false,
+    ))),
     GetPage(name: messages, page: () {
       final convIdStr = Get.parameters['conversation_id'];
       final convId = (convIdStr != null && convIdStr != 'null') ? int.tryParse(convIdStr) : null;

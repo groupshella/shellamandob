@@ -1,3 +1,4 @@
+import 'package:sixam_mart/features/employee/network/controllers/my_network_controller.dart';
 import 'dart:convert';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/employee/services/marketer_shift_service.dart';
@@ -204,6 +205,7 @@ Future<Map<String, Map<String, String>>> init() async {
 
   // Marketer and Update Controllers
   Get.lazyPut(() => MarketerController(apiClient: Get.find()), fenix: true);
+  Get.lazyPut(() => MyNetworkController(apiClient: Get.find()), fenix: true);
   Get.lazyPut(() => MarketerShiftService(apiClient: Get.find()), fenix: true);
   Get.lazyPut(() => UpdateController());
 

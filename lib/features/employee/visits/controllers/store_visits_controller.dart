@@ -1231,17 +1231,20 @@ class StoreVisitsController extends GetxController {
 
   Future<void> loadInActivationContracts() async {
     try {
+      debugPrint('🔍 [StoreVisitsController] loadInActivationContracts CALLED');
       if (Get.isRegistered<ApiClient>()) {
         final res = await Get.find<ApiClient>().getData('${AppConstants.contractActivationUri}/in-activation');
+        debugPrint('🔍 [StoreVisitsController] in-activation statusCode: ${res.statusCode}, body: ${res.body}');
         if (res.statusCode == 200 && res.body != null && res.body['data'] is List) {
           inActivationContracts = (res.body['data'] as List)
               .map((i) => ContractActivationModel.fromJson(Map<String, dynamic>.from(i)))
               .toList();
+          debugPrint('✅ [StoreVisitsController] Parsed ${inActivationContracts.length} in-activation contracts');
           update();
         }
       }
-    } catch (e) {
-      debugPrint('❌ [StoreVisitsController] loadInActivationContracts error: $e');
+    } catch (e, stack) {
+      debugPrint('❌ [StoreVisitsController] loadInActivationContracts error: $e\n$stack');
     }
   }
 

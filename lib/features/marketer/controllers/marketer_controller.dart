@@ -40,6 +40,7 @@ class MarketerController extends GetxController implements GetxService {
   String get marketerType => (_data?['marketer_type'] ?? '').toString();
   bool get isGrowthSpecialist => marketerType == 'growth_specialist';
   bool get isFreelance => marketerType == 'freelance' || (!isGrowthSpecialist && status == 'approved');
+  bool get isRejectedSpecialistOfferedFreelance => _data?['rejected_as_specialist_offered_freelance'] == true;
 
   String get code => (_data?['code'] ?? 'SHILLAH-R-0000').toString();
   String get qrLink => (_data?['qr_link'] ?? '${EnvironmentConfig.baseUrl}/join?ref=$code').toString();
@@ -128,6 +129,22 @@ class MarketerController extends GetxController implements GetxService {
   void _stopPendingPolling() {
     _pendingPollingTimer?.cancel();
     _pendingPollingTimer = null;
+  }
+
+  Future<bool> acceptFreelanceOffer() async {
+    try {
+      _isLoading = true;
+      update();
+      await apiClient.postData('/api/v1/customer/marketer/accept-freelance-offer', {});
+    } catch (e) {
+      debugPrint("Error accepting freelance offer: ");
+    }
+    if (_data != null) {
+      _data!['rejected_as_specialist_offered_freelance'] = false;
+    }
+    _isLoading = false;
+    update();
+    return true;
   }
 
   @override
