@@ -20,6 +20,8 @@ import 'package:sixam_mart/features/employee/visits/models/store_visit_model.dar
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'employee_vacations_screen.dart';
+import 'growth_specialist_earnings_screen.dart';
+import '../controllers/monthly_earnings_controller.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_dashboard_screen.dart';
 
 /// Employee Profile screen — faithfully matches Figma node 8976:27114 (8960:27650)
@@ -139,6 +141,20 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
                     // ─── 2. Monthly Performance Card (Only for Employees) ─────────────
                     if (!isFreelance) ...[
+            _buildRowItem(
+              icon: Icons.account_balance_wallet_outlined,
+              title: 'مستحقات وأرباح الشهر (4 طبقات)',
+              darkText: darkText,
+              subText: subText,
+              arrowColor: arrowColor,
+              onTap: () {
+                if (!Get.isRegistered<MonthlyEarningsController>()) {
+                  Get.put(MonthlyEarningsController(apiClient: Get.find()));
+                }
+                Get.to(() => const GrowthSpecialistEarningsScreen());
+              },
+            ),
+            _buildDivider(dividerColor),
                       const SizedBox(height: 12),
                       _buildMonthlyPerformanceCard(
                         cardBg: cardBg,
