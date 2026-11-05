@@ -26,18 +26,41 @@ class MonthlyEarningsModel {
   });
 
   factory MonthlyEarningsModel.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> l1Json = json['layer1_salary'] is Map ? Map<String, dynamic>.from(json['layer1_salary']) : {};
+    final Map<String, dynamic> l2Json = json['layer2_contract_incentive'] is Map
+        ? Map<String, dynamic>.from(json['layer2_contract_incentive'])
+        : (json['layer2_incentive'] is Map ? Map<String, dynamic>.from(json['layer2_incentive']) : {});
+    final Map<String, dynamic> l3Json = json['layer3_network_income'] is Map
+        ? Map<String, dynamic>.from(json['layer3_network_income'])
+        : (json['layer3_network'] is Map ? Map<String, dynamic>.from(json['layer3_network']) : {});
+    final Map<String, dynamic> l4Json = json['layer4_self_marketer_income'] is Map
+        ? Map<String, dynamic>.from(json['layer4_self_marketer_income'])
+        : (json['layer4_direct'] is Map ? Map<String, dynamic>.from(json['layer4_direct']) : {});
+
+    final double totalEarnings = (json['total_confirmed_monthly_earnings'] as num?)?.toDouble()
+        ?? (json['summary'] is Map ? (json['summary']['total_monthly_earnings'] as num?)?.toDouble() : null)
+        ?? 0.0;
+
     return MonthlyEarningsModel(
-      status: json['status']?.toString() ?? 'provisional',
-      month: json['month']?.toString() ?? '',
+      status: json['snapshot_status']?.toString() ?? json['status']?.toString() ?? 'provisional',
+      month: json['month_year']?.toString() ?? json['month']?.toString() ?? '',
       calculatedAt: json['calculated_at']?.toString() ?? '',
-      specialist: GrowthSpecialistInfo.fromJson(json['specialist'] is Map ? json['specialist'] : {}),
+      specialist: GrowthSpecialistInfo.fromJson(json['specialist'] is Map ? json['specialist'] : {'id': json['specialist_user_id']}),
       configVersions: ConfigVersionsInfo.fromJson(json['config_versions'] is Map ? json['config_versions'] : {}),
-      workingDays: WorkingDaysInfo.fromJson(json['working_days'] is Map ? json['working_days'] : {}),
-      layer1Salary: Layer1Salary.fromJson(json['layer1_salary'] is Map ? json['layer1_salary'] : {}),
-      layer2Incentive: Layer2Incentive.fromJson(json['layer2_incentive'] is Map ? json['layer2_incentive'] : {}),
-      layer3Network: Layer3Network.fromJson(json['layer3_network'] is Map ? json['layer3_network'] : {}),
-      layer4Direct: Layer4Direct.fromJson(json['layer4_direct'] is Map ? json['layer4_direct'] : {}),
-      summary: EarningsSummary.fromJson(json['summary'] is Map ? json['summary'] : {}),
+      workingDays: WorkingDaysInfo.fromJson(json['working_days'] is Map ? json['working_days'] : l1Json),
+      layer1Salary: Layer1Salary.fromJson(l1Json),
+      layer2Incentive: Layer2Incentive.fromJson(l2Json),
+      layer3Network: Layer3Network.fromJson(l3Json),
+      layer4Direct: Layer4Direct.fromJson(l4Json),
+      summary: json['summary'] is Map
+          ? EarningsSummary.fromJson(json['summary'])
+          : EarningsSummary(
+              layer1SalaryTotal: (l1Json['adjusted_base_salary'] as num?)?.toDouble() ?? 0.0,
+              layer2IncentiveTotal: (l2Json['confirmed_contract_incentive'] as num?)?.toDouble() ?? 0.0,
+              layer3NetworkTotal: (l3Json['total_amount'] as num?)?.toDouble() ?? 0.0,
+              layer4DirectTotal: (l4Json['total_amount'] as num?)?.toDouble() ?? 0.0,
+              totalMonthlyEarnings: totalEarnings,
+            ),
     );
   }
 }
@@ -88,9 +111,15 @@ class WorkingDaysInfo {
   factory WorkingDaysInfo.fromJson(Map<String, dynamic> json) {
     return WorkingDaysInfo(
       baselineMode: json['baseline_mode']?.toString() ?? 'fixed_contractual',
-      totalBaselineDays: json['total_baseline_days'] is int ? json['total_baseline_days'] : int.tryParse('${json['total_baseline_days']}') ?? 22,
-      approvedLeaveDays: json['approved_leave_days'] is int ? json['approved_leave_days'] : int.tryParse('${json['approved_leave_days']}') ?? 0,
-      effectiveWorkingDays: json['effective_working_days'] is int ? json['effective_working_days'] : int.tryParse('${json['effective_working_days']}') ?? 22,
+      totalBaselineDays: json['total_baseline_days'] is int
+          ? json['total_baseline_days']
+          : int.tryParse('${json['working_days_in_month'] ?? json['total_baseline_days']}') ?? 22,
+      approvedLeaveDays: json['approved_leave_days'] is int
+          ? json['approved_leave_days']
+          : int.tryParse('${json['approved_leave_days']}') ?? 0,
+      effectiveWorkingDays: json['effective_working_days'] is int
+          ? json['effective_working_days']
+          : int.tryParse('${json['effective_working_days']}') ?? 22,
     );
   }
 }
@@ -111,12 +140,24 @@ class Layer1Salary {
   });
 
   factory Layer1Salary.fromJson(Map<String, dynamic> json) {
+    final double base = (json['base_salary'] as num?)?.toDouble()
+        ?? (json['base_contractual_salary'] as num?)?.toDouble()
+        ?? 0.0;
+    final int workingDays = json['working_days_in_month'] is int
+        ? json['working_days_in_month']
+        : int.tryParse('${json['working_days_in_month']}') ?? 22;
+    final double daily = (json['daily_salary_rate'] as num?)?.toDouble()
+        ?? (workingDays > 0 ? (base / workingDays) : 0.0);
+    final double net = (json['adjusted_base_salary'] as num?)?.toDouble()
+        ?? (json['net_calculated_salary'] as num?)?.toDouble()
+        ?? base;
+
     return Layer1Salary(
-      baseContractualSalary: (json['base_contractual_salary'] as num?)?.toDouble() ?? 0.0,
-      dailySalaryRate: (json['daily_salary_rate'] as num?)?.toDouble() ?? 0.0,
+      baseContractualSalary: base,
+      dailySalaryRate: daily,
       approvedUnpaidLeaveDays: json['approved_unpaid_leave_days'] is int ? json['approved_unpaid_leave_days'] : int.tryParse('${json['approved_unpaid_leave_days']}') ?? 0,
       unpaidLeaveDeduction: (json['unpaid_leave_deduction'] as num?)?.toDouble() ?? 0.0,
-      netCalculatedSalary: (json['net_calculated_salary'] as num?)?.toDouble() ?? 0.0,
+      netCalculatedSalary: net,
     );
   }
 }
@@ -153,20 +194,47 @@ class Layer2Incentive {
   });
 
   factory Layer2Incentive.fromJson(Map<String, dynamic> json) {
+    final int target = json['adjusted_target'] is int
+        ? json['adjusted_target']
+        : int.tryParse('${json['adjusted_target'] ?? json['adjusted_monthly_target']}') ?? 352;
+    final int baseTarget = json['base_target'] is int
+        ? json['base_target']
+        : int.tryParse('${json['base_target'] ?? json['base_monthly_target']}') ?? target;
+    final int activated = json['activated_contracts_count'] is int
+        ? json['activated_contracts_count']
+        : int.tryParse('${json['activated_contracts_count']}') ?? 0;
+    final double percent = (json['achievement_percentage'] as num?)?.toDouble()
+        ?? (target > 0 ? (activated / target * 100) : 0.0);
+    final double minPercent = (json['minimum_qualification_percent'] as num?)?.toDouble() ?? 30.0;
+    final int needed = json['contracts_to_unlock_threshold'] is int
+        ? json['contracts_to_unlock_threshold']
+        : int.tryParse('${json['contracts_to_unlock_threshold'] ?? json['contracts_needed_to_qualify']}')
+            ?? (target > 0 ? (target * (minPercent / 100)).ceil() - activated : 0);
+
+    final double standard = (json['standard_contract_incentive'] as num?)?.toDouble()
+        ?? (json['standard_incentive_earned'] as num?)?.toDouble()
+        ?? 0.0;
+    final double totalIncentive = (json['confirmed_contract_incentive'] as num?)?.toDouble()
+        ?? (json['total_confirmed_incentive'] as num?)?.toDouble()
+        ?? standard;
+    final double rate = (json['display_rate'] as num?)?.toDouble()
+        ?? (json['displayed_per_contract_rate'] as num?)?.toDouble()
+        ?? 6.39;
+
     return Layer2Incentive(
-      baseMonthlyTarget: json['base_monthly_target'] is int ? json['base_monthly_target'] : int.tryParse('${json['base_monthly_target']}') ?? 352,
-      adjustedMonthlyTarget: json['adjusted_monthly_target'] is int ? json['adjusted_monthly_target'] : int.tryParse('${json['adjusted_monthly_target']}') ?? 352,
-      activatedContractsCount: json['activated_contracts_count'] is int ? json['activated_contracts_count'] : int.tryParse('${json['activated_contracts_count']}') ?? 0,
-      achievementPercentage: (json['achievement_percentage'] as num?)?.toDouble() ?? 0.0,
-      isQualified: BooleanOrFalse(json['is_qualified']),
-      minimumQualificationPercent: (json['minimum_qualification_percent'] as num?)?.toDouble() ?? 30.0,
-      contractsNeededToQualify: json['contracts_needed_to_qualify'] is int ? json['contracts_needed_to_qualify'] : int.tryParse('${json['contracts_needed_to_qualify']}') ?? 0,
-      standardIncentiveEarned: (json['standard_incentive_earned'] as num?)?.toDouble() ?? 0.0,
+      baseMonthlyTarget: baseTarget,
+      adjustedMonthlyTarget: target,
+      activatedContractsCount: activated,
+      achievementPercentage: percent,
+      isQualified: BooleanOrFalse(json['is_qualified']) || percent >= minPercent,
+      minimumQualificationPercent: minPercent,
+      contractsNeededToQualify: needed > 0 ? needed : 0,
+      standardIncentiveEarned: standard,
       overTargetContractsCount: json['over_target_contracts_count'] is int ? json['over_target_contracts_count'] : int.tryParse('${json['over_target_contracts_count']}') ?? 0,
-      overTargetBonusEarned: (json['over_target_bonus_earned'] as num?)?.toDouble() ?? 0.0,
-      totalConfirmedIncentive: (json['total_confirmed_incentive'] as num?)?.toDouble() ?? 0.0,
-      displayedPerContractRate: (json['displayed_per_contract_rate'] as num?)?.toDouble() ?? 6.39,
-      pendingContracts: PendingContractsStats.fromJson(json['pending_contracts'] is Map ? json['pending_contracts'] : {}),
+      overTargetBonusEarned: (json['over_target_bonus_amount'] as num?)?.toDouble() ?? (json['over_target_bonus_earned'] as num?)?.toDouble() ?? 0.0,
+      totalConfirmedIncentive: totalIncentive,
+      displayedPerContractRate: rate,
+      pendingContracts: PendingContractsStats.fromJson(json['pending_contracts'] is Map ? json['pending_contracts'] : {'count': json['pending_contracts_count']}),
     );
   }
 
@@ -212,11 +280,14 @@ class Layer3Network {
   });
 
   factory Layer3Network.fromJson(Map<String, dynamic> json) {
+    final double total = (json['total_amount'] as num?)?.toDouble()
+        ?? (json['total_network_earnings'] as num?)?.toDouble()
+        ?? 0.0;
     return Layer3Network(
       activeSupervisedMarketersCount: json['active_supervised_marketers_count'] is int ? json['active_supervised_marketers_count'] : int.tryParse('${json['active_supervised_marketers_count']}') ?? 0,
-      networkSupervisionCommissions: (json['network_supervision_commissions'] as num?)?.toDouble() ?? 0.0,
+      networkSupervisionCommissions: (json['network_supervision_commissions'] as num?)?.toDouble() ?? total,
       milestoneBonusesEarned: (json['milestone_bonuses_earned'] as num?)?.toDouble() ?? 0.0,
-      totalNetworkEarnings: (json['total_network_earnings'] as num?)?.toDouble() ?? 0.0,
+      totalNetworkEarnings: total,
     );
   }
 }
@@ -233,10 +304,13 @@ class Layer4Direct {
   });
 
   factory Layer4Direct.fromJson(Map<String, dynamic> json) {
+    final double total = (json['total_amount'] as num?)?.toDouble()
+        ?? (json['customer_acquisition_commissions'] as num?)?.toDouble()
+        ?? 0.0;
     return Layer4Direct(
       registeredUsersCount: json['registered_users_count'] is int ? json['registered_users_count'] : int.tryParse('${json['registered_users_count']}') ?? 0,
       qualifiedFirstOrdersCount: json['qualified_first_orders_count'] is int ? json['qualified_first_orders_count'] : int.tryParse('${json['qualified_first_orders_count']}') ?? 0,
-      customerAcquisitionCommissions: (json['customer_acquisition_commissions'] as num?)?.toDouble() ?? 0.0,
+      customerAcquisitionCommissions: total,
     );
   }
 }
@@ -266,4 +340,3 @@ class EarningsSummary {
     );
   }
 }
-

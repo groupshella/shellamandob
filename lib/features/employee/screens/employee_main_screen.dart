@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'employee_profile_screen.dart';
+import 'growth_specialist_earnings_screen.dart';
 import '../controllers/employee_navigation_controller.dart';
 import '../controllers/employee_shift_controller.dart';
+import '../controllers/monthly_earnings_controller.dart';
 import '../widgets/employee_bottom_nav_bar.dart';
 import 'employee_home_screen.dart';
 import '../attendance/screens/select_work_zone_screen.dart';
@@ -32,6 +34,9 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
     }
     if (!Get.isRegistered<AntiFraudAlertsController>()) {
       Get.put(AntiFraudAlertsController(), permanent: true);
+    }
+    if (!Get.isRegistered<MonthlyEarningsController>()) {
+      Get.put(MonthlyEarningsController(apiClient: Get.find()), permanent: true);
     }
   }
 
@@ -68,7 +73,7 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
                     fit: StackFit.expand,
                     children: [
                       IndexedStack(
-                        index: navController.currentIndex,
+                        index: navController.currentIndex.clamp(0, 4),
                         children: [
                           // Tab 0: الرئيسية (Employee Home Dashboard)
                           EmployeeHomeScreen(
@@ -77,13 +82,16 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
                             },
                           ),
 
-                          // Tab 1: المواعيد والزيارات اليومية
-                          const DailyVisitsScreen(),
-
-                          // Tab 2: التقارير وملخص نهاية اليوم
+                          // Tab 1: التقارير والأداء (Daily Performance Summary)
                           const DailyPerformanceSummaryScreen(),
 
-                          // Tab 3: حسابي (Employee Profile — Figma 8976-27114)
+                          // Tab 2: المواعيد والزيارات اليومية (Daily Visits)
+                          const DailyVisitsScreen(),
+
+                          // Tab 3: أرباحي / المحفظة (Growth Specialist Earnings)
+                          const GrowthSpecialistEarningsScreen(isRoot: true),
+
+                          // Tab 4: حسابي (Employee Profile — Figma 8976-27114)
                           const EmployeeProfileScreen(),
                         ],
                       ),
@@ -104,7 +112,7 @@ class _EmployeeMainScreenState extends State<EmployeeMainScreen> {
             },
           ),
         );
-  },
-);
+      },
+    );
   }
 }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/employee_shift_controller.dart';
+import '../models/employee_shift_model.dart';
 
 class ShiftMetricsGridWidget extends StatelessWidget {
   final bool? isDark;
@@ -11,56 +12,68 @@ class ShiftMetricsGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = isDark ?? (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
+    final dark = isDark ??
+        (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
     final darkText = dark ? Colors.white : const Color(0xFF111B18);
     final subText = dark ? const Color(0xFF9CA3AF) : const Color(0xFF555555);
-    final purpleBg = dark ? const Color(0xFF261D3B) : const Color(0xFFDFD3F5);
+    final iconGray = dark ? const Color(0xFF9CA3AF) : const Color(0xFFB0B5BC);
+    final purpleBg = dark ? const Color(0xFF261D3B) : const Color(0xFFE5DDFB);
     final purpleTitle = dark ? const Color(0xFFD3BFFF) : const Color(0xFF331259);
     final purpleValue = dark ? Colors.white : const Color(0xFF240648);
-    final cardBg = dark ? const Color(0xFF1C2028) : const Color(0xFFFAFBFB);
+    final cardBg = dark ? const Color(0xFF1C2028) : const Color(0xFFFDFDFE);
     final borderColor = dark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
 
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final model = controller.shiftModel;
+        final bool showValues = controller.status != ShiftStatus.notStarted;
         final workTime = model.localizedWorkedTime;
-        final String currentDate = DateFormat('d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
+        final String currentDate =
+            DateFormat('d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Column(
             children: [
               // Row 1: وقت بدء الدوام (Right in RTL) & وقت العمل (Left in RTL)
               Row(
                 children: [
-                  // وقت بدء الدوام (Child 0 -> Far right in RTL)
+                  // 1. وقت بدء الدوام (Right in RTL)
                   Expanded(
                     child: _buildMetricCard(
                       date: currentDate,
                       title: 'shift_start_time'.tr,
                       value: model.localizedStartTime,
+                      showValue: showValues,
                       backgroundColor: purpleBg,
-                      borderColor: borderColor,
+                      borderColor: purpleBg,
                       titleColor: purpleTitle,
                       valueColor: purpleValue,
-                      icon: IconlyLight.timeCircle,
-                      iconColor: purpleTitle,
+                      iconWidget: Icon(
+                        IconlyLight.work,
+                        size: 18,
+                        color: purpleTitle,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
 
-                  // وقت العمل (Child 1 -> Far left in RTL)
+                  // 2. وقت العمل (Left in RTL)
                   Expanded(
                     child: _buildMetricCard(
                       date: currentDate,
                       title: 'work_time'.tr,
                       value: workTime,
+                      showValue: showValues,
                       backgroundColor: cardBg,
                       borderColor: borderColor,
                       titleColor: subText,
                       valueColor: darkText,
-                      icon: IconlyLight.work,
-                      iconColor: subText,
+                      iconWidget: _buildBriefcaseWithBadge(
+                        iconColor: iconGray,
+                        badgeBg: cardBg,
+                        badgeIcon: Icons.access_time_rounded,
+                      ),
                     ),
                   ),
                 ],
@@ -70,34 +83,42 @@ class ShiftMetricsGridWidget extends StatelessWidget {
               // Row 2: خارج الدوام (Right in RTL) & الاستئذان المعتمد (Left in RTL)
               Row(
                 children: [
-                  // خارج الدوام (Child 0 -> Far right in RTL)
+                  // 3. خارج الدوام (Right in RTL)
                   Expanded(
                     child: _buildMetricCard(
                       date: currentDate,
                       title: 'overtime_hours'.tr,
                       value: model.localizedOvertimeHours,
+                      showValue: showValues,
                       backgroundColor: cardBg,
                       borderColor: borderColor,
                       titleColor: subText,
                       valueColor: darkText,
-                      icon: IconlyLight.timeSquare,
-                      iconColor: subText,
+                      iconWidget: _buildBriefcaseWithBadge(
+                        iconColor: iconGray,
+                        badgeBg: cardBg,
+                        badgeIcon: Icons.close_rounded,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
 
-                  // الاستئذان المعتمد (Child 1 -> Far left in RTL)
+                  // 4. الاستئذان المعتمد (Left in RTL)
                   Expanded(
                     child: _buildMetricCard(
                       date: currentDate,
                       title: 'approved_leave'.tr,
                       value: model.localizedApprovedLeaveHours,
+                      showValue: showValues,
                       backgroundColor: cardBg,
                       borderColor: borderColor,
                       titleColor: subText,
                       valueColor: darkText,
-                      icon: IconlyLight.ticketStar,
-                      iconColor: subText,
+                      iconWidget: Icon(
+                        Icons.local_offer_outlined,
+                        size: 18,
+                        color: iconGray,
+                      ),
                     ),
                   ),
                 ],
@@ -109,74 +130,122 @@ class ShiftMetricsGridWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildBriefcaseWithBadge({
+    required Color iconColor,
+    required Color badgeBg,
+    required IconData badgeIcon,
+  }) {
+    return SizedBox(
+      width: 20,
+      height: 20,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(
+            IconlyLight.work,
+            size: 18,
+            color: iconColor,
+          ),
+          Positioned(
+            bottom: -1,
+            left: -1,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: badgeBg,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                badgeIcon,
+                size: 9,
+                color: iconColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMetricCard({
     required String date,
     required String title,
     required String value,
+    required bool showValue,
     required Color backgroundColor,
     required Color borderColor,
     required Color titleColor,
     required Color valueColor,
-    IconData? icon,
-    Color? iconColor,
+    required Widget iconWidget,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: borderColor,
           width: 1,
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Date
+          // Date (Top right in RTL)
           Text(
             date,
             style: TextStyle(
               fontFamily: 'Tajawal',
               fontSize: 11,
-              color: titleColor,
+              color: titleColor.withValues(alpha: 0.85),
             ),
-          ),
-          const SizedBox(height: 6),
-
-          // Title & Icon
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: titleColor,
-                ),
-              ),
-              if (icon != null)
-                Icon(
-                  icon,
-                  size: 16,
-                  color: iconColor ?? titleColor,
-                ),
-            ],
           ),
           const SizedBox(height: 8),
 
-          // Value
-          Text(
-            value,
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: valueColor,
-            ),
+          // Icon + Title aligned together on the Right in RTL (Figma 1:1)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              iconWidget,
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: titleColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
+
+          // Value (Only shown in active and onBreak states per Figma)
+          if (showValue) ...[
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: valueColor,
+              ),
+            ),
+          ],
         ],
       ),
     );

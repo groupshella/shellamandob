@@ -52,8 +52,8 @@ class EmployeeBottomNavBar extends StatelessWidget {
   static const double _slotWidth = 50;
   static const double _slotHeight = 40;
 
-  /// Default 4 navigation items for Shella Employee App
-  /// (RTL visual order: home, visits, reports, profile).
+  /// Default 5 navigation items for Shella Employee App matching Figma "new nav"
+  /// (RTL visual order: home, reports/chart, visits/calendar, wallet/earnings, profile).
   static const List<FloatingNavItem> defaultNavItems = [
     // 0: الرئيسية (Home)
     FloatingNavItem(
@@ -64,23 +64,28 @@ class EmployeeBottomNavBar extends StatelessWidget {
       labelKey: 'home',
       fallbackLabel: 'الرئيسية',
     ),
-    // 1: المواعيد والزيارات (Daily Visits)
+    // 1: التقارير والأداء (Performance Reports - 3 vertical bars icon per Figma)
+    FloatingNavItem(
+      activeIcon: Icons.bar_chart_rounded,
+      inactiveIcon: Icons.bar_chart_outlined,
+      labelKey: 'reports',
+      fallbackLabel: 'التقارير',
+    ),
+    // 2: المواعيد والزيارات (Daily Visits - Calendar icon)
     FloatingNavItem(
       activeIcon: IconlyBold.calendar,
       inactiveIcon: IconlyLight.calendar,
       labelKey: 'today_visits',
       fallbackLabel: 'الزيارات',
     ),
-    // 2: التقارير والأداء (Performance Reports)
+    // 3: أرباحي / المحفظة (Wallet / Earnings - Wallet icon)
     FloatingNavItem(
-      activeAsset: Images.navReceiptActive,
-      inactiveAsset: Images.navReceiptInactive,
-      activeIcon: IconlyBold.chart,
-      inactiveIcon: IconlyLight.chart,
-      labelKey: 'reports',
-      fallbackLabel: 'التقارير',
+      activeIcon: IconlyBold.wallet,
+      inactiveIcon: IconlyLight.wallet,
+      labelKey: 'my_earnings',
+      fallbackLabel: 'أرباحي',
     ),
-    // 3: حسابي (Employee Profile)
+    // 4: حسابي (Employee Profile)
     FloatingNavItem(
       activeAsset: Images.navProfileActive,
       inactiveAsset: Images.navProfileInactive,

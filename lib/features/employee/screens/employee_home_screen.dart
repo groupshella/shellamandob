@@ -6,11 +6,12 @@ import '../controllers/employee_navigation_controller.dart';
 import '../controllers/employee_shift_controller.dart';
 import '../widgets/employee_header_widget.dart';
 import '../widgets/shift_status_card_widget.dart';
+import '../widgets/upcoming_visit_card_widget.dart';
 import '../widgets/shift_metrics_grid_widget.dart';
+import '../widgets/employee_quick_actions_widget.dart';
 import '../widgets/supervisor_recommendations_banner.dart';
 import '../widgets/employee_warnings_banner.dart';
 import '../widgets/today_visits_summary_widget.dart';
-import '../widgets/instant_reward_tracker_widget.dart';
 import '../visits/controllers/store_visits_controller.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import '../controllers/supervisor_recommendations_controller.dart';
@@ -63,7 +64,7 @@ class EmployeeHomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 1. الترويسة والترحيب
+                    // 1. الترويسة والترحيب (الجرس أعلى اليسار، والترحيب أسفله على اليمين)
                     EmployeeHeaderWidget(
                       isDark: isDark,
                       onNotificationTap: () {
@@ -71,7 +72,7 @@ class EmployeeHomeScreen extends StatelessWidget {
                       },
                     ),
 
-                    // 2. بطاقة حالة الدوام الديناميكية (لم يبدأ / نشط مع عداد حي / استراحة)
+                    // 2. بطاقة حالة الدوام والهدف اليومي (إطار أخضر + الهدف اليومي وشريط التقدم)
                     ShiftStatusCardWidget(
                       isDark: isDark,
                       onStartShift: onStartShiftPressed ?? () {
@@ -79,23 +80,26 @@ class EmployeeHomeScreen extends StatelessWidget {
                       },
                     ),
 
-                    // 3. عداد مكافآت التأسيس الفورية (محدث ديناميكياً)
-                    InstantRewardTrackerWidget(isDark: isDark),
+                    // 3. بطاقة الزيارة القادمة (تظهر في حالة الدوام النشط)
+                    UpcomingVisitCardWidget(isDark: isDark),
 
-                    // 4. شبكة المقاييس (وقت البدء، وقت العمل، خارج الدوام، الاستئذان المعتمد)
+                    // 4. شبكة المقاييس 2×2 (وقت بدء الدوام، وقت العمل، خارج الدوام، الاستئذان المعتمد)
                     ShiftMetricsGridWidget(isDark: isDark),
 
-                    // 5. توصيات المشرف
+                    // 5. بطاقات الاختصارات الأربعة السريعة (أرباحي، شبكتي، تفعيل المتجر، الدعم)
+                    EmployeeQuickActionsWidget(isDark: isDark),
+
+                    // 6. توصيات المشرف (تظهر في حالة الدوام النشط)
                     SupervisorRecommendationsBanner(isDark: isDark),
 
-                    // 6. شريط ونافذة الإنذارات
+                    // 7. شريط الإنذارات (يظهر عند وجود إنذارات)
                     EmployeeWarningsBanner(isDark: isDark),
 
-                    // 7. ملخص زيارات اليوم
+                    // 8. ملخص زيارات اليوم
                     TodayVisitsSummaryWidget(
                       isDark: isDark,
                       onStartNextVisit: () {
-                        Get.find<EmployeeNavigationController>().changeIndex(1);
+                        Get.find<EmployeeNavigationController>().changeIndex(2);
                       },
                     ),
                   ],

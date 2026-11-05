@@ -67,7 +67,8 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     return GetBuilder<ThemeController>(
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
-        final isFreelance = Get.isRegistered<MarketerController>() && Get.find<MarketerController>().isFreelance;
+        final isFreelance = Get.isRegistered<MarketerController>() &&
+            Get.find<MarketerController>().isFreelance;
         final bg = isDark ? const Color(0xFF121418) : const Color(0xFFF6F5F8);
         final cardBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFFFFFFF);
         final darkText = isDark ? Colors.white : const Color(0xFF111B18);
@@ -141,20 +142,6 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
                     // ─── 2. Monthly Performance Card (Only for Employees) ─────────────
                     if (!isFreelance) ...[
-            _buildRowItem(
-              icon: Icons.account_balance_wallet_outlined,
-              title: 'مستحقات وأرباح الشهر (4 طبقات)',
-              darkText: darkText,
-              subText: subText,
-              arrowColor: arrowColor,
-              onTap: () {
-                if (!Get.isRegistered<MonthlyEarningsController>()) {
-                  Get.put(MonthlyEarningsController(apiClient: Get.find()));
-                }
-                Get.to(() => const GrowthSpecialistEarningsScreen());
-              },
-            ),
-            _buildDivider(dividerColor),
                       const SizedBox(height: 12),
                       _buildMonthlyPerformanceCard(
                         cardBg: cardBg,
@@ -165,7 +152,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
                     const SizedBox(height: 12),
 
-                    // ─── 3. Menu Group 1: Vacations, Geo, Lang, Dark Mode (8960:27711)
+                    // ─── 3. Menu Group 1 (Work/Earnings Card + Settings Card per Figma)
                     _buildMenuGroup1(
                       context: context,
                       cardBg: cardBg,
@@ -294,7 +281,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       : const Center(
                           child: Icon(
                             IconlyBold.profile,
-                            color: _primaryGreen,
+                            color: Color(0xFF555555),
                             size: 32,
                           ),
                         ),
@@ -339,6 +326,12 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              const Icon(
+                                IconlyLight.setting,
+                                color: _primaryGreen,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 6),
                               Text(
                                 isLoggedIn
                                     ? 'account_settings'.tr
@@ -349,12 +342,6 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                                   fontWeight: FontWeight.w600,
                                   color: darkText,
                                 ),
-                              ),
-                              const SizedBox(width: 6),
-                              Icon(
-                                IconlyLight.setting,
-                                color: darkText,
-                                size: 18,
                               ),
                             ],
                           ),
@@ -398,7 +385,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     );
   }
 
-  /// Monthly Performance Summary Card (Dynamic from database with Figma fallback)
+  /// Monthly Performance Summary Card (Dynamic from database with Figma colors)
   Widget _buildMonthlyPerformanceCard({
     required Color cardBg,
     required Color darkText,
@@ -406,10 +393,10 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
   }) {
     final currentMonth = _getCurrentMonth();
 
-    // Box backgrounds adapting to dark mode
+    // Box backgrounds adapting to dark mode (Figma: green #D1FDD2, mint #EBFEEB, lavender #EDE7FB)
     final visitsBoxBg = isDark ? const Color(0xFF163E20) : const Color(0xFFD1FDD2);
     final contractsBoxBg = isDark ? const Color(0xFF1A3324) : const Color(0xFFEBFEEB);
-    final rateBoxBg = isDark ? const Color(0xFF1A3324) : const Color(0xFFEBFEEB);
+    final rateBoxBg = isDark ? const Color(0xFF261D3B) : const Color(0xFFEDE7FB);
 
     return GetBuilder<StoreVisitsController>(
       builder: (visitsCtrl) {
@@ -544,7 +531,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                   ),
                   const SizedBox(width: 8),
 
-                  // 3. معدل النجاح (Figma: bg #EBFEEB, value 78%)
+                  // 3. معدل النجاح (Figma: lavender bg #EDE7FB, value 78%)
                   Expanded(
                     child: Container(
                       height: 72,
@@ -594,7 +581,9 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     );
   }
 
-  /// Menu Group 1: الإجازات, الموقع الجغرافي, اللغة, تفعيل الوضع الداكن (Figma 8960:27711)
+  /// Menu Group 1: Split into two cards matching Figma 1:1
+  /// Card A (Employee Work & Earnings): أرباح ومستحقات, شبكتي, تفعيل المتجر, الإجازات
+  /// Card B (Settings & Preferences): الموقع الجغرافي, اللغة, تفعيل الوضع الداكن
   Widget _buildMenuGroup1({
     required BuildContext context,
     required Color cardBg,
@@ -605,133 +594,206 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
     required ThemeController themeCtrl,
     required bool isFreelance,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08000000),
-            blurRadius: 8.9,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 1. الإجازات -> Navigates to EmployeeVacationsScreen (Only for Employees)
-          if (!isFreelance) ...[
-            _buildRowItem(
-              icon: Icons.work_outline_rounded,
-              title: 'vacations_title'.tr,
-              darkText: darkText,
-              subText: subText,
-              arrowColor: arrowColor,
-              onTap: () => Get.to(() => const EmployeeVacationsScreen()),
-            ),
-            _buildDivider(dividerColor),
-
-            // 2. الموقع الجغرافي
-            _buildRowItem(
-              icon: IconlyLight.location,
-              title: 'geographic_location'.tr,
-              darkText: darkText,
-              subText: subText,
-              arrowColor: arrowColor,
-              onTap: () => Get.toNamed(RouteHelper.getSelectWorkZoneRoute()),
-            ),
-            _buildDivider(dividerColor),
-
-            // شبكتي (المسوقين المشرف عليهم)
-            _buildRowItem(
-              icon: IconlyLight.user3,
-              title: 'my_network'.tr,
-              subtitle: 'my_network_subtitle'.tr,
-              darkText: darkText,
-              subText: subText,
-              arrowColor: arrowColor,
-              onTap: () => Get.toNamed(RouteHelper.getMyNetworkRoute()),
-            ),
-            _buildDivider(dividerColor),
-
-            // [R01] قائمة تفعيل العقد والـ 30 يوماً
-            _buildRowItem(
-              icon: IconlyLight.document,
-              title: 'تفعيل المتجر (قائمة تفعيل العقد 30 يوماً)',
-              subtitle: 'متابعة بنود تفعيل المتجر والعداد التنازلي',
-              darkText: darkText,
-              subText: subText,
-              arrowColor: arrowColor,
-              onTap: () => Get.toNamed(RouteHelper.getStoresInActivationListRoute()),
-            ),
-            _buildDivider(dividerColor),
-
-
-          ],
-
-          // 3. اللغة -> Opens Language Select Screen
-          GetBuilder<LocalizationController>(
-            builder: (locCtrl) {
-              final langCode = locCtrl.locale.languageCode;
-              final langSub = langCode == 'ar'
-                  ? 'العربية (المملكة العربية السعودية)'
-                  : 'English (US)';
-
-              return _buildRowItem(
-                icon: Icons.translate_rounded,
-                title: 'pf_language'.tr,
-                subtitle: langSub,
-                darkText: darkText,
-                subText: subText,
-                arrowColor: arrowColor,
-                onTap: () => Get.to(() => const LanguageSelectScreen()),
-              );
-            },
-          ),
-          _buildDivider(dividerColor),
-
-          // 4. شروط وسياسة العمولات (For Freelance Marketers)
-          if (isFreelance) ...[
-            _buildRowItem(
-              icon: IconlyLight.document,
-              title: 'commission_terms_policy'.tr,
-              subtitle: 'commission_terms_subtitle'.tr,
-              darkText: darkText,
-              subText: subText,
-              arrowColor: arrowColor,
-              onTap: () => _showCommissionTermsDialog(context, darkText, cardBg),
-            ),
-            _buildDivider(dividerColor),
-          ],
-
-          // 5. تفعيل الوضع الداكن -> Toggle Switch bound to ThemeController
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.dark_mode_outlined,
-                  color: darkText,
-                  size: 22,
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    'enable_dark_mode'.tr,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: darkText,
-                    ),
-                  ),
-                ),
-                CupertinoSwitch(
-                  value: themeCtrl.darkTheme,
-                  activeTrackColor: _primaryGreen,
-                  onChanged: (val) => themeCtrl.toggleTheme(),
+    return Column(
+      children: [
+        if (!isFreelance) ...[
+          Container(
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x08000000),
+                  blurRadius: 8.9,
+                  offset: Offset(0, 4),
                 ),
               ],
+            ),
+            child: Column(
+              children: [
+                // 1. أرباح ومستحقات
+                _buildRowItem(
+                  icon: IconlyLight.wallet,
+                  title: 'earnings_and_dues'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () {
+                    if (!Get.isRegistered<MonthlyEarningsController>()) {
+                      Get.put(MonthlyEarningsController(apiClient: Get.find()));
+                    }
+                    Get.to(() => const GrowthSpecialistEarningsScreen());
+                  },
+                ),
+                _buildDivider(dividerColor),
+
+                // 2. شبكتي
+                _buildRowItem(
+                  icon: IconlyLight.user3,
+                  title: 'my_network'.tr,
+                  subtitle: 'my_network_subtitle'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () => Get.toNamed(RouteHelper.getMyNetworkRoute()),
+                ),
+                _buildDivider(dividerColor),
+
+                // 3. تفعيل المتجر
+                _buildRowItem(
+                  icon: IconlyLight.document,
+                  title: 'store_activation'.tr,
+                  subtitle: 'store_activation_subtitle'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () => Get.toNamed(RouteHelper.getStoresInActivationListRoute()),
+                ),
+                _buildDivider(dividerColor),
+
+                // 4. الإجازات (Briefcase with x badge per Figma)
+                _buildRowItem(
+                  icon: IconlyLight.work,
+                  customIcon: _buildBriefcaseCloseIcon(darkText, cardBg),
+                  title: 'vacations_title'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () => Get.to(() => const EmployeeVacationsScreen()),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        // Settings & Preferences Card: الموقع الجغرافي, اللغة, تفعيل الوضع الداكن
+        Container(
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x08000000),
+                blurRadius: 8.9,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              if (!isFreelance) ...[
+                // 1. الموقع الجغرافي
+                _buildRowItem(
+                  icon: IconlyLight.location,
+                  title: 'geographic_location'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () => Get.toNamed(RouteHelper.getSelectWorkZoneRoute()),
+                ),
+                _buildDivider(dividerColor),
+              ],
+
+              // 2. اللغة -> Opens Language Select Screen
+              GetBuilder<LocalizationController>(
+                builder: (locCtrl) {
+                  final langCode = locCtrl.locale.languageCode;
+                  final langSub = langCode == 'ar'
+                      ? 'العربية (المملكة العربية السعودية)'
+                      : 'English (US)';
+
+                  return _buildRowItem(
+                    icon: Icons.translate_rounded,
+                    title: 'pf_language'.tr,
+                    subtitle: langSub,
+                    darkText: darkText,
+                    subText: subText,
+                    arrowColor: arrowColor,
+                    onTap: () => Get.to(() => const LanguageSelectScreen()),
+                  );
+                },
+              ),
+              _buildDivider(dividerColor),
+
+              // شروط وسياسة العمولات (For Freelance Marketers)
+              if (isFreelance) ...[
+                _buildRowItem(
+                  icon: IconlyLight.document,
+                  title: 'commission_terms_policy'.tr,
+                  subtitle: 'commission_terms_subtitle'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () => _showCommissionTermsDialog(context, darkText, cardBg),
+                ),
+                _buildDivider(dividerColor),
+              ],
+
+              // 3. تفعيل الوضع الداكن -> Toggle Switch bound to ThemeController
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.wb_sunny_outlined,
+                      color: darkText,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        'enable_dark_mode'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: darkText,
+                        ),
+                      ),
+                    ),
+                    CupertinoSwitch(
+                      value: themeCtrl.darkTheme,
+                      activeTrackColor: _primaryGreen,
+                      onChanged: (val) => themeCtrl.toggleTheme(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBriefcaseCloseIcon(Color iconColor, Color badgeBg) {
+    return SizedBox(
+      width: 22,
+      height: 22,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Icon(
+            IconlyLight.work,
+            size: 21,
+            color: iconColor,
+          ),
+          Positioned(
+            bottom: -1,
+            left: -1,
+            child: Container(
+              width: 11,
+              height: 11,
+              decoration: BoxDecoration(
+                color: badgeBg,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.close_rounded,
+                size: 10,
+                color: iconColor,
+              ),
             ),
           ),
         ],
@@ -924,7 +986,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
           // 2. الخصوصية
           _buildRowItem(
-            icon: Icons.security_rounded,
+            icon: IconlyLight.shieldDone,
             title: 'pf_privacy'.tr,
             darkText: darkText,
             subText: subText,
@@ -936,7 +998,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
           // 3. الشروط والأحكام
           _buildRowItem(
-            icon: IconlyLight.document,
+            icon: IconlyLight.folder,
             title: 'pf_terms'.tr,
             darkText: darkText,
             subText: subText,
@@ -1000,13 +1062,6 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                       fontWeight: FontWeight.w700,
                       color: textColor,
                     ),
-                  ),
-                ),
-                GetBuilder<LocalizationController>(
-                  builder: (locCtrl) => Icon(
-                    locCtrl.isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2,
-                    color: textColor.withValues(alpha: 0.8),
-                    size: 18,
                   ),
                 ),
               ],
@@ -1078,6 +1133,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
 
   Widget _buildRowItem({
     required IconData icon,
+    Widget? customIcon,
     required String title,
     String? subtitle,
     required Color darkText,
@@ -1093,7 +1149,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, color: darkText, size: 22),
+            customIcon ?? Icon(icon, color: darkText, size: 22),
             const SizedBox(width: 14),
             Expanded(
               child: Column(

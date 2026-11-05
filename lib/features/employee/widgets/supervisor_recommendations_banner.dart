@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -49,49 +50,21 @@ class SupervisorRecommendationsBanner extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Right side in RTL (or left in LTR) - Title
-                Row(
-                  children: [
-                    Text(
-                      'supervisor_recommendations'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: primaryColor,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GetBuilder<SupervisorRecommendationsController>(
-                      builder: (recCtrl) {
-                        if (recCtrl.unreadCount > 0) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0E4AAC),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '${recCtrl.unreadCount}',
-                              style: const TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ],
+                // Right side in RTL - Title only (without numeric circle badge per Figma)
+                Text(
+                  'supervisor_recommendations'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: primaryColor,
+                  ),
                 ),
 
-                // Left side in RTL (or right in LTR) - Arrow navigation
+                // Left side in RTL - Left-pointing chevron (<) matching Figma
                 Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
+                  IconlyLight.arrowLeft2,
+                  size: 20,
                   color: primaryColor,
                 ),
               ],

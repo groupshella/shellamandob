@@ -16,15 +16,16 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = isDark ?? (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
+    final dark = isDark ??
+        (Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme);
     final cardBg = dark ? const Color(0xFF1C2028) : Colors.white;
-    final borderColor = dark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final borderColor = dark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
     final innerBg = dark ? const Color(0xFF252B37) : const Color(0xFFFAF9FB);
-    final innerBorder = dark ? const Color(0xFF2B3240) : const Color(0xFFF0F0F2);
+    final innerBorder = dark ? const Color(0xFF2B3240) : const Color(0xFFF3F4F6);
     final darkText = dark ? Colors.white : const Color(0xFF111B18);
     final subText = dark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final btnBg = dark ? const Color(0xFF2B3240) : const Color(0xFFF6F6F6);
-    final btnText = dark ? Colors.white : const Color(0xFF43474F);
+    final btnBg = dark ? const Color(0xFF2B3240) : const Color(0xFFF5F6F7);
+    final btnText = dark ? Colors.white : const Color(0xFF111B18);
 
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
@@ -42,7 +43,7 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
             ),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x0A000000),
+                color: Color(0x06000000),
                 blurRadius: 10,
                 offset: Offset(0, 2),
               ),
@@ -51,7 +52,7 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Title: today_visits
+              // Title: زيارات اليوم
               Text(
                 'today_visits'.tr,
                 style: TextStyle(
@@ -63,16 +64,16 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Row 1: مكتملة (Right in RTL) & إجمالي الزيارات (Left in RTL)
+              // Row 1: إجمالي الزيارات (Right in RTL) & مكتملة (Left in RTL)
               Row(
                 children: [
-                  // مكتملة (Child 0 -> Far right in RTL)
+                  // إجمالي الزيارات (Right in RTL)
                   Expanded(
                     child: _buildCounterCard(
-                      label: 'completed'.tr,
-                      count: model.completedVisits,
-                      badgeColor: dark ? const Color(0xFF163E20) : const Color(0x1722C55E),
-                      textColor: dark ? const Color(0xFF81C784) : const Color(0xFF22C55E),
+                      label: 'total_visits'.tr,
+                      count: model.totalVisits,
+                      badgeColor: dark ? const Color(0xFF1E3A5F) : const Color(0xFFE8F1FF),
+                      textColor: dark ? const Color(0xFF90CAF9) : const Color(0xFF3B82F6),
                       innerBg: innerBg,
                       innerBorder: innerBorder,
                       subText: subText,
@@ -80,13 +81,13 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
 
-                  // إجمالي الزيارات (Child 1 -> Far left in RTL)
+                  // مكتملة (Left in RTL)
                   Expanded(
                     child: _buildCounterCard(
-                      label: 'total_visits'.tr,
-                      count: model.totalVisits,
-                      badgeColor: dark ? const Color(0xFF1E3A5F) : const Color(0x173B82F6),
-                      textColor: dark ? const Color(0xFF90CAF9) : const Color(0xFF3B82F6),
+                      label: 'completed'.tr,
+                      count: model.completedVisits,
+                      badgeColor: dark ? const Color(0xFF163E20) : const Color(0xFFE6F8EC),
+                      textColor: dark ? const Color(0xFF81C784) : const Color(0xFF22C55E),
                       innerBg: innerBg,
                       innerBorder: innerBorder,
                       subText: subText,
@@ -99,12 +100,12 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
               // Row 2: قادمة (Right in RTL) & تحتاج متابعة (Left in RTL)
               Row(
                 children: [
-                  // قادمة (Child 0 -> Far right in RTL)
+                  // قادمة (Right in RTL)
                   Expanded(
                     child: _buildCounterCard(
                       label: 'upcoming'.tr,
                       count: model.upcomingVisits,
-                      badgeColor: dark ? const Color(0xFF3B2E15) : const Color(0x17F59E0B),
+                      badgeColor: dark ? const Color(0xFF3B2E15) : const Color(0xFFFEF4E2),
                       textColor: dark ? const Color(0xFFFFD54F) : const Color(0xFFF59E0B),
                       innerBg: innerBg,
                       innerBorder: innerBorder,
@@ -113,13 +114,13 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
 
-                  // تحتاج متابعة (Child 1 -> Far left in RTL)
+                  // تحتاج متابعة (Left in RTL)
                   Expanded(
                     child: _buildCounterCard(
                       label: 'needs_follow_up'.tr,
                       count: model.followUpVisits,
-                      badgeColor: dark ? const Color(0xFF2C2242) : const Color(0x177861A6),
-                      textColor: dark ? const Color(0xFFCE93D8) : const Color(0xFF7861A6),
+                      badgeColor: dark ? const Color(0xFF2C2242) : const Color(0xFFEEEBF5),
+                      textColor: dark ? const Color(0xFFCE93D8) : const Color(0xFF6D549E),
                       innerBg: innerBg,
                       innerBorder: innerBorder,
                       subText: subText,
@@ -174,16 +175,37 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
     required Color subText,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: innerBg,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: innerBorder),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Label (Right in RTL)
+          // Badge FIRST -> Appears on the RIGHT in RTL (Figma 1:1)
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: badgeColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                '$count',
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: textColor,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+
+          // Label SECOND -> Appears to the LEFT of the badge in RTL (Figma 1:1)
           Expanded(
             child: Text(
               label,
@@ -193,24 +215,8 @@ class TodayVisitsSummaryWidget extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: subText,
               ),
-            ),
-          ),
-
-          // Badge (Left in RTL)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: badgeColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$count',
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: textColor,
-              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
