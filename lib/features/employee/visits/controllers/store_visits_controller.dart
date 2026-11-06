@@ -1091,36 +1091,50 @@ class StoreVisitsController extends GetxController {
     // Call backend API and await
     try {
       if (Get.isRegistered<ApiClient>()) {
-        final res = await Get.find<ApiClient>().postData(
+        // Multipart: front_image/inside_image are local camera-capture file
+        // paths that must be uploaded as real files, not sent as plain text
+        // (the backend's $request->hasFile() check silently falls back to
+        // storing the raw local device path as a string otherwise, which
+        // looks like a photo but is actually a dead, unrecoverable link).
+        final List<MultipartBody> multipart = [
+          if (updated.frontImagePath != null && updated.frontImagePath!.isNotEmpty)
+            MultipartBody('front_image', XFile(updated.frontImagePath!)),
+          if (updated.insideImagePath != null && updated.insideImagePath!.isNotEmpty)
+            MultipartBody('inside_image', XFile(updated.insideImagePath!)),
+        ];
+
+        final res = await Get.find<ApiClient>().postMultipartData(
           '${AppConstants.marketerVisitsUri}/$finishedVisitId/complete',
           {
             'store_name': updated.storeName,
             'manager_name': updated.managerName,
             'phone': updated.phone,
-            'openings_count': updated.openingsCount,
+            'openings_count': updated.openingsCount.toString(),
             'cr_number': updated.crNumber,
-            'decision_maker_name': updated.decisionMakerName,
-            'decision_maker_phone': updated.decisionMakerPhone,
-            'decision_maker_best_time': updated.decisionMakerBestTime,
-            'interviewed_person_role': updated.interviewedPersonRole,
+            'decision_maker_name': updated.decisionMakerName ?? '',
+            'decision_maker_phone': updated.decisionMakerPhone ?? '',
+            'decision_maker_best_time': updated.decisionMakerBestTime ?? '',
+            'interviewed_person_role': updated.interviewedPersonRole ?? '',
             'pipeline_step': updated.pipelineStep.name,
             'visit_status': updated.visitStatus == StoreVisitStatus.followUp
                 ? 'follow_up'
                 : (updated.visitStatus == StoreVisitStatus.inProgress ? 'in_progress' : 'completed'),
-            'obstacles_notes': updated.obstaclesNotes,
-            'closing_reason': updated.closingReason,
-            'closing_reason_other_details': updated.closingReasonOtherDetails,
-            'confidential_notes': updated.confidentialNotes,
-            'front_image': updated.frontImagePath,
-            'inside_image': updated.insideImagePath,
-            'is_qualified': updated.isQualifiedOutcome,
-            'is_extended': updated.isExtended,
-            'extended_minutes': updated.extendedMinutes,
+            'obstacles_notes': updated.obstaclesNotes ?? '',
+            'closing_reason': updated.closingReason ?? '',
+            'closing_reason_other_details': updated.closingReasonOtherDetails ?? '',
+            'confidential_notes': updated.confidentialNotes ?? '',
+            // PHP's (bool) cast treats any non-empty string (including "false")
+            // as true, so booleans must travel as "1"/"0" over multipart, not
+            // "true"/"false" -- that only holds for real JSON requests.
+            'is_qualified': updated.isQualifiedOutcome ? '1' : '0',
+            'is_extended': updated.isExtended ? '1' : '0',
+            'extended_minutes': updated.extendedMinutes.toString(),
             if (isFollowUpNeeded && updated.nextFollowUpDate != null)
               'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
             if (isFollowUpNeeded)
-              'next_follow_up_commitments': updated.nextFollowUpCommitments,
+              'next_follow_up_commitments': updated.nextFollowUpCommitments ?? '',
           },
+          multipart,
         );
 
         if (res.statusCode == 200) {
