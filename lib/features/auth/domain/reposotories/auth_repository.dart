@@ -656,8 +656,15 @@ class AuthRepository implements AuthRepositoryInterface {
       }
     }
 
-    // Clear legacy storage
-    sharedPreferences.remove(AppConstants.token);
+    // Clear legacy storage. The token key must stay guarded by the same
+    // `removeToken` flag as the secure token above -- `isLoggedIn()` checks
+    // this legacy key, so wiping it unconditionally silently logs the user
+    // out even on calls that explicitly asked to keep the session
+    // (clearSharedData(removeToken: false), used by several "don't log out
+    // on a transient error" guards in api_checker.dart).
+    if (removeToken) {
+      sharedPreferences.remove(AppConstants.token);
+    }
     sharedPreferences.remove(AppConstants.guestId);
     sharedPreferences.setStringList(AppConstants.cartList, []);
     sharedPreferences.remove(AppConstants.intro); // Reset onboarding status
