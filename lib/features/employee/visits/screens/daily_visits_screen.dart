@@ -31,6 +31,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
       } else {
         Get.find<StoreVisitsController>().loadVisits();
       }
+      Get.find<StoreVisitsController>().loadNearbyLeads();
     });
   }
 
@@ -255,17 +256,12 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                       ),
                     )
                   else if (visits.isEmpty)
-                    SliverFillRemaining(
-                      child: Center(
-                        child: Text(
-                          _tr('no_visits_found', 'لا توجد زيارات متاحة حالياً'),
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 14,
-                            color: dateText,
-                          ),
-                        ),
-                      ),
+                    _buildNearbyLeadsSliver(
+                      controller: controller,
+                      isDark: isDark,
+                      cardBg: cardBg,
+                      headingText: headingText,
+                      dateText: dateText,
                     )
                   else
                     SliverPadding(
@@ -349,6 +345,101 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Suggested nearby candidate businesses (name + address + distance only —
+  // shown when there are no logged visits yet today, so the rep always has
+  // somewhere to go next without typing anything in by hand).
+  Widget _buildNearbyLeadsSliver({
+    required StoreVisitsController controller,
+    required bool isDark,
+    required Color cardBg,
+    required Color headingText,
+    required Color dateText,
+  }) {
+    if (controller.isLoadingLeads) {
+      return const SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator(color: _primaryGreen)),
+      );
+    }
+
+    final leads = controller.nearbyLeads;
+    if (leads.isEmpty) {
+      return SliverFillRemaining(
+        child: Center(
+          child: Text(
+            _tr('no_visits_found', 'لا توجد زيارات متاحة حالياً'),
+            style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: dateText),
+          ),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final lead = leads[index];
+            final distance = (lead['distance_km'] as num?)?.toStringAsFixed(1) ?? '--';
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          lead['name']?.toString() ?? '',
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: headingText,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${lead['address'] ?? ''} · $distance ${_tr('km', 'كم')}',
+                          style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: dateText),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final started = await controller.startVisitFromLead(lead);
+                      if (started && controller.activeVisit != null) {
+                        Get.to(() => ActiveStoreVisitScreen(visit: controller.activeVisit!));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primaryGreen,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Text(
+                      _tr('start_visit', 'ابدأ الزيارة'),
+                      style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          childCount: leads.length,
+        ),
       ),
     );
   }

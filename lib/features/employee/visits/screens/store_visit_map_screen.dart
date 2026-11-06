@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import '../../../../common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
@@ -147,22 +150,101 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
     _liveDistanceKm = meters / 1000.0;
   }
 
-  void _updatePolylines() {
-    _polylines.clear();
-    if (_currentPosition != null && _selectedVisit != null) {
-      final storePos = _getVisitLatLng(_selectedVisit!);
-      final userPos = LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
+  int _routeRequestId = 0;
 
-      _polylines.add(
+  void _updatePolylines() {
+    if (_currentPosition == null || _selectedVisit == null) {
+      _polylines.clear();
+      return;
+    }
+
+    final storePos = _getVisitLatLng(_selectedVisit!);
+    final userPos = LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
+
+    // Straight line first so something shows immediately, then swapped for
+    // the real driving route as soon as Directions API responds.
+    _polylines
+      ..clear()
+      ..add(
         Polyline(
           polylineId: const PolylineId('route_to_store'),
           points: [userPos, storePos],
-          color: _primaryGreen,
+          color: _primaryGreen.withValues(alpha: 0.4),
           width: 4,
           patterns: [PatternItem.dash(20), PatternItem.gap(10)],
         ),
       );
+
+    _fetchRoutePolyline(userPos, storePos);
+  }
+
+  Future<void> _fetchRoutePolyline(LatLng origin, LatLng destination) async {
+    final requestId = ++_routeRequestId;
+    try {
+      final uri = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
+        'origin': '${origin.latitude},${origin.longitude}',
+        'destination': '${destination.latitude},${destination.longitude}',
+        'mode': 'driving',
+        'key': AppConstants.googleMapsApiKey,
+      });
+      final response = await http.get(uri).timeout(const Duration(seconds: 8));
+      if (!mounted || requestId != _routeRequestId) return;
+      if (response.statusCode != 200) return;
+
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final routes = body['routes'] as List?;
+      if (routes == null || routes.isEmpty) return;
+
+      final overviewPolyline = routes.first['overview_polyline']?['points'] as String?;
+      if (overviewPolyline == null || overviewPolyline.isEmpty) return;
+
+      final points = _decodePolyline(overviewPolyline);
+      if (points.isEmpty) return;
+
+      setState(() {
+        _polylines
+          ..clear()
+          ..add(
+            Polyline(
+              polylineId: const PolylineId('route_to_store'),
+              points: points,
+              color: _primaryGreen,
+              width: 5,
+            ),
+          );
+      });
+    } catch (e) {
+      debugPrint('⚠️ [StoreVisitMapScreen] Directions lookup failed, keeping straight line: $e');
     }
+  }
+
+  /// Decodes a Google Maps encoded polyline string into a list of points.
+  /// Standard algorithm -- see Google's polyline encoding docs.
+  List<LatLng> _decodePolyline(String encoded) {
+    final List<LatLng> points = [];
+    int index = 0, lat = 0, lng = 0;
+
+    while (index < encoded.length) {
+      int shift = 0, result = 0, b;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+      points.add(LatLng(lat / 1e5, lng / 1e5));
+    }
+    return points;
   }
 
   void _animateCameraToStore() {

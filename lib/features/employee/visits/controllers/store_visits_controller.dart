@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -614,6 +615,220 @@ class StoreVisitsController extends GetxController {
         isError: true,
         showDuration: 4,
       );
+      return false;
+    }
+  }
+
+  // Nearby candidate businesses list (shown on the "زيارات اليوم" tab when
+  // there are no visits logged yet for today).
+  List<Map<String, dynamic>> _nearbyLeads = [];
+  List<Map<String, dynamic>> get nearbyLeads => _nearbyLeads;
+
+  bool _isLoadingLeads = false;
+  bool get isLoadingLeads => _isLoadingLeads;
+
+  // The chain anchor: once the rep picks a store to visit, every following
+  // suggestion is measured from THAT store instead of live GPS, so the
+  // route walks naturally from one nearby place to the next rather than
+  // jumping back to wherever the rep is physically standing. Resets to
+  // live GPS at the start of a fresh day/shift (controller is recreated).
+  double? _chainLat;
+  double? _chainLng;
+
+  /// Resolves the point to measure "nearby" from: the last visited store
+  /// once one exists in this session, otherwise the rep's live GPS.
+  Future<({double lat, double lng})?> _resolveReferencePoint() async {
+    if (_chainLat != null && _chainLng != null) {
+      return (lat: _chainLat!, lng: _chainLng!);
+    }
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+      return null;
+    }
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    ).timeout(const Duration(seconds: 10));
+    return (lat: position.latitude, lng: position.longitude);
+  }
+
+  Future<void> loadNearbyLeads({int limit = 15}) async {
+    _isLoadingLeads = true;
+    update();
+    try {
+      final point = await _resolveReferencePoint();
+      if (point == null) {
+        _nearbyLeads = [];
+        return;
+      }
+
+      if (!Get.isRegistered<ApiClient>()) return;
+      final res = await Get.find<ApiClient>().getData(
+        '/api/v1/customer/marketer/leads/nearby'
+            '?latitude=${point.lat}&longitude=${point.lng}&limit=$limit',
+        useEtag: false,
+      );
+      if (res.statusCode == 200 && res.body != null) {
+        final leads = res.body['data']?['leads'];
+        if (leads is List) {
+          _nearbyLeads = leads.map((e) => Map<String, dynamic>.from(e)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadNearbyLeads error: $e');
+    } finally {
+      _isLoadingLeads = false;
+      update();
+    }
+  }
+
+  // Manual picker: neighborhood -> store list (step 1 then step 2).
+  List<Map<String, dynamic>> _neighborhoods = [];
+  List<Map<String, dynamic>> get neighborhoods => _neighborhoods;
+  bool _isLoadingNeighborhoods = false;
+  bool get isLoadingNeighborhoods => _isLoadingNeighborhoods;
+
+  Future<void> loadNeighborhoods() async {
+    _isLoadingNeighborhoods = true;
+    update();
+    try {
+      if (!Get.isRegistered<ApiClient>()) return;
+      final res = await Get.find<ApiClient>().getData(
+        '/api/v1/customer/marketer/leads/neighborhoods',
+        useEtag: false,
+      );
+      if (res.statusCode == 200 && res.body != null) {
+        final list = res.body['data']?['neighborhoods'];
+        if (list is List) {
+          _neighborhoods = list.map((e) => Map<String, dynamic>.from(e)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadNeighborhoods error: $e');
+    } finally {
+      _isLoadingNeighborhoods = false;
+      update();
+    }
+  }
+
+  List<Map<String, dynamic>> _neighborhoodLeads = [];
+  List<Map<String, dynamic>> get neighborhoodLeads => _neighborhoodLeads;
+  bool _isLoadingNeighborhoodLeads = false;
+  bool get isLoadingNeighborhoodLeads => _isLoadingNeighborhoodLeads;
+
+  /// Every business in [neighborhood] -- available AND already-claimed, so
+  /// the rep can see "someone already visited this one" instead of it just
+  /// vanishing. Sorted by distance when location is available.
+  Future<void> loadLeadsForNeighborhood(String neighborhood) async {
+    _isLoadingNeighborhoodLeads = true;
+    update();
+    try {
+      String query = 'neighborhood=${Uri.encodeQueryComponent(neighborhood)}';
+      try {
+        final point = await _resolveReferencePoint();
+        if (point != null) {
+          query += '&latitude=${point.lat}&longitude=${point.lng}';
+        }
+      } catch (_) {
+        // Location unavailable -- list still loads, just unsorted.
+      }
+
+      if (!Get.isRegistered<ApiClient>()) return;
+      final res = await Get.find<ApiClient>().getData(
+        '/api/v1/customer/marketer/leads/by-neighborhood?$query',
+        useEtag: false,
+      );
+      if (res.statusCode == 200 && res.body != null) {
+        final list = res.body['data']?['leads'];
+        if (list is List) {
+          _neighborhoodLeads = list.map((e) => Map<String, dynamic>.from(e)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadLeadsForNeighborhood error: $e');
+    } finally {
+      _isLoadingNeighborhoodLeads = false;
+      update();
+    }
+  }
+
+  /// Looks up the nearest not-yet-claimed candidate business from the
+  /// pre-loaded area leads list. Returns null if location isn't available,
+  /// the request fails, or there's nothing nearby to suggest.
+  Future<Map<String, dynamic>?> fetchNearestLead() async {
+    try {
+      final point = await _resolveReferencePoint();
+      if (point == null) return null;
+
+      if (!Get.isRegistered<ApiClient>()) return null;
+      final res = await Get.find<ApiClient>().getData(
+        '/api/v1/customer/marketer/leads/nearby'
+            '?latitude=${point.lat}&longitude=${point.lng}',
+        useEtag: false,
+      );
+      if (res.statusCode == 200 && res.body != null) {
+        final leads = res.body['data']?['leads'];
+        if (leads is List && leads.isNotEmpty) {
+          return Map<String, dynamic>.from(leads.first);
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] fetchNearestLead error: $e');
+    }
+    return null;
+  }
+
+  /// Creates a visit record from a suggested lead, then starts it exactly
+  /// like any other visit (same timer/prefill/API flow as [startVisit]).
+  Future<bool> startVisitFromLead(Map<String, dynamic> lead) async {
+    try {
+      if (!Get.isRegistered<ApiClient>()) return false;
+      final res = await Get.find<ApiClient>().postData(
+        '${AppConstants.marketerVisitsUri}/store',
+        {
+          'lead_id': lead['id'],
+          'store_name': lead['name'],
+          'address': lead['address'],
+          'latitude': lead['latitude'],
+          'longitude': lead['longitude'],
+          'visit_status': 'scheduled',
+        },
+      );
+      if (res.statusCode != 200 || res.body == null || res.body['data']?['id'] == null) {
+        final msg = res.body?['message']?.toString() ?? 'تعذّر إنشاء الزيارة، حاول مرة أخرى';
+        showCustomSnackBar(msg, isError: true);
+        return false;
+      }
+      final newVisit = StoreVisitModel(
+        id: res.body['data']['id'].toString(),
+        storeName: lead['name']?.toString() ?? '',
+        managerName: '',
+        phone: '',
+        address: lead['address']?.toString() ?? '',
+        latitude: (lead['latitude'] as num?)?.toDouble(),
+        longitude: (lead['longitude'] as num?)?.toDouble(),
+        category: '',
+        distanceKm: (lead['distance_km'] as num?)?.toDouble() ?? 0,
+        timeSlot: '',
+      );
+      _allVisits.add(newVisit);
+      _nearbyLeads.removeWhere((l) => l['id'] == lead['id']);
+
+      // Chain the next suggestions off THIS store instead of live GPS, then
+      // refresh the list in the background so it's ready by the time the
+      // rep finishes this visit and comes back for the next one.
+      if (newVisit.latitude != null && newVisit.longitude != null) {
+        _chainLat = newVisit.latitude;
+        _chainLng = newVisit.longitude;
+        unawaited(loadNearbyLeads());
+      }
+
+      update();
+      return startVisit(newVisit);
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] startVisitFromLead error: $e');
       return false;
     }
   }

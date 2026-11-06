@@ -12,6 +12,8 @@ import '../widgets/employee_warnings_banner.dart';
 import '../widgets/today_visits_summary_widget.dart';
 import '../widgets/instant_reward_tracker_widget.dart';
 import '../visits/controllers/store_visits_controller.dart';
+import '../visits/models/store_visit_model.dart';
+import '../visits/screens/neighborhood_picker_screen.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import '../controllers/supervisor_recommendations_controller.dart';
 
@@ -94,9 +96,7 @@ class EmployeeHomeScreen extends StatelessWidget {
                     // 7. ملخص زيارات اليوم
                     TodayVisitsSummaryWidget(
                       isDark: isDark,
-                      onStartNextVisit: () {
-                        Get.find<EmployeeNavigationController>().changeIndex(1);
-                      },
+                      onStartNextVisit: () => _onStartNextVisit(context),
                     ),
                   ],
                 ),
@@ -106,5 +106,22 @@ class EmployeeHomeScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  /// If there's already a scheduled visit today, keep the old behaviour
+  /// (open the visits tab). Otherwise open the area picker: choose a
+  /// neighborhood, then pick a specific store from it to start a visit.
+  Future<void> _onStartNextVisit(BuildContext context) async {
+    final navController = Get.find<EmployeeNavigationController>();
+    final visitsController = Get.find<StoreVisitsController>();
+
+    final hasPendingVisit = visitsController.allVisits.any((v) =>
+        v.visitStatus == StoreVisitStatus.scheduled || v.visitStatus == StoreVisitStatus.inProgress);
+    if (hasPendingVisit) {
+      navController.changeIndex(1);
+      return;
+    }
+
+    Get.to(() => const NeighborhoodPickerScreen());
   }
 }

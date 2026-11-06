@@ -6,7 +6,10 @@ import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
+import 'package:sixam_mart/features/chat/screens/chat_screen.dart';
 import 'package:sixam_mart/features/employee/visits/controllers/store_visits_controller.dart';
+import 'legal/marketer_privacy_screen.dart';
+import 'legal/marketer_terms_screen.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -15,7 +18,6 @@ import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/features/employee/visits/models/store_visit_model.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'employee_vacations_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_dashboard_screen.dart';
@@ -657,7 +659,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
             darkText: darkText,
             subText: subText,
             arrowColor: arrowColor,
-            onTap: () => _launchHelpSupport(),
+            onTap: () => Get.to(() => const ChatScreen()),
           ),
           _buildDivider(dividerColor),
 
@@ -668,8 +670,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
             darkText: darkText,
             subText: subText,
             arrowColor: arrowColor,
-            onTap: () =>
-                Get.toNamed(RouteHelper.getHtmlRoute('privacy-policy')),
+            onTap: () => Get.to(() => const MarketerPrivacyScreen()),
           ),
           _buildDivider(dividerColor),
 
@@ -680,8 +681,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
             darkText: darkText,
             subText: subText,
             arrowColor: arrowColor,
-            onTap: () =>
-                Get.toNamed(RouteHelper.getHtmlRoute('terms-and-condition')),
+            onTap: () => Get.to(() => const MarketerTermsScreen()),
           ),
         ],
       ),
@@ -882,13 +882,6 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
       endIndent: 16,
       color: dividerColor,
     );
-  }
-
-  void _launchHelpSupport() async {
-    final Uri url = Uri.parse('https://wa.me/966500000000');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
   }
 
   void _showLogoutDialog(BuildContext context) {
