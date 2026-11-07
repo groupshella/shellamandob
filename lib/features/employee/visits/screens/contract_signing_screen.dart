@@ -40,6 +40,18 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   String _contractNumber = '';
   String _nafathCode = '54';
 
+  final TextEditingController _nationalIdController = TextEditingController();
+  final TextEditingController _signerNameController = TextEditingController();
+  bool _showIdentityErrors = false;
+
+  // Nafath only verifies real Saudi national IDs / Iqamas: 10 digits,
+  // starting with 1 (citizen) or 2 (resident). A commercial registration
+  // number or phone number -- what this screen used to fall back to --
+  // will never pass real verification.
+  bool get _isNationalIdValid => RegExp(r'^[12][0-9]{9}$').hasMatch(_nationalIdController.text.trim());
+  bool get _isSignerNameValid => _signerNameController.text.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).length >= 4;
+  bool get _canSubmitIdentity => _isAgreed && _isNationalIdValid && _isSignerNameValid;
+
   Timer? _countdownTimer;
   Timer? _pollTimer;
   int _waitingSecondsRemaining = 90;
@@ -75,20 +87,10 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
     _nafathCode = rand.toString();
   }
 
-  String _getIdentifierForNafath() {
-    if (widget.visit.crNumber.trim().isNotEmpty) {
-      final digits = widget.visit.crNumber.replaceAll(RegExp(r'\D'), '');
-      if (digits.length >= 10) return digits.substring(0, 10);
-    }
-    if (widget.visit.phone.trim().isNotEmpty) {
-      final digits = widget.visit.phone.replaceAll(RegExp(r'\D'), '');
-      if (digits.length >= 10) return digits.substring(0, 10);
-      if (digits.length == 9) return '1$digits';
-    }
-    final rawDigits = widget.visit.id.replaceAll(RegExp(r'\D'), '');
-    final idNum = int.tryParse(rawDigits) ?? 1;
-    return (1000000000 + (idNum % 899999999)).toString();
-  }
+  // The merchant's own national ID/Iqama, entered on the review screen --
+  // a CR number or phone number is never a valid Nafath identifier, so
+  // there is no synthetic fallback here on purpose.
+  String _getIdentifierForNafath() => _nationalIdController.text.trim();
 
   Future<void> _initiateNafathRequest() async {
     try {
@@ -96,7 +98,10 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
         final nationalId = _getIdentifierForNafath();
         final response = await Get.find<ApiClient>().postData(
           '/api/v1/nafath/initiate',
-          {'national_id': nationalId},
+          {
+            'national_id': nationalId,
+            'full_name': _signerNameController.text.trim(),
+          },
         );
         if (response.statusCode == 200 && response.body != null) {
           final code = response.body['code']?.toString() ??
@@ -223,6 +228,8 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   void dispose() {
     _countdownTimer?.cancel();
     _pollTimer?.cancel();
+    _nationalIdController.dispose();
+    _signerNameController.dispose();
     super.dispose();
   }
 
@@ -420,6 +427,65 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
 
             const SizedBox(height: 16),
 
+            // Signer Identity (required for real Nafath verification)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: borderColor, width: 0.8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'signer_identity_for_nafath'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: darkText,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _signerNameController,
+                    onChanged: (_) => setState(() {}),
+                    style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: darkText),
+                    decoration: InputDecoration(
+                      labelText: 'signer_full_name_label'.tr,
+                      hintText: 'signer_full_name_hint'.tr,
+                      errorText: _showIdentityErrors && !_isSignerNameValid
+                          ? 'signer_full_name_error'.tr
+                          : null,
+                      isDense: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _nationalIdController,
+                    onChanged: (_) => setState(() {}),
+                    keyboardType: TextInputType.number,
+                    maxLength: 10,
+                    style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: darkText),
+                    decoration: InputDecoration(
+                      labelText: 'signer_national_id_label'.tr,
+                      hintText: 'signer_national_id_hint'.tr,
+                      counterText: '',
+                      errorText: _showIdentityErrors && !_isNationalIdValid
+                          ? 'signer_national_id_error'.tr
+                          : null,
+                      isDense: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
             // Agreement Checkbox Container
             GestureDetector(
               onTap: () {
@@ -498,6 +564,10 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
             child: ElevatedButton(
               onPressed: _isAgreed
                   ? () {
+                      if (!_isNationalIdValid || !_isSignerNameValid) {
+                        setState(() => _showIdentityErrors = true);
+                        return;
+                      }
                       setState(() {
                         _currentStage = ContractFlowStage.nafathCode;
                       });
@@ -505,7 +575,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                     }
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _isAgreed
+                backgroundColor: _canSubmitIdentity
                     ? _primaryGreen
                     : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
                 disabledBackgroundColor:
@@ -519,7 +589,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                   fontFamily: 'Tajawal',
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: _isAgreed ? Colors.white : subText,
+                  color: _canSubmitIdentity ? Colors.white : subText,
                 ),
               ),
             ),
