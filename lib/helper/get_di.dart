@@ -90,115 +90,100 @@ Future<Map<String, Map<String, String>>> init() async {
 
 // ====================================
 
-  /// Repository interface
-  final AuthRepositoryInterface authRepositoryInterface =
-      AuthRepository(apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => authRepositoryInterface);
+  /// Repository interface (True Lazy Singletons via Factory Closures)
+  Get.lazyPut<AuthRepositoryInterface>(
+      () => AuthRepository(apiClient: Get.find(), sharedPreferences: Get.find()));
 
-  final LocationRepositoryInterface locationRepositoryInterface =
-      LocationRepository(apiClient: Get.find());
-  Get.lazyPut(() => locationRepositoryInterface);
+  Get.lazyPut<LocationRepositoryInterface>(
+      () => LocationRepository(apiClient: Get.find()));
 
-  final DeliverymanRegistrationRepositoryInterface
-      deliverymanRegistrationRepositoryInterface =
-      DeliverymanRegistrationRepository(
-          apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => deliverymanRegistrationRepositoryInterface);
+  Get.lazyPut<DeliverymanRegistrationRepositoryInterface>(
+      () => DeliverymanRegistrationRepository(
+          apiClient: Get.find(), sharedPreferences: Get.find()));
 
-  final StoreRegistrationRepositoryInterface
-      storeRegistrationRepositoryInterface =
-      StoreRegistrationRepository(apiClient: Get.find());
-  Get.lazyPut(() => storeRegistrationRepositoryInterface);
+  Get.lazyPut<StoreRegistrationRepositoryInterface>(
+      () => StoreRegistrationRepository(apiClient: Get.find()));
 
   Get.lazyPut<AddressRepositoryInterface<AddressModel>>(
       () => AddressRepository(apiClient: Get.find()));
 
-  final LanguageRepositoryInterface languageRepositoryInterface =
-      LanguageRepository(apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => languageRepositoryInterface);
+  Get.lazyPut<LanguageRepositoryInterface>(
+      () => LanguageRepository(apiClient: Get.find(), sharedPreferences: Get.find()));
 
-  final NotificationRepositoryInterface notificationRepositoryInterface =
-      NotificationRepository(
-          sharedPreferences: Get.find(), apiClient: Get.find());
-  Get.lazyPut(() => notificationRepositoryInterface);
+  Get.lazyPut<NotificationRepositoryInterface>(
+      () => NotificationRepository(
+          sharedPreferences: Get.find(), apiClient: Get.find()));
 
-  final ProfileRepositoryInterface profileRepositoryInterface =
-      ProfileRepository(apiClient: Get.find());
-  Get.lazyPut(() => profileRepositoryInterface);
+  Get.lazyPut<ProfileRepositoryInterface>(
+      () => ProfileRepository(apiClient: Get.find()));
 
-  final SplashRepositoryInterface splashRepositoryInterface =
-      SplashRepository(sharedPreferences: Get.find(), apiClient: Get.find());
-  Get.lazyPut(() => splashRepositoryInterface);
+  Get.lazyPut<SplashRepositoryInterface>(
+      () => SplashRepository(sharedPreferences: Get.find(), apiClient: Get.find()));
 
-  final VerificationRepositoryInterface verificationRepositoryInterface =
-      VerificationRepository(
-          apiClient: Get.find(), sharedPreferences: Get.find());
-  Get.lazyPut(() => verificationRepositoryInterface);
+  Get.lazyPut<VerificationRepositoryInterface>(
+      () => VerificationRepository(
+          apiClient: Get.find(), sharedPreferences: Get.find()));
 
-  /// Service Interface
-  final AuthServiceInterface authServiceInterface =
-      AuthService(authRepositoryInterface: Get.find());
-  Get.lazyPut(() => authServiceInterface);
+  /// Service Interface (True Lazy Singletons via Factory Closures)
+  Get.lazyPut<AuthServiceInterface>(
+      () => AuthService(authRepositoryInterface: Get.find<AuthRepositoryInterface>()));
 
-  final LocationServiceInterface locationServiceInterface =
-      LocationService(locationRepoInterface: Get.find());
-  Get.lazyPut(() => locationServiceInterface);
+  Get.lazyPut<LocationServiceInterface>(
+      () => LocationService(locationRepoInterface: Get.find<LocationRepositoryInterface>()));
 
-  final DeliverymanRegistrationServiceInterface
-      deliverymanRegistrationServiceInterface = DeliverymanRegistrationService(
-          deliverymanRegistrationRepoInterface: Get.find(),
-          authRepositoryInterface: Get.find());
-  Get.lazyPut(() => deliverymanRegistrationServiceInterface);
+  Get.lazyPut<DeliverymanRegistrationServiceInterface>(
+      () => DeliverymanRegistrationService(
+          deliverymanRegistrationRepoInterface:
+              Get.find<DeliverymanRegistrationRepositoryInterface>(),
+          authRepositoryInterface: Get.find<AuthRepositoryInterface>()));
 
-  final StoreRegistrationServiceInterface storeRegistrationServiceInterface =
-      StoreRegistrationService(
-          deliverymanRegistrationRepositoryInterface: Get.find(),
-          storeRegistrationRepoInterface: Get.find());
-  Get.lazyPut(() => storeRegistrationServiceInterface);
+  Get.lazyPut<StoreRegistrationServiceInterface>(
+      () => StoreRegistrationService(
+          deliverymanRegistrationRepositoryInterface:
+              Get.find<DeliverymanRegistrationRepositoryInterface>(),
+          storeRegistrationRepoInterface:
+              Get.find<StoreRegistrationRepositoryInterface>()));
 
-  final AddressServiceInterface addressServiceInterface = AddressService(
+  Get.lazyPut<AddressServiceInterface>(() => AddressService(
       addressRepoInterface:
-          Get.find<AddressRepositoryInterface<AddressModel>>());
-  Get.lazyPut(() => addressServiceInterface);
+          Get.find<AddressRepositoryInterface<AddressModel>>()));
 
-  final LanguageServiceInterface languageServiceInterface =
-      LanguageService(languageRepositoryInterface: Get.find());
-  Get.lazyPut(() => languageServiceInterface);
+  Get.lazyPut<LanguageServiceInterface>(() => LanguageService(
+      languageRepositoryInterface: Get.find<LanguageRepositoryInterface>()));
 
-  final NotificationServiceInterface notificationServiceInterface =
-      NotificationService(notificationRepositoryInterface: Get.find());
-  Get.lazyPut(() => notificationServiceInterface);
+  Get.lazyPut<NotificationServiceInterface>(() => NotificationService(
+      notificationRepositoryInterface:
+          Get.find<NotificationRepositoryInterface>()));
 
-  final ProfileServiceInterface profileServiceInterface =
-      ProfileService(profileRepositoryInterface: Get.find());
-  Get.lazyPut(() => profileServiceInterface);
+  Get.lazyPut<ProfileServiceInterface>(() => ProfileService(
+      profileRepositoryInterface: Get.find<ProfileRepositoryInterface>()));
 
-  final SplashServiceInterface splashServiceInterface =
-      SplashService(splashRepositoryInterface: Get.find());
-  Get.lazyPut(() => splashServiceInterface);
+  Get.lazyPut<SplashServiceInterface>(() =>
+      SplashService(splashRepositoryInterface: Get.find<SplashRepositoryInterface>()));
 
-  final VerificationServiceInterface verificationServiceInterface =
-      VerificationService(
-          verificationRepoInterface: Get.find(), authRepoInterface: Get.find());
-  Get.lazyPut(() => verificationServiceInterface);
+  Get.lazyPut<VerificationServiceInterface>(() => VerificationService(
+      verificationRepoInterface: Get.find<VerificationRepositoryInterface>(),
+      authRepoInterface: Get.find<AuthRepositoryInterface>()));
 
-  /// Controller
+  /// Controller (True Lazy Singletons via Factory Closures)
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
-  Get.lazyPut(() => SplashController(splashServiceInterface: Get.find()));
-  Get.lazyPut(() => AddressController(addressServiceInterface: Get.find()));
+  Get.lazyPut(() => SplashController(splashServiceInterface: Get.find<SplashServiceInterface>()));
+  Get.lazyPut(() => AddressController(addressServiceInterface: Get.find<AddressServiceInterface>()));
   Get.lazyPut(() =>
-      LocationController(locationServiceInterface: locationServiceInterface));
+      LocationController(locationServiceInterface: Get.find<LocationServiceInterface>()));
   Get.lazyPut(
-      () => LocalizationController(languageServiceInterface: Get.find()));
-  Get.lazyPut(() => AuthController(authServiceInterface: Get.find()));
+      () => LocalizationController(languageServiceInterface: Get.find<LanguageServiceInterface>()));
+  Get.lazyPut(() => AuthController(authServiceInterface: Get.find<AuthServiceInterface>()));
   Get.lazyPut(() => DeliverymanRegistrationController(
-      deliverymanRegistrationServiceInterface: Get.find()));
+      deliverymanRegistrationServiceInterface:
+          Get.find<DeliverymanRegistrationServiceInterface>()));
   Get.lazyPut(() => StoreRegistrationController(
-      storeRegistrationServiceInterface: Get.find(),
-      locationServiceInterface: locationServiceInterface));
-  Get.lazyPut(() => ProfileController(profileServiceInterface: Get.find()));
+      storeRegistrationServiceInterface:
+          Get.find<StoreRegistrationServiceInterface>(),
+      locationServiceInterface: Get.find<LocationServiceInterface>()));
+  Get.lazyPut(() => ProfileController(profileServiceInterface: Get.find<ProfileServiceInterface>()));
   Get.lazyPut(
-      () => NotificationController(notificationServiceInterface: Get.find()));
+      () => NotificationController(notificationServiceInterface: Get.find<NotificationServiceInterface>()));
   Get.lazyPut(
       () => VerificationController(verificationServiceInterface: Get.find()),
       fenix: true);

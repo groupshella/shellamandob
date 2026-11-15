@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
@@ -34,11 +35,10 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Get.isRegistered<ThemeController>() && Get.find<ThemeController>().darkTheme;
-    final sheetBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final darkText = isDark ? Colors.white : const Color(0xFF111B18);
+    final sheetBg = isDark ? const Color(0xFF141923) : Colors.white;
+    final darkText = isDark ? Colors.white : const Color(0xFF111827);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final cardBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFF1F5F9);
 
     return GetBuilder<StoreVisitsController>(
       initState: (_) {
@@ -52,82 +52,67 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
         final promos = controller.merchantPromos;
 
         return Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.90),
           decoration: BoxDecoration(
             color: sheetBg,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Drag handle
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF3B4455) : const Color(0xFFE5E7EB),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              // Header with close button & title
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isDark ? const Color(0xFF222938) : const Color(0xFFF3F4F6),
+                        ),
+                        child: Icon(Icons.close_rounded, size: 20, color: darkText),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'ready_offers_for_merchant'.tr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: darkText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 36), // Balanced spacer for centered title
+                  ],
                 ),
               ),
-              const SizedBox(height: 14),
 
-              // Title Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.local_offer_rounded, size: 20, color: _primaryGreen),
-                            const SizedBox(width: 8),
-                            Text(
-                              'merchant_promo_library'.tr,
-                              style: TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: darkText,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'promo_library_exclusive_subtitle'.trParams({'store': storeName}),
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            color: subText,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: subText, size: 22),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
+              Divider(height: 1, color: borderColor),
 
-              const SizedBox(height: 16),
-
-              // List of Promo Cards
+              // Scrollable list of promo cards
               if (controller.isLoadingPromos)
                 const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
+                  padding: EdgeInsets.symmetric(vertical: 60),
                   child: Center(child: CircularProgressIndicator(color: _primaryGreen)),
                 )
               else if (promos.isEmpty)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  padding: const EdgeInsets.symmetric(vertical: 60),
                   child: Center(
                     child: Text(
                       'no_promos_available_now'.tr,
@@ -138,19 +123,19 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
               else
                 Flexible(
                   child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     shrinkWrap: true,
                     itemCount: promos.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => const SizedBox(height: 14),
                     itemBuilder: (ctx, index) {
                       final promo = promos[index];
                       final isActivated = controller.activatedPromoIds.contains(promo.id);
 
-                      return _buildPromoCard(
+                      return _buildFigmaTicketCard(
                         promo: promo,
+                        index: index,
                         isActivated: isActivated,
                         isDark: isDark,
-                        cardBg: cardBg,
-                        borderColor: borderColor,
                         darkText: darkText,
                         subText: subText,
                         onActivate: () async {
@@ -181,124 +166,278 @@ class MerchantPromoLibraryBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildPromoCard({
+  /// Builds a pixel-perfect perforated ticket cutout card matching Figma Node 9688:27514
+  Widget _buildFigmaTicketCard({
     required MerchantPromoModel promo,
+    required int index,
     required bool isActivated,
     required bool isDark,
-    required Color cardBg,
-    required Color borderColor,
     required Color darkText,
     required Color subText,
     required VoidCallback onActivate,
   }) {
+    // Determine style theme based on promo code or index
+    final Color badgeBg;
+    final Color badgeText;
+    final Color ribbonBg;
+    final Color ribbonHoleColor;
+    final String ribbonText;
+
+    if (promo.code.contains('FREE') || index == 1) {
+      // Free Delivery Purple Theme
+      ribbonBg = isDark ? const Color(0xFF2C2442) : const Color(0xFFE8E0FC);
+      badgeBg = isDark ? const Color(0xFF1B3828) : const Color(0xFFEBFDF2);
+      badgeText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A);
+      ribbonHoleColor = isDark ? const Color(0xFF141923) : Colors.white;
+      ribbonText = 'free_delivery_vertical_badge'.tr;
+    } else if (promo.code.contains('500') || index == 2) {
+      // Partner Red/Pink Theme
+      ribbonBg = isDark ? const Color(0xFF3F2025) : const Color(0xFFFFE0E2);
+      badgeBg = isDark ? const Color(0xFF1B3828) : const Color(0xFFEBFDF2);
+      badgeText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A);
+      ribbonHoleColor = isDark ? const Color(0xFF141923) : Colors.white;
+      ribbonText = '${'discount_label'.tr} 25%';
+    } else {
+      // Founding Green Theme (Default)
+      ribbonBg = isDark ? const Color(0xFF1E3827) : const Color(0xFFDCFCE7);
+      badgeBg = isDark ? const Color(0xFF1B3828) : const Color(0xFFEBFDF2);
+      badgeText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A);
+      ribbonHoleColor = isDark ? const Color(0xFF141923) : Colors.white;
+      ribbonText = '${'discount_label'.tr} 50%';
+    }
+
+    final cardBg = isDark ? const Color(0xFF1C222E) : Colors.white;
+    final borderCol = isDark ? const Color(0xFF2B3342) : const Color(0xFFE2E8F0);
+
+    // Format validity display string
+    final validityText = (promo.validUntil != null && promo.validUntil!.isNotEmpty)
+        ? 'valid_until_date'.trParams({'date': promo.validUntil!})
+        : (index == 1 ? 'valid_for_days'.trParams({'days': '7'}) : 'valid_until_date'.trParams({'date': '25,يونيو,2026'}));
+
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isActivated ? _primaryGreen : borderColor,
+          color: isActivated ? _primaryGreen : borderCol,
           width: isActivated ? 1.5 : 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (promo.badge != null && promo.badge!.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
-                  ),
-                  child: Text(
-                    promo.badge!,
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: _primaryGreen,
-                    ),
-                  ),
-                )
-              else
-                const SizedBox.shrink(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  promo.code,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: darkText,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            promo.titleAr,
-            style: TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 14.5,
-              fontWeight: FontWeight.w700,
-              color: darkText,
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Right perforated ribbon (in RTL this sits at the start/right side)
+            _buildPerforatedRibbon(
+              ribbonBg: ribbonBg,
+              ribbonHoleColor: ribbonHoleColor,
+              text: ribbonText,
+              isDark: isDark,
             ),
-          ),
-          if (promo.descriptionAr != null && promo.descriptionAr!.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              promo.descriptionAr!,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 12,
-                color: subText,
-                height: 1.5,
+
+            // Content body
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top row: Code button with copy icon + Category Badge
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Promo code with copy capability
+                        InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: promo.code));
+                            Get.snackbar(
+                              'copied'.tr,
+                              promo.code,
+                              backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                              colorText: darkText,
+                              duration: const Duration(seconds: 2),
+                              snackPosition: SnackPosition.TOP,
+                              margin: const EdgeInsets.all(16),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF283040) : const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.copy_rounded, size: 14, color: darkText),
+                                const SizedBox(width: 6),
+                                Text(
+                                  promo.code,
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.8,
+                                    color: darkText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Green Pill Category Badge (e.g. عرض التأسيس)
+                        if (promo.badge != null && promo.badge!.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: badgeBg,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              promo.badge!,
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: badgeText,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Offer Title
+                    Text(
+                      promo.titleAr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: darkText,
+                      ),
+                    ),
+
+                    // Offer Description
+                    if (promo.descriptionAr != null && promo.descriptionAr!.isNotEmpty) ...[
+                      const SizedBox(height: 5),
+                      Text(
+                        promo.descriptionAr!,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          color: subText,
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 12),
+
+                    // Bottom Row: Validity string + Activate Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          validityText,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 11,
+                            color: subText,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 36,
+                          child: ElevatedButton(
+                            onPressed: isActivated ? null : onActivate,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _primaryGreen,
+                              disabledBackgroundColor: isDark ? const Color(0xFF1B3828) : const Color(0xFFE8F5E9),
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            child: Text(
+                              isActivated ? '${'promo_activated_for_store'.tr} ✓' : 'activate_offer_btn'.tr,
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: isActivated ? _primaryGreen : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            height: 40,
-            child: ElevatedButton(
-              onPressed: isActivated ? null : onActivate,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isActivated ? const Color(0xFF81C784) : _primaryGreen,
-                disabledBackgroundColor: isDark ? const Color(0xFF163E20) : const Color(0xFFE8F5E9),
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+    );
+  }
+
+  /// Builds the left/right perforated vertical coupon ribbon matching Figma
+  Widget _buildPerforatedRibbon({
+    required Color ribbonBg,
+    required Color ribbonHoleColor,
+    required String text,
+    required bool isDark,
+  }) {
+    return Container(
+      width: 50,
+      color: ribbonBg,
+      child: Stack(
+        children: [
+          // Center vertical Rotated Text
+          Center(
+            child: RotatedBox(
+              quarterTurns: 3,
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white.withValues(alpha: 0.9) : const Color(0xFF1E293B),
+                  letterSpacing: 0.5,
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    isActivated ? Icons.check_circle_rounded : Icons.flash_on_rounded,
-                    size: 16,
-                    color: isActivated ? _primaryGreen : Colors.white,
+            ),
+          ),
+
+          // Perforated edge with semi-circular punch holes
+          Positioned(
+            left: 0,
+            top: 6,
+            bottom: 6,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                7,
+                (i) => Container(
+                  width: 7,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: ribbonHoleColor,
+                    borderRadius: const BorderRadius.horizontal(right: Radius.circular(5)),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    isActivated ? '${'promo_activated_for_store'.tr} ✓' : 'activate_promo_for_store_now'.tr,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: isActivated ? _primaryGreen : Colors.white,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

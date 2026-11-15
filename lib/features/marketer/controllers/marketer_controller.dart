@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,6 +25,38 @@ class MarketerController extends GetxController implements GetxService {
 
   Map<String, dynamic>? _data;
   Map<String, dynamic>? get data => _data;
+
+  static const String _cacheKey = 'marketer_dashboard_cached_data';
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadFromCache();
+  }
+
+  void _loadFromCache() {
+    try {
+      if (Get.isRegistered<SharedPreferences>()) {
+        final sp = Get.find<SharedPreferences>();
+        final cached = sp.getString(_cacheKey);
+        if (cached != null && cached.isNotEmpty) {
+          _data = Map<String, dynamic>.from(jsonDecode(cached));
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [MarketerController] Error loading cache: $e');
+    }
+  }
+
+  void _saveToCache(Map<String, dynamic> data) {
+    try {
+      if (Get.isRegistered<SharedPreferences>()) {
+        Get.find<SharedPreferences>().setString(_cacheKey, jsonEncode(data));
+      }
+    } catch (e) {
+      debugPrint('⚠️ [MarketerController] Error saving cache: $e');
+    }
+  }
 
   Timer? _pendingPollingTimer;
 
@@ -99,6 +132,9 @@ class MarketerController extends GetxController implements GetxService {
       if (response.statusCode == 200 && response.body != null) {
         _data = Map<String, dynamic>.from(
             response.body['data'] ?? <String, dynamic>{'marketer_status': 'none'});
+        if (_data != null) {
+          _saveToCache(_data!);
+        }
         if (status == 'pending') {
           _startPendingPolling();
         } else {

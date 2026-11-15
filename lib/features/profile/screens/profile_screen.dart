@@ -18,6 +18,7 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/common/widgets/error_state_view.dart';
 import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/features/profile/widgets/profile_button_widget.dart';
 import 'package:sixam_mart/features/profile/widgets/profile_card_widget.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               )
             : (isLoggedIn && profileController.userInfoModel == null)
-                ? const Center(child: CircularProgressIndicator())
+                ? SkeletonLoadingWidgets.profileScreenSkeleton(isDark: Theme.of(context).brightness == Brightness.dark)
             : SingleChildScrollView(
                 child: FooterView(
                   minHeight: isLoggedIn

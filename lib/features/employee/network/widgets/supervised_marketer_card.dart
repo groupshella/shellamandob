@@ -18,240 +18,222 @@ class SupervisedMarketerCard extends StatelessWidget {
     final Color darkText = isDark ? Colors.white : const Color(0xFF111827);
     final Color subText = isDark ? const Color(0xFF94A3B8) : const Color(0xFF6B7280);
 
+    final int recent7dRegistrations =
+        marketer.dailyRegistrationRate7d > 0 ? (marketer.dailyRegistrationRate7d * 7).round() : 0;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
+          width: 1,
+        ),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D000000), // rgba(0, 0, 0, 0.05)
+            color: Color(0x05000000),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Row 1: Header with Avatar + Name + Store & Status Badge (Top Right/Left)
+            // Row 1: Right in RTL = Avatar + Name + Profession Badge | Left in RTL = Status Pill Badge
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
-                  child: Text(
-                    marketer.name.isNotEmpty ? marketer.name[0].toUpperCase() : 'M',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF111827),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Name & Type + Store
+                // Right in RTL: Avatar + Name + Profession
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        marketer.name,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: darkText,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          _buildTypeBadge(marketer.marketerType, isDark),
-                          if (marketer.storeName != null && marketer.storeName!.isNotEmpty) ...[
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                marketer.storeName!,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: subText,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                      _buildMarketerAvatar(marketer.name, marketer.avatar, isDark),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              marketer.name,
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: darkText,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 3),
+                            _buildProfessionBadge(
+                              marketer.storeName,
+                              marketer.marketerType,
+                              isDark,
                             ),
                           ],
-                        ],
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                // Idle Badge if inactive
-                if (marketer.isIdle)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                const SizedBox(width: 8),
+
+                // Left in RTL: Status Badge (نشط / بحاجة لمتابعة)
+                _buildStatusTag(marketer.isIdle, isDark),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Row 2: Two Statistics Boxes (Right in RTL = آخر تسجيل | Left in RTL = آخر 7 أيام)
+            Row(
+              children: [
+                // 1. Right in RTL: Last registration date/time
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF3B1F2B) : const Color(0xFFFEE2E2),
-                      borderRadius: BorderRadius.circular(20),
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF9FAFB),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Row(
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.circle, size: 6, color: Color(0xFFDC2626)),
-                        const SizedBox(width: 4),
                         Text(
-                          'idle_marketer'.tr,
-                          style: const TextStyle(
-                            fontSize: 11,
+                          _formatLastActivity(marketer.lastActivityAt),
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFFDC2626),
+                            color: darkText,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'last_registration'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 10,
+                            color: subText,
                           ),
                         ),
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(width: 10),
+
+                // 2. Left in RTL: Last 7 days registrations count
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF9FAFB),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '$recent7dRegistrations',
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: darkText,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'last_7_days'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 10,
+                            color: subText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
 
-            // Inactive Warning Alert Bar (Clean Figma Alert style)
-            if (marketer.isIdle) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2A241C) : const Color(0xFFFFFBEB),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(IconlyLight.infoSquare, size: 16, color: Color(0xFFD97706)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '${'idle_since'.tr} ${marketer.daysSinceLastRegistration} ${'days_ago'.tr}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFFB45309),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            const SizedBox(height: 12),
 
-            const SizedBox(height: 14),
-
-            // Milestone 300 Target Progress
+            // Row 3: Milestone 300 Target Progress
+            // Right in RTL = الهدف نحو حافز النجمة (300 عميل) | Left in RTL = 300/X
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'milestone_star_target'.tr,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: subText,
+                Flexible(
+                  child: Text(
+                    'milestone_star_target'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: darkText,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
-                    borderRadius: BorderRadius.circular(12),
+                    color: isDark ? const Color(0xFF143326) : const Color(0xFFDCFCE7),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    '${marketer.qualifiedCustomersCount} / ${marketer.milestoneTarget}',
-                    style: const TextStyle(
-                      fontSize: 11,
+                    '${marketer.milestoneTarget}/${marketer.qualifiedCustomersCount}',
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF2563EB),
+                      color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: (marketer.milestoneProgressPct / 100.0).clamp(0.0, 1.0),
-                minHeight: 6,
-                backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  marketer.milestoneProgressPct >= 100
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFF2563EB),
-                ),
+                minHeight: 5,
+                backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
+                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
-            // 7-day stats
+            // Row 4: Action Buttons (Right in RTL = اتصال [Solid Green] | Left in RTL = زيارة تنشيط [Soft Neutral])
             Row(
               children: [
-                Icon(IconlyLight.graph, size: 14, color: subText),
-                const SizedBox(width: 6),
-                Text(
-                  '${'daily_rate_7d'.tr}: ${marketer.dailyRegistrationRate7d} ${'customers_per_day'.tr}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: subText,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Row 3: Action Buttons (Direct Call & Schedule Visit)
-            Row(
-              children: [
-                // Direct Call Button (Grey/Outlined Figma Style)
+                // Right in RTL: اتصال (Solid Primary Green Button)
                 Expanded(
                   child: SizedBox(
-                    height: 44,
+                    height: 40,
                     child: ElevatedButton.icon(
                       onPressed: () => _callPhone(marketer.phone),
-                      icon: Icon(IconlyBold.call, size: 16, color: darkText),
+                      icon: const Icon(IconlyLight.call, size: 16, color: Colors.white),
                       label: Text(
-                        'direct_call'.tr,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: darkText,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-
-                // Activation Visit Button (App Primary Green #30913F)
-                Expanded(
-                  child: SizedBox(
-                    height: 44,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _showScheduleModal(context, marketer),
-                      icon: const Icon(IconlyBold.calendar, size: 16, color: Colors.white),
-                      label: Text(
-                        'activation_visit'.tr,
+                        'call'.tr,
                         style: const TextStyle(
+                          fontFamily: 'Tajawal',
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -260,7 +242,37 @@ class SupervisedMarketerCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF30913F),
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                // Left in RTL: زيارة تنشيط (Soft Neutral Gray Button)
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _showScheduleModal(context, marketer),
+                      icon: Icon(
+                        IconlyLight.calendar,
+                        size: 16,
+                        color: isDark ? Colors.white : const Color(0xFF1F2937),
+                      ),
+                      label: Text(
+                        'activation_visit_btn'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : const Color(0xFF1F2937),
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ),
@@ -273,43 +285,180 @@ class SupervisedMarketerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeBadge(String type, bool isDark) {
-    Color bg;
-    Color fg;
-    String label;
+  Widget _buildMarketerAvatar(String name, String? avatarUrl, bool isDark) {
+    final String trimmed = name.trim();
+    final String initial = trimmed.isNotEmpty ? trimmed.characters.first : '-';
 
-    switch (type) {
-      case 'cashier':
-        bg = isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF);
-        fg = const Color(0xFF2563EB);
-        label = 'cashier'.tr;
-        break;
-      case 'driver':
-        bg = isDark ? const Color(0xFF451A03) : const Color(0xFFFEF3C7);
-        fg = const Color(0xFFD97706);
-        label = 'driver'.tr;
-        break;
-      default:
-        bg = isDark ? const Color(0xFF3B0764) : const Color(0xFFFAF5FF);
-        fg = const Color(0xFF9333EA);
-        label = 'freelance'.tr;
+    if (avatarUrl != null && avatarUrl.trim().isNotEmpty && avatarUrl.startsWith('http')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          avatarUrl,
+          width: 36,
+          height: 36,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildInitialBox(initial, isDark),
+        ),
+      );
     }
+
+    return _buildInitialBox(initial, isDark);
+  }
+
+  Widget _buildInitialBox(String initial, bool isDark) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF143326) : const Color(0xFFDCFCE7),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: TextStyle(
+          fontFamily: 'Tajawal',
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfessionBadge(String? storeName, String marketerType, bool isDark) {
+    final String rawLabel = (storeName != null && storeName.trim().isNotEmpty)
+        ? storeName.trim()
+        : (marketerType == 'cashier'
+            ? 'cashier'.tr
+            : (marketerType == 'driver' ? 'driver'.tr : 'freelance'.tr));
+
+    final bool isDriver = marketerType == 'driver' || rawLabel.contains('سائق');
+
+    final Color bg = isDriver
+        ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFEF9C3))
+        : (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF));
+    final Color fg = isDriver
+        ? (isDark ? const Color(0xFFFDE047) : const Color(0xFFCA8A04))
+        : (isDark ? const Color(0xFF93C5FD) : const Color(0xFF2563EB));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        label,
+        rawLabel,
         style: TextStyle(
-          fontSize: 11,
+          fontFamily: 'Tajawal',
+          fontSize: 10,
           fontWeight: FontWeight.w600,
           color: fg,
         ),
       ),
     );
+  }
+
+  Widget _buildStatusTag(bool isIdle, bool isDark) {
+    if (isIdle) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF451A03) : const Color(0xFFFEF3C7),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: Color(0xFFD97706),
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'needs_follow_up'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF143326) : const Color(0xFFDCFCE7),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: Color(0xFF30913F),
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'active_filter'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  String _formatLastActivity(String? dateStr) {
+    if (dateStr == null || dateStr.trim().isEmpty) return '-';
+    try {
+      final dt = DateTime.parse(dateStr);
+      final now = DateTime.now();
+      if (dt.year == now.year && dt.month == now.month && dt.day == now.day) {
+        final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+        final period = dt.hour >= 12 ? 'م' : 'ص';
+        return 'اليوم، $hour:${dt.minute.toString().padLeft(2, '0')} $period';
+      }
+      return '${dt.day} ${_monthNameAr(dt.month)}، ${dt.year}';
+    } catch (_) {
+      return dateStr;
+    }
+  }
+
+  String _monthNameAr(int m) {
+    const months = [
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
+    ];
+    if (m >= 1 && m <= 12) return months[m - 1];
+    return '';
   }
 
   void _callPhone(String phone) async {
@@ -363,6 +512,7 @@ class SupervisedMarketerCard extends StatelessWidget {
                 Text(
                   '${'schedule_visit_for'.tr} ${m.name}',
                   style: TextStyle(
+                    fontFamily: 'Tajawal',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: darkText,
@@ -381,6 +531,7 @@ class SupervisedMarketerCard extends StatelessWidget {
                     title: Text(
                       '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
                       style: TextStyle(
+                        fontFamily: 'Tajawal',
                         fontWeight: FontWeight.w700,
                         color: darkText,
                       ),
@@ -402,6 +553,7 @@ class SupervisedMarketerCard extends StatelessWidget {
                       child: Text(
                         'change_date'.tr,
                         style: const TextStyle(
+                          fontFamily: 'Tajawal',
                           color: Color(0xFF30913F),
                           fontWeight: FontWeight.w700,
                         ),
@@ -415,7 +567,11 @@ class SupervisedMarketerCard extends StatelessWidget {
                   maxLines: 2,
                   decoration: InputDecoration(
                     hintText: 'visit_notes_hint'.tr,
-                    hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                    hintStyle: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 13,
+                      color: Colors.grey,
+                    ),
                     filled: true,
                     fillColor: isDark ? const Color(0xFF334155) : const Color(0xFFF9FAFB),
                     border: OutlineInputBorder(
@@ -456,6 +612,7 @@ class SupervisedMarketerCard extends StatelessWidget {
                           : Text(
                               'confirm_schedule_visit'.tr,
                               style: const TextStyle(
+                                fontFamily: 'Tajawal',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,

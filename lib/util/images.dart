@@ -21,9 +21,9 @@ class Images {
   static const String mail = 'assets/image/mail.png';
   static const String map = 'assets/image/map.png';
 
-  static const String onboard_1 = 'assets/image/onboard_1.png';
-  static const String onboard_2 = 'assets/image/onboard_2.png';
-  static const String onboard_3 = 'assets/image/onboard_3.png';
+  static const String onboard_1 = 'assets/image/onboard_1.webp';
+  static const String onboard_2 = 'assets/image/onboard_2.webp';
+  static const String onboard_3 = 'assets/image/onboard_3.webp';
 
   static const String sar = 'assets/image/sar.png';
 
@@ -36,10 +36,10 @@ class Images {
       'assets/image/component_not_actine.png';
   static const String background_category =
       'assets/image/background_category.png';
-  static const String Blured_effect_1 = 'assets/image/Blured_effect_1.png';
-  static const String Blured_effect_2 = 'assets/image/Blured_effect_2.png';
-  static const String Blured_effect_3 = 'assets/image/Blured_effect_3.png';
-  static const String Blured_effect_4 = 'assets/image/Blured_effect_4.png';
+  static const String Blured_effect_1 = 'assets/image/Blured_effect_1.webp';
+  static const String Blured_effect_2 = 'assets/image/Blured_effect_2.webp';
+  static const String Blured_effect_3 = 'assets/image/Blured_effect_3.webp';
+  static const String Blured_effect_4 = 'assets/image/Blured_effect_4.webp';
   static const String ob_ic_food = 'assets/image/ob_ic_food.png';
   static const String oclock = 'assets/image/oclock.png';
   static const String boxes = 'assets/image/boxes.png';
@@ -121,7 +121,7 @@ class Images {
   static const String cafes = 'assets/image/coffe.png';
   static const String pickupDelivery = 'assets/image/send_recive.png';
   // "اكتشف خدمات أكثر" home promo banner.
-  static const String exploreService = 'assets/image/explor_service.png';
+  static const String exploreService = 'assets/image/explor_service.webp';
   static const String deistination_v2 = 'assets/image/deistination_v2.png';
   static const String deliveryManMarker =
       'assets/image/delivery_man_marker.png';

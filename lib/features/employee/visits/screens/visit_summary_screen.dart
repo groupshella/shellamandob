@@ -531,103 +531,6 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 14),
-
-                    // Merchant Promo Library Interactive Card
-                    InkWell(
-                      onTap: () {
-                        MerchantPromoLibraryBottomSheet.show(
-                          context,
-                          storeId: currentVisit.storeId,
-                          visitId: currentVisit.id,
-                          storeName: currentVisit.storeName,
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: borderColor,
-                            width: 1.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF30913F),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.card_giftcard_rounded,
-                                  color: Colors.white, size: 22),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'merchant_promo_library'.tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Tajawal',
-                                          fontSize: 13.5,
-                                          fontWeight: FontWeight.w700,
-                                          color: darkText,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF30913F),
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          'new_badge'.tr,
-                                          style: const TextStyle(
-                                              fontFamily: 'Tajawal',
-                                              fontSize: 9.5,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'instant_promos_enable_desc'.tr,
-                                    style: TextStyle(
-                                      fontFamily: 'Tajawal',
-                                      fontSize: 11,
-                                      color: subText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(Icons.arrow_forward_ios_rounded,
-                                size: 14, color: subText),
-                          ],
-                        ),
-                      ),
-                    ),
-
                     const SizedBox(height: 16),
 
                     // 2. بيانات المسؤول (Figma Container 8940:108585)
@@ -837,12 +740,6 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         // Conditional reason when 'لم تتم المقابلة' is selected (Figma Node 8942:1746 & 8945:23023)
                         if (controller.selectedPipelineStep ==
                             StorePipelineStep.notMet) ...[
-                          DecisionMakerCardWidget(
-                            controller: controller,
-                            visit: currentVisit,
-                            isDark: isDark,
-                            readOnly: !_isEditable,
-                          ),
                           const SizedBox(height: 14),
                           _buildInputField(
                             label: 'reason_for_not_meeting'.tr,
@@ -855,6 +752,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             darkText: darkText,
                             inputFill: inputFill,
                             isDark: isDark,
+                          ),
+                          const SizedBox(height: 14),
+                          DecisionMakerCardWidget(
+                            controller: controller,
+                            visit: currentVisit,
+                            isDark: isDark,
+                            readOnly: !_isEditable,
                           ),
                         ],
 
@@ -894,6 +798,78 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           ),
                         ],
                       ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Merchant Promo Library Interactive Card (Banner matching Figma Node 9710-47944 & 9688-27514)
+                    InkWell(
+                      onTap: () {
+                        MerchantPromoLibraryBottomSheet.show(
+                          context,
+                          storeId: currentVisit.storeId,
+                          visitId: currentVisit.id,
+                          storeName: currentVisit.storeName,
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: borderColor,
+                            width: 1.0,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.arrow_back_ios_new, size: 14, color: subText),
+                            const Spacer(),
+                            Expanded(
+                              flex: 10,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'ready_offers_for_merchant'.tr,
+                                        style: TextStyle(
+                                          fontFamily: 'Tajawal',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: darkText,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Icon(Icons.campaign, color: _primaryGreen, size: 22),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'instant_promos_enable_desc'.tr,
+                                    style: TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 11,
+                                      color: subText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     const SizedBox(height: 16),
@@ -1658,7 +1634,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             borderRadius: BorderRadius.circular(12)),
                       ),
                       child: Text(
-                        'confidential_report_title'.tr,
+                        'supervisor_confidential_report_btn'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12.5,
@@ -1950,7 +1926,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         onPressed: () {
                           Navigator.pop(ctx);
                           Get.snackbar(
-                            'confidential_report_title'.tr,
+                            'supervisor_confidential_report_btn'.tr,
                             'report_sent_success'.tr,
                             snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: _primaryGreen,
@@ -1997,6 +1973,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     );
   }
 
+  // Figma Frame: مؤقت الزيارة مع العداد الدائري وبادج الحالة
   Widget _buildLiveTimerCard({
     required StoreVisitsController controller,
     required bool isDark,
@@ -2008,10 +1985,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     final isExtended = controller.isAutoExtended;
     final remainingMin = controller.remainingMinutes;
     final isCritical = controller.remainingVisitSeconds <= 0;
+    final totalLimitSec = isExtended ? (60 * 60) : (30 * 60);
+    final elapsedSec = controller.elapsedVisitSeconds;
+    final progress = (elapsedSec / totalLimitSec).clamp(0.0, 1.0);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(16),
@@ -2027,126 +2007,116 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: isExtended
-                      ? _primaryGreen.withValues(alpha: 0.18)
-                      : (isDark
-                          ? const Color(0xFF252B37)
-                          : const Color(0xFFF3F4F6)),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                alignment: Alignment.center,
-                child: Icon(
-                  isExtended ? Icons.verified_outlined : Icons.timer_outlined,
-                  size: 20,
-                  color: isExtended
-                      ? _primaryGreen
-                      : (isCritical ? const Color(0xFFEF4444) : _primaryGreen),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      alignment: WrapAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          isExtended
-                              ? 'auto_visit_extension_success'.tr
-                              : 'visit_timer_title'.tr,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: isExtended ? _primaryGreen : darkText,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: isCritical
-                                ? const Color(0xFFFEE2E2)
-                                : (isExtended
-                                    ? _primaryGreen.withValues(alpha: 0.2)
-                                    : (isDark
-                                        ? const Color(0xFF252B37)
-                                        : const Color(0xFFF3F4F6))),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            isCritical
-                                ? 'max_visit_time_exceeded'.tr
-                                : '${'remaining_visit_time'.tr} $remainingMin ${'minute_unit'.tr}',
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: isCritical
-                                  ? const Color(0xFFDC2626)
-                                  : (isExtended ? _primaryGreen : darkText),
-                            ),
-                          ),
-                        ),
-                      ],
+          // Left Side: Status Badge & Auto Extend Explanatory Subtitle
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isCritical
+                        ? (isDark ? const Color(0xFF4C1D24) : const Color(0xFFFDE8E8))
+                        : (isExtended
+                            ? _primaryGreen.withValues(alpha: 0.15)
+                            : (isDark ? const Color(0xFF252B37) : const Color(0xFFEBFDF2))),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isCritical
+                        ? 'max_visit_time_exceeded'.tr
+                        : (isExtended
+                            ? 'auto_visit_extension_success'.tr
+                            : '${'remaining_visit_time'.tr} $remainingMin ${'minute_unit'.tr}'),
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isCritical
+                          ? const Color(0xFFE02D3C)
+                          : (isExtended ? _primaryGreen : const Color(0xFF166534)),
                     ),
-                    const SizedBox(height: 3),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Hint: يتم تمديد وقت الزيارة تلقائياً 30 دقيقة إضافية عند مرحلة التفاوض أو توقيع العقد
+                Text(
+                  'auto_extension_hint'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 11.5,
+                    color: subText,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Right Side: Circular Timer with Elapsed Value & Label
+          SizedBox(
+            width: 72,
+            height: 72,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Background Track
+                SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: CircularProgressIndicator(
+                    value: 1.0,
+                    strokeWidth: 5,
+                    color: isDark ? const Color(0xFF2B3240) : const Color(0xFFF1F3F5),
+                  ),
+                ),
+                // Active Progress Arc
+                SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 5,
+                    color: isCritical
+                        ? const Color(0xFFE02D3C)
+                        : (isExtended ? const Color(0xFF3B82F6) : _primaryGreen),
+                    strokeCap: StrokeCap.round,
+                  ),
+                ),
+                // Center Text (Time & "مضى")
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      isExtended
-                          ? '${'max_visit_extended_badge'.tr} • ${'elapsed_label'.tr} ${controller.formattedVisitTime}'
-                          : '${'max_visit_duration_hint'.tr} • ${'elapsed_label'.tr} ${controller.formattedVisitTime}',
+                      controller.formattedVisitTime,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
-                        fontSize: 11,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: darkText,
+                      ),
+                    ),
+                    Text(
+                      'elapsed_label'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 9.5,
                         color: subText,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          if (!isExtended) ...[
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color:
-                    isDark ? const Color(0xFF252B37) : const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 13, color: subText),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'auto_extension_hint'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 10.5,
-                        color: subText,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );

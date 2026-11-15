@@ -18,6 +18,7 @@ class EmployeeShiftModel {
   final String overtimeHoursText;
   final int approvedLeaveSeconds;
   final String approvedLeaveHoursText;
+  final int dailyTargetVisits;
   final int totalVisits;
   final int completedVisits;
   final int upcomingVisits;
@@ -36,6 +37,7 @@ class EmployeeShiftModel {
     this.overtimeHoursText = '',
     this.approvedLeaveSeconds = 0,
     this.approvedLeaveHoursText = '',
+    this.dailyTargetVisits = 8,
     this.totalVisits = 0,
     this.completedVisits = 0,
     this.upcomingVisits = 0,
@@ -55,6 +57,7 @@ class EmployeeShiftModel {
     String? overtimeHoursText,
     int? approvedLeaveSeconds,
     String? approvedLeaveHoursText,
+    int? dailyTargetVisits,
     int? totalVisits,
     int? completedVisits,
     int? upcomingVisits,
@@ -73,6 +76,7 @@ class EmployeeShiftModel {
       overtimeHoursText: overtimeHoursText ?? this.overtimeHoursText,
       approvedLeaveSeconds: approvedLeaveSeconds ?? this.approvedLeaveSeconds,
       approvedLeaveHoursText: approvedLeaveHoursText ?? this.approvedLeaveHoursText,
+      dailyTargetVisits: dailyTargetVisits ?? this.dailyTargetVisits,
       totalVisits: totalVisits ?? this.totalVisits,
       completedVisits: completedVisits ?? this.completedVisits,
       upcomingVisits: upcomingVisits ?? this.upcomingVisits,

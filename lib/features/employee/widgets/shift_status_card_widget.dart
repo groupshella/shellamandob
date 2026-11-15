@@ -38,8 +38,8 @@ class ShiftStatusCardWidget extends StatelessWidget {
         final isActive = status == ShiftStatus.active;
         final isOnBreak = status == ShiftStatus.onBreak;
 
-        final int targetVisits = model.totalVisits > 0
-            ? model.totalVisits
+        final int targetVisits = model.dailyTargetVisits > 0
+            ? model.dailyTargetVisits
             : StoreVisitsController.dailyTargetVisits;
         final int completedVisits = model.completedVisits;
         final int remainingVisits = (targetVisits - completedVisits).clamp(0, targetVisits);

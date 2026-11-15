@@ -5,6 +5,11 @@ class NetworkOverviewModel {
   final int todayNetworkCustomers;
   final double monthlySupervisionCommission;
   final double supervisionCommissionRate;
+  final double directEarnings;
+  final int directCustomersCount;
+  final double teamEarnings;
+  final int teamCustomersCount;
+  final List<IdleMarketerSummaryModel> idleMarketers;
 
   NetworkOverviewModel({
     required this.totalSubMarketers,
@@ -13,9 +18,15 @@ class NetworkOverviewModel {
     required this.todayNetworkCustomers,
     required this.monthlySupervisionCommission,
     required this.supervisionCommissionRate,
+    this.directEarnings = 0.0,
+    this.directCustomersCount = 0,
+    this.teamEarnings = 0.0,
+    this.teamCustomersCount = 0,
+    this.idleMarketers = const [],
   });
 
   factory NetworkOverviewModel.fromJson(Map<String, dynamic> json) {
+    var rawIdle = json['idle_marketers'] as List<dynamic>? ?? [];
     return NetworkOverviewModel(
       totalSubMarketers: json['total_sub_marketers'] as int? ?? 0,
       activeMarketersCount: json['active_marketers_count'] as int? ?? 0,
@@ -23,6 +34,46 @@ class NetworkOverviewModel {
       todayNetworkCustomers: json['today_network_customers'] as int? ?? 0,
       monthlySupervisionCommission: (json['monthly_supervision_commission'] as num?)?.toDouble() ?? 0.0,
       supervisionCommissionRate: (json['supervision_commission_rate'] as num?)?.toDouble() ?? 0.50,
+      directEarnings: (json['direct_earnings'] as num?)?.toDouble() ?? 0.0,
+      directCustomersCount: json['direct_customers_count'] as int? ?? 0,
+      teamEarnings: (json['team_earnings'] as num?)?.toDouble() ?? 0.0,
+      teamCustomersCount: json['team_customers_count'] as int? ?? 0,
+      idleMarketers: rawIdle.map((e) => IdleMarketerSummaryModel.fromJson(e)).toList(),
+    );
+  }
+}
+
+class IdleMarketerSummaryModel {
+  final int marketerId;
+  final int userId;
+  final String name;
+  final String profession;
+  final String? joinedAt;
+  final int customersCount;
+  final String? phone;
+  final String? avatar;
+
+  IdleMarketerSummaryModel({
+    required this.marketerId,
+    required this.userId,
+    required this.name,
+    required this.profession,
+    this.joinedAt,
+    required this.customersCount,
+    this.phone,
+    this.avatar,
+  });
+
+  factory IdleMarketerSummaryModel.fromJson(Map<String, dynamic> json) {
+    return IdleMarketerSummaryModel(
+      marketerId: json['marketer_id'] as int? ?? 0,
+      userId: json['user_id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      profession: json['profession'] as String? ?? 'كاشير',
+      joinedAt: json['joined_at'] as String?,
+      customersCount: json['customers_count'] as int? ?? 0,
+      phone: json['phone'] as String?,
+      avatar: json['avatar'] as String?,
     );
   }
 }

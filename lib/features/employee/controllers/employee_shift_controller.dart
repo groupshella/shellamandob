@@ -9,6 +9,7 @@ import 'package:sixam_mart/features/profile/controllers/profile_controller.dart'
 import '../models/employee_shift_model.dart';
 import '../models/employee_warning_model.dart';
 import '../services/marketer_shift_service.dart';
+import '../visits/controllers/store_visits_controller.dart';
 
 class EmployeeShiftController extends GetxController implements GetxService {
   EmployeeShiftModel _shiftModel = const EmployeeShiftModel();
@@ -173,13 +174,21 @@ class EmployeeShiftController extends GetxController implements GetxService {
           warningCount = warningsList.length;
         }
 
-        // 7. Visits Summary
+        // 7. Visits Summary & Daily Target
+        int dailyTargetVisits = StoreVisitsController.dailyTargetVisits;
+        if (data['daily_target_visits'] != null) {
+          dailyTargetVisits = int.tryParse('${data['daily_target_visits']}') ?? dailyTargetVisits;
+        }
+
         int totalVisits = 0;
         int completedVisits = 0;
         int upcomingVisits = 0;
         int followUpVisits = 0;
         if (data['visits_summary'] is Map) {
           final vs = data['visits_summary'];
+          if (vs['target'] != null) {
+            dailyTargetVisits = int.tryParse('${vs['target']}') ?? dailyTargetVisits;
+          }
           totalVisits = int.tryParse('${vs['total']}') ?? 0;
           completedVisits = int.tryParse('${vs['completed']}') ?? 0;
           upcomingVisits = int.tryParse('${vs['upcoming']}') ?? 0;
@@ -197,6 +206,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
           overtimeHoursText: overtimeText,
           approvedLeaveSeconds: approvedLeaveSeconds,
           approvedLeaveHoursText: approvedLeaveText,
+          dailyTargetVisits: dailyTargetVisits,
           totalVisits: totalVisits,
           completedVisits: completedVisits,
           upcomingVisits: upcomingVisits,
@@ -233,6 +243,9 @@ class EmployeeShiftController extends GetxController implements GetxService {
     _pollingTimer = null;
   }
 
+  /// Constant ID used to scope 1-second timer tick rebuilds strictly to the timer UI
+  static const String timerClockUpdateId = 'shift_timer_clock';
+
   void _startTimer() {
     _tickerTimer?.cancel();
     _tickerTimer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -240,12 +253,12 @@ class EmployeeShiftController extends GetxController implements GetxService {
         _shiftModel = _shiftModel.copyWith(
           actualWorkSeconds: _shiftModel.actualWorkSeconds + 1,
         );
-        update();
+        update([timerClockUpdateId]);
       } else if (_shiftModel.status == ShiftStatus.onBreak) {
         _shiftModel = _shiftModel.copyWith(
           breakSeconds: _shiftModel.breakSeconds + 1,
         );
-        update();
+        update([timerClockUpdateId]);
       }
     });
   }

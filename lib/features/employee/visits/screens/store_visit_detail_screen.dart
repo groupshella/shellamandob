@@ -219,7 +219,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                       ),
                     ),
 
-                  // 2. Daily Target Progress Indicator (الهدف اليومي: 16 زيارة)
+                  // 2. Daily Target Progress Indicator (الهدف اليومي: 8 زيارات)
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(

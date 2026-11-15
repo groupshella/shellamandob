@@ -84,6 +84,24 @@ class ApiClient extends GetxService {
   static const String _etagPrefix = 'etag_';
   Completer<void>? _contextSyncCompleter;
 
+  // Inflight request coalescing (Phase 3 Optimization)
+  // Safely prevents concurrent duplicate GET requests from transmitting multiple roundtrips
+  final Map<String, Future<Response<dynamic>>> _inFlightGetRequests = {};
+
+  String _buildDeduplicationKey(String uri, Map<String, dynamic>? query, Map<String, String>? headers) {
+    final List<String> queryList = [];
+    if (query != null && query.isNotEmpty) {
+      for (final entry in query.entries) {
+        queryList.add('${entry.key}=${entry.value}');
+      }
+      queryList.sort();
+    }
+    final String tokenPart = token ?? '';
+    final String langPart = headers?['X-localization'] ?? _mainHeaders['X-localization'] ?? '';
+    final String queryPart = queryList.join('&');
+    return '$tokenPart|$langPart|$uri|$queryPart';
+  }
+
   ApiClient({required this.appBaseUrl, required this.sharedPreferences}) {
     _fallbackDio = dio_pkg.Dio(dio_pkg.BaseOptions(
       connectTimeout: const Duration(seconds: 30),
@@ -672,6 +690,62 @@ class ApiClient extends GetxService {
   }
 
   Future<Response<dynamic>> getData(String uri,
+      {Map<String, dynamic>? query,
+      Map<String, String>? headers,
+      bool handleError = true,
+      bool changeBaseUrl = false,
+      Uri? newUri,
+      bool useEtag = true,
+      bool omitModuleId = false,
+      dio_pkg.CancelToken? cancelToken,
+      String? requestId}) async {
+    // Phase 3 Optimization: Inflight GET request deduplication
+    // Skip deduplication when a cancelToken or explicit newUri is provided to avoid cross-cancellation
+    if (cancelToken == null && !changeBaseUrl) {
+      final String dedupKey = _buildDeduplicationKey(uri, query, headers);
+      if (_inFlightGetRequests.containsKey(dedupKey)) {
+        if (kDebugMode) {
+          appLogger.debug('[ApiClient][DEDUP_COALESCE] Joining inflight GET request for ');
+        }
+        return await _inFlightGetRequests[dedupKey]!;
+      }
+
+      final future = _executeGetData(
+        uri,
+        query: query,
+        headers: headers,
+        handleError: handleError,
+        changeBaseUrl: changeBaseUrl,
+        newUri: newUri,
+        useEtag: useEtag,
+        omitModuleId: omitModuleId,
+        cancelToken: cancelToken,
+        requestId: requestId,
+      );
+
+      _inFlightGetRequests[dedupKey] = future;
+      try {
+        return await future;
+      } finally {
+        _inFlightGetRequests.remove(dedupKey);
+      }
+    }
+
+    return await _executeGetData(
+      uri,
+      query: query,
+      headers: headers,
+      handleError: handleError,
+      changeBaseUrl: changeBaseUrl,
+      newUri: newUri,
+      useEtag: useEtag,
+      omitModuleId: omitModuleId,
+      cancelToken: cancelToken,
+      requestId: requestId,
+    );
+  }
+
+  Future<Response<dynamic>> _executeGetData(String uri,
       {Map<String, dynamic>? query,
       Map<String, String>? headers,
       bool handleError = true,

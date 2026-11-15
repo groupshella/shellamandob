@@ -27,7 +27,6 @@ class ShiftMetricsGridWidget extends StatelessWidget {
       builder: (controller) {
         final model = controller.shiftModel;
         final bool showValues = controller.status != ShiftStatus.notStarted;
-        final workTime = model.localizedWorkedTime;
         final String currentDate =
             DateFormat('d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
 
@@ -58,22 +57,29 @@ class ShiftMetricsGridWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
 
-                  // 2. وقت العمل (Left in RTL)
+                  // 2. وقت العمل (Left in RTL) - Scoped to timer ticks for optimal 60fps rendering
                   Expanded(
-                    child: _buildMetricCard(
-                      date: currentDate,
-                      title: 'work_time'.tr,
-                      value: workTime,
-                      showValue: showValues,
-                      backgroundColor: cardBg,
-                      borderColor: borderColor,
-                      titleColor: subText,
-                      valueColor: darkText,
-                      iconWidget: _buildBriefcaseWithBadge(
-                        iconColor: iconGray,
-                        badgeBg: cardBg,
-                        badgeIcon: Icons.access_time_rounded,
-                      ),
+                    child: GetBuilder<EmployeeShiftController>(
+                      id: EmployeeShiftController.timerClockUpdateId,
+                      builder: (timerCtrl) {
+                        final currentWorkTime = timerCtrl.shiftModel.localizedWorkedTime;
+                        final currentShowValues = timerCtrl.status != ShiftStatus.notStarted;
+                        return _buildMetricCard(
+                          date: currentDate,
+                          title: 'work_time'.tr,
+                          value: currentWorkTime,
+                          showValue: currentShowValues,
+                          backgroundColor: cardBg,
+                          borderColor: borderColor,
+                          titleColor: subText,
+                          valueColor: darkText,
+                          iconWidget: _buildBriefcaseWithBadge(
+                            iconColor: iconGray,
+                            badgeBg: cardBg,
+                            badgeIcon: Icons.access_time_rounded,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],

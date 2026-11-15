@@ -151,51 +151,24 @@ class StoreContactsSectionWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              if (contact.whatsappConsent)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: _primaryGreen.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.verified_rounded, size: 16, color: _primaryGreen),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          'whatsapp_consent_verified'.tr,
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: _primaryGreen,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               const SizedBox(height: 20),
-
-              // Action buttons row
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: OutlinedButton.icon(
                       onPressed: () {
                         Navigator.pop(ctx);
-                        _openWhatsApp(contact.phone);
+                        _makePhoneCall(contact.phone);
                       },
-                      icon: const Icon(Icons.chat_rounded, size: 18, color: Colors.white),
-                      label: Text('whatsapp'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700, color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF25D366),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      icon: const Icon(Icons.phone_outlined, size: 18, color: _primaryGreen),
+                      label: Text(
+                        'call_phone_action'.tr,
+                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: _primaryGreen),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: _primaryGreen),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                   ),
@@ -204,42 +177,23 @@ class StoreContactsSectionWidget extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(ctx);
-                        _makePhoneCall(contact.phone);
+                        _openWhatsApp(contact.phone);
                       },
-                      icon: const Icon(Icons.phone_rounded, size: 18, color: Colors.white),
-                      label: Text('call'.tr, style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700, color: Colors.white)),
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18, color: Colors.white),
+                      label: Text(
+                        'whatsapp_action'.tr,
+                        style: const TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: Colors.white),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _primaryGreen,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        backgroundColor: const Color(0xFF25D366),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
                   ),
                 ],
               ),
-              if (!readOnly && contact.id != null) ...[
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton.icon(
-                    onPressed: () async {
-                      Navigator.pop(ctx);
-                      await controller.deleteStoreContact(contact.id!);
-                    },
-                    icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFFEF4444)),
-                    label: Text(
-                      'delete_contact'.tr,
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFEF4444),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              const SizedBox(height: 8),
             ],
           ),
         );
@@ -247,51 +201,54 @@ class StoreContactsSectionWidget extends StatelessWidget {
     );
   }
 
+  // Figma Node 9716-48376: إضافة جهة اتصال بالمتجر
   void _showAddContactModal(BuildContext context) {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
     final notesController = TextEditingController();
-    String selectedRole = 'cashier';
+    String selectedRole = 'owner';
     String selectedLang = 'ar';
     bool consent = true;
 
-    final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final darkText = isDark ? Colors.white : const Color(0xFF111827);
-    final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final inputFill = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-
+    // Figma Roles: المالك, شريك, مدير فرع, كاشير, عامل
     final roles = [
-      {'key': 'owner', 'label': 'role_owner'.tr, 'icon': Icons.admin_panel_settings_outlined},
-      {'key': 'partner', 'label': 'role_partner'.tr, 'icon': Icons.handshake_outlined},
-      {'key': 'manager', 'label': 'role_branch_manager'.tr, 'icon': Icons.manage_accounts_outlined},
-      {'key': 'cashier', 'label': 'role_cashier'.tr, 'icon': Icons.point_of_sale_outlined},
-      {'key': 'worker', 'label': 'role_worker'.tr, 'icon': Icons.badge_outlined},
+      {'key': 'owner', 'label': 'role_owner'.tr},
+      {'key': 'partner', 'label': 'role_partner'.tr},
+      {'key': 'manager', 'label': 'role_branch_manager'.tr},
+      {'key': 'cashier', 'label': 'role_cashier'.tr},
+      {'key': 'worker', 'label': 'role_worker'.tr},
     ];
 
+    // Figma Languages: 🇸🇦 العربية, 🇬🇧 English, 🇵🇰 اردو (Urdu), 🇧🇩 বাংলা (Bengali), 🇵🇭 Tagalog
     final languages = [
       {'key': 'ar', 'label': 'العربية', 'flag': '🇸🇦'},
       {'key': 'en', 'label': 'English', 'flag': '🇬🇧'},
       {'key': 'ur', 'label': 'اردو (Urdu)', 'flag': '🇵🇰'},
-      {'key': 'bn', 'label': 'বাংলা (Bengali)', 'flag': '🇧🇩'},
       {'key': 'tl', 'label': 'Tagalog', 'flag': '🇵🇭'},
+      {'key': 'bn', 'label': 'বাংলা (Bengali)', 'flag': '🇧🇩'},
     ];
+
+    final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final darkText = isDark ? Colors.white : const Color(0xFF111827);
+    final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
+    final inputFill = isDark ? const Color(0xFF252B37) : const Color(0xFFF8F9FA);
+    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: cardBg,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setStateModal) {
             return Padding(
               padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 14,
+                left: 20,
+                right: 20,
+                top: 16,
                 bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
               ),
               child: SingleChildScrollView(
@@ -299,9 +256,10 @@ class StoreContactsSectionWidget extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Sheet Handle
                     Center(
                       child: Container(
-                        width: 40,
+                        width: 44,
                         height: 4,
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
@@ -310,60 +268,81 @@ class StoreContactsSectionWidget extends StatelessWidget {
                         ),
                       ),
                     ),
+
+                    // Sheet Title
                     Text(
                       'add_store_contact_title'.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
-                        fontSize: 17,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: darkText,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 1. الدور في المتجر
+                    Text(
+                      'role_in_store'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13.5,
                         fontWeight: FontWeight.w700,
                         color: darkText,
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    // Role selection chips
-                    Text(
-                      'role_in_store'.tr,
-                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, fontWeight: FontWeight.w600, color: darkText),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: roles.map((r) {
-                        final isSelected = selectedRole == r['key'];
-                        return ChoiceChip(
-                          showCheckmark: false,
-                          avatar: Icon(r['icon'] as IconData, size: 16, color: isSelected ? Colors.white : _primaryGreen),
-                          label: Text(
-                            r['label'] as String,
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? Colors.white : darkText,
+                    const SizedBox(height: 10),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: roles.map((r) {
+                          final isSelected = selectedRole == r['key'];
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: InkWell(
+                              onTap: () => setStateModal(() => selectedRole = r['key'] as String),
+                              borderRadius: BorderRadius.circular(24),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? (isDark ? const Color(0xFF163E20) : const Color(0xFFEBFDF2))
+                                      : (isDark ? const Color(0xFF252B37) : Colors.white),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: isSelected ? _primaryGreen : borderColor,
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: Text(
+                                  r['label'] as String,
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 12.5,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSelected ? _primaryGreen : darkText,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          selected: isSelected,
-                          selectedColor: _primaryGreen,
-                          backgroundColor: inputFill,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: isSelected ? _primaryGreen : borderColor),
-                          ),
-                          onSelected: (_) => setStateModal(() => selectedRole = r['key'] as String),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
 
-                    // Name
+                    // 2. الاسم الكامل
                     Text(
                       'person_full_name'.tr,
-                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, fontWeight: FontWeight.w600, color: darkText),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     TextField(
                       controller: nameController,
                       style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
@@ -372,125 +351,212 @@ class StoreContactsSectionWidget extends StatelessWidget {
                         hintStyle: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: subText),
                         filled: true,
                         fillColor: inputFill,
-                        prefixIcon: const Icon(Icons.person_outline, size: 18, color: _primaryGreen),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: borderColor)),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: borderColor)),
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _primaryGreen, width: 1.5)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: _primaryGreen, width: 1.5),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
 
-                    // Phone / WhatsApp
+                    // 3. رقم الواتساب للتواصل والتدريب (+966 with WhatsApp Icon)
                     Text(
                       'whatsapp_number_label'.tr,
-                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, fontWeight: FontWeight.w600, color: darkText),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
-                      decoration: InputDecoration(
-                        hintText: '05XXXXXXXX',
-                        hintStyle: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: subText),
-                        filled: true,
-                        fillColor: inputFill,
-                        prefixIcon: const Icon(Icons.chat_outlined, size: 18, color: _primaryGreen),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: borderColor)),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: borderColor)),
-                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _primaryGreen, width: 1.5)),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 8),
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: TextField(
+                        controller: phoneController,
+                        keyboardType: TextInputType.phone,
+                        style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
+                        decoration: InputDecoration(
+                          prefixIcon: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.chat, color: Color(0xFF25D366), size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '+966',
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: darkText,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  height: 20,
+                                  width: 1,
+                                  color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                                ),
+                              ],
+                            ),
+                          ),
+                          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                          hintText: '12 234 5678',
+                          hintStyle: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: subText),
+                          filled: true,
+                          fillColor: inputFill,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: _primaryGreen, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
 
-                    // Preferred Language
+                    // 4. اللغة المفضلة للتدريب والمراسلة
                     Text(
                       'preferred_training_language'.tr,
-                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, fontWeight: FontWeight.w600, color: darkText),
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: languages.map((lang) {
                         final isSelected = selectedLang == lang['key'];
-                        return ChoiceChip(
-                          showCheckmark: false,
-                          avatar: Text(lang['flag']!, style: const TextStyle(fontSize: 14)),
-                          label: Text(
-                            lang['label']!,
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected ? Colors.white : darkText,
+                        return InkWell(
+                          onTap: () => setStateModal(() => selectedLang = lang['key']!),
+                          borderRadius: BorderRadius.circular(24),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? (isDark ? const Color(0xFF163E20) : const Color(0xFFEBFDF2))
+                                  : (isDark ? const Color(0xFF252B37) : Colors.white),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: isSelected ? _primaryGreen : borderColor,
+                                width: 1.2,
+                              ),
                             ),
-                          ),
-                          selected: isSelected,
-                          selectedColor: _primaryGreen,
-                          backgroundColor: inputFill,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: isSelected ? _primaryGreen : borderColor),
-                          ),
-                          onSelected: (_) => setStateModal(() => selectedLang = lang['key']!),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // WhatsApp Consent Checkbox (Legal requirement)
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: consent
-                            ? (isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4))
-                            : inputFill,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: consent ? _primaryGreen.withValues(alpha: 0.4) : borderColor,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Checkbox(
-                            value: consent,
-                            activeColor: _primaryGreen,
-                            onChanged: (val) => setStateModal(() => consent = val ?? true),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  'whatsapp_consent_declaration'.tr,
+                                  lang['label']!,
                                   style: TextStyle(
                                     fontFamily: 'Tajawal',
                                     fontSize: 12.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: darkText,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSelected ? _primaryGreen : darkText,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'whatsapp_consent_desc'.tr,
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 11,
-                                    color: subText,
-                                  ),
+                                  lang['flag']!,
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ],
                             ),
                           ),
-                        ],
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // 5. بطاقة الموافقة على استلام رسائل الواتساب
+                    InkWell(
+                      onTap: () => setStateModal(() => consent = !consent),
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF163E20).withValues(alpha: 0.35) : const Color(0xFFEBFDF2),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: consent ? _primaryGreen.withValues(alpha: 0.5) : borderColor,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 22,
+                              height: 22,
+                              margin: const EdgeInsets.only(top: 2),
+                              decoration: BoxDecoration(
+                                color: consent ? _primaryGreen : Colors.transparent,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: consent ? _primaryGreen : const Color(0xFF9CA3AF),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: consent
+                                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'whatsapp_consent_declaration'.tr,
+                                    style: TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: darkText,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'whatsapp_consent_desc'.tr,
+                                    style: TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 11.5,
+                                      color: subText,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 22),
 
-                    // Submit Button
+                    // 6. زر حفظ جهة الاتصال
                     SizedBox(
                       height: 48,
                       child: ElevatedButton(
@@ -518,11 +584,11 @@ class StoreContactsSectionWidget extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primaryGreen,
-                          elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
                         ),
                         child: Text(
-                          'save_contact_btn'.tr,
+                          'save_store_contact_btn'.tr,
                           style: const TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 15,
@@ -544,172 +610,154 @@ class StoreContactsSectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final contacts = controller.storeContacts;
     final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
     final darkText = isDark ? Colors.white : const Color(0xFF111827);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-    final tagBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF8FAFC);
-    final contacts = controller.storeContacts;
 
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(top: 14),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x06000000),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.people_outline_rounded, size: 17, color: _primaryGreen),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'store_contacts_registry_title'.tr,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: darkText,
-                    ),
-                  ),
-                ],
-              ),
-              if (contacts.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: _primaryGreen.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${contacts.length}',
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: _primaryGreen,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Tags & Chips interactive Wrap layout
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              // 1. Add Person Action Tag
-              if (!readOnly)
-                InkWell(
-                  onTap: () => _showAddContactModal(context),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _primaryGreen.withValues(alpha: 0.4), width: 1),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.add_rounded, size: 15, color: _primaryGreen),
-                        const SizedBox(width: 4),
-                        Text(
-                          'add_person_btn'.tr,
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _primaryGreen,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-              // 2. Contact Chips
-              ...contacts.map((contact) {
-                return InkWell(
-                  onTap: () => _showContactActionModal(context, contact),
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: tagBg,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: borderColor, width: 0.8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(_getRoleIcon(contact.role), size: 14, color: _primaryGreen),
-                        const SizedBox(width: 5),
-                        Text(
-                          contact.name,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: darkText,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _getLanguageFlag(contact.preferredLanguage),
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                        if (contact.whatsappConsent) ...[
-                          const SizedBox(width: 4),
-                          const Icon(Icons.verified_rounded, size: 13, color: _primaryGreen),
-                        ],
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-
-          if (contacts.isEmpty && readOnly)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                'no_contacts_registered_yet'.tr,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 12,
-                  color: subText,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        // Header Row: العنوان + زر إضافة شخص
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'store_contacts_and_training'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: darkText,
               ),
             ),
-        ],
-      ),
+            if (!readOnly)
+              InkWell(
+                onTap: () => _showAddContactModal(context),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'add_person_btn'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: darkText,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.person_add_outlined, size: 16, color: darkText),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Contacts List or Empty State Card
+        if (contacts.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderColor, width: 1),
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.contacts_outlined,
+                  size: 32,
+                  color: isDark ? const Color(0xFF4B5563) : const Color(0xFF9CA3AF),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'no_contacts_recorded_yet'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 12.5,
+                    color: subText,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: borderColor, width: 1),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: contacts.length,
+              separatorBuilder: (_, __) => Divider(color: borderColor, height: 1),
+              itemBuilder: (ctx, index) {
+                final c = contacts[index];
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: _primaryGreen.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(_getRoleIcon(c.role), color: _primaryGreen, size: 20),
+                  ),
+                  title: Row(
+                    children: [
+                      Text(
+                        c.name,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: darkText,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _getLanguageFlag(c.preferredLanguage),
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  subtitle: Text(
+                    '${'role_${c.role}'.tr} • ${c.phone}',
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 12,
+                      color: subText,
+                    ),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.more_vert, size: 20),
+                    onPressed: () => _showContactActionModal(context, c),
+                  ),
+                  onTap: () => _showContactActionModal(context, c),
+                );
+              },
+            ),
+          ),
+      ],
     );
   }
 }

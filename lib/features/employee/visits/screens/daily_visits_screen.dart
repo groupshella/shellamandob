@@ -3,6 +3,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import '../../../../common/controllers/theme_controller.dart';
+import '../../../../core/widgets/skeleton_loading_widgets.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'visit_summary_screen.dart';
@@ -250,9 +251,13 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
 
                   // 2. Visits Cards List
                   if (controller.isLoading && visits.isEmpty)
-                    const SliverFillRemaining(
-                      child: Center(
-                        child: CircularProgressIndicator(color: _primaryGreen),
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => SkeletonLoadingWidgets.storeVisitCardSkeleton(isDark: isDark),
+                          childCount: 4,
+                        ),
                       ),
                     )
                   else if (visits.isEmpty)

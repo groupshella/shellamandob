@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_main_screen.dart';
@@ -20,8 +21,6 @@ class MarketerScreen extends StatefulWidget {
 }
 
 class _MarketerScreenState extends State<MarketerScreen> {
-  static const Color _primaryGreen = Color(0xFF30913F);
-
   @override
   void initState() {
     super.initState();
@@ -40,8 +39,8 @@ class _MarketerScreenState extends State<MarketerScreen> {
           final isDark = Theme.of(context).brightness == Brightness.dark;
           return Scaffold(
             backgroundColor: isDark ? const Color(0xFF121418) : Colors.white,
-            body: const Center(
-              child: CircularProgressIndicator(color: _primaryGreen),
+            body: SafeArea(
+              child: SkeletonLoadingWidgets.employeeHomeSkeleton(isDark: isDark),
             ),
           );
         }

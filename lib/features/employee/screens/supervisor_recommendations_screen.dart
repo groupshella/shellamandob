@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import '../controllers/supervisor_recommendations_controller.dart';
 import '../models/supervisor_recommendation_model.dart';
 
@@ -47,8 +48,10 @@ class SupervisorRecommendationsScreen extends StatelessWidget {
             child: GetBuilder<SupervisorRecommendationsController>(
               builder: (controller) {
                 if (controller.isLoading && controller.recommendations.isEmpty) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF30913F)),
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    itemCount: 4,
+                    itemBuilder: (ctx, index) => SkeletonLoadingWidgets.supervisorRecommendationSkeleton(isDark: isDark),
                   );
                 }
 

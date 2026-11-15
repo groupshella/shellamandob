@@ -45,17 +45,22 @@ class EmployeeHomeScreen extends StatelessWidget {
             child: RefreshIndicator(
               color: const Color(0xFF30913F),
               onRefresh: () async {
+                // Phase 6 Optimization: Execute independent refresh requests in parallel
+                final futures = <Future<dynamic>>[];
                 if (Get.isRegistered<EmployeeShiftController>()) {
-                  await Get.find<EmployeeShiftController>().loadCurrentShift(notify: true);
+                  futures.add(Get.find<EmployeeShiftController>().loadCurrentShift(notify: true));
                 }
                 if (Get.isRegistered<SupervisorRecommendationsController>()) {
-                  await Get.find<SupervisorRecommendationsController>().loadRecommendations(notify: true);
+                  futures.add(Get.find<SupervisorRecommendationsController>().loadRecommendations(notify: true));
                 }
                 if (Get.isRegistered<StoreVisitsController>()) {
-                  await Get.find<StoreVisitsController>().loadRewardSettings();
+                  futures.add(Get.find<StoreVisitsController>().loadRewardSettings());
                 }
                 if (Get.isRegistered<NotificationController>()) {
-                  await Get.find<NotificationController>().getNotificationList(true);
+                  futures.add(Get.find<NotificationController>().getNotificationList(true));
+                }
+                if (futures.isNotEmpty) {
+                  await Future.wait(futures);
                 }
               },
               child: SingleChildScrollView(

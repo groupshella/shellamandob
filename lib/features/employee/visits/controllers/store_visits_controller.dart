@@ -19,7 +19,7 @@ class StoreVisitsController extends GetxController {
   final ImagePicker _picker = ImagePicker();
 
   // Daily target constants
-  static const int dailyTargetVisits = 16;
+  static const int dailyTargetVisits = 8;
   static const int baseMaxVisitMinutes = 30;
   static const int autoExtensionMinutes = 30;
 
