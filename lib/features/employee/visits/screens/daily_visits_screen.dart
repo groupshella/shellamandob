@@ -8,6 +8,8 @@ import '../models/store_visit_model.dart';
 import 'visit_summary_screen.dart';
 import 'active_store_visit_screen.dart';
 import 'store_visit_map_screen.dart';
+import '../widgets/store_approval_sheet.dart';
+import 'add_field_visit_screen.dart';
 import 'contract_signing_screen.dart';
 import '../../attendance/screens/select_work_zone_screen.dart';
 import '../../../../helper/route_helper.dart';
@@ -125,7 +127,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
       body: SafeArea(
         child: GetBuilder<StoreVisitsController>(
           builder: (controller) {
-            final visits = controller.allVisits;
+            final visits = controller.sortedVisits;
             final currentDate = DateFormat('EEEE، d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
 
             return RefreshIndicator(
@@ -216,6 +218,37 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                           ),
                           const SizedBox(height: 14),
 
+                          // Action Button: تصفح محلات منطقتي (self-serve store pool)
+                          SizedBox(
+                            height: 46,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final createdVisit = await Get.to(() => const AddFieldVisitScreen());
+                                if (createdVisit != null) {
+                                  Get.find<StoreVisitsController>().loadVisits();
+                                }
+                              },
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _primaryGreen,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              label: Text(
+                                _tr('new_field_visit', 'زيارة جديدة'),
+                                style: const TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
                           // Action Button: طلب تغيير المنطقة
                           SizedBox(
                             height: 46,
@@ -248,7 +281,13 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
 
                   const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-                  // 2. Visits Cards List
+                  // 2. Visits Cards List -- the marketer's own scheduled /
+                  // in-progress / follow-up visits (NOT a browsable catalog
+                  // of untouched candidate stores -- that's what "زيارة
+                  // جديدة" above replaced). Hiding this entirely once made
+                  // a marketer's own follow-up visits unreachable, so it's
+                  // back: only the old pre-loaded "browse stores" button
+                  // was removed, not the marketer's real visit list.
                   if (controller.isLoading && visits.isEmpty)
                     const SliverFillRemaining(
                       child: Center(
@@ -258,12 +297,16 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                   else if (visits.isEmpty)
                     SliverFillRemaining(
                       child: Center(
-                        child: Text(
-                          _tr('no_visits_found', 'لا توجد زيارات متاحة حالياً'),
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 14,
-                            color: dateText,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            _tr('use_new_field_visit_hint', 'استخدم زر "زيارة جديدة" أعلاه لإضافة زيارة لأي محل'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 14,
+                              color: dateText,
+                            ),
                           ),
                         ),
                       ),
@@ -277,19 +320,27 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                             final visit = visits[index];
                             final isFirstUpcoming = visit.visitStatus == StoreVisitStatus.scheduled &&
                                 visits.where((v) => v.visitStatus == StoreVisitStatus.scheduled).firstOrNull?.id == visit.id;
+                            final distanceFromPrevious = controller.distanceFromPreviousStopKm(visit, visits);
 
-                            return _buildVisitCard(
-                              context: context,
-                              visit: visit,
-                              controller: controller,
-                              isPrimaryAction: isFirstUpcoming || visit.visitStatus == StoreVisitStatus.inProgress,
-                              isDark: isDark,
-                              cardBg: cardBg,
-                              headingText: headingText,
-                              subText: subText,
-                              btnGreyBg: btnGreyBg,
-                              btnGreyText: btnGreyText,
-                              darkText: darkText,
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (distanceFromPrevious != null)
+                                  _buildRouteDistanceSeparator(distanceFromPrevious, subText),
+                                _buildVisitCard(
+                                  context: context,
+                                  visit: visit,
+                                  controller: controller,
+                                  isPrimaryAction: isFirstUpcoming || visit.visitStatus == StoreVisitStatus.inProgress,
+                                  isDark: isDark,
+                                  cardBg: cardBg,
+                                  headingText: headingText,
+                                  subText: subText,
+                                  btnGreyBg: btnGreyBg,
+                                  btnGreyText: btnGreyText,
+                                  darkText: darkText,
+                                ),
+                              ],
                             );
                           },
                           childCount: visits.length,
@@ -310,6 +361,40 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
   }
 
   // Summary Counter Box (Figma Container 8903:32643)
+  // Small connector row between two consecutive stops on the same مسار,
+  // showing the straight-line distance between them (the real driving route
+  // is on the full map screen -- this is just a quick at-a-glance hint here).
+  Widget _buildRouteDistanceSeparator(double distanceKm, Color subText) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: subText.withValues(alpha: 0.25))),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.arrow_downward_rounded, size: 11, color: subText),
+                const SizedBox(width: 3),
+                Text(
+                  '${distanceKm.toStringAsFixed(1)} ${_tr('distance_km', 'كم')}',
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: subText,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(child: Divider(color: subText.withValues(alpha: 0.25))),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCounterBox({
     required int count,
     required String label,
@@ -799,7 +884,9 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     Navigator.pop(bottomSheetContext);
-                    final success = await controller.startVisit(visit);
+                    final approvalPosition = await runStoreApprovalFlow(context, controller, visit);
+                    if (approvalPosition == null && visit.startedAt == null) return;
+                    final success = await controller.startVisit(visit, approvalPosition: approvalPosition);
                     if (success) {
                       Get.to(() => ActiveStoreVisitScreen(visit: visit));
                     }

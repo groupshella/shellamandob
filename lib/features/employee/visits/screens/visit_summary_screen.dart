@@ -73,9 +73,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         if (initialCr.length == 10) {
           controller.verifyCommercialRegister(initialCr);
         }
-        final sId = widget.visit.storeId ?? int.tryParse(widget.visit.id) ?? 0;
-        if (sId > 0) {
-          controller.loadStoreContacts(sId);
+        // storeId is only real for visits tied to an actual stores-table
+        // record; a field-discovered store (typed by the marketer, no
+        // pre-existing merchant account) has no storeId, so there's no
+        // contacts registry to fetch -- falling back to the visit's own id
+        // here used to look like a store id and 404 on the backend.
+        if (widget.visit.storeId != null && widget.visit.storeId! > 0) {
+          controller.loadStoreContacts(widget.visit.storeId!);
         }
         controller.commitmentsController.text =
             widget.visit.nextFollowUpCommitments ?? '';
@@ -341,7 +345,9 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildInputField(
-                              label: 'cr_number'.tr,
+                              label: isContract
+                                  ? 'cr_number'.tr
+                                  : '${'cr_number'.tr} (${'optional'.tr})',
                               controller: controller.crNumberController,
                               hintText: '1010XXXXXX',
                               keyboardType: TextInputType.number,
@@ -1682,49 +1688,55 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                   final enteredCr = controller.crNumberController.text.trim();
                   final cleanCr = enteredCr.replaceAll(RegExp(r'\D'), '');
 
-                  // Mandatory CR Validation: Must be entered, 10 digits, and verified
-                  if (cleanCr.isEmpty) {
-                    showCustomSnackBar(
-                        'please_enter_or_scan_cr_to_continue'.tr,
-                        isError: true);
-                    return;
-                  }
+                  // The CR is only actually required when the outcome is a
+                  // signed contract (it's what prevents a duplicate contract
+                  // on the same commercial registration). For every other
+                  // outcome it's optional -- skip straight past validation
+                  // if the marketer didn't type anything.
+                  if (isContract || cleanCr.isNotEmpty) {
+                    if (cleanCr.isEmpty) {
+                      showCustomSnackBar(
+                          'please_enter_or_scan_cr_to_continue'.tr,
+                          isError: true);
+                      return;
+                    }
 
-                  if (cleanCr.length != 10) {
-                    showCustomSnackBar(
-                        'cr_number_must_be_10_digits'.tr,
-                        isError: true);
-                    return;
-                  }
+                    if (cleanCr.length != 10) {
+                      showCustomSnackBar(
+                          'cr_number_must_be_10_digits'.tr,
+                          isError: true);
+                      return;
+                    }
 
-                  if (controller.isVerifyingCr) {
-                    showCustomSnackBar(
-                        'verifying_cr_please_wait'.tr,
-                        isError: false);
-                    return;
-                  }
+                    if (controller.isVerifyingCr) {
+                      showCustomSnackBar(
+                          'verifying_cr_please_wait'.tr,
+                          isError: false);
+                      return;
+                    }
 
-                  // If not yet verified for this 10-digit number, perform verification now
-                  if (controller.crVerificationResult == null) {
-                    final isOk =
-                        await controller.verifyCommercialRegister(cleanCr);
-                    if (!isOk) return;
-                  }
+                    // If not yet verified for this 10-digit number, perform verification now
+                    if (controller.crVerificationResult == null) {
+                      final isOk =
+                          await controller.verifyCommercialRegister(cleanCr);
+                      if (!isOk) return;
+                    }
 
-                  // Final check on verification result
-                  final bool isValid = controller
-                              .crVerificationResult?['is_valid'] ==
-                          true &&
-                      controller
-                              .crVerificationResult?['is_already_registered'] !=
-                          true;
+                    // Final check on verification result
+                    final bool isValid = controller
+                                .crVerificationResult?['is_valid'] ==
+                            true &&
+                        controller
+                                .crVerificationResult?['is_already_registered'] !=
+                            true;
 
-                  if (!isValid) {
-                    final msg = controller.crVerificationResult?['message']
-                            ?.toString() ??
-                        'cr_invalid_or_already_registered'.tr;
-                    showCustomSnackBar(msg, isError: true, showDuration: 4);
-                    return;
+                    if (!isValid) {
+                      final msg = controller.crVerificationResult?['message']
+                              ?.toString() ??
+                          'cr_invalid_or_already_registered'.tr;
+                      showCustomSnackBar(msg, isError: true, showDuration: 4);
+                      return;
+                    }
                   }
 
                   // Save all current form fields to the active visit model

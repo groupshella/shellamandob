@@ -1187,12 +1187,16 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () async {
+                    bool success = true;
                     if (Get.isRegistered<StoreVisitsController>()) {
                       final controller = Get.find<StoreVisitsController>();
                       controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
+                      success = await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
                       await controller.loadVisits();
                     }
+                    // submitAndFinishVisit already shows its own error snackbar
+                    // on failure; don't also claim the contract was saved.
+                    if (!success) return;
                     final targetStoreId = widget.visit.storeId ?? (int.tryParse(widget.visit.id) ?? 0);
                     Get.to(() => ContractActivationScreen(
                       storeId: targetStoreId,
@@ -1224,12 +1228,14 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                 height: 48,
                 child: OutlinedButton(
                   onPressed: () async {
+                    bool success = true;
                     if (Get.isRegistered<StoreVisitsController>()) {
                       final controller = Get.find<StoreVisitsController>();
                       controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
+                      success = await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
                       await controller.loadVisits();
                     }
+                    if (!success) return;
                     if (Get.isRegistered<EmployeeNavigationController>()) {
                       Get.find<EmployeeNavigationController>().changeIndex(1);
                     }

@@ -80,6 +80,8 @@ class StoreVisitModel {
   final String address;
   final double? latitude;
   final double? longitude;
+  final int? routeId;
+  final int? routeSequence;
   final String category;
   final double distanceKm;
   final String timeSlot;
@@ -118,6 +120,8 @@ class StoreVisitModel {
     required this.address,
     this.latitude,
     this.longitude,
+    this.routeId,
+    this.routeSequence,
     required this.category,
     this.distanceKm = 0.5,
     required this.timeSlot,
@@ -286,6 +290,8 @@ class StoreVisitModel {
       address: json['address']?.toString() ?? '',
       latitude: json['latitude'] != null ? double.tryParse('${json['latitude']}') : null,
       longitude: json['longitude'] != null ? double.tryParse('${json['longitude']}') : null,
+      routeId: json['route_id'] != null ? int.tryParse('${json['route_id']}') : null,
+      routeSequence: json['route_sequence'] != null ? int.tryParse('${json['route_sequence']}') : null,
       category: json['category']?.toString() ?? '',
       distanceKm: double.tryParse('${json['distance_km']}') ?? 0.5,
       timeSlot: json['time_slot']?.toString() ?? '',

@@ -5,6 +5,8 @@ enum NotClosingReason {
   needsMoreDetails('needs_more_details', 'reason_more_details'),
   unsureAboutService('unsure_about_service', 'reason_unsure_service'),
   currentlyBusy('currently_busy', 'reason_currently_busy'),
+  storeClosed('store_closed', 'reason_store_closed'),
+  storeNotFound('store_not_found', 'reason_store_not_found'),
   other('other', 'reason_other');
 
   final String key;
@@ -26,6 +28,10 @@ enum NotClosingReason {
         return 'غير متأكد من الخدمة';
       case NotClosingReason.currentlyBusy:
         return 'مشغول حالياً';
+      case NotClosingReason.storeClosed:
+        return 'المحل مغلق';
+      case NotClosingReason.storeNotFound:
+        return 'المحل غير موجود';
       case NotClosingReason.other:
         return 'سبب آخر';
     }
@@ -43,6 +49,8 @@ enum NotClosingReason {
     if (key.contains('تفاصيل')) return NotClosingReason.needsMoreDetails;
     if (key.contains('خدمة') || key.contains('متأكد') || key.contains('متاكد')) return NotClosingReason.unsureAboutService;
     if (key.contains('مشغول')) return NotClosingReason.currentlyBusy;
+    if (key.contains('مغلق')) return NotClosingReason.storeClosed;
+    if (key.contains('غير موجود')) return NotClosingReason.storeNotFound;
     return NotClosingReason.other;
   }
 }

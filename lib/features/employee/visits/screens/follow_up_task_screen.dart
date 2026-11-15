@@ -875,6 +875,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
       _selectedTime.minute,
     );
 
+    bool success = false;
     if (Get.isRegistered<StoreVisitsController>()) {
       final controller = Get.find<StoreVisitsController>();
       controller.setClosingReason(finalReason);
@@ -883,9 +884,14 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
       if (_notesController.text.trim().isNotEmpty) {
         controller.obstaclesController.text = _notesController.text.trim();
       }
-      await controller.submitAndFinishVisit(targetVisit: widget.visit);
+      success = await controller.submitAndFinishVisit(targetVisit: widget.visit);
       await controller.loadVisits();
     }
+
+    // submitAndFinishVisit already shows its own error snackbar on failure;
+    // only claim success and navigate away when it actually was one, so a
+    // failed submission doesn't look like it worked.
+    if (!success) return;
 
     Get.snackbar(
       'follow_up_scheduled_success'.tr,

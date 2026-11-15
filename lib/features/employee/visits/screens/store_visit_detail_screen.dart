@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import '../controllers/store_visits_controller.dart';
+import '../models/not_closing_reason.dart';
 import '../models/store_visit_model.dart';
 import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
@@ -1185,7 +1187,28 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
       return;
     }
 
-    if (controller.frontImagePath == null && controller.insideImagePath == null) {
+    final isStoreClosedOrNotFound = controller.selectedNotClosingReason == NotClosingReason.storeClosed ||
+        controller.selectedNotClosingReason == NotClosingReason.storeNotFound;
+
+    if (isStoreClosedOrNotFound) {
+      // These two outcomes claim the marketer physically went to the store
+      // and found it closed/gone -- so a photo of the storefront and proof
+      // they were actually there are both mandatory, not optional like the
+      // general "at least one photo" rule below.
+      if (controller.frontImagePath == null) {
+        Get.snackbar(
+          'photo_doc_required_snack_title'.tr,
+          'store_photo_required_for_closed_not_found'.tr,
+          backgroundColor: const Color(0xFFEF4444),
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
+
+      final locationOk = await _verifyMarketerAtStoreLocation(context, visit);
+      if (!locationOk) return;
+    } else if (controller.frontImagePath == null && controller.insideImagePath == null) {
       Get.snackbar(
         'photo_doc_required_snack_title'.tr,
         'photo_doc_required_snack_body'.tr,
@@ -1208,5 +1231,52 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
         duration: const Duration(seconds: 4),
       );
     }
+  }
+}
+
+/// Confirms the marketer's current GPS position is actually near the store
+/// they're reporting as closed/not found -- otherwise "المحل مغلق" could be
+/// selected from anywhere without ever visiting. 300m tolerance accounts for
+/// normal GPS drift in dense commercial areas.
+Future<bool> _verifyMarketerAtStoreLocation(BuildContext context, StoreVisitModel visit) async {
+  if (!visit.hasCoordinates) {
+    // No recorded store coordinates to check against -- don't block the
+    // marketer over a data gap that isn't their fault.
+    return true;
+  }
+
+  try {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      showCustomSnackBar('location_permission_required_for_this_action'.tr, isError: true, showDuration: 4);
+      return false;
+    }
+
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 10)),
+    );
+
+    final distanceMeters = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      visit.latitude!,
+      visit.longitude!,
+    );
+
+    if (distanceMeters > 300) {
+      showCustomSnackBar(
+        'must_be_at_store_location_to_report'.trParams({'distance': distanceMeters.round().toString()}),
+        isError: true,
+        showDuration: 5,
+      );
+      return false;
+    }
+    return true;
+  } catch (e) {
+    showCustomSnackBar('location_check_failed_try_again'.tr, isError: true, showDuration: 4);
+    return false;
   }
 }

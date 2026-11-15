@@ -25,6 +25,10 @@ class EmployeeShiftController extends GetxController implements GetxService {
   Timer? _pollingTimer;
   Timer? _locationPingTimer;
 
+  // Tracks the last known in-zone state so we only show a message on an
+  // actual crossing (entering or leaving), not on every 60s ping.
+  bool? _lastKnownInZone;
+
   MarketerShiftService get _service {
     if (Get.isRegistered<MarketerShiftService>()) {
       return Get.find<MarketerShiftService>();
@@ -74,9 +78,33 @@ class EmployeeShiftController extends GetxController implements GetxService {
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
       );
-      await _service.pingLocation(lat: pos.latitude, lng: pos.longitude);
+      final response = await _service.pingLocation(lat: pos.latitude, lng: pos.longitude);
+      _handleZoneTransition(response);
     } catch (e) {
       debugPrint('❌ [EmployeeShiftController] location ping error: $e');
+    }
+  }
+
+  /// Reacts to an in/out-of-zone crossing reported by the ping response --
+  /// shows the exit/return message immediately (same ping cycle) instead of
+  /// waiting for the background tracking job's own notification.
+  void _handleZoneTransition(dynamic response) {
+    try {
+      final body = response?.body;
+      if (body is! Map) return;
+      final inZone = body['data']?['in_zone'];
+      if (inZone is! bool) return; // null = not on an active shift / no locked zone, nothing to track
+
+      if (_lastKnownInZone != null && _lastKnownInZone != inZone) {
+        if (!inZone) {
+          showCustomSnackBar('now_outside_zone_message'.tr, isError: true, showDuration: 5);
+        } else {
+          showCustomSnackBar('back_inside_zone_message'.tr, isError: false, showDuration: 4);
+        }
+      }
+      _lastKnownInZone = inZone;
+    } catch (e) {
+      debugPrint('❌ [EmployeeShiftController] zone transition check error: $e');
     }
   }
 

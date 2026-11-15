@@ -1,14 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../common/controllers/theme_controller.dart';
+import '../../../../util/app_constants.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
+import '../widgets/store_approval_sheet.dart';
 import 'active_store_visit_screen.dart';
 import 'visit_summary_screen.dart';
 
@@ -38,6 +42,10 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
   StoreVisitModel? _selectedVisit;
   bool _isLoadingGps = false;
   double? _liveDistanceKm;
+
+  bool _isLoadingRoute = false;
+  double? _routeDistanceKm;
+  String? _routeDurationText;
 
   @override
   void initState() {
@@ -79,9 +87,12 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
             onTap: () {
               setState(() {
                 _selectedVisit = v;
+                _routeDistanceKm = null;
+                _routeDurationText = null;
                 _computeDistance();
                 _updatePolylines();
               });
+              _fetchDrivingRoute();
             },
           ),
         );
@@ -124,6 +135,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
             _computeDistance();
             _updatePolylines();
           });
+          _fetchDrivingRoute();
         }
       }
     } catch (e) {
@@ -163,6 +175,93 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
         ),
       );
     }
+  }
+
+  // Replaces the straight-line "as the crow flies" polyline with the real
+  // driving route along actual streets, via the Directions API (same Google
+  // Maps key already embedded natively). Falls back silently to the straight
+  // line already drawn by _updatePolylines() if the request fails.
+  Future<void> _fetchDrivingRoute() async {
+    if (_currentPosition == null || _selectedVisit == null) return;
+
+    final origin = LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
+    final destination = _getVisitLatLng(_selectedVisit!);
+    final requestedFor = _selectedVisit;
+
+    setState(() => _isLoadingRoute = true);
+
+    try {
+      final uri = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
+        'origin': '${origin.latitude},${origin.longitude}',
+        'destination': '${destination.latitude},${destination.longitude}',
+        'mode': 'driving',
+        'language': 'ar',
+        'key': AppConstants.googleMapsApiKey,
+      });
+
+      final res = await http.get(uri).timeout(const Duration(seconds: 10));
+      if (!mounted || requestedFor?.id != _selectedVisit?.id) return;
+
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body) as Map<String, dynamic>;
+        final routes = body['routes'] as List?;
+        if (body['status'] == 'OK' && routes != null && routes.isNotEmpty) {
+          final route = routes.first as Map<String, dynamic>;
+          final overview = route['overview_polyline']?['points']?.toString();
+          final legs = route['legs'] as List?;
+          final leg = (legs != null && legs.isNotEmpty) ? legs.first as Map<String, dynamic> : null;
+
+          if (overview != null) {
+            setState(() {
+              _polylines
+                ..clear()
+                ..add(Polyline(
+                  polylineId: const PolylineId('driving_route'),
+                  points: _decodePolyline(overview),
+                  color: _primaryGreen,
+                  width: 4,
+                ));
+              if (leg != null) {
+                final meters = leg['distance']?['value'];
+                if (meters is int) _routeDistanceKm = meters / 1000.0;
+                _routeDurationText = leg['duration']?['text']?.toString();
+              }
+            });
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [StoreVisitMapScreen] Directions API error: $e');
+    } finally {
+      if (mounted) setState(() => _isLoadingRoute = false);
+    }
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    final points = <LatLng>[];
+    int index = 0, lat = 0, lng = 0;
+
+    while (index < encoded.length) {
+      int shift = 0, result = 0, b;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+      points.add(LatLng(lat / 1e5, lng / 1e5));
+    }
+    return points;
   }
 
   void _animateCameraToStore() {
@@ -447,9 +546,12 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
     required Color borderColor,
     required bool isDark,
   }) {
-    final distText = _liveDistanceKm != null
-        ? '${_liveDistanceKm!.toStringAsFixed(1)} ${'km_from_your_location'.tr}'
-        : '${visit.distanceKm} ${'km_short'.tr}';
+    final distText = _routeDistanceKm != null
+        ? '${_routeDistanceKm!.toStringAsFixed(1)} ${'km_from_your_location'.tr}'
+            '${_routeDurationText != null ? ' · $_routeDurationText' : ''}'
+        : _liveDistanceKm != null
+            ? '${_liveDistanceKm!.toStringAsFixed(1)} ${'km_from_your_location'.tr}'
+            : '${visit.distanceKm} ${'km_short'.tr}';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -526,7 +628,14 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(IconlyLight.discovery, size: 12, color: subText),
+                    if (_isLoadingRoute && _routeDistanceKm == null)
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 1.5, color: subText),
+                      )
+                    else
+                      Icon(IconlyLight.discovery, size: 12, color: subText),
                     const SizedBox(width: 4),
                     Text(
                       distText,
@@ -640,7 +749,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                 child: SizedBox(
                   height: 44,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final controller = Get.find<StoreVisitsController>();
                       if (visit.visitStatus == StoreVisitStatus.inProgress) {
                         controller.resumeVisit(visit);
@@ -651,11 +760,12 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                         controller.resumeVisit(visit);
                         Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: false));
                       } else {
-                        controller.startVisit(visit).then((success) {
-                          if (success) {
-                            Get.to(() => ActiveStoreVisitScreen(visit: visit));
-                          }
-                        });
+                        final approvalPosition = await runStoreApprovalFlow(context, controller, visit);
+                        if (approvalPosition == null) return;
+                        final success = await controller.startVisit(visit, approvalPosition: approvalPosition);
+                        if (success) {
+                          Get.to(() => ActiveStoreVisitScreen(visit: visit));
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import '../models/store_visit_model.dart';
+import '../models/marketer_lead_model.dart';
 import '../models/store_contact_model.dart';
 import '../models/merchant_promo_model.dart';
 import '../models/not_closing_reason.dart';
@@ -143,6 +147,8 @@ class StoreVisitsController extends GetxController {
     'يحتاج تفاصيل إضافية',
     'غير متأكد من الخدمة',
     'مشغول حالياً',
+    'المحل مغلق',
+    'المحل غير موجود',
     'سبب آخر',
   ];
 
@@ -222,6 +228,40 @@ class StoreVisitsController extends GetxController {
   // Visits lists (Real database data only)
   final List<StoreVisitModel> _allVisits = [];
   List<StoreVisitModel> get allVisits => _allVisits;
+
+  // Visits assigned via a generated "مسار" (route_id + route_sequence) are
+  // grouped together and ordered by their intended visiting sequence, so the
+  // marketer walks the route in the geographically-sensible order the admin
+  // generated -- instead of the default server (id) order, which can jumble
+  // route stops with unrelated manually-scheduled visits.
+  List<StoreVisitModel> get sortedVisits {
+    final routed = _allVisits.where((v) => v.routeId != null).toList()
+      ..sort((a, b) {
+        final routeCompare = a.routeId!.compareTo(b.routeId!);
+        if (routeCompare != 0) return routeCompare;
+        return (a.routeSequence ?? 0).compareTo(b.routeSequence ?? 0);
+      });
+    final unrouted = _allVisits.where((v) => v.routeId == null).toList();
+    return [...routed, ...unrouted];
+  }
+
+  // Straight-line distance between two consecutive route stops, for display
+  // only (the real driving route is shown on the full map screen).
+  double? distanceFromPreviousStopKm(StoreVisitModel visit, List<StoreVisitModel> displayList) {
+    if (visit.routeId == null || visit.latitude == null || visit.longitude == null) return null;
+    final index = displayList.indexWhere((v) => v.id == visit.id);
+    if (index <= 0) return null;
+    final previous = displayList[index - 1];
+    if (previous.routeId != visit.routeId || previous.latitude == null || previous.longitude == null) return null;
+
+    final meters = Geolocator.distanceBetween(
+      previous.latitude!,
+      previous.longitude!,
+      visit.latitude!,
+      visit.longitude!,
+    );
+    return meters / 1000.0;
+  }
 
   // Commercial Register Verification State
   bool isVerifyingCr = false;
@@ -455,6 +495,89 @@ class StoreVisitsController extends GetxController {
     if (notify) update();
   }
 
+  // Shared store pool for the marketer's own locked zone (قاعدة المحلات).
+  List<MarketerLeadModel> availableLeads = [];
+  bool isLoadingLeads = false;
+  int? claimingLeadId;
+
+  Future<void> loadAvailableLeads() async {
+    isLoadingLeads = true;
+    update();
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData(
+          AppConstants.marketerLeadsUri,
+          useEtag: false,
+          headers: {'X-No-ETag': '1', 'Cache-Control': 'no-cache'},
+        );
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          final list = res.body['data']['leads'];
+          availableLeads = (list is List)
+              ? list.map((item) => MarketerLeadModel.fromJson(Map<String, dynamic>.from(item))).toList()
+              : [];
+        } else {
+          final msg = res.body?['message']?.toString();
+          if (msg != null && msg.isNotEmpty) {
+            showCustomSnackBar(msg, isError: true);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadAvailableLeads error: $e');
+    } finally {
+      isLoadingLeads = false;
+      update();
+    }
+  }
+
+  // Claims a shared-pool store for this marketer and opens today's visit for
+  // it. If another marketer claimed it a moment earlier, the backend's
+  // conditional update returns 409 and we surface that as a clear notice
+  // instead of silently failing, then refresh the list so it drops out.
+  Future<StoreVisitModel?> claimLead(MarketerLeadModel lead) async {
+    claimingLeadId = lead.id;
+    update();
+    try {
+      if (!Get.isRegistered<ApiClient>()) return null;
+
+      final res = await Get.find<ApiClient>().postData(
+        '${AppConstants.marketerLeadsUri}/${lead.id}/claim',
+        {},
+      );
+
+      if (res.statusCode == 200 && res.body != null && res.body['data']?['visit'] != null) {
+        final visit = StoreVisitModel.fromJson(Map<String, dynamic>.from(res.body['data']['visit']));
+        final index = _allVisits.indexWhere((v) => v.id == visit.id);
+        if (index != -1) {
+          _allVisits[index] = visit;
+        } else {
+          _allVisits.add(visit);
+        }
+        availableLeads.removeWhere((l) => l.id == lead.id);
+        showCustomSnackBar('store_claimed_success'.tr, isError: false);
+        return visit;
+      }
+
+      if (res.statusCode == 409) {
+        final msg = res.body?['message']?.toString() ?? 'store_already_claimed'.tr;
+        showCustomSnackBar(msg, isError: true, showDuration: 4);
+        availableLeads.removeWhere((l) => l.id == lead.id);
+        return null;
+      }
+
+      final errorMsg = res.body?['message']?.toString() ?? 'store_already_claimed'.tr;
+      showCustomSnackBar(errorMsg, isError: true, showDuration: 4);
+      return null;
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] claimLead error: $e');
+      showCustomSnackBar('server_connection_failed'.tr, isError: true);
+      return null;
+    } finally {
+      claimingLeadId = null;
+      update();
+    }
+  }
+
   @override
   void onClose() {
     _visitTimer?.cancel();
@@ -533,9 +656,73 @@ class StoreVisitsController extends GetxController {
     return true;
   }
 
-  // Start a store visit with exception handling & null safety guards
-  Future<bool> startVisit(StoreVisitModel visit) async {
+  /// Signboard photo captured to approve the store before the visit itself
+  /// starts (distinct from [_frontImagePath], which the finish-visit flow
+  /// reuses for its own storefront photo field).
+  String? _storeApprovalPhotoPath;
+  String? get storeApprovalPhotoPath => _storeApprovalPhotoPath;
+
+  Future<void> captureStoreApprovalPhoto() async {
+    registerActivity();
+    try {
+      final XFile? photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70,
+        preferredCameraDevice: CameraDevice.rear,
+      );
+      if (photo != null) {
+        _storeApprovalPhotoPath = photo.path;
+        update();
+      }
+    } catch (e) {
+      debugPrint('Store approval photo capture error: $e');
+    }
+  }
+
+  void clearStoreApprovalPhoto() {
+    _storeApprovalPhotoPath = null;
+    update();
+  }
+
+  /// Current GPS fix used to approve the store, separate from the
+  /// background location-ping stream the shift already runs.
+  Future<Position?> captureStoreApprovalLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        showCustomSnackBar('location_permission_required_for_this_action'.tr, isError: true, showDuration: 4);
+        return null;
+      }
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 10)),
+      );
+    } catch (e) {
+      debugPrint('Store approval location error: $e');
+      showCustomSnackBar('تعذر تحديد موقعك الحالي. يرجى تفعيل خدمة الموقع والمحاولة مرة أخرى.', isError: true, showDuration: 4);
+      return null;
+    }
+  }
+
+  // Start a store visit with exception handling & null safety guards.
+  // isFreshStart visits must first be "approved" with a signboard photo
+  // (storeApprovalPhotoPath) and a GPS fix (approvalPosition) -- the server
+  // rejects a fresh start without both, so the caller must capture these via
+  // captureStoreApprovalPhoto()/captureStoreApprovalLocation() first.
+  Future<bool> startVisit(StoreVisitModel visit, {LatLng? approvalPosition}) async {
     if (!canStartVisit(showWarning: true)) {
+      return false;
+    }
+
+    final isFreshStart = visit.startedAt == null;
+    if (isFreshStart && (_storeApprovalPhotoPath == null || approvalPosition == null)) {
+      showCustomSnackBar(
+        'يجب تصوير لوحة المحل وتأكيد الموقع لاعتماده قبل بدء الزيارة.',
+        isError: true,
+        showDuration: 4,
+      );
       return false;
     }
 
@@ -599,11 +786,21 @@ class StoreVisitsController extends GetxController {
 
       // Call backend API with safety check
       if (Get.isRegistered<ApiClient>()) {
-        final res = await Get.find<ApiClient>().postData(
-          '${AppConstants.marketerVisitsUri}/${visit.id}/start',
-          {},
-        );
+        final res = isFreshStart
+            ? await Get.find<ApiClient>().postMultipartData(
+                '${AppConstants.marketerVisitsUri}/${visit.id}/start',
+                {
+                  'latitude': approvalPosition!.latitude.toString(),
+                  'longitude': approvalPosition.longitude.toString(),
+                },
+                [MultipartBody('front_image', XFile(_storeApprovalPhotoPath!))],
+              )
+            : await Get.find<ApiClient>().postData(
+                '${AppConstants.marketerVisitsUri}/${visit.id}/start',
+                {},
+              );
         if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          _storeApprovalPhotoPath = null;
           final visitData = res.body['data']['visit'];
           if (visitData != null && visitData['started_at'] != null) {
             final serverStartedAt = DateTime.tryParse(visitData['started_at'].toString());
@@ -648,6 +845,77 @@ class StoreVisitsController extends GetxController {
         showDuration: 4,
       );
       return false;
+    }
+  }
+
+  /// New field-discovery flow: the marketer types the store name and sets
+  /// their own location (no pre-loaded candidate list), photographs the
+  /// signboard, and the visit is created already started in one call. See
+  /// AddFieldVisitScreen for the entry point.
+  Future<StoreVisitModel?> createAndStartVisit({
+    required String storeName,
+    required LatLng position,
+    String? address,
+  }) async {
+    if (!canStartVisit(showWarning: true)) return null;
+    if (_storeApprovalPhotoPath == null) {
+      showCustomSnackBar('يجب تصوير لوحة المحل لاعتماده قبل بدء الزيارة.', isError: true, showDuration: 4);
+      return null;
+    }
+
+    try {
+      final res = await Get.find<ApiClient>().postMultipartData(
+        '${AppConstants.marketerVisitsUri}/store',
+        {
+          'store_name': storeName,
+          'latitude': position.latitude.toString(),
+          'longitude': position.longitude.toString(),
+          if (address != null && address.isNotEmpty) 'address': address,
+        },
+        [MultipartBody('front_image', XFile(_storeApprovalPhotoPath!))],
+      );
+
+      if (res.statusCode == 200 && res.body != null && res.body['data'] != null && res.body['data']['visit'] != null) {
+        _storeApprovalPhotoPath = null;
+        final visit = StoreVisitModel.fromJson(res.body['data']['visit']);
+        _activeVisit = visit;
+        _allVisits.add(visit);
+        _elapsedVisitSeconds = 0;
+        _inactivitySeconds = 0;
+        storeNameController.text = visit.storeName;
+        managerNameController.clear();
+        phoneController.clear();
+        openingsController.text = '1';
+        crNumberController.clear();
+        _selectedPipelineStep = visit.pipelineStep;
+        _frontImagePath = visit.frontImagePath;
+        _insideImagePath = null;
+        _selectedObstacle = null;
+        otherReasonController.clear();
+        obstaclesController.clear();
+        _selectedClosingReason = null;
+        reasonNotMetController.clear();
+        reasonRejectedController.clear();
+        reasonDisqualifiedController.clear();
+        confidentialTitleController.clear();
+        _selectedInterestStatus = 'interested';
+        _frontPhotoCapturedTime = DateTime.now();
+        _insidePhotoCapturedTime = null;
+        _isAutoExtended = false;
+        _extensionMinutes = 0;
+        _startVisitTimer();
+        update();
+        showCustomSnackBar('تم اعتماد المحل وبدء الزيارة بنجاح', isError: false, showDuration: 2);
+        return visit;
+      }
+
+      final errorMsg = res.body?['message'] ?? 'تعذر اعتماد المحل، يرجى المحاولة مرة أخرى.';
+      showCustomSnackBar(errorMsg.toString(), isError: true, showDuration: 4);
+      return null;
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] createAndStartVisit error: $e');
+      showCustomSnackBar('حدث خطأ غير متوقع أثناء اعتماد المحل. يرجى المحاولة مرة أخرى.', isError: true, showDuration: 4);
+      return null;
     }
   }
 
@@ -1091,16 +1359,20 @@ class StoreVisitsController extends GetxController {
     // Call backend API and await
     try {
       if (Get.isRegistered<ApiClient>()) {
-        // Multipart: front_image/inside_image are local camera-capture file
-        // paths that must be uploaded as real files, not sent as plain text
-        // (the backend's $request->hasFile() check silently falls back to
-        // storing the raw local device path as a string otherwise, which
-        // looks like a photo but is actually a dead, unrecoverable link).
+        // Multipart: _frontImagePath/_insideImagePath are also used by the UI
+        // to show an "already captured" thumbnail, so they get populated
+        // from the server's *relative storage path* (e.g. "marketer/visits/x.jpg")
+        // whenever a visit is created/resumed/started -- not just on a fresh
+        // local capture via captureFrontImage()/captureInsideImage(). Only a
+        // path that actually exists on this device is a real local file safe
+        // to wrap in XFile() and re-upload; a server path isn't, and wrapping
+        // it throws (readAsBytes() on a nonexistent file), which used to be
+        // silently swallowed and still reported as success to the caller.
         final List<MultipartBody> multipart = [
-          if (updated.frontImagePath != null && updated.frontImagePath!.isNotEmpty)
-            MultipartBody('front_image', XFile(updated.frontImagePath!)),
-          if (updated.insideImagePath != null && updated.insideImagePath!.isNotEmpty)
-            MultipartBody('inside_image', XFile(updated.insideImagePath!)),
+          if (_frontImagePath != null && _frontImagePath!.isNotEmpty && File(_frontImagePath!).existsSync())
+            MultipartBody('front_image', XFile(_frontImagePath!)),
+          if (_insideImagePath != null && _insideImagePath!.isNotEmpty && File(_insideImagePath!).existsSync())
+            MultipartBody('inside_image', XFile(_insideImagePath!)),
         ];
 
         final res = await Get.find<ApiClient>().postMultipartData(
@@ -1146,11 +1418,13 @@ class StoreVisitsController extends GetxController {
         } else {
           final errorMsg = res.body?['message'] ?? 'حدث خطأ أثناء توثيق الزيارة في الخادم';
           showCustomSnackBar(errorMsg.toString(), isError: true, showDuration: 4);
+          return false;
         }
       }
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] completeVisit api error: $e');
       showCustomSnackBar('server_connection_failed_saved_locally'.tr, isError: true);
+      return false;
     }
 
     // Update main shift metrics only if visit is truly completed
