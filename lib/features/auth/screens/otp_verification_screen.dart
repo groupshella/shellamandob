@@ -130,6 +130,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           profession: data['profession']?.toString() ?? '',
           documentType: data['documentType']?.toString() ?? 'هوية وطنية',
           documentFile: docFile,
+          idNumber: data['idNumber']?.toString(),
           supervisorCode: data['supervisorCode']?.toString(),
           marketerType: data['marketerType']?.toString() ?? 'freelance',
         );

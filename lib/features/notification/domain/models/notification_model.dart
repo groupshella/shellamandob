@@ -43,7 +43,11 @@ class Data {
   /// deep-linking the tap straight to that order's details.
   int? orderId;
 
-  Data({this.title, this.description, this.imageFullUrl, this.type, this.orderId});
+  /// Set only on `idle_alert` notifications -- lets the UI show an
+  /// "اعتراض" button that submits an objection for this exact idle period.
+  int? idlePeriodId;
+
+  Data({this.title, this.description, this.imageFullUrl, this.type, this.orderId, this.idlePeriodId});
 
   Data.fromJson(Map<String, dynamic> json) {
     title = json['title']?.toString();
@@ -51,6 +55,7 @@ class Data {
     imageFullUrl = json['image_full_url']?.toString();
     type = json['type']?.toString();
     orderId = int.tryParse('${json['order_id'] ?? ''}');
+    idlePeriodId = int.tryParse('${json['idle_period_id'] ?? ''}');
   }
 
   Map<String, dynamic> toJson() {
@@ -60,6 +65,7 @@ class Data {
     data['image_full_url'] = imageFullUrl;
     data['type'] = type;
     data['order_id'] = orderId;
+    data['idle_period_id'] = idlePeriodId;
     return data;
   }
 }

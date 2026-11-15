@@ -100,6 +100,21 @@ class AuthService implements AuthServiceInterface {
     _updateUserDataFromLoginResponse(responseBody);
   }
 
+  // The backend's 'code' field only distinguishes a handful of known OTP
+  // failures (invalid_otp, otp_temp_blocked, ...). A Laravel validation
+  // failure (e.g. malformed phone) has no 'code' at all, just an 'errors'
+  // map -- previously that fell through to a generic "something went wrong"
+  // with zero indication the phone itself was the problem. Without this, a
+  // genuinely bad phone number looks identical to a server outage.
+  String? _errorCodeFromBody(Map<String, dynamic> body) {
+    final existing = body['code']?.toString();
+    if (existing != null && existing.isNotEmpty) return existing;
+    if (body['errors'] is Map && (body['errors'] as Map).isNotEmpty) {
+      return 'validation_error';
+    }
+    return null;
+  }
+
   @override
   Future<OtpSendResult> sendOtp({required String phone}) async {
     final Response response =
@@ -110,7 +125,7 @@ class AuthService implements AuthServiceInterface {
     }
     return OtpSendResult.failure(
       body['message']?.toString() ?? response.statusText,
-      errorCode: body['code']?.toString(),
+      errorCode: _errorCodeFromBody(body),
     );
   }
 
@@ -129,7 +144,7 @@ class AuthService implements AuthServiceInterface {
     }
     return OtpVerifyResult.failure(
       body['message']?.toString() ?? response.statusText,
-      errorCode: body['code']?.toString(),
+      errorCode: _errorCodeFromBody(body),
     );
   }
 

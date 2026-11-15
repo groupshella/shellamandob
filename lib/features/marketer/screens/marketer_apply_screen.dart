@@ -34,6 +34,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _customProfessionController = TextEditingController();
   final TextEditingController _referenceCodeController = TextEditingController();
+  final TextEditingController _idNumberController = TextEditingController();
 
   // 1. Profession dropdown options
   final List<String> _professionList = [
@@ -94,7 +95,17 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
     _phoneController.dispose();
     _customProfessionController.dispose();
     _referenceCodeController.dispose();
+    _idNumberController.dispose();
     super.dispose();
+  }
+
+  bool get _isIdNumberValid {
+    final value = _idNumberController.text.trim();
+    if (value.isEmpty) return false;
+    if (_selectedDocumentType == 'هوية وطنية') {
+      return RegExp(r'^[12][0-9]{9}$').hasMatch(value);
+    }
+    return value.length >= 4;
   }
 
   bool get _isProfessionValid {
@@ -117,6 +128,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
       _lastNameController.text.trim().isNotEmpty &&
       _phoneController.text.trim().isNotEmpty &&
       _isProfessionValid &&
+      _isIdNumberValid &&
       _agreedToTerms;
 
   Future<void> _pickDocument() async {
@@ -284,6 +296,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
           'phone': fullPhone,
           'profession': _effectiveProfession,
           'documentType': _selectedDocumentType,
+          'idNumber': _idNumberController.text.trim(),
           'idPhotoPath': _selectedFile?.path,
           'supervisorCode': _referenceCodeController.text.trim(),
           'marketerType': widget.marketerType ?? 'freelance',
@@ -319,6 +332,7 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
       profession: _effectiveProfession,
       documentType: _selectedDocumentType,
       documentFile: _selectedFile,
+      idNumber: _idNumberController.text.trim(),
       supervisorCode: _referenceCodeController.text.trim(),
       marketerType: widget.marketerType ?? 'freelance',
     );
@@ -487,6 +501,19 @@ class _MarketerApplyScreenState extends State<MarketerApplyScreen> {
                     _buildLabel('select_document_type'.tr, isDark),
                     const SizedBox(height: 10),
                     _buildDocumentTypeSelector(isDark),
+                    const SizedBox(height: 16),
+
+                    // Document / National ID Number
+                    _buildLabel('document_number'.tr, isDark),
+                    const SizedBox(height: 8),
+                    _buildTextField(
+                      controller: _idNumberController,
+                      hintText: _selectedDocumentType == 'هوية وطنية'
+                          ? 'document_number_national_id_hint'.tr
+                          : 'document_number_generic_hint'.tr,
+                      isDark: isDark,
+                      onChanged: (_) => setState(() {}),
+                    ),
                     const SizedBox(height: 14),
 
                     // Dotted Document Uploader Box

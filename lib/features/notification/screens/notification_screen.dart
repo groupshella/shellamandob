@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:sixam_mart/api/api_client.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_model.dart';
 import 'package:sixam_mart/features/notification/helpers/notification_navigation_helper.dart';
 import 'package:sixam_mart/features/notification/helpers/notification_type_icon.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -280,6 +283,24 @@ class _NotificationItem extends StatelessWidget {
                             fontSize: Dimensions.fontSizeSmall,
                             color: Theme.of(context).disabledColor)),
                   ],
+                  if (model.data?.type == 'idle_alert' && model.data?.idlePeriodId != null) ...[
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: OutlinedButton(
+                        onPressed: () => _showObjectionDialog(context, model.data!.idlePeriodId!),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFDC2626),
+                          side: const BorderSide(color: Color(0xFFDC2626)),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text('submit_objection'.tr,
+                            style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -332,7 +353,7 @@ class _NotificationShimmer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(height: 12, width: 140, color: Colors.white),
+    Container(height: 12, width: 140, color: Colors.white),
                     const SizedBox(height: 8),
                     Container(height: 10, width: 200, color: Colors.white),
                   ],
@@ -344,4 +365,64 @@ class _NotificationShimmer extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Opens a small dialog for the marketer to type why this idle period was
+/// flagged incorrectly, then submits it for admin review. One objection per
+/// idle period -- the backend rejects a second submission.
+Future<void> _showObjectionDialog(BuildContext context, int idlePeriodId) async {
+  final reasonController = TextEditingController();
+  bool isSubmitting = false;
+
+  await showDialog<void>(
+    context: context,
+    builder: (dialogContext) => StatefulBuilder(
+      builder: (dialogContext, setDialogState) => AlertDialog(
+        title: Text('submit_objection'.tr),
+        content: TextField(
+          controller: reasonController,
+          maxLines: 3,
+          autofocus: true,
+          decoration: InputDecoration(hintText: 'objection_reason_hint'.tr),
+        ),
+        actions: [
+          TextButton(
+            onPressed: isSubmitting ? null : () => Navigator.of(dialogContext).pop(),
+            child: Text('cancel'.tr),
+          ),
+          ElevatedButton(
+            onPressed: isSubmitting
+                ? null
+                : () async {
+                    final reason = reasonController.text.trim();
+                    if (reason.isEmpty) {
+                      showCustomSnackBar('objection_reason_required'.tr, isError: true);
+                      return;
+                    }
+                    setDialogState(() => isSubmitting = true);
+                    try {
+                      final response = await Get.find<ApiClient>().postData(
+                        '${AppConstants.marketerIdleObjectionUri}/$idlePeriodId/objection',
+                        {'reason': reason},
+                      );
+                      if (response.statusCode == 200) {
+                        showCustomSnackBar('objection_submitted_success'.tr, isError: false);
+                        if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+                      } else {
+                        showCustomSnackBar(response.body?['message']?.toString() ?? 'something_went_wrong'.tr, isError: true);
+                      }
+                    } catch (e) {
+                      showCustomSnackBar('something_went_wrong'.tr, isError: true);
+                    } finally {
+                      setDialogState(() => isSubmitting = false);
+                    }
+                  },
+            child: isSubmitting
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : Text('send'.tr),
+          ),
+        ],
+      ),
+    ),
+  );
 }
