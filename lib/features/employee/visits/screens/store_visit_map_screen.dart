@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:sixam_mart/util/app_constants.dart';
 import '../../../../common/controllers/theme_controller.dart';
 import '../../../../util/app_constants.dart';
 import '../controllers/store_visits_controller.dart';

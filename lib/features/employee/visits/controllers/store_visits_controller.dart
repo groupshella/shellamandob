@@ -927,7 +927,7 @@ class StoreVisitsController extends GetxController {
   List<Map<String, dynamic>> get nearbyLeads => _nearbyLeads;
 
   bool _isLoadingLeads = false;
-  bool get isLoadingLeads => _isLoadingLeads;
+  bool get isLoadingNearbyLeads => _isLoadingLeads;
 
   // The chain anchor: once the rep picks a store to visit, every following
   // suggestion is measured from THAT store instead of live GPS, so the
