@@ -140,6 +140,10 @@ class _EmployeeLeaveRequestScreenState
   void _submitForm() async {
     if (!_isFormValid || _isSubmitting) return;
 
+    // Close the keyboard right away so the submit feels instant instead of
+    // looking like nothing happened while it sits over the form.
+    FocusScope.of(context).unfocus();
+
     setState(() => _isSubmitting = true);
 
     final vacationsCtrl = Get.isRegistered<EmployeeVacationsController>()

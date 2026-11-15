@@ -54,7 +54,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
     return GetBuilder<ThemeController>(
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
-        final screenBg = isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
+        final screenBg =
+            isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
         final appBarBg = isDark ? const Color(0xFF1C2028) : Colors.white;
         final darkText = isDark ? Colors.white : const Color(0xFF111B18);
 
@@ -92,7 +93,9 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: _currentStep == 1 ? _buildReasonStep(isDark) : _buildScheduleStep(isDark),
+            child: _currentStep == 1
+                ? _buildReasonStep(isDark)
+                : _buildScheduleStep(isDark),
           ),
           bottomNavigationBar: _buildBottomBar(isDark),
         );
@@ -104,11 +107,14 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
   Widget _buildReasonStep(bool isDark) {
     final cardBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8);
     final itemBg = isDark ? const Color(0xFF252B37) : Colors.white;
-    final itemSelectedBg = isDark ? const Color(0xFF163E20) : const Color(0xFFE8F5E9);
+    final itemSelectedBg =
+        isDark ? const Color(0xFF163E20) : const Color(0xFFE8F5E9);
     final darkText = isDark ? Colors.white : const Color(0xFF1F2937);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-    final inputFill = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+    final borderColor =
+        isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final inputFill =
+        isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +160,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                   return Container(
                     margin: EdgeInsets.only(bottom: isLast ? 0 : 8),
                     child: InkWell(
-                      onTap: () => setState(() => _selectedReasonKey = reasonKey),
+                      onTap: () =>
+                          setState(() => _selectedReasonKey = reasonKey),
                       borderRadius: BorderRadius.circular(14),
                       child: Container(
                         width: double.infinity,
@@ -174,7 +181,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 14,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected ? _primaryGreen : darkText,
                           ),
                         ),
@@ -243,14 +251,20 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
     final cardBg = isDark ? const Color(0xFF252B37) : Colors.white;
     final darkText = isDark ? Colors.white : const Color(0xFF111B18);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-    final inputFill = isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8);
+    final borderColor =
+        isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final inputFill =
+        isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8);
 
-    final formattedDate = '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
+    final formattedDate =
+        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
     final period = _selectedTime.period == DayPeriod.am ? 'AM' : 'PM';
-    final hourOfPeriod = _selectedTime.hourOfPeriod == 0 ? 12 : _selectedTime.hourOfPeriod;
+    final hourOfPeriod =
+        _selectedTime.hourOfPeriod == 0 ? 12 : _selectedTime.hourOfPeriod;
     final minuteStr = _selectedTime.minute.toString().padLeft(2, '0');
-    final formattedTime = '$hourOfPeriod : $minuteStr $period';
+    // LTR mark (‎) keeps "6:50 PM" from getting visually reversed to
+    // "PM 50:6" by the bidi algorithm when rendered inside this RTL screen.
+    final formattedTime = '‎$hourOfPeriod:$minuteStr $period‎';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,25 +331,31 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                             borderRadius: BorderRadius.circular(14),
                             child: Container(
                               height: 43,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: inputFill,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: borderColor),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    formattedTime,
-                                    style: TextStyle(
-                                      fontFamily: 'Tajawal',
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: darkText,
+                                  Directionality(
+                                    textDirection: TextDirection.ltr,
+                                    child: Text(
+                                      formattedTime,
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: darkText,
+                                      ),
                                     ),
                                   ),
-                                  Icon(IconlyLight.timeCircle, color: darkText, size: 18),
+                                  Icon(IconlyLight.timeCircle,
+                                      color: darkText, size: 18),
                                 ],
                               ),
                             ),
@@ -365,14 +385,16 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                             borderRadius: BorderRadius.circular(14),
                             child: Container(
                               height: 43,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: inputFill,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: borderColor),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     formattedDate,
@@ -383,7 +405,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                                       color: darkText,
                                     ),
                                   ),
-                                  Icon(IconlyLight.calendar, color: darkText, size: 18),
+                                  Icon(IconlyLight.calendar,
+                                      color: darkText, size: 18),
                                 ],
                               ),
                             ),
@@ -446,7 +469,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
 
   // Time Picker Modal
   void _showFigmaTimePicker(bool isDark) {
-    int hour = _selectedTime.hourOfPeriod == 0 ? 12 : _selectedTime.hourOfPeriod;
+    int hour =
+        _selectedTime.hourOfPeriod == 0 ? 12 : _selectedTime.hourOfPeriod;
     int minute = _selectedTime.minute;
     bool isAm = _selectedTime.period == DayPeriod.am;
 
@@ -460,7 +484,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
           builder: (ctx, setPickerState) {
             return Dialog(
               backgroundColor: dialogBg,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Container(
                 width: 220,
                 padding: const EdgeInsets.all(16),
@@ -478,85 +503,95 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Hours & Minutes
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Hours
-                        Column(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.keyboard_arrow_up, size: 24, color: darkText),
-                              onPressed: () {
-                                setPickerState(() {
-                                  hour = hour == 12 ? 1 : hour + 1;
-                                });
-                              },
-                            ),
-                            Text(
-                              hour.toString().padLeft(2, '0'),
+                    // Hours & Minutes -- forced LTR so hour always renders on
+                    // the left of the colon and minute on the right, instead
+                    // of the whole row flipping under this screen's RTL
+                    // ambient direction.
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Hours
+                          Column(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.keyboard_arrow_up,
+                                    size: 24, color: darkText),
+                                onPressed: () {
+                                  setPickerState(() {
+                                    hour = hour == 12 ? 1 : hour + 1;
+                                  });
+                                },
+                              ),
+                              Text(
+                                hour.toString().padLeft(2, '0'),
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: darkText,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.keyboard_arrow_down,
+                                    size: 24, color: darkText),
+                                onPressed: () {
+                                  setPickerState(() {
+                                    hour = hour == 1 ? 12 : hour - 1;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              ':',
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 24,
                                 fontWeight: FontWeight.w700,
                                 color: darkText,
                               ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.keyboard_arrow_down, size: 24, color: darkText),
-                              onPressed: () {
-                                setPickerState(() {
-                                  hour = hour == 1 ? 12 : hour - 1;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Text(
-                            ':',
-                            style: TextStyle(
-                              fontFamily: 'Tajawal',
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: darkText,
                             ),
                           ),
-                        ),
 
-                        // Minutes
-                        Column(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.keyboard_arrow_up, size: 24, color: darkText),
-                              onPressed: () {
-                                setPickerState(() {
-                                  minute = (minute + 5) % 60;
-                                });
-                              },
-                            ),
-                            Text(
-                              minute.toString().padLeft(2, '0'),
-                              style: TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                color: darkText,
+                          // Minutes
+                          Column(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.keyboard_arrow_up,
+                                    size: 24, color: darkText),
+                                onPressed: () {
+                                  setPickerState(() {
+                                    minute = (minute + 5) % 60;
+                                  });
+                                },
                               ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.keyboard_arrow_down, size: 24, color: darkText),
-                              onPressed: () {
-                                setPickerState(() {
-                                  minute = (minute - 5 + 60) % 60;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+                              Text(
+                                minute.toString().padLeft(2, '0'),
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: darkText,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.keyboard_arrow_down,
+                                    size: 24, color: darkText),
+                                onPressed: () {
+                                  setPickerState(() {
+                                    minute = (minute - 5 + 60) % 60;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 12),
@@ -574,11 +609,15 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: isAm
-                                  ? (isDark ? const Color(0xFF163E20) : const Color(0xFFD1FDD2))
+                                  ? (isDark
+                                      ? const Color(0xFF163E20)
+                                      : const Color(0xFFD1FDD2))
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: isAm ? _primaryGreen : const Color(0xFFC6C8CE),
+                                color: isAm
+                                    ? _primaryGreen
+                                    : const Color(0xFFC6C8CE),
                                 width: 1,
                               ),
                             ),
@@ -588,7 +627,11 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: isAm ? _primaryGreen : (isDark ? Colors.white70 : const Color(0xFF888888)),
+                                color: isAm
+                                    ? _primaryGreen
+                                    : (isDark
+                                        ? Colors.white70
+                                        : const Color(0xFF888888)),
                               ),
                             ),
                           ),
@@ -603,11 +646,15 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: !isAm
-                                  ? (isDark ? const Color(0xFF163E20) : const Color(0xFFD1FDD2))
+                                  ? (isDark
+                                      ? const Color(0xFF163E20)
+                                      : const Color(0xFFD1FDD2))
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: !isAm ? _primaryGreen : const Color(0xFFC6C8CE),
+                                color: !isAm
+                                    ? _primaryGreen
+                                    : const Color(0xFFC6C8CE),
                                 width: 1,
                               ),
                             ),
@@ -617,7 +664,11 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: !isAm ? _primaryGreen : (isDark ? Colors.white70 : const Color(0xFF888888)),
+                                color: !isAm
+                                    ? _primaryGreen
+                                    : (isDark
+                                        ? Colors.white70
+                                        : const Color(0xFF888888)),
                               ),
                             ),
                           ),
@@ -637,13 +688,15 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                               ? (hour == 12 ? 0 : hour)
                               : (hour == 12 ? 12 : hour + 12);
                           setState(() {
-                            _selectedTime = TimeOfDay(hour: h24, minute: minute);
+                            _selectedTime =
+                                TimeOfDay(hour: h24, minute: minute);
                           });
                           Navigator.pop(dialogCtx);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primaryGreen,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                           elevation: 0,
                         ),
                         child: Text(
@@ -680,13 +733,18 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
         return StatefulBuilder(
           builder: (ctx, setCalendarState) {
             final lang = Get.locale?.languageCode ?? 'ar';
-            final monthName = DateFormat('MMMM yyyy', lang).format(displayedMonth);
-            final daysInMonth = DateUtils.getDaysInMonth(displayedMonth.year, displayedMonth.month);
-            final firstDayOffset = DateTime(displayedMonth.year, displayedMonth.month, 1).weekday % 7;
+            final monthName =
+                DateFormat('MMMM yyyy', lang).format(displayedMonth);
+            final daysInMonth = DateUtils.getDaysInMonth(
+                displayedMonth.year, displayedMonth.month);
+            final firstDayOffset =
+                DateTime(displayedMonth.year, displayedMonth.month, 1).weekday %
+                    7;
 
             return Dialog(
               backgroundColor: dialogBg,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -697,10 +755,12 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.chevron_right, size: 22, color: darkText),
+                          icon: Icon(Icons.chevron_right,
+                              size: 22, color: darkText),
                           onPressed: () {
                             setCalendarState(() {
-                              displayedMonth = DateTime(displayedMonth.year, displayedMonth.month - 1);
+                              displayedMonth = DateTime(displayedMonth.year,
+                                  displayedMonth.month - 1);
                             });
                           },
                         ),
@@ -714,10 +774,12 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons.chevron_left, size: 22, color: darkText),
+                          icon: Icon(Icons.chevron_left,
+                              size: 22, color: darkText),
                           onPressed: () {
                             setCalendarState(() {
-                              displayedMonth = DateTime(displayedMonth.year, displayedMonth.month + 1);
+                              displayedMonth = DateTime(displayedMonth.year,
+                                  displayedMonth.month + 1);
                             });
                           },
                         ),
@@ -730,7 +792,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: daysInMonth + firstDayOffset,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 7,
                         mainAxisSpacing: 4,
                         crossAxisSpacing: 4,
@@ -740,14 +803,16 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                           return const SizedBox.shrink();
                         }
                         final dayNum = index - firstDayOffset + 1;
-                        final isSelected = tempSelectedDate.year == displayedMonth.year &&
+                        final isSelected = tempSelectedDate.year ==
+                                displayedMonth.year &&
                             tempSelectedDate.month == displayedMonth.month &&
                             tempSelectedDate.day == dayNum;
 
                         return InkWell(
                           onTap: () {
                             setCalendarState(() {
-                              tempSelectedDate = DateTime(displayedMonth.year, displayedMonth.month, dayNum);
+                              tempSelectedDate = DateTime(displayedMonth.year,
+                                  displayedMonth.month, dayNum);
                             });
                           },
                           borderRadius: BorderRadius.circular(6),
@@ -756,7 +821,9 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? _primaryGreen
-                                  : (isDark ? const Color(0xFF252B37) : const Color(0x10000000)),
+                                  : (isDark
+                                      ? const Color(0xFF252B37)
+                                      : const Color(0x10000000)),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -764,7 +831,9 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
                                 color: isSelected ? Colors.white : darkText,
                               ),
                             ),
@@ -788,7 +857,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primaryGreen,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                           elevation: 0,
                         ),
                         child: Text(
@@ -817,7 +887,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
         _customReasonController.text.trim().isNotEmpty;
     final bool isButtonActive = _currentStep == 1 ? canProceedStep1 : true;
     final bottomBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final borderColor =
+        isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Container(
@@ -842,13 +913,21 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                   }
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: isButtonActive ? _primaryGreen : (isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6)),
-              disabledBackgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6),
+              backgroundColor: isButtonActive
+                  ? _primaryGreen
+                  : (isDark
+                      ? const Color(0xFF252B37)
+                      : const Color(0xFFE2E4E6)),
+              disabledBackgroundColor:
+                  isDark ? const Color(0xFF252B37) : const Color(0xFFE2E4E6),
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
-              _currentStep == 1 ? 'proceed_to_schedule'.tr : 'schedule_follow_up_btn'.tr,
+              _currentStep == 1
+                  ? 'proceed_to_schedule'.tr
+                  : 'schedule_follow_up_btn'.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 15,
@@ -863,7 +942,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
   }
 
   Future<void> _submitFollowUp() async {
-    final finalReason = _selectedReasonKey == 'reason_other' && _customReasonController.text.trim().isNotEmpty
+    final finalReason = _selectedReasonKey == 'reason_other' &&
+            _customReasonController.text.trim().isNotEmpty
         ? _customReasonController.text.trim()
         : _selectedReasonKey.tr;
 
