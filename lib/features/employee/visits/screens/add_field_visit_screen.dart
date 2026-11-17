@@ -343,7 +343,12 @@ class _AddFieldVisitScreenState extends State<AddFieldVisitScreen> {
                         color: cardBg,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: photoPath != null ? _primaryGreen : borderColor, width: photoPath != null ? 2 : 1),
-                        image: photoPath != null ? DecorationImage(image: FileImage(File(photoPath)), fit: BoxFit.cover) : null,
+                        image: photoPath != null
+                            ? DecorationImage(
+                                image: ResizeImage(FileImage(File(photoPath)), width: 480),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
                       ),
                       child: photoPath == null
                           ? Column(

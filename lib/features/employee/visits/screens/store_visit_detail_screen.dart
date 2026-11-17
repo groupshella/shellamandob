@@ -1054,6 +1054,7 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
                     child: Image.file(
                       File(imagePath),
                       fit: BoxFit.cover,
+                      cacheWidth: 480,
                     ),
                   ),
                   Positioned(

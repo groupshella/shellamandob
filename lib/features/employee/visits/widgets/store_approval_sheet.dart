@@ -116,7 +116,10 @@ class _StoreApprovalSheetBodyState extends State<_StoreApprovalSheetBody> {
                     width: photoPath != null ? 2 : 1,
                   ),
                   image: photoPath != null
-                      ? DecorationImage(image: FileImage(File(photoPath)), fit: BoxFit.cover)
+                      ? DecorationImage(
+                          image: ResizeImage(FileImage(File(photoPath)), width: 480),
+                          fit: BoxFit.cover,
+                        )
                       : null,
                 ),
                 child: photoPath == null

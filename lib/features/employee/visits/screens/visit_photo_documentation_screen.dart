@@ -357,6 +357,7 @@ class VisitPhotoDocumentationScreen extends StatelessWidget {
                             width: 44,
                             height: 44,
                             fit: BoxFit.cover,
+                            cacheWidth: 132,
                           ),
                         ),
                     ],
