@@ -639,6 +639,19 @@ class StoreVisitsController extends GetxController {
   }
 
   // Validation check before starting any visit
+  /// Another visit that is currently in progress, if any.
+  StoreVisitModel? openVisitOtherThan(String visitId) {
+    if (_activeVisit != null &&
+        _activeVisit!.id != visitId &&
+        _activeVisit!.visitStatus == StoreVisitStatus.inProgress) {
+      return _activeVisit;
+    }
+    for (final v in _allVisits) {
+      if (v.id != visitId && v.visitStatus == StoreVisitStatus.inProgress) return v;
+    }
+    return null;
+  }
+
   bool canStartVisit({bool showWarning = true}) {
     if (Get.isRegistered<EmployeeShiftController>()) {
       final shiftCtrl = Get.find<EmployeeShiftController>();
@@ -668,6 +681,8 @@ class StoreVisitsController extends GetxController {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 70,
+        maxWidth: 1600,
+        maxHeight: 1600,
         preferredCameraDevice: CameraDevice.rear,
       );
       if (photo != null) {
@@ -713,6 +728,19 @@ class StoreVisitsController extends GetxController {
   // captureStoreApprovalPhoto()/captureStoreApprovalLocation() first.
   Future<bool> startVisit(StoreVisitModel visit, {LatLng? approvalPosition}) async {
     if (!canStartVisit(showWarning: true)) {
+      return false;
+    }
+
+    // One open visit at a time: resuming the same visit is fine, opening a
+    // second one while another is still in progress is not (the backend
+    // enforces this too and returns VISIT_ALREADY_OPEN).
+    final StoreVisitModel? otherOpenVisit = openVisitOtherThan(visit.id);
+    if (otherOpenVisit != null) {
+      showCustomSnackBar(
+        'visit_already_open_close_first'.trParams({'store': otherOpenVisit.storeName}),
+        isError: true,
+        showDuration: 4,
+      );
       return false;
     }
 
@@ -822,6 +850,13 @@ class StoreVisitsController extends GetxController {
           final errorMsg = res.body?['message'] ?? 'يجب تسجيل الحضور وبدء الدوام الرسمي أولاً قبل بدء أي زيارة ميدانية.';
           _visitTimer?.cancel();
           _activeVisit = null;
+          // The visit was optimistically marked in progress above; undo that
+          // so a rejected start (e.g. VISIT_ALREADY_OPEN) doesn't leave a
+          // phantom open visit in the list.
+          final rejectedIndex = _allVisits.indexWhere((v) => v.id == visit.id);
+          if (rejectedIndex != -1) {
+            _allVisits[rejectedIndex] = visit;
+          }
           update();
           showCustomSnackBar(errorMsg.toString(), isError: true, showDuration: 4);
           return false;
@@ -1337,7 +1372,7 @@ class StoreVisitsController extends GetxController {
           {
             'extended_minutes': autoExtensionMinutes,
             'reason': step.name,
-            'pipeline_step': step.name,
+            'pipeline_step': step.apiValue,
           },
         );
       }
@@ -1373,6 +1408,8 @@ class StoreVisitsController extends GetxController {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 70,
+        maxWidth: 1600,
+        maxHeight: 1600,
         preferredCameraDevice: CameraDevice.rear,
       );
       if (photo != null) {
@@ -1386,6 +1423,8 @@ class StoreVisitsController extends GetxController {
         final XFile? photo = await _picker.pickImage(
           source: ImageSource.gallery,
           imageQuality: 70,
+        maxWidth: 1600,
+        maxHeight: 1600,
         );
         if (photo != null) {
           _frontImagePath = photo.path;
@@ -1404,6 +1443,8 @@ class StoreVisitsController extends GetxController {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
         imageQuality: 70,
+        maxWidth: 1600,
+        maxHeight: 1600,
         preferredCameraDevice: CameraDevice.front,
       );
       if (photo != null) {
@@ -1417,6 +1458,8 @@ class StoreVisitsController extends GetxController {
         final XFile? photo = await _picker.pickImage(
           source: ImageSource.gallery,
           imageQuality: 70,
+        maxWidth: 1600,
+        maxHeight: 1600,
         );
         if (photo != null) {
           _insideImagePath = photo.path;
@@ -1454,6 +1497,8 @@ class StoreVisitsController extends GetxController {
   Future<bool> submitAndFinishVisit({
     StoreVisitModel? targetVisit,
     bool isNafathVerified = false,
+    String? nafathNationalId,
+    String? nafathRequestId,
   }) async {
     final baseVisit = targetVisit ?? _activeVisit;
     if (baseVisit == null) return false;
@@ -1603,7 +1648,7 @@ class StoreVisitsController extends GetxController {
             'decision_maker_phone': updated.decisionMakerPhone ?? '',
             'decision_maker_best_time': updated.decisionMakerBestTime ?? '',
             'interviewed_person_role': updated.interviewedPersonRole ?? '',
-            'pipeline_step': updated.pipelineStep.name,
+            'pipeline_step': updated.pipelineStep.apiValue,
             'visit_status': updated.visitStatus == StoreVisitStatus.followUp
                 ? 'follow_up'
                 : (updated.visitStatus == StoreVisitStatus.inProgress ? 'in_progress' : 'completed'),
@@ -1621,6 +1666,12 @@ class StoreVisitsController extends GetxController {
               'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
             if (isFollowUpNeeded)
               'next_follow_up_commitments': updated.nextFollowUpCommitments ?? '',
+            // Proof of the merchant's Nafath approval -- the backend refuses to
+            // mark a contract as signed without a matching approved request.
+            if (nafathNationalId != null && nafathNationalId.isNotEmpty)
+              'nafath_national_id': nafathNationalId,
+            if (nafathRequestId != null && nafathRequestId.isNotEmpty)
+              'nafath_request_id': nafathRequestId,
           },
           multipart,
         );
