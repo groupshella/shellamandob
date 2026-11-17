@@ -39,6 +39,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   String _signedDate = '';
   String _contractNumber = '';
   String _nafathCode = '54';
+  String? _nafathRequestId;
 
   final TextEditingController _nationalIdController = TextEditingController();
   final TextEditingController _signerNameController = TextEditingController();
@@ -104,6 +105,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
           },
         );
         if (response.statusCode == 200 && response.body != null) {
+          _nafathRequestId = response.body['request_id']?.toString() ?? _nafathRequestId;
           final code = response.body['code']?.toString() ??
               response.body['random']?.toString() ??
               response.body['data']?['random']?.toString() ??
@@ -176,6 +178,7 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
           final status = (body['status'] ?? '').toString().toLowerCase();
 
           if (status == 'approved' || status == 'completed' || status == 'success') {
+            _nafathRequestId = body['request_id']?.toString() ?? _nafathRequestId;
             _applyContractSuccess();
             return;
           } else if (status == 'failed' || status == 'rejected') {
@@ -1191,7 +1194,12 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                     if (Get.isRegistered<StoreVisitsController>()) {
                       final controller = Get.find<StoreVisitsController>();
                       controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      success = await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
+                      success = await controller.submitAndFinishVisit(
+                        targetVisit: widget.visit,
+                        isNafathVerified: true,
+                        nafathNationalId: _getIdentifierForNafath(),
+                        nafathRequestId: _nafathRequestId,
+                      );
                       await controller.loadVisits();
                     }
                     // submitAndFinishVisit already shows its own error snackbar
@@ -1232,7 +1240,12 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
                     if (Get.isRegistered<StoreVisitsController>()) {
                       final controller = Get.find<StoreVisitsController>();
                       controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      success = await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
+                      success = await controller.submitAndFinishVisit(
+                        targetVisit: widget.visit,
+                        isNafathVerified: true,
+                        nafathNationalId: _getIdentifierForNafath(),
+                        nafathRequestId: _nafathRequestId,
+                      );
                       await controller.loadVisits();
                     }
                     if (!success) return;

@@ -4027,5 +4027,10 @@
   "qualified_first_orders": "الطلبات الأولى المؤهلة والمكتملة",
   "total_acquisition_commissions": "إجمالي عمولات الاكتساب",
   "marketer_count_unit": "مسوق",
-  "orders_count_unit": "طلب"
+  "orders_count_unit": "طلب",
+  "visit_already_open_close_first": "لديك زيارة مفتوحة في (@store)، أغلقها أولًا.",
+  "cr_number_fake_sequence": "رقم السجل التجاري غير صحيح (أرقام متكررة أو متسلسلة). يرجى إدخال رقم السجل الفعلي للمتجر.",
+  "visit_manager_name_required": "اسم المسؤول مطلوب لتوثيق الزيارة.",
+  "visit_saudi_mobile_required": "جوال المسؤول مطلوب بصيغة جوال سعودي 05xxxxxxxx.",
+  "visit_contact_or_decision_maker_required": "يجب إدخال اسم وجوال المسؤول أو صاحب القرار (جوال سعودي بصيغة 05xxxxxxxx)."
 }

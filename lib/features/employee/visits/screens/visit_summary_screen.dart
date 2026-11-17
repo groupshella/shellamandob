@@ -1,3 +1,4 @@
+import 'package:sixam_mart/features/employee/visits/domain/visit_data_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -1708,6 +1709,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       return;
                     }
 
+                    if (VisitDataValidator.isFakeSequence(cleanCr)) {
+                      showCustomSnackBar(
+                          'cr_number_fake_sequence'.tr,
+                          isError: true);
+                      return;
+                    }
+
                     if (controller.isVerifyingCr) {
                       showCustomSnackBar(
                           'verifying_cr_please_wait'.tr,
@@ -1735,6 +1743,33 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                               ?.toString() ??
                           'cr_invalid_or_already_registered'.tr;
                       showCustomSnackBar(msg, isError: true, showDuration: 4);
+                      return;
+                    }
+                  }
+
+                  // Mandatory contact person + Saudi mobile (mirrors the backend).
+                  // When the owner wasn't met, the decision maker's details
+                  // are accepted instead of the manager's.
+                  final managerName = controller.managerNameController.text.trim();
+                  final bool hasManager = managerName.isNotEmpty &&
+                      VisitDataValidator.isValidSaudiMobile(controller.phoneController.text);
+                  if (controller.selectedPipelineStep == StorePipelineStep.notMet) {
+                    final bool hasDecisionMaker =
+                        controller.decisionMakerNameController.text.trim().isNotEmpty &&
+                            VisitDataValidator.isValidSaudiMobile(controller.decisionMakerPhoneController.text);
+                    if (!hasManager && !hasDecisionMaker) {
+                      showCustomSnackBar(
+                          'visit_contact_or_decision_maker_required'.tr,
+                          isError: true, showDuration: 4);
+                      return;
+                    }
+                  } else {
+                    if (managerName.isEmpty) {
+                      showCustomSnackBar('visit_manager_name_required'.tr, isError: true);
+                      return;
+                    }
+                    if (!VisitDataValidator.isValidSaudiMobile(controller.phoneController.text)) {
+                      showCustomSnackBar('visit_saudi_mobile_required'.tr, isError: true);
                       return;
                     }
                   }

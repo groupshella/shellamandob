@@ -17,6 +17,21 @@ enum StorePipelineStep {
 
   const StorePipelineStep(this.label, this.color, this.icon);
 
+  /// Canonical snake_case value stored by the backend (e.g. contract_signed).
+  String get apiValue =>
+      name.replaceAllMapped(RegExp(r'[A-Z]'), (m) => '_${m[0]!.toLowerCase()}');
+
+  /// Accepts both the canonical snake_case value and the legacy camelCase
+  /// enum name that older app builds used to store.
+  static StorePipelineStep fromApi(String? value, {StorePipelineStep fallback = StorePipelineStep.notMet}) {
+    final v = value?.trim() ?? '';
+    if (v.isEmpty) return fallback;
+    for (final s in StorePipelineStep.values) {
+      if (s.apiValue == v || s.name == v) return s;
+    }
+    return fallback;
+  }
+
   String get localizedLabel {
     switch (this) {
       case StorePipelineStep.notMet:
@@ -259,14 +274,7 @@ class StoreVisitModel {
       status = StoreVisitStatus.inProgress;
     }
 
-    StorePipelineStep step = StorePipelineStep.notMet;
-    final stepStr = json['pipeline_step']?.toString() ?? '';
-    for (var s in StorePipelineStep.values) {
-      if (s.name == stepStr) {
-        step = s;
-        break;
-      }
-    }
+    final StorePipelineStep step = StorePipelineStep.fromApi(json['pipeline_step']?.toString());
 
     if (step == StorePipelineStep.contractSigned && statusStr != 'in_progress' && statusStr != 'inprogress') {
       status = StoreVisitStatus.completed;

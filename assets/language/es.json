@@ -3659,5 +3659,10 @@
   "view_attachment": "Ver adjunto",
   "max_file_size_hint": "Asegúrese de que el tamaño máximo sea de 5 MB (pdf, jpg, png)",
   "add_any_notes_hint": "Añadir notas ...",
-  "submit_request_btn": "Enviar solicitud"
+  "submit_request_btn": "Enviar solicitud",
+  "visit_already_open_close_first": "You have an open visit at (@store). Close it first.",
+  "cr_number_fake_sequence": "Invalid CR number (repeated or sequential digits). Please enter the store's real CR number.",
+  "visit_manager_name_required": "Contact person name is required to document the visit.",
+  "visit_saudi_mobile_required": "Contact mobile is required in Saudi format 05xxxxxxxx.",
+  "visit_contact_or_decision_maker_required": "Enter the name and mobile of the contact person or the decision maker (Saudi format 05xxxxxxxx)."
 }
