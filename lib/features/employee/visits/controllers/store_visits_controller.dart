@@ -675,11 +675,11 @@ class StoreVisitsController extends GetxController {
   String? _storeApprovalPhotoPath;
   String? get storeApprovalPhotoPath => _storeApprovalPhotoPath;
 
-  Future<void> captureStoreApprovalPhoto() async {
+  Future<void> captureStoreApprovalPhoto({bool fromGallery = false}) async {
     registerActivity();
     try {
       final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
+        source: fromGallery ? ImageSource.gallery : ImageSource.camera,
         imageQuality: 70,
         maxWidth: 1600,
         maxHeight: 1600,
@@ -691,6 +691,23 @@ class StoreVisitsController extends GetxController {
       }
     } catch (e) {
       debugPrint('Store approval photo capture error: $e');
+      if (!fromGallery) {
+        debugPrint('Falling back to gallery...');
+        try {
+          final XFile? photo = await _picker.pickImage(
+            source: ImageSource.gallery,
+            imageQuality: 70,
+            maxWidth: 1600,
+            maxHeight: 1600,
+          );
+          if (photo != null) {
+            _storeApprovalPhotoPath = photo.path;
+            update();
+          }
+        } catch (e2) {
+          debugPrint('Gallery fallback error: $e2');
+        }
+      }
     }
   }
 

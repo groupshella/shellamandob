@@ -127,8 +127,8 @@ class _AddFieldVisitScreenState extends State<AddFieldVisitScreen> {
     super.dispose();
   }
 
-  Future<void> _handleCapturePhoto() async {
-    await Get.find<StoreVisitsController>().captureStoreApprovalPhoto();
+  Future<void> _handleCapturePhoto({bool fromGallery = false}) async {
+    await Get.find<StoreVisitsController>().captureStoreApprovalPhoto(fromGallery: fromGallery);
     setState(() {});
   }
 
@@ -372,7 +372,18 @@ class _AddFieldVisitScreenState extends State<AddFieldVisitScreen> {
                             ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  Align(
+                    alignment: Alignment.center,
+                    child: TextButton.icon(
+                      onPressed: () => _handleCapturePhoto(fromGallery: true),
+                      icon: Icon(IconlyLight.image, size: 18, color: hintText),
+                      label: Text(
+                        'choose_from_gallery'.tr,
+                        style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w500, color: hintText),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
 
                   Text(
                     'set_store_location_on_map'.tr,

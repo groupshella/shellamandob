@@ -47,8 +47,8 @@ class _StoreApprovalSheetBodyState extends State<_StoreApprovalSheetBody> {
   Position? _position;
   bool _capturingLocation = false;
 
-  Future<void> _handleCapturePhoto() async {
-    await widget.controller.captureStoreApprovalPhoto();
+  Future<void> _handleCapturePhoto({bool fromGallery = false}) async {
+    await widget.controller.captureStoreApprovalPhoto(fromGallery: fromGallery);
     setState(() {});
   }
 
@@ -144,7 +144,18 @@ class _StoreApprovalSheetBodyState extends State<_StoreApprovalSheetBody> {
                       ),
               ),
             ),
-            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton.icon(
+                onPressed: () => _handleCapturePhoto(fromGallery: true),
+                icon: Icon(IconlyLight.image, size: 18, color: theme.hintColor),
+                label: Text(
+                  'choose_from_gallery'.tr,
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: theme.hintColor),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
 
             // Step 2: confirm location
             OutlinedButton.icon(
