@@ -687,9 +687,19 @@ class AttendanceStepperScreen extends StatelessWidget {
                 if (Get.isRegistered<EmployeeShiftController>()) {
                   Get.find<EmployeeShiftController>().startShift();
                 }
-                Get.until((route) => route.settings.name == RouteHelper.employeeMain || route.isFirst);
+                // Get.until(... || route.isFirst) previously popped all the
+                // way to the splash/login screen whenever EmployeeMainScreen
+                // was on the stack without the named route (e.g. pushed via
+                // Get.offAll(() => const EmployeeMainScreen())), since that
+                // route's settings.name is null and never matches employeeMain.
+                // Reset the stack to the named route directly instead --
+                // same pattern already used by daily_visits_screen.dart,
+                // contract_signing_screen.dart and follow_up_task_screen.dart.
+                Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
                 if (Get.isRegistered<EmployeeNavigationController>()) {
-                  Get.find<EmployeeNavigationController>().changeIndex(1); // go to visits tab
+                  // Tab 1 is reports, not visits -- see EmployeeMainScreen's
+                  // IndexedStack (0=home, 1=reports, 2=visits, 3=earnings, 4=profile).
+                  Get.find<EmployeeNavigationController>().changeIndex(2); // go to visits tab
                 }
               },
               style: ElevatedButton.styleFrom(

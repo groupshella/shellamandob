@@ -464,8 +464,11 @@ class _ZoneMapState extends State<_ZoneMap> {
       southwest: LatLng(minLat, minLng),
       northeast: LatLng(maxLat, maxLng),
     );
+    // moveCamera (not animateCamera): jumps straight to the fitted bounds
+    // with no fly-through animation, so a screenshot taken right after the
+    // screen opens can never catch a mid-flight/warped intermediate frame.
     Future.delayed(const Duration(milliseconds: 250), () {
-      _mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 60));
+      _mapController?.moveCamera(CameraUpdate.newLatLngBounds(bounds, 60));
     });
   }
 }

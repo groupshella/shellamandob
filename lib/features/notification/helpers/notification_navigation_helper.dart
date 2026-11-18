@@ -35,7 +35,8 @@ class NotificationNavigationHelper {
         type == 'zone' ||
         has(['نطاق', 'منطقة', 'زون', 'zone'])) {
       if (Get.isRegistered<EmployeeNavigationController>()) {
-        Get.find<EmployeeNavigationController>().changeIndex(1);
+        // Tab 1 is reports, not visits -- see EmployeeMainScreen's IndexedStack.
+        Get.find<EmployeeNavigationController>().changeIndex(2);
       }
       _showDetailDialog(
         title: title.isNotEmpty ? title : 'zone_update'.tr,
@@ -75,7 +76,8 @@ class NotificationNavigationHelper {
         type == 'contract' ||
         has(['متابعة', 'متابعه', 'زيارة', 'زياره', 'عقد', 'اتفاقية'])) {
       if (Get.isRegistered<EmployeeNavigationController>()) {
-        Get.find<EmployeeNavigationController>().changeIndex(1);
+        // Tab 1 is reports, not visits -- see EmployeeMainScreen's IndexedStack.
+        Get.find<EmployeeNavigationController>().changeIndex(2);
         Get.back<void>();
       }
       return;

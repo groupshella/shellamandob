@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import '../../../../helper/route_helper.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/not_closing_reason.dart';
 import '../models/store_visit_model.dart';
@@ -1222,7 +1223,13 @@ class _StoreVisitDetailScreenState extends State<StoreVisitDetailScreen> {
 
     final success = await controller.submitAndFinishVisit(targetVisit: visit);
     if (success) {
-      Get.until((route) => route.isFirst || Get.currentRoute.contains('DailyVisitsScreen'));
+      // Get.until(... || route.isFirst) previously popped all the way to
+      // the splash/login screen: DailyVisitsScreen is a bottom-nav tab, not
+      // a named route, so Get.currentRoute never actually contains its name
+      // and the condition fell through to route.isFirst every time. Reset
+      // to the named employee-main route instead (same fix as the
+      // attendance-stepper "explore visits" button).
+      Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
       Get.snackbar(
         'report_sent_success_title'.tr,
         'report_sent_success_body'.tr,

@@ -984,7 +984,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
     );
 
     if (Get.isRegistered<EmployeeNavigationController>()) {
-      Get.find<EmployeeNavigationController>().changeIndex(1);
+      // Tab 1 is reports, not visits -- see EmployeeMainScreen's IndexedStack.
+      Get.find<EmployeeNavigationController>().changeIndex(2);
     }
     Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
   }
