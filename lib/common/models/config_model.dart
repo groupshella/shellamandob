@@ -184,14 +184,23 @@ class ConfigModel {
     currencySymbolDirection = json['currency_symbol_direction']?.toString();
 
     appMinimumVersionAndroid = double.tryParse(
-            json['app_minimum_version_android']?.toString() ?? '0') ??
+            (json['app_minimum_version_android_marketer'] ??
+                    json['app_minimum_version_android'])
+                ?.toString() ??
+                '0') ??
         0.0;
-    appUrlAndroid = json['app_url_android']?.toString();
+    appUrlAndroid =
+        (json['app_url_android_marketer'] ?? json['app_url_android'])
+            ?.toString();
 
-    appMinimumVersionIos =
-        double.tryParse(json['app_minimum_version_ios']?.toString() ?? '0') ??
-            0.0;
-    appUrlIos = json['app_url_ios']?.toString();
+    appMinimumVersionIos = double.tryParse(
+            (json['app_minimum_version_ios_marketer'] ??
+                    json['app_minimum_version_ios'])
+                ?.toString() ??
+                '0') ??
+        0.0;
+    appUrlIos =
+        (json['app_url_ios_marketer'] ?? json['app_url_ios'])?.toString();
 
     final cv = json['customer_verification'];
     customerVerification = cv == true || cv == 1 || cv?.toString() == '1';
