@@ -561,4 +561,67 @@ class SkeletonLoadingWidgets {
       ),
     );
   }
+
+  /// Helper card wrapper for consistent themed shimmer containers
+  static Widget _themedCard({
+    required Widget child,
+    bool isDark = false,
+    double borderRadius = 18,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+    EdgeInsetsGeometry? margin,
+  }) {
+    return Container(
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
+          width: 0.8,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  /// Skeleton for Generic List Cards (Zone Stores Demand list)
+  static Widget listCardsSkeleton({
+    bool isDark = false,
+    int itemCount = 5,
+    double cardHeight = 86,
+    double borderRadius = 16,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+  }) {
+    return ListView.separated(
+      padding: padding,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: itemCount,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (_, __) => _themedCard(
+        isDark: isDark,
+        borderRadius: borderRadius,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                shimmerBox(height: 15, width: 150, borderRadius: 6, isDark: isDark),
+                shimmerBox(height: 22, width: 64, borderRadius: 10, isDark: isDark),
+              ],
+            ),
+            const SizedBox(height: 10),
+            shimmerBox(height: 12, width: double.infinity, borderRadius: 4, isDark: isDark),
+            if (cardHeight > 78) ...[
+              const SizedBox(height: 6),
+              shimmerBox(height: 12, width: 180, borderRadius: 4, isDark: isDark),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }
