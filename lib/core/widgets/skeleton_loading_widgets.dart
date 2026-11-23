@@ -561,8 +561,6 @@ class SkeletonLoadingWidgets {
       ),
     );
   }
-<<<<<<< Updated upstream
-=======
 
   /// Helper card wrapper for consistent themed shimmer containers
   static Widget _themedCard({
@@ -963,5 +961,4 @@ class SkeletonLoadingWidgets {
       ),
     );
   }
->>>>>>> Stashed changes
 }

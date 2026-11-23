@@ -8,7 +8,6 @@ import '../models/store_visit_model.dart';
 import 'merchant_objections_screen.dart';
 import 'store_visit_map_screen.dart';
 import 'visit_photo_documentation_screen.dart';
-import 'zone_stores_demand_screen.dart';
 
 class ActiveStoreVisitScreen extends StatelessWidget {
   final StoreVisitModel visit;
@@ -135,20 +134,6 @@ class ActiveStoreVisitScreen extends StatelessWidget {
                         showInlineAlert: showInlineAlert,
                         alertLevel: alertLevel,
                         lastAlert: lastAlert,
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // 3. قائمة المتاجر (Figma 9975:9978)
-                      _buildNavigationCard(
-                        title: 'stores_list_title'.tr,
-                        cardBg: cardBg,
-                        titleColor: cardTitleColor,
-                        iconColor: subTextColor,
-                        isRtl: isRtl,
-                        isDark: isDark,
-                        onTap: () =>
-                            Get.to(() => const ZoneStoresDemandScreen()),
                       ),
 
                       const SizedBox(height: 16),
