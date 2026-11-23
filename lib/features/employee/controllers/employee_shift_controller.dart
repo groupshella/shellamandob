@@ -58,7 +58,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
   /// Live location: foreground-only (no background tracking), running the
   /// whole time this controller is alive (i.e. the app is open) regardless
   /// of shift state, so the admin dashboard can show every marketer who has
-  /// the app open right now. Pings immediately, then every 60s.
+  /// the app open right now. Pings immediately, then every 20s.
   Future<void> _sendLocationPingOnce() async {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -76,8 +76,11 @@ class EmployeeShiftController extends GetxController implements GetxService {
         return;
       }
 
+      // High accuracy forces a real GPS fix instead of a coarse
+      // network/cell-based position, which on some devices gets served
+      // from cache and can repeat the exact same coordinate for hours.
       final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
       await _service.pingLocation(lat: pos.latitude, lng: pos.longitude);
     } catch (e) {
@@ -88,7 +91,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
   void _startLocationPing() {
     _locationPingTimer?.cancel();
     _sendLocationPingOnce();
-    _locationPingTimer = Timer.periodic(const Duration(seconds: 60), (_) => _sendLocationPingOnce());
+    _locationPingTimer = Timer.periodic(const Duration(seconds: 20), (_) => _sendLocationPingOnce());
   }
 
   /// Load current active shift from server truth
