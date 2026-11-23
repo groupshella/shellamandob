@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import '../controllers/employee_navigation_controller.dart';
 import '../controllers/employee_shift_controller.dart';
@@ -12,6 +13,8 @@ import '../widgets/employee_quick_actions_widget.dart';
 import '../widgets/supervisor_recommendations_banner.dart';
 import '../widgets/employee_warnings_banner.dart';
 import '../widgets/today_visits_summary_widget.dart';
+import '../widgets/acquisition_targets_cards_widget.dart';
+import '../widgets/performance_report_card_widget.dart';
 import '../visits/controllers/store_visits_controller.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import '../controllers/supervisor_recommendations_controller.dart';
@@ -42,74 +45,87 @@ class EmployeeHomeScreen extends StatelessWidget {
           color: bg,
           child: SafeArea(
             bottom: false,
-            child: RefreshIndicator(
-              color: const Color(0xFF30913F),
-              onRefresh: () async {
-                // Phase 6 Optimization: Execute independent refresh requests in parallel
-                final futures = <Future<dynamic>>[];
-                if (Get.isRegistered<EmployeeShiftController>()) {
-                  futures.add(Get.find<EmployeeShiftController>().loadCurrentShift(notify: true));
+            child: GetBuilder<EmployeeShiftController>(
+              builder: (shiftCtrl) {
+                if (!shiftCtrl.hasLoadedOnce) {
+                  return SkeletonLoadingWidgets.employeeHomeSkeleton(isDark: isDark);
                 }
-                if (Get.isRegistered<SupervisorRecommendationsController>()) {
-                  futures.add(Get.find<SupervisorRecommendationsController>().loadRecommendations(notify: true));
-                }
-                if (Get.isRegistered<StoreVisitsController>()) {
-                  futures.add(Get.find<StoreVisitsController>().loadRewardSettings());
-                }
-                if (Get.isRegistered<NotificationController>()) {
-                  futures.add(Get.find<NotificationController>().getNotificationList(true));
-                }
-                if (futures.isNotEmpty) {
-                  await Future.wait(futures);
-                }
+                return RefreshIndicator(
+                  color: const Color(0xFF30913F),
+                  onRefresh: () async {
+                    // Phase 6 Optimization: Execute independent refresh requests in parallel
+                    final futures = <Future<dynamic>>[];
+                    if (Get.isRegistered<EmployeeShiftController>()) {
+                      futures.add(Get.find<EmployeeShiftController>().loadCurrentShift(notify: true));
+                    }
+                    if (Get.isRegistered<SupervisorRecommendationsController>()) {
+                      futures.add(Get.find<SupervisorRecommendationsController>().loadRecommendations(notify: true));
+                    }
+                    if (Get.isRegistered<StoreVisitsController>()) {
+                      futures.add(Get.find<StoreVisitsController>().loadRewardSettings());
+                    }
+                    if (Get.isRegistered<NotificationController>()) {
+                      futures.add(Get.find<NotificationController>().getNotificationList(true));
+                    }
+                    if (futures.isNotEmpty) {
+                      await Future.wait(futures);
+                    }
+                  },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 96),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // 1. الترويسة والترحيب (الجرس أعلى اليسار، والترحيب أسفله على اليمين)
+                        EmployeeHeaderWidget(
+                          isDark: isDark,
+                          onNotificationTap: () {
+                            Get.toNamed(RouteHelper.getNotificationRoute());
+                          },
+                        ),
+
+                        // 2. بطاقة حالة الدوام والهدف اليومي (إطار أخضر + الهدف اليومي وشريط التقدم)
+                        ShiftStatusCardWidget(
+                          isDark: isDark,
+                          onStartShift: onStartShiftPressed ?? () {
+                            Get.toNamed(RouteHelper.getSelectWorkZoneRoute());
+                          },
+                        ),
+
+                        // 3. بطاقة الزيارة القادمة (تظهر في حالة الدوام النشط)
+                        UpcomingVisitCardWidget(isDark: isDark),
+
+                        // 4. شبكة المقاييس 2×2 (وقت بدء الدوام، وقت العمل، خارج الدوام، الاستئذان المعتمد)
+                        ShiftMetricsGridWidget(isDark: isDark),
+
+                        // 5. بطاقات الاختصارات الأربعة السريعة (أرباحي، شبكتي، تفعيل المتجر، الدعم)
+                        EmployeeQuickActionsWidget(isDark: isDark),
+
+                        // 5.5. تقرير الأداء (تقييم يومك + درس مقترح ليك)
+                        PerformanceReportCardWidget(isDark: isDark),
+
+                        // 6. توصيات المشرف (تظهر في حالة الدوام النشط)
+                        SupervisorRecommendationsBanner(isDark: isDark),
+
+                        // 7. شريط الإنذارات (يظهر عند وجود إنذارات)
+                        EmployeeWarningsBanner(isDark: isDark),
+
+                        // 8. ملخص زيارات اليوم
+                        TodayVisitsSummaryWidget(
+                          isDark: isDark,
+                          onStartNextVisit: () {
+                            Get.find<EmployeeNavigationController>().changeIndex(2);
+                          },
+                        ),
+
+                        // 9. بطاقات التقدم الشهرية: استقطاب المتاجر & استقطاب المسوقين
+                        AcquisitionTargetsCardsWidget(isDark: isDark),
+                      ],
+                    ),
+                  ),
+                );
               },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 96),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // 1. الترويسة والترحيب (الجرس أعلى اليسار، والترحيب أسفله على اليمين)
-                    EmployeeHeaderWidget(
-                      isDark: isDark,
-                      onNotificationTap: () {
-                        Get.toNamed(RouteHelper.getNotificationRoute());
-                      },
-                    ),
-
-                    // 2. بطاقة حالة الدوام والهدف اليومي (إطار أخضر + الهدف اليومي وشريط التقدم)
-                    ShiftStatusCardWidget(
-                      isDark: isDark,
-                      onStartShift: onStartShiftPressed ?? () {
-                        Get.toNamed(RouteHelper.getSelectWorkZoneRoute());
-                      },
-                    ),
-
-                    // 3. بطاقة الزيارة القادمة (تظهر في حالة الدوام النشط)
-                    UpcomingVisitCardWidget(isDark: isDark),
-
-                    // 4. شبكة المقاييس 2×2 (وقت بدء الدوام، وقت العمل، خارج الدوام، الاستئذان المعتمد)
-                    ShiftMetricsGridWidget(isDark: isDark),
-
-                    // 5. بطاقات الاختصارات الأربعة السريعة (أرباحي، شبكتي، تفعيل المتجر، الدعم)
-                    EmployeeQuickActionsWidget(isDark: isDark),
-
-                    // 6. توصيات المشرف (تظهر في حالة الدوام النشط)
-                    SupervisorRecommendationsBanner(isDark: isDark),
-
-                    // 7. شريط الإنذارات (يظهر عند وجود إنذارات)
-                    EmployeeWarningsBanner(isDark: isDark),
-
-                    // 8. ملخص زيارات اليوم
-                    TodayVisitsSummaryWidget(
-                      isDark: isDark,
-                      onStartNextVisit: () {
-                        Get.find<EmployeeNavigationController>().changeIndex(2);
-                      },
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
         );

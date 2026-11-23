@@ -1,4 +1,5 @@
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
@@ -10,12 +11,9 @@ import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dar
 import 'package:sixam_mart/features/marketer/screens/marketer_commissions_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
+import 'package:sixam_mart/features/employee/screens/employee_profile_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_bank_transfer_sheet.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_pending_balance_sheet.dart';
 
@@ -72,88 +70,59 @@ class MarketerDashboardScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            Column(
-              children: [
-                MarketerHeader(
-                  title: 'voucher_marketer'.tr,
-                  showBackButton: !isRoot,
-                  trailing: null,
-                ),
-                Expanded(
-                  child: GetBuilder<MarketerController>(
-                    builder: (c) {
-                      return RefreshIndicator(
-                        color: _primaryGreen,
-                        onRefresh: c.loadDashboard,
-                        child: SingleChildScrollView(
-                          padding: EdgeInsets.fromLTRB(16, 10, 16, isRoot ? 90 : 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // 0. Profile Summary Bar (when in root tab)
-                              if (isRoot) ...[
-                                _buildProfileSummaryBar(isDark),
-                                const SizedBox(height: 14),
-                              ],
-
-                              // 1. Hero Gradient Balance Card
-                              _buildHeroBalanceCard(context, c, isDark),
-                              const SizedBox(height: 16),
-
-                              // 2. Personal QR Code Card
-                              _buildQRCard(context, c, isDark),
-                              const SizedBox(height: 16),
-
-                              // 3. KPI Cards
-                              _buildKPICards(c, isDark),
-                              const SizedBox(height: 16),
-
-                              // 4. Recent Commissions Card
-                              _buildRecentCommissionsCard(c, isDark),
-                              const SizedBox(height: 80),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            // Floating Support Button (Matching Figma: Circular 56x56 at Bottom Left)
-            Positioned(
-              bottom: isRoot ? 85 : 20,
-              left: 20,
-              child: GestureDetector(
-                onTap: () => Get.toNamed(RouteHelper.getSupportRoute()),
-                child: Container(
-                  width: 54,
-                  height: 54,
-                  decoration: ShapeDecoration(
-                    color: isDark ? const Color(0xFF1C2028) : Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35),
-                      side: isDark ? const BorderSide(color: Color(0xFF2C3240)) : BorderSide.none,
-                    ),
-                    shadows: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.13),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+            MarketerHeader(
+              title: 'voucher_marketer'.tr,
+              showBackButton: !isRoot,
+              trailing: isRoot
+                  ? IconButton(
+                      onPressed: () => Get.to(() => const EmployeeProfileScreen(isRoot: false)),
+                      icon: Icon(
+                        IconlyLight.profile,
+                        size: 22,
+                        color: isDark ? Colors.white : _darkText,
                       ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.headset_mic_outlined,
-                      color: _primaryGreen,
-                      size: 26,
+                      splashRadius: 22,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    )
+                  : null,
+            ),
+            Expanded(
+              child: GetBuilder<MarketerController>(
+                builder: (c) {
+                  if (c.isLoading && c.data == null) {
+                    return SkeletonLoadingWidgets.employeeHomeSkeleton(isDark: isDark);
+                  }
+                  return RefreshIndicator(
+                    color: _primaryGreen,
+                    onRefresh: c.loadDashboard,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // 1. Hero Gradient Balance Card (Figma 9632:34988)
+                          _buildHeroBalanceCard(context, c, isDark),
+                          const SizedBox(height: 16),
+
+                          // 2. Personal QR Code Card (Figma 9632:35023)
+                          _buildQRCard(context, c, isDark),
+                          const SizedBox(height: 16),
+
+                          // 3. KPI Cards (Figma 9632:35055 & 9632:35069)
+                          _buildKPICards(c, isDark),
+                          const SizedBox(height: 16),
+
+                          // 4. Recent Commissions Card (Figma 9632:35129)
+                          _buildRecentCommissionsCard(c, isDark),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -671,14 +640,14 @@ class MarketerDashboardScreen extends StatelessWidget {
     );
   }
 
-  // ---------------------------------------------------- 3. KPI Cards (Figma Exact)
+  // ---------------------------------------------------- 3. KPI Cards (Figma 9632:35055 & 9632:35069 Exact)
   Widget _buildKPICards(MarketerController c, bool isDark) {
     return Column(
       children: [
-        // KPI Card 1: Acquired Customers (Full Width)
+        // KPI Card 1: العملاء المكتسبون بنجاح (Full Width - Figma 9632:35055)
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 20.8, vertical: 10),
           decoration: ShapeDecoration(
             color: isDark ? const Color(0xFF162A1D) : const Color(0xFFFAFFFA),
             shape: RoundedRectangleBorder(
@@ -694,9 +663,8 @@ class MarketerDashboardScreen extends StatelessWidget {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _buildGrowthBadge('${c.kpiGrowthPct}%', isDark),
                   Container(
                     width: 44,
                     height: 44,
@@ -706,26 +674,30 @@ class MarketerDashboardScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(32),
                       ),
                     ),
-                    child: const Center(
-                      child: Icon(IconlyLight.addUser,
-                          color: Colors.white, size: 20),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/image/figma_kpi_profile_tick.svg',
+                        width: 20,
+                        height: 20,
+                      ),
                     ),
                   ),
+                  _buildGrowthBadge('${c.kpiGrowthPct}%', isDark),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                'paying_customers_completed'.tr,
+                'successfully_acquired_customers'.tr,
                 style: TextStyle(
                   color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
-                  fontSize: 15,
+                  fontSize: 16,
                   fontFamily: 'Tajawal',
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
-                '${c.payingCustomers} ${'customers'.tr}',
+                '${c.payingCustomers} ${'customers_acc_unit'.tr}',
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF1E2939),
                   fontSize: 24,
@@ -736,202 +708,146 @@ class MarketerDashboardScreen extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
-        // Row with 2 Bottom KPI Cards — exact Figma layout
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Card: إجمالي المسجلين بالكود (Right in RTL)
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: ShapeDecoration(
-                  color: isDark ? const Color(0xFF1C2028) : Colors.white,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                        width: 0.80,
-                        color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    // Badge + Icon Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Growth badge (green)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: ShapeDecoration(
-                            color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.north_east,
-                                  size: 12,
-                                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236)),
-                              const SizedBox(width: 2),
-                              Text(
-                                '${c.kpiGrowthPct}%',
-                                style: TextStyle(
-                                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236),
-                                  fontSize: 12,
-                                  fontFamily: 'Tajawal',
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Users icon
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFF2563EB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                          ),
-                          child: const Center(
-                            child: Icon(IconlyLight.profile,
-                                color: Colors.white, size: 18),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'total_registered'.tr,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
-                        fontSize: 13,
-                        fontFamily: 'Tajawal',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${c.registeredCustomers} ${'customers'.tr}',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : const Color(0xFF1E2939),
-                        fontSize: 20,
-                        fontFamily: 'Tajawal',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+        // Row with 3 Bottom KPI Cards — exact Figma 9632:35069
+        // In RTL order (Right to Left):
+        // 1. العملاء المترددون (9632:35115)
+        // 2. انضمام مسوقين (9632:35096)
+        // 3. إجمالي عمليات مسح الـ QR (9632:35070)
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Card 1 (Right in RTL): العملاء المترددون (9632:35115)
+              Expanded(
+                child: _buildSmallKpiCard(
+                  isDark: isDark,
+                  bgColor: isDark ? const Color(0xFF1C2028) : const Color(0xFFFCFCFD),
+                  iconCircleColor: isDark ? const Color(0xFF374151) : const Color(0xFFC6C8CE),
+                  iconAsset: 'assets/image/figma_kpi_profile_delete.svg',
+                  badgeText: '${c.kpiGrowthPct}%',
+                  isDownBadge: true,
+                  label: 'hesitant_customers_label'.tr,
+                  value: '${c.hesitantCustomers} ${'customers_acc_unit'.tr}',
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
+              const SizedBox(width: 8),
 
-            // Card: لم يدفعوا بعد (Left in RTL)
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: ShapeDecoration(
-                  color: isDark ? const Color(0xFF1C2028) : const Color(0xFFFCFCFD),
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                        width: 0.80,
-                        color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    // Badge + Icon Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Pending badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: ShapeDecoration(
-                            color: isDark ? const Color(0xFF332512) : const Color(0xFFFFFBEB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.access_time,
-                                  size: 12, color: Color(0xFFD97706)),
-                              const SizedBox(width: 2),
-                              Text(
-                                '${c.hesitantCustomers}',
-                                style: const TextStyle(
-                                  color: Color(0xFFD97706),
-                                  fontSize: 11,
-                                  fontFamily: 'Tajawal',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Alert / Pending Icon
-                        Container(
-                          width: 32,
-                          height: 32,
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFFF59E0B),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                          ),
-                          child: const Center(
-                            child: Icon(IconlyLight.timeCircle,
-                                color: Colors.white, size: 18),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'haven_not_paid_yet'.tr,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
-                        fontSize: 13,
-                        fontFamily: 'Tajawal',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${c.hesitantCustomers} ${'customer'.tr}',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : const Color(0xFF1E2939),
-                        fontSize: 20,
-                        fontFamily: 'Tajawal',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+              // Card 2 (Middle in RTL): انضمام مسوقين (9632:35096)
+              Expanded(
+                child: _buildSmallKpiCard(
+                  isDark: isDark,
+                  bgColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+                  iconCircleColor: _primaryGreen,
+                  iconAsset: 'assets/image/figma_kpi_user_tag.svg',
+                  badgeText: '${c.kpiGrowthPct}%',
+                  isDownBadge: false,
+                  label: 'marketers_joined_label'.tr,
+                  value: '${c.joinedMarketersCount} ${'customers_acc_unit'.tr}',
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+
+              // Card 3 (Left in RTL): إجمالي عمليات مسح الـ QR (9632:35070)
+              Expanded(
+                child: _buildSmallKpiCard(
+                  isDark: isDark,
+                  bgColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+                  iconCircleColor: _primaryGreen,
+                  iconAsset: 'assets/image/figma_kpi_qr_scan.svg',
+                  badgeText: '${c.kpiGrowthPct}%',
+                  isDownBadge: false,
+                  label: 'total_qr_scans_label'.tr,
+                  value: '${c.totalScans} ${'customers_acc_unit'.tr}',
+                ),
+              ),
+            ],
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSmallKpiCard({
+    required bool isDark,
+    required Color bgColor,
+    required Color iconCircleColor,
+    required String iconAsset,
+    required String badgeText,
+    required bool isDownBadge,
+    required String label,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(8.8),
+      decoration: ShapeDecoration(
+        color: bgColor,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            width: 0.80,
+            color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6),
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: ShapeDecoration(
+                  color: iconCircleColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    iconAsset,
+                    width: 16,
+                    height: 16,
+                  ),
+                ),
+              ),
+              isDownBadge
+                  ? _buildDownBadge(badgeText, isDark)
+                  : _buildGrowthBadge(badgeText, isDark),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6A7282),
+              fontSize: 12,
+              height: 1.2,
+              fontFamily: 'Tajawal',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF1E2939),
+              fontSize: 16,
+              fontFamily: 'Tajawal',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -947,10 +863,6 @@ class MarketerDashboardScreen extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.arrow_upward,
-              size: 12,
-              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF008236)),
-          const SizedBox(width: 2),
           Text(
             value,
             style: TextStyle(
@@ -958,6 +870,47 @@ class MarketerDashboardScreen extends StatelessWidget {
               fontSize: 12,
               fontFamily: 'Tajawal',
               fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 2),
+          SvgPicture.asset(
+            'assets/image/figma_kpi_arrow_up_green.svg',
+            width: 12,
+            height: 12,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDownBadge(String value, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: ShapeDecoration(
+        color: isDark ? const Color(0xFF252B37) : const Color(0xFFF0F0F1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555),
+              fontSize: 12,
+              fontFamily: 'Tajawal',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 2),
+          Transform.flip(
+            flipY: true,
+            child: SvgPicture.asset(
+              'assets/image/figma_kpi_arrow_down_grey.svg',
+              width: 12,
+              height: 12,
             ),
           ),
         ],
@@ -1058,7 +1011,7 @@ class MarketerDashboardScreen extends StatelessWidget {
 
                 return Row(
                   children: [
-                    // Coin Icon Box (Figma: 40x40 with rounded 12)
+                    // Coin Icon Box (Figma 9632:35149: 40x40 with rounded 12)
                     Container(
                       width: 40,
                       height: 40,
@@ -1071,12 +1024,12 @@ class MarketerDashboardScreen extends StatelessWidget {
                         ),
                       ),
                       child: Center(
-                        child: Icon(
-                          IconlyLight.paper,
-                          size: 20,
-                          color: isPending
-                              ? const Color(0xFFEC9C17)
-                              : _primaryGreen,
+                        child: SvgPicture.asset(
+                          isPending
+                              ? 'assets/image/figma_comm_coin_amber.svg'
+                              : 'assets/image/figma_comm_coin_green.svg',
+                          width: 21.3,
+                          height: 21.3,
                         ),
                       ),
                     ),
@@ -1115,7 +1068,7 @@ class MarketerDashboardScreen extends StatelessWidget {
                                 : 'registered_successfully'.tr,
                             style: TextStyle(
                               color: isPending
-                                  ? const Color(0xFFEC9C17)
+                                  ? const Color(0xFFEC9C18)
                                   : _primaryGreen,
                               fontSize: 11,
                               fontFamily: 'Tajawal',
@@ -1126,26 +1079,28 @@ class MarketerDashboardScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // Amount with SAR currency
+                    // Amount with SAR currency SVG (Figma 9632:35137)
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '+$amount ',
+                          '+$amount',
                           style: TextStyle(
                             color: isPending
-                                ? const Color(0xFFEC9C17)
+                                ? const Color(0xFFEC9C18)
                                 : _primaryGreen,
                             fontSize: 15,
                             fontFamily: 'Tajawal',
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        SarCurrencyWidget(
-                          size: 14,
-                          color: isPending
-                              ? const Color(0xFFEC9C17)
-                              : _primaryGreen,
+                        const SizedBox(width: 4),
+                        SvgPicture.asset(
+                          isPending
+                              ? 'assets/image/figma_comm_sar_amber.svg'
+                              : 'assets/image/figma_comm_sar_green.svg',
+                          width: 12,
+                          height: 15,
                         ),
                       ],
                     ),
@@ -1155,113 +1110,6 @@ class MarketerDashboardScreen extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-
-  Widget _buildProfileSummaryBar(bool isDark) {
-    return GetBuilder<ProfileController>(
-      builder: (profileCtrl) {
-        final userInfo = profileCtrl.userInfoModel;
-        final name = userInfo != null
-            ? ' '.trim()
-            : 'certified_freelance_marketer'.tr;
-        final phone = userInfo?.phone ?? '';
-        final imageUrl = userInfo?.imageFullUrl ?? '';
-
-        final isFreelance = Get.isRegistered<MarketerController>() &&
-            Get.find<MarketerController>().isFreelance;
-        final roleBadge = isFreelance
-            ? 'certified_freelance_marketer'.tr
-            : 'certified_marketer'.tr;
-
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-                color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-          ),
-          child: Row(
-            children: [
-              ClipOval(
-                child: imageUrl.isNotEmpty
-                    ? CustomImage(
-                        image: imageUrl,
-                        height: 44,
-                        width: 44,
-                        placeholder: Images.guestIcon,
-                      )
-                    : Container(
-                        height: 44,
-                        width: 44,
-                        decoration: BoxDecoration(
-                          color: _primaryGreen.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          IconlyBold.profile,
-                          size: 22,
-                          color: _primaryGreen,
-                        ),
-                      ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name.isNotEmpty ? name : 'shella_agent'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : _darkText,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      phone.isNotEmpty ? phone : roleBadge,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 12,
-                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF162D1D) : const Color(0xFFEBFEEB),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                      color: isDark ? const Color(0xFF225B2E) : const Color(0xFFC3ECC8)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.check_circle_rounded,
-                        size: 15, color: _primaryGreen),
-                    const SizedBox(width: 4),
-                    Text(
-                      roleBadge,
-                      style: const TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: _primaryGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

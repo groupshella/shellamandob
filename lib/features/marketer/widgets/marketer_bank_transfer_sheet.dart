@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
+import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 
-/// Modal Bottom Sheet for Bank Transfer (Figma 9054:70244, 70279, 70343 - التحويل البنكي)
+/// Modal Bottom Sheet for Bank Transfer matching Figma node 9632:35339 ("التحويل البنكي")
+/// Connected to real Backend API:
+/// - GET  /api/v1/customer/marketer/withdrawals (saved bank info + min withdrawal amount)
+/// - POST /api/v1/customer/marketer/withdraw    (creates real withdrawal request & updates balance)
 class MarketerBankTransferSheet extends StatefulWidget {
   const MarketerBankTransferSheet({super.key});
 
@@ -37,6 +41,8 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
   final FocusNode _ibanFocus = FocusNode();
 
   bool _isSubmitting = false;
+  double _minWithdrawalAmount = 200.0;
+  double _withdrawableBalance = 0.0;
 
   final List<String> _popularBanks = [
     'البنك الأهلي السعودي',
@@ -45,20 +51,64 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
     'مصرف الإنماء',
     'البنك السعودي الأول (SAB)',
     'البنك العربي الوطني',
+    'بنك البلاد',
+    'بنك الجزيرة',
   ];
 
   @override
   void initState() {
     super.initState();
-    // Default or pre-filled values
-    final profileCtrl = Get.find<ProfileController>();
-    final userInfo = profileCtrl.userInfoModel;
-    final fullName = '${userInfo?.fName ?? ''} ${userInfo?.lName ?? ''}'.trim();
-    if (fullName.isNotEmpty) {
-      _accountHolderController.text = fullName;
+    if (Get.isRegistered<MarketerController>()) {
+      final mc = Get.find<MarketerController>();
+      _minWithdrawalAmount = mc.minTransferAmount;
+      _withdrawableBalance = mc.balance;
     }
+    if (Get.isRegistered<ProfileController>()) {
+      final userInfo = Get.find<ProfileController>().userInfoModel;
+      final fullName = '${userInfo?.fName ?? ''} ${userInfo?.lName ?? ''}'.trim();
+      if (fullName.isNotEmpty) {
+        _accountHolderController.text = fullName;
+      }
+    }
+    _bankNameController.text = _popularBanks.first;
+    _loadSavedWithdrawalInfo();
+  }
 
-    _bankNameController.text = 'البنك الأهلي السعودي';
+  Future<void> _loadSavedWithdrawalInfo() async {
+    if (!Get.isRegistered<MarketerController>()) return;
+    final info = await Get.find<MarketerController>().loadWithdrawals();
+    if (!mounted || info == null) return;
+    setState(() {
+      if (info['withdrawable_balance'] != null) {
+        _withdrawableBalance = double.tryParse('${info['withdrawable_balance']}') ?? _withdrawableBalance;
+      }
+      if (info['withdrawal_settings'] is Map) {
+        final settings = info['withdrawal_settings'] as Map;
+        if (settings['min_withdrawal_amount'] != null) {
+          _minWithdrawalAmount = double.tryParse('${settings['min_withdrawal_amount']}') ?? _minWithdrawalAmount;
+        }
+      }
+      if (info['saved_bank_info'] is Map) {
+        final bank = info['saved_bank_info'] as Map;
+        final savedBankName = bank['bank_name']?.toString().trim() ?? '';
+        final savedHolder = bank['beneficiary_name']?.toString().trim() ?? '';
+        final savedIban = bank['iban']?.toString().trim() ?? '';
+        if (savedBankName.isNotEmpty) {
+          if (!_popularBanks.contains(savedBankName)) {
+            _popularBanks.insert(0, savedBankName);
+          }
+          _bankNameController.text = savedBankName;
+        }
+        if (savedHolder.isNotEmpty) {
+          _accountHolderController.text = savedHolder;
+        }
+        if (savedIban.isNotEmpty) {
+          _ibanController.text = savedIban.toUpperCase().startsWith('SA')
+              ? savedIban.substring(2)
+              : savedIban;
+        }
+      }
+    });
   }
 
   @override
@@ -75,14 +125,26 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
   }
 
   double get _enteredAmount => double.tryParse(_amountController.text.trim()) ?? 0.0;
-  bool get _isAmountBelowMin => _amountController.text.isNotEmpty && _enteredAmount < 200.0;
-  bool get _isIbanInvalid =>
-      _ibanController.text.isNotEmpty && _ibanController.text.replaceAll(' ', '').length < 15;
+  bool get _isAmountBelowMin =>
+      _amountController.text.isNotEmpty && _enteredAmount < _minWithdrawalAmount;
+  bool get _isAmountAboveBalance =>
+      _amountController.text.isNotEmpty && _withdrawableBalance > 0 && _enteredAmount > _withdrawableBalance;
 
-  void _submit() async {
+  String get _cleanIbanDigits => _ibanController.text.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+  bool get _isIbanInvalid {
+    if (_ibanController.text.trim().isEmpty) return false;
+    final full = _cleanIbanDigits.startsWith('SA') ? _cleanIbanDigits : 'SA$_cleanIbanDigits';
+    return !RegExp(r'^SA[0-9]{22}$').hasMatch(full) && !RegExp(r'^[A-Z]{2}[0-9A-Z]{13,32}$').hasMatch(full);
+  }
+
+  Future<void> _submit() async {
     final amount = _enteredAmount;
-    if (_amountController.text.isEmpty || amount < 200) {
+    if (_amountController.text.trim().isEmpty || amount < _minWithdrawalAmount) {
       showCustomSnackBar('min_transfer_warning'.tr);
+      return;
+    }
+    if (_withdrawableBalance > 0 && amount > _withdrawableBalance) {
+      showCustomSnackBar('${'insufficient_balance'.tr} (${_withdrawableBalance.toStringAsFixed(2)})');
       return;
     }
     if (_bankNameController.text.trim().isEmpty) {
@@ -98,21 +160,38 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
       return;
     }
 
+    if (!Get.isRegistered<MarketerController>()) return;
+
     setState(() => _isSubmitting = true);
-    await Future.delayed(const Duration(milliseconds: 700));
-    if (mounted) {
-      setState(() => _isSubmitting = false);
+    final result = await Get.find<MarketerController>().submitWithdrawal(
+      amount: amount,
+      bankName: _bankNameController.text.trim(),
+      beneficiaryName: _accountHolderController.text.trim(),
+      iban: _cleanIbanDigits,
+    );
+
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+
+    if (result.ok) {
       Navigator.of(context).pop();
-      showCustomSnackBar('transfer_request_sent_success'.tr, isError: false);
+      showCustomSnackBar(result.message, isError: false);
+    } else {
+      showCustomSnackBar(result.message, isError: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final fieldBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
-    final borderColor = isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB);
+    final surfaceBg = isDark ? const Color(0xFF1C2028) : Colors.white;
+    final fieldBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
+    final headlineColor = isDark ? Colors.white : MarketerBankTransferSheet._darkText;
+    final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF707784);
+    final infoBg = isDark ? const Color(0xFF132D1B) : const Color(0xFFEBFEEB);
+    final infoBorder = isDark
+        ? const Color(0xFF30913F).withValues(alpha: 0.5)
+        : const Color(0x8C3EC856);
 
     return AnimatedPadding(
       padding: MediaQuery.of(context).viewInsets,
@@ -120,10 +199,10 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
       curve: Curves.easeOut,
       child: Container(
         decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          color: surfaceBg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         child: SafeArea(
           top: false,
           child: SingleChildScrollView(
@@ -131,81 +210,72 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Drag handle
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Header with title and close icon (Figma 9054:70245)
+                // 1. Header: Title centered + Close SVG button (Figma 9632:35340)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'enter_bank_account'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : MarketerBankTransferSheet._darkText,
+                    const SizedBox(width: 28),
+                    Expanded(
+                      child: Text(
+                        'enter_bank_account'.tr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: headlineColor,
+                        ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          size: 18,
-                          color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+                      child: SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: Center(
+                          child: SvgPicture.asset(
+                            'assets/image/figma_bank_close.svg',
+                            width: 25,
+                            height: 25,
+                            colorFilter: isDark
+                                ? const ColorFilter.mode(Colors.white70, BlendMode.srcIn)
+                                : null,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                // Note Container (Figma 9054:70250)
+                // 2. Green Info Banner (Figma 9632:35345)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1E2838)
-                        : const Color(0xFFEFF6FF),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF2B3B52) : const Color(0xFFDBEAFE),
-                    ),
+                    color: infoBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: infoBorder, width: 0.8),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.info_outline_rounded,
-                        color: Color(0xFF2563EB),
-                        size: 20,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: SvgPicture.asset(
+                          'assets/image/figma_bank_info.svg',
+                          width: 16,
+                          height: 16,
+                        ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'bank_account_owner_note'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1E40AF),
-                            height: 1.35,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: MarketerBankTransferSheet._primaryGreen,
+                            height: 1.5,
                           ),
                         ),
                       ),
@@ -214,30 +284,21 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                 ),
                 const SizedBox(height: 20),
 
-                // 1. Amount field (Figma 9054:70255 / 70289 / 70353)
-                _buildFieldLabel('enter_transfer_amount'.tr, isDark),
-                const SizedBox(height: 6),
+                // 3. Amount field (Figma 9632:35350)
+                _buildFieldLabel('enter_transfer_amount'.tr, headlineColor),
+                const SizedBox(height: 8),
                 Container(
+                  height: 56,
                   decoration: BoxDecoration(
                     color: fieldBg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _isAmountBelowMin
-                          ? MarketerBankTransferSheet._errorRed
-                          : borderColor,
-                      width: _isAmountBelowMin ? 1.5 : 1,
-                    ),
+                    border: (_isAmountBelowMin || _isAmountAboveBalance)
+                        ? Border.all(color: MarketerBankTransferSheet._errorRed, width: 1.2)
+                        : null,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      SarCurrencyWidget(
-                        size: 20,
-                        color: _isAmountBelowMin
-                            ? MarketerBankTransferSheet._errorRed
-                            : (isDark ? Colors.white : MarketerBankTransferSheet._darkText),
-                      ),
-                      const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           controller: _amountController,
@@ -248,59 +309,78 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                             fontFamily: 'Tajawal',
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: isDark ? Colors.white : MarketerBankTransferSheet._darkText,
+                            color: headlineColor,
                           ),
                           decoration: InputDecoration(
-                            hintText: '200',
+                            hintText: _minWithdrawalAmount.toStringAsFixed(0),
                             hintStyle: TextStyle(
-                              color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
+                              fontFamily: 'Tajawal',
+                              color: subTextColor.withValues(alpha: 0.6),
                             ),
                             border: InputBorder.none,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                // Warning message for Amount (Figma 9054:70262 / 70297)
-                Padding(
-                  padding: const EdgeInsets.only(top: 6, right: 4, left: 4),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        size: 15,
-                        color: _isAmountBelowMin
-                            ? MarketerBankTransferSheet._errorRed
-                            : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'min_transfer_warning'.tr,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: _isAmountBelowMin
+                      const SizedBox(width: 8),
+                      SvgPicture.asset(
+                        'assets/image/figma_bank_sar.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          (_isAmountBelowMin || _isAmountAboveBalance)
                               ? MarketerBankTransferSheet._errorRed
-                              : (isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280)),
+                              : headlineColor,
+                          BlendMode.srcIn,
                         ),
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/image/figma_bank_warning.svg',
+                      width: 18,
+                      height: 18,
+                      colorFilter: ColorFilter.mode(
+                        (_isAmountBelowMin || _isAmountAboveBalance)
+                            ? MarketerBankTransferSheet._errorRed
+                            : subTextColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        _isAmountAboveBalance
+                            ? '${'insufficient_balance'.tr} (${_withdrawableBalance.toStringAsFixed(0)})'
+                            : 'min_transfer_warning'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: (_isAmountBelowMin || _isAmountAboveBalance)
+                              ? MarketerBankTransferSheet._errorRed
+                              : subTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 16),
 
-                // 2. Bank Name field (Figma 9054:70265 / 70301)
-                _buildFieldLabel('bank_name_label'.tr, isDark),
-                const SizedBox(height: 6),
+                // 4. Bank Name field (Figma 9632:35360)
+                _buildFieldLabel('bank_name_label'.tr, headlineColor),
+                const SizedBox(height: 8),
                 Container(
+                  height: 56,
                   decoration: BoxDecoration(
                     color: fieldBg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: borderColor),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  alignment: Alignment.center,
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
@@ -309,14 +389,14 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                           : _popularBanks.first,
                       icon: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+                        color: subTextColor,
                       ),
-                      dropdownColor: cardBg,
+                      dropdownColor: surfaceBg,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : MarketerBankTransferSheet._darkText,
+                        color: headlineColor,
                       ),
                       items: _popularBanks.map((bank) {
                         return DropdownMenuItem<String>(
@@ -334,16 +414,17 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                 ),
                 const SizedBox(height: 16),
 
-                // 3. Triple name of account holder (Figma 9054:70269 / 70306)
-                _buildFieldLabel('account_holder_name_label'.tr, isDark),
-                const SizedBox(height: 6),
+                // 5. Account Holder Triple Name (Figma 9632:35364)
+                _buildFieldLabel('account_holder_name_label'.tr, headlineColor),
+                const SizedBox(height: 8),
                 Container(
+                  height: 56,
                   decoration: BoxDecoration(
                     color: fieldBg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: borderColor),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  alignment: Alignment.center,
                   child: TextField(
                     controller: _accountHolderController,
                     focusNode: _holderFocus,
@@ -351,12 +432,13 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                       fontFamily: 'Tajawal',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : MarketerBankTransferSheet._darkText,
+                      color: headlineColor,
                     ),
                     decoration: InputDecoration(
                       hintText: 'account_holder_name_label'.tr,
                       hintStyle: TextStyle(
-                        color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
+                        fontFamily: 'Tajawal',
+                        color: subTextColor.withValues(alpha: 0.6),
                       ),
                       border: InputBorder.none,
                     ),
@@ -364,75 +446,84 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                 ),
                 const SizedBox(height: 16),
 
-                // 4. IBAN Number field (Figma 9054:70273 / 70314 / 70372)
-                _buildFieldLabel('iban_label'.tr, isDark),
-                const SizedBox(height: 6),
+                // 6. IBAN Field (Figma 9632:35368)
+                _buildFieldLabel('iban_label'.tr, headlineColor),
+                const SizedBox(height: 8),
                 Container(
+                  height: 56,
                   decoration: BoxDecoration(
                     color: fieldBg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _isIbanInvalid ? MarketerBankTransferSheet._errorRed : borderColor,
-                      width: _isIbanInvalid ? 1.5 : 1,
-                    ),
+                    border: _isIbanInvalid
+                        ? Border.all(color: MarketerBankTransferSheet._errorRed, width: 1.2)
+                        : null,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  child: Row(
-                    children: [
-                      Text(
-                        'SA',
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white70 : const Color(0xFF4B5563),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: _ibanController,
-                          focusNode: _ibanFocus,
-                          keyboardType: TextInputType.text,
-                          onChanged: (_) => setState(() {}),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Row(
+                      children: [
+                        Text(
+                          'SA',
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
-                            color: isDark ? Colors.white : MarketerBankTransferSheet._darkText,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: '5285 5285 5285 5285',
-                            hintStyle: TextStyle(
-                              letterSpacing: 1.0,
-                              color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
-                            ),
-                            border: InputBorder.none,
+                            fontWeight: FontWeight.w800,
+                            color: subTextColor,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _ibanController,
+                            focusNode: _ibanFocus,
+                            keyboardType: TextInputType.text,
+                            onChanged: (_) => setState(() {}),
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                              color: headlineColor,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: '0000 0000 0000 0000 0000 00',
+                              hintStyle: TextStyle(
+                                letterSpacing: 0.8,
+                                color: subTextColor.withValues(alpha: 0.55),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 if (_isIbanInvalid)
                   Padding(
-                    padding: const EdgeInsets.only(top: 6, right: 4, left: 4),
+                    padding: const EdgeInsets.only(top: 6),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.warning_amber_rounded,
-                          size: 15,
-                          color: MarketerBankTransferSheet._errorRed,
+                        SvgPicture.asset(
+                          'assets/image/figma_bank_warning.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter: const ColorFilter.mode(
+                            MarketerBankTransferSheet._errorRed,
+                            BlendMode.srcIn,
+                          ),
                         ),
                         const SizedBox(width: 6),
-                        Text(
-                          'invalid_iban_warning'.tr,
-                          style: const TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: MarketerBankTransferSheet._errorRed,
+                        Expanded(
+                          child: Text(
+                            'invalid_iban_warning'.tr,
+                            style: const TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: MarketerBankTransferSheet._errorRed,
+                            ),
                           ),
                         ),
                       ],
@@ -440,30 +531,31 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                   ),
                 const SizedBox(height: 24),
 
-                // Submit Button (Figma 9054:70278 / 70342 / 70397)
+                // 7. Submit Button (Figma 9632:35373 - height 48, radius 12, #30913F)
                 SizedBox(
-                  height: 52,
+                  height: 48,
                   child: ElevatedButton(
                     onPressed: _isSubmitting ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: MarketerBankTransferSheet._primaryGreen,
                       foregroundColor: Colors.white,
+                      disabledBackgroundColor: MarketerBankTransferSheet._primaryGreen.withValues(alpha: 0.6),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: _isSubmitting
                         ? const SizedBox(
-                            width: 24,
-                            height: 24,
+                            width: 22,
+                            height: 22,
                             child: CircularProgressIndicator(
+                              strokeWidth: 2.2,
                               color: Colors.white,
-                              strokeWidth: 2.5,
                             ),
                           )
                         : Text(
-                            'save_action'.tr,
+                            'save'.tr,
                             style: const TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 16,
@@ -472,7 +564,6 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
                           ),
                   ),
                 ),
-                const SizedBox(height: 12),
               ],
             ),
           ),
@@ -481,14 +572,14 @@ class _MarketerBankTransferSheetState extends State<MarketerBankTransferSheet> {
     );
   }
 
-  Widget _buildFieldLabel(String label, bool isDark) {
+  Widget _buildFieldLabel(String text, Color color) {
     return Text(
-      label,
+      text,
       style: TextStyle(
         fontFamily: 'Tajawal',
-        fontSize: 13,
+        fontSize: 16,
         fontWeight: FontWeight.w700,
-        color: isDark ? Colors.white : MarketerBankTransferSheet._darkText,
+        color: color,
       ),
     );
   }

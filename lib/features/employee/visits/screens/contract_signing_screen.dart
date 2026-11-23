@@ -8,7 +8,6 @@ import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
-import 'contract_activation_screen.dart';
 import '../../../../helper/route_helper.dart';
 import '../../controllers/employee_navigation_controller.dart';
 
@@ -39,13 +38,13 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   String _signedDate = '';
   String _contractNumber = '';
   String _nafathCode = '54';
+  String? _nafathRequestId;
+  String? _nafathNationalId;
 
   Timer? _countdownTimer;
   Timer? _pollTimer;
   int _waitingSecondsRemaining = 90;
   bool _isCheckingStatus = false;
-  String _statusMessage = 'waiting_merchant_nafath_open'.tr;
-  String? _errorMessage;
 
   @override
   void initState() {
@@ -94,11 +93,19 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
     try {
       if (Get.isRegistered<ApiClient>()) {
         final nationalId = _getIdentifierForNafath();
+        _nafathNationalId = nationalId;
         final response = await Get.find<ApiClient>().postData(
           '/api/v1/nafath/initiate',
           {'national_id': nationalId},
         );
         if (response.statusCode == 200 && response.body != null) {
+          final reqId = response.body['request_id']?.toString() ??
+              response.body['data']?['request_id']?.toString() ??
+              response.body['transId']?.toString() ??
+              response.body['data']?['transId']?.toString();
+          if (reqId != null && reqId.isNotEmpty) {
+            _nafathRequestId = reqId;
+          }
           final code = response.body['code']?.toString() ??
               response.body['random']?.toString() ??
               response.body['data']?['random']?.toString() ??
@@ -123,22 +130,18 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
       _currentStage = ContractFlowStage.waiting;
       _waitingSecondsRemaining = 90;
       _isCheckingStatus = false;
-      _statusMessage = 'waiting_merchant_nafath_code'.trParams({'code': _nafathCode});
     });
 
     // Realistic countdown timer (every 1 second)
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       if (_waitingSecondsRemaining > 1) {
-        setState(() {
-          _waitingSecondsRemaining--;
-        });
+        _waitingSecondsRemaining--;
       } else {
         timer.cancel();
         _pollTimer?.cancel();
         setState(() {
           _waitingSecondsRemaining = 0;
-          _errorMessage = 'nafath_timeout_no_confirmation'.tr;
           _currentStage = ContractFlowStage.failed;
         });
       }
@@ -179,18 +182,10 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
             if (mounted) {
               setState(() {
                 _isCheckingStatus = false;
-                _errorMessage = 'nafath_rejected_by_merchant'.tr;
                 _currentStage = ContractFlowStage.failed;
               });
             }
             return;
-          } else {
-            // Still pending in Nafath
-            if (mounted && isManual) {
-              setState(() {
-                _statusMessage = 'nafath_still_waiting'.trParams({'code': _nafathCode});
-              });
-            }
           }
         }
       }
@@ -789,252 +784,103 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
     );
   }
 
+  Widget _buildCleanHeader(Color iconColor, VoidCallback onBack) {
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: IconButton(
+          onPressed: onBack,
+          icon: Transform.flip(
+            flipX: !isRtl,
+            child: SvgPicture.asset(
+              'assets/image/figma_arrow_right.svg',
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   // =========================================================================
   // 3. Figma Frame 9146:10289: انتظار توثيق السند عبر نافذ
   // =========================================================================
   Widget _buildWaitingScreen(bool isDark) {
     final screenBg = isDark ? const Color(0xFF121418) : Colors.white;
-    final appBarBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final cardBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB);
     final darkText = isDark ? Colors.white : const Color(0xFF111B18);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
 
     return Scaffold(
       backgroundColor: screenBg,
-      appBar: AppBar(
-        backgroundColor: appBarBg,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: Icon(
-            Directionality.of(context) == TextDirection.rtl
-                ? Icons.arrow_forward_ios_rounded
-                : Icons.arrow_back_ios_new_rounded,
-            color: darkText,
-            size: 20,
-          ),
-          onPressed: () {
-            _countdownTimer?.cancel();
-            _pollTimer?.cancel();
-            setState(() {
-              _currentStage = ContractFlowStage.nafathCode;
-            });
-          },
-        ),
-        title: Text(
-          'waiting_nafath_verification'.tr,
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: darkText,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 10),
-
-            // Clock/Timer Illustration
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: SvgPicture.asset(
-                'assets/image/nafath_wait_clock.svg',
-                fit: BoxFit.contain,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Verification Code Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF163E20) : const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF2E7D32) : const Color(0xFF81C784),
-                  width: 1.5,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'nafath_verification_number'.tr,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? const Color(0xFF81C784) : const Color(0xFF237D2D),
+            _buildCleanHeader(darkText, () {
+              _countdownTimer?.cancel();
+              _pollTimer?.cancel();
+              setState(() {
+                _currentStage = ContractFlowStage.nafathCode;
+              });
+            }),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const Spacer(flex: 2),
+                    SvgPicture.asset(
+                      'assets/image/figma_nafath_waiting.svg',
+                      width: 188,
+                      height: 196,
+                      fit: BoxFit.contain,
                     ),
-                  ),
-                  Text(
-                    _nafathCode,
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: _primaryGreen,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Text(
-              'waiting_nafath_verification'.tr,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Tajawal',
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: darkText,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Countdown timer indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.timer_outlined, size: 16, color: _primaryGreen),
-                const SizedBox(width: 6),
-                Text(
-                  'remaining_time_seconds'.trParams({'seconds': '$_waitingSecondsRemaining'}),
-                  style: const TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: _primaryGreen,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Status feedback card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor, width: 0.8),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF59E0B),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      _statusMessage,
+                    const SizedBox(height: 41),
+                    Text(
+                      'waiting_nafath_verification'.tr,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: darkText.withValues(alpha: 0.9),
-                        height: 1.5,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                        height: 1.6,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Button 1: فحص حالة التوثيق الآن
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: _isCheckingStatus ? null : () => _checkNafathStatus(isManual: true),
-                icon: _isCheckingStatus
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.refresh_rounded, size: 20, color: Colors.white),
-                label: Text(
-                  _isCheckingStatus ? 'checking_status'.tr : 'check_nafath_status_now'.tr,
-                  style: const TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _primaryGreen,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Button 2: عرض العقد
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: OutlinedButton(
-                onPressed: () {
-                  _countdownTimer?.cancel();
-                  _pollTimer?.cancel();
-                  setState(() {
-                    _currentStage = ContractFlowStage.review;
-                  });
-                },
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: borderColor, width: 1.2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: Text(
-                  'view_contract'.tr,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: darkText,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Development / Test Simulation Action (Clear and explicit, never auto-triggers)
-            TextButton.icon(
-              onPressed: _applyContractSuccess,
-              icon: const Icon(Icons.verified_outlined, size: 16, color: Color(0xFF10B981)),
-              label: Text(
-                'quick_test_simulate_nafath'.tr,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF10B981),
-                  decoration: TextDecoration.underline,
+                    const Spacer(flex: 3),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _countdownTimer?.cancel();
+                          _pollTimer?.cancel();
+                          setState(() {
+                            _currentStage = ContractFlowStage.review;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _primaryGreen,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'view_contract'.tr,
+                          style: const TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
             ),
@@ -1049,140 +895,183 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   // =========================================================================
   Widget _buildSuccessScreen(bool isDark) {
     final screenBg = isDark ? const Color(0xFF121418) : Colors.white;
-    final cardBg = isDark ? const Color(0xFF1C2028) : const Color(0xFFF9FAFB);
+    final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
     final darkText = isDark ? Colors.white : const Color(0xFF111B18);
+    final valueText = isDark ? Colors.white : const Color(0xFF1F2937);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+    final dividerColor = isDark
+        ? const Color(0xFF2B3240)
+        : const Color(0xFFE5E7EB).withValues(alpha: 0.5);
 
     return Scaffold(
       backgroundColor: screenBg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            children: [
-              const Spacer(),
-
-              // Success Illustration
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: SvgPicture.asset(
-                  'assets/image/contract_signed_success.svg',
-                  fit: BoxFit.contain,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              Text(
-                'contract_signed_success'.tr,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: darkText,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Details Metadata Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: borderColor, width: 0.8),
-                ),
+        child: Column(
+          children: [
+            _buildCleanHeader(darkText, () => Get.back()),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
-                    _buildMetaRow('store_label'.tr, widget.visit.storeName, darkText, subText),
-                    Divider(color: borderColor, height: 18),
-                    _buildMetaRow('signing_date'.tr, _signedDate, darkText, subText),
-                    Divider(color: borderColor, height: 18),
-                    _buildMetaRow('signing_time'.tr, _signedTime, darkText, subText),
-                    Divider(color: borderColor, height: 18),
-                    _buildMetaRow('contract_number'.tr, _contractNumber, _primaryGreen, subText, isBold: true),
+                    const Spacer(flex: 2),
+                    SvgPicture.asset(
+                      'assets/image/figma_nafath_success.svg',
+                      width: 173,
+                      height: 110,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'contract_signed_success'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                        height: 1.6,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Details Metadata Card (Figma 9148:10529)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: isDark
+                            ? null
+                            : const [
+                                BoxShadow(
+                                  color: Color(0x0F000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: _buildMetaRow(
+                              'store_label'.tr,
+                              widget.visit.storeName,
+                              valueText,
+                              subText,
+                            ),
+                          ),
+                          Divider(color: dividerColor, height: 1, thickness: 1),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: _buildMetaRow(
+                              'signing_date'.tr,
+                              _signedDate,
+                              valueText,
+                              subText,
+                            ),
+                          ),
+                          Divider(color: dividerColor, height: 1, thickness: 1),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: _buildMetaRow(
+                              'signing_time'.tr,
+                              _signedTime,
+                              valueText,
+                              subText,
+                            ),
+                          ),
+                          Divider(color: dividerColor, height: 1, thickness: 1),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: _buildMetaRow(
+                              'contract_number'.tr,
+                              _contractNumber,
+                              valueText,
+                              subText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(flex: 3),
+                    // Primary Action Button: بدء الزيارة التالية (Figma 9148:10558)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (Get.isRegistered<StoreVisitsController>()) {
+                            final controller =
+                                Get.find<StoreVisitsController>();
+                            controller.setPipelineStep(
+                                StorePipelineStep.contractSigned);
+                            await controller.submitAndFinishVisit(
+                              targetVisit: widget.visit,
+                              isNafathVerified: true,
+                            );
+                            if (Get.isRegistered<ApiClient>()) {
+                              try {
+                                await Get.find<ApiClient>().postData(
+                                  '/api/v1/customer/marketer/contracts/confirm-nafath-signing',
+                                  {
+                                    'visit_id': int.tryParse(widget.visit.id) ?? widget.visit.id,
+                                    if (widget.visit.storeId != null)
+                                      'store_id': widget.visit.storeId,
+                                    if (_nafathRequestId != null && _nafathRequestId!.isNotEmpty)
+                                      'nafath_request_id': _nafathRequestId,
+                                    'national_id': _nafathNationalId ?? _getIdentifierForNafath(),
+                                    'owner_name': widget.visit.managerName.isNotEmpty
+                                        ? widget.visit.managerName
+                                        : widget.visit.storeName,
+                                    'store_name': widget.visit.storeName,
+                                    if (widget.visit.crNumber.isNotEmpty)
+                                      'cr_number': widget.visit.crNumber,
+                                    'contract_number': _contractNumber,
+                                  },
+                                );
+                              } catch (e) {
+                                debugPrint('confirm-nafath-signing error: $e');
+                              }
+                            }
+                            await controller.loadInActivationContracts();
+                            await controller.loadVisits();
+                          }
+                          if (Get.isRegistered<
+                              EmployeeNavigationController>()) {
+                            Get.find<EmployeeNavigationController>()
+                                .changeIndex(1);
+                          }
+                          Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _primaryGreen,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'start_next_visit'.tr,
+                          style: const TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-
-              const Spacer(),
-
-              // Primary Action Button: متابعة تفعيل المتجر
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (Get.isRegistered<StoreVisitsController>()) {
-                      final controller = Get.find<StoreVisitsController>();
-                      controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
-                      await controller.loadVisits();
-                    }
-                    final targetStoreId = widget.visit.storeId ?? (int.tryParse(widget.visit.id) ?? 0);
-                    Get.to(() => ContractActivationScreen(
-                      storeId: targetStoreId,
-                      storeName: widget.visit.storeName,
-                      contractNumber: _contractNumber,
-                    ));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryGreen,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(
-                    'track_store_activation'.tr,
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Secondary Action Button: بدء الزيارة التالية
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton(
-                  onPressed: () async {
-                    if (Get.isRegistered<StoreVisitsController>()) {
-                      final controller = Get.find<StoreVisitsController>();
-                      controller.setPipelineStep(StorePipelineStep.contractSigned);
-                      await controller.submitAndFinishVisit(targetVisit: widget.visit, isNafathVerified: true);
-                      await controller.loadVisits();
-                    }
-                    if (Get.isRegistered<EmployeeNavigationController>()) {
-                      Get.find<EmployeeNavigationController>().changeIndex(1);
-                    }
-                    Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: _primaryGreen),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(
-                    'start_next_visit'.tr,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: _primaryGreen,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -1194,84 +1083,77 @@ class _ContractSigningScreenState extends State<ContractSigningScreen> {
   Widget _buildFailedScreen(bool isDark) {
     final screenBg = isDark ? const Color(0xFF121418) : Colors.white;
     final darkText = isDark ? Colors.white : const Color(0xFF111B18);
-    final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Scaffold(
       backgroundColor: screenBg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-
-              Image.asset(
-                'assets/image/nafath_failed_icon.png',
-                width: 140,
-                height: 140,
-                fit: BoxFit.contain,
-              ),
-
-              const SizedBox(height: 24),
-
-              Text(
-                'failed_nafath_verification'.tr,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: darkText,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              Text(
-                _errorMessage ?? 'nafath_timeout_retry'.tr,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: subText,
-                  height: 1.5,
-                ),
-              ),
-
-              const Spacer(),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    _generateRandomNafathCode();
-                    _initiateNafathRequest();
-                    setState(() {
-                      _currentStage = ContractFlowStage.nafathCode;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryGreen,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(
-                    'send_code_again'.tr,
-                    style: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+        child: Column(
+          children: [
+            _buildCleanHeader(darkText, () {
+              setState(() {
+                _currentStage = ContractFlowStage.nafathCode;
+              });
+            }),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const Spacer(flex: 2),
+                    Image.asset(
+                      'assets/image/figma_nafath_failed.png',
+                      width: 243,
+                      height: 248,
+                      fit: BoxFit.contain,
                     ),
-                  ),
+                    const SizedBox(height: 38),
+                    Text(
+                      'failed_nafath_verification'.tr,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: darkText,
+                        height: 1.6,
+                      ),
+                    ),
+                    const Spacer(flex: 3),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _generateRandomNafathCode();
+                          _initiateNafathRequest();
+                          setState(() {
+                            _currentStage = ContractFlowStage.nafathCode;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _primaryGreen,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'send_code_again'.tr,
+                          style: const TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

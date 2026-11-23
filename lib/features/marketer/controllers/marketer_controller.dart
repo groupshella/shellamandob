@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/features/auth/domain/reposotories/auth_repository_interface.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/environment_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/auth/helper/qr_referral_token_storage.dart';
@@ -65,6 +66,13 @@ class MarketerController extends GetxController implements GetxService {
     _data = null;
     _isLoading = false;
     _isSubmitting = false;
+    try {
+      if (Get.isRegistered<SharedPreferences>()) {
+        Get.find<SharedPreferences>().remove(_cacheKey);
+      }
+    } catch (e) {
+      debugPrint('⚠️ [MarketerController] Error clearing cache: $e');
+    }
     update();
   }
 
@@ -75,12 +83,13 @@ class MarketerController extends GetxController implements GetxService {
   bool get isFreelance => marketerType == 'freelance' || (!isGrowthSpecialist && status == 'approved');
   bool get isRejectedSpecialistOfferedFreelance => _data?['rejected_as_specialist_offered_freelance'] == true;
 
-  String get code => (_data?['code'] ?? 'SHILLAH-R-0000').toString();
+  String get code => (_data?['code'] ?? '').toString();
   String get qrLink => (_data?['qr_link'] ?? '${EnvironmentConfig.baseUrl}/join?ref=$code').toString();
   String get appDeepLink => (_data?['app_deep_link'] ?? 'shella://join?ref=$code').toString();
   String get shareText => (_data?['share_text'] ?? 'حمّل تطبيق شلة واستخدم كودي $code واحصل على مكافأة! $qrLink').toString();
 
   double get balance => double.tryParse('${_data?['balance'] ?? 0}') ?? 0.0;
+  double get lifetimeEarnings => double.tryParse('${_data?['lifetime_earnings'] ?? _data?['total_earned'] ?? 0}') ?? 0.0;
   double get pendingBalance => double.tryParse('${_data?['pending_balance'] ?? 0}') ?? 0.0;
   int get pendingDays => int.tryParse('${_data?['pending_days'] ?? 0}') ?? 0;
   double get minTransferAmount => double.tryParse('${_data?['min_transfer_amount'] ?? 200}') ?? 200.0;
@@ -91,6 +100,7 @@ class MarketerController extends GetxController implements GetxService {
   int get registeredCustomers => int.tryParse('${_data?['registered_customers'] ?? _data?['acquired_customers'] ?? 0}') ?? 0;
   int get payingCustomers => int.tryParse('${_data?['paying_customers'] ?? 0}') ?? 0;
   int get totalScans => int.tryParse('${_data?['total_scans'] ?? 0}') ?? 0;
+  int get joinedMarketersCount => int.tryParse('${_data?['joined_marketers_count'] ?? _data?['sub_marketers_count'] ?? 0}') ?? 0;
   int get hesitantCustomers => int.tryParse('${_data?['hesitant_customers'] ?? 0}') ?? 0;
   int get kpiGrowthPct => int.tryParse('${_data?['kpi_growth_pct'] ?? 12}') ?? 12;
 
@@ -281,5 +291,84 @@ class MarketerController extends GetxController implements GetxService {
     _isSubmitting = false;
     update();
     return ok;
+  }
+
+  /// Fetch real withdrawal settings, saved bank info, and withdrawal history
+  Future<Map<String, dynamic>?> loadWithdrawals() async {
+    try {
+      final response = await apiClient.getData(
+        AppConstants.marketerWithdrawalsUri,
+        handleError: false,
+      );
+      if (response.statusCode == 200 && response.body is Map && response.body['data'] is Map) {
+        return Map<String, dynamic>.from(response.body['data'] as Map);
+      }
+    } catch (e) {
+      debugPrint('❌ [MarketerController] loadWithdrawals error: $e');
+    }
+    return null;
+  }
+
+  /// Submit a real bank withdrawal request to POST /api/v1/customer/marketer/withdraw
+  Future<({bool ok, String message})> submitWithdrawal({
+    required double amount,
+    required String bankName,
+    required String beneficiaryName,
+    required String iban,
+  }) async {
+    _isSubmitting = true;
+    update();
+    try {
+      final normalizedIban = iban.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+      final finalIban = normalizedIban.startsWith('SA') ? normalizedIban : 'SA$normalizedIban';
+      final response = await apiClient.postData(
+        AppConstants.marketerWithdrawUri,
+        {
+          'amount': amount,
+          'bank_name': bankName.trim(),
+          'beneficiary_name': beneficiaryName.trim(),
+          'iban': finalIban,
+        },
+        handleError: false,
+      );
+
+      final body = response.body is Map ? Map<String, dynamic>.from(response.body as Map) : <String, dynamic>{};
+      final message = body['message']?.toString() ?? '';
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (body['data'] is Map) {
+          final resData = Map<String, dynamic>.from(body['data'] as Map);
+          if (_data != null) {
+            if (resData['withdrawable_balance'] != null) {
+              _data!['balance'] = resData['withdrawable_balance'];
+              _data!['withdrawable_balance'] = resData['withdrawable_balance'];
+            }
+            if (resData['reserved_balance'] != null) {
+              _data!['reserved_balance'] = resData['reserved_balance'];
+            }
+            _saveToCache(_data!);
+          }
+        }
+        await loadDashboard();
+        _isSubmitting = false;
+        update();
+        return (
+          ok: true,
+          message: message.isNotEmpty ? message : 'transfer_request_sent_success'.tr,
+        );
+      }
+
+      _isSubmitting = false;
+      update();
+      return (
+        ok: false,
+        message: message.isNotEmpty ? message : 'something_went_wrong'.tr,
+      );
+    } catch (e) {
+      debugPrint('❌ [MarketerController] submitWithdrawal error: $e');
+      _isSubmitting = false;
+      update();
+      return (ok: false, message: 'something_went_wrong'.tr);
+    }
   }
 }

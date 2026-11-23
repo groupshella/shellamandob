@@ -3,6 +3,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'employee_leave_request_screen.dart';
 import 'employee_leave_status_screen.dart';
 import '../controllers/employee_vacations_controller.dart';
@@ -190,18 +191,11 @@ class EmployeeVacationsScreen extends StatelessWidget {
                           GetBuilder<EmployeeVacationsController>(
                             builder: (ctrl) {
                               if (ctrl.isLoading) {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 24),
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: _primaryGreen,
-                                      ),
-                                    ),
-                                  ),
+                                return SkeletonLoadingWidgets.listCardsSkeleton(
+                                  isDark: isDark,
+                                  itemCount: 3,
+                                  cardHeight: 72,
+                                  padding: EdgeInsets.zero,
                                 );
                               }
 

@@ -11,6 +11,7 @@ import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'active_store_visit_screen.dart';
 import 'visit_summary_screen.dart';
+import 'submit_visit_summary_screen.dart';
 
 class StoreVisitMapScreen extends StatefulWidget {
   final StoreVisitModel? visit;
@@ -646,7 +647,7 @@ class _StoreVisitMapScreenState extends State<StoreVisitMapScreen> {
                         controller.resumeVisit(visit);
                         Get.to(() => ActiveStoreVisitScreen(visit: visit));
                       } else if (visit.visitStatus == StoreVisitStatus.completed) {
-                        Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: true));
+                        Get.to(() => SubmitVisitSummaryScreen(visit: visit, isReadOnly: true));
                       } else if (visit.visitStatus == StoreVisitStatus.followUp) {
                         controller.resumeVisit(visit);
                         Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: false));

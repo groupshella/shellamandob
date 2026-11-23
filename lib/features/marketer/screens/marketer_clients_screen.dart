@@ -1,4 +1,5 @@
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
@@ -59,6 +60,9 @@ class _MarketerClientsScreenState extends State<MarketerClientsScreen> {
           body: SafeArea(
             child: GetBuilder<MarketerController>(
               builder: (c) {
+                if (c.isLoading && c.data == null) {
+                  return SkeletonLoadingWidgets.listCardsSkeleton(isDark: isDark, itemCount: 5);
+                }
                 final txns = c.transactions;
 
                 final filtered = txns.where((item) {

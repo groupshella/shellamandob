@@ -3,6 +3,8 @@ class DailyProductivityModel {
   final String dateFormatted;
   final ProductivityKpis kpis;
   final DailyTargetInfo dailyTarget;
+  final DailyTargetInfo monthlyStoresTarget;
+  final DailyTargetInfo monthlyMarketersTarget;
   final List<TimelineItem> timeline;
   final List<SignedAgreementItem> signedAgreements;
   final List<UpcomingFollowUpItem> upcomingFollowUps;
@@ -12,6 +14,8 @@ class DailyProductivityModel {
     required this.dateFormatted,
     required this.kpis,
     required this.dailyTarget,
+    required this.monthlyStoresTarget,
+    required this.monthlyMarketersTarget,
     required this.timeline,
     required this.signedAgreements,
     required this.upcomingFollowUps,
@@ -23,6 +27,14 @@ class DailyProductivityModel {
       dateFormatted: json['date_formatted']?.toString() ?? '',
       kpis: ProductivityKpis.fromJson(json['kpis'] ?? {}),
       dailyTarget: DailyTargetInfo.fromJson(json['daily_target'] ?? {}),
+      monthlyStoresTarget: DailyTargetInfo.fromJson(
+        json['monthly_stores_target'] ?? {},
+        defaultTarget: 120,
+      ),
+      monthlyMarketersTarget: DailyTargetInfo.fromJson(
+        json['monthly_marketers_target'] ?? {},
+        defaultTarget: 150,
+      ),
       timeline: (json['timeline'] as List<dynamic>?)
               ?.map((e) => TimelineItem.fromJson(e))
               .toList() ??
@@ -62,14 +74,14 @@ class ProductivityKpis {
 
   factory ProductivityKpis.fromJson(Map<String, dynamic> json) {
     return ProductivityKpis(
-      successfulVisits: (json['successful_visits'] as num?)?.toInt() ?? 12,
-      successfulVisitsText: json['successful_visits_text']?.toString() ?? '12 زيارة',
-      workHours: json['work_hours']?.toString() ?? '7س 40د',
-      workSeconds: (json['work_seconds'] as num?)?.toInt() ?? 27600,
-      warningsCount: (json['warnings_count'] as num?)?.toInt() ?? 1,
-      warningsText: json['warnings_text']?.toString() ?? '1 إنذار',
-      signedContracts: (json['signed_contracts'] as num?)?.toInt() ?? 2,
-      signedContractsText: json['signed_contracts_text']?.toString() ?? '2 اتفاقية',
+      successfulVisits: (json['successful_visits'] as num?)?.toInt() ?? 0,
+      successfulVisitsText: json['successful_visits_text']?.toString() ?? '0 زيارة',
+      workHours: json['work_hours']?.toString() ?? '0س 0د',
+      workSeconds: (json['work_seconds'] as num?)?.toInt() ?? 0,
+      warningsCount: (json['warnings_count'] as num?)?.toInt() ?? 0,
+      warningsText: json['warnings_text']?.toString() ?? '0 إنذار',
+      signedContracts: (json['signed_contracts'] as num?)?.toInt() ?? 0,
+      signedContractsText: json['signed_contracts_text']?.toString() ?? '0 اتفاقية',
     );
   }
 }
@@ -91,14 +103,18 @@ class DailyTargetInfo {
     required this.subtitle,
   });
 
-  factory DailyTargetInfo.fromJson(Map<String, dynamic> json) {
+  factory DailyTargetInfo.fromJson(Map<String, dynamic> json, {int defaultTarget = 8}) {
+    final target = (json['target'] as num?)?.toInt() ?? defaultTarget;
+    final achieved = (json['achieved'] as num?)?.toInt() ?? 0;
+    final remaining = (json['remaining'] as num?)?.toInt() ?? (target - achieved).clamp(0, target);
+    final pct = (json['percentage'] as num?)?.toInt() ?? (target > 0 ? ((achieved / target) * 100).round().clamp(0, 100) : 0);
     return DailyTargetInfo(
-      target: (json['target'] as num?)?.toInt() ?? 16,
-      achieved: (json['achieved'] as num?)?.toInt() ?? 12,
-      targetText: json['target_text']?.toString() ?? '16 / 12',
-      remaining: (json['remaining'] as num?)?.toInt() ?? 4,
-      percentage: (json['percentage'] as num?)?.toInt() ?? 75,
-      subtitle: json['subtitle']?.toString() ?? 'متبقي 4 زيارات — 75%',
+      target: target,
+      achieved: achieved,
+      targetText: json['target_text']?.toString() ?? '$target / $achieved',
+      remaining: remaining,
+      percentage: pct,
+      subtitle: json['subtitle']?.toString() ?? 'متبقي $remaining - $pct%',
     );
   }
 }
@@ -189,6 +205,7 @@ class PeriodProductivityModel {
   final PeriodKpis kpis;
   final List<PeriodDayItem> days;
   final List<SignedAgreementItem> signedAgreements;
+  final List<PreviousLeaveItem> previousLeaves;
   final PeriodSummaryInfo periodSummary;
 
   PeriodProductivityModel({
@@ -199,6 +216,7 @@ class PeriodProductivityModel {
     required this.kpis,
     required this.days,
     required this.signedAgreements,
+    this.previousLeaves = const [],
     required this.periodSummary,
   });
 
@@ -217,7 +235,43 @@ class PeriodProductivityModel {
               ?.map((e) => SignedAgreementItem.fromJson(e))
               .toList() ??
           [],
+      previousLeaves: (json['previous_leaves'] as List<dynamic>?)
+              ?.map((e) => PreviousLeaveItem.fromJson(e))
+              .toList() ??
+          [],
       periodSummary: PeriodSummaryInfo.fromJson(json['period_summary'] ?? {}),
+    );
+  }
+}
+
+class PreviousLeaveItem {
+  final int id;
+  final String type;
+  final String typeLabel;
+  final String status;
+  final String statusLabel;
+  final String dateAndDuration;
+  final int days;
+
+  PreviousLeaveItem({
+    required this.id,
+    required this.type,
+    required this.typeLabel,
+    required this.status,
+    required this.statusLabel,
+    required this.dateAndDuration,
+    required this.days,
+  });
+
+  factory PreviousLeaveItem.fromJson(Map<String, dynamic> json) {
+    return PreviousLeaveItem(
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      type: json['type']?.toString() ?? 'leave',
+      typeLabel: json['type_label']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'pending',
+      statusLabel: json['status_label']?.toString() ?? '',
+      dateAndDuration: json['date_and_duration']?.toString() ?? '',
+      days: (json['days'] as num?)?.toInt() ?? 1,
     );
   }
 }
@@ -239,11 +293,11 @@ class PeriodKpis {
 
   factory PeriodKpis.fromJson(Map<String, dynamic> json) {
     return PeriodKpis(
-      warningsCount: (json['warnings_count'] as num?)?.toInt() ?? 4,
-      warningsText: json['warnings_text']?.toString() ?? '4 إنذار',
-      workHours: json['work_hours']?.toString() ?? '7س 40د',
-      signedContracts: (json['signed_contracts'] as num?)?.toInt() ?? 2,
-      signedContractsText: json['signed_contracts_text']?.toString() ?? '2 اتفاقية',
+      warningsCount: (json['warnings_count'] as num?)?.toInt() ?? 0,
+      warningsText: json['warnings_text']?.toString() ?? '0',
+      workHours: json['work_hours']?.toString() ?? '00:00',
+      signedContracts: (json['signed_contracts'] as num?)?.toInt() ?? 0,
+      signedContractsText: json['signed_contracts_text']?.toString() ?? '0',
     );
   }
 }

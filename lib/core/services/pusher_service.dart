@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
@@ -7,10 +10,15 @@ import 'package:sixam_mart/api/api_client.dart';
 class PusherService extends GetxService {
   static PusherService get to => Get.find<PusherService>();
 
+  static const int _baseReconnectDelaySeconds = 2;
+  static const int _maxReconnectDelaySeconds = 30;
+
   late PusherChannelsClient pusher;
   String? socketId;
   final Map<String, Channel> _channels = {};
   bool _isInitialized = false;
+  Timer? _reconnectTimer;
+  int _reconnectAttempts = 0;
 
   Future<PusherService> init() async {
     if (_isInitialized) return this;
@@ -34,12 +42,31 @@ class PusherService extends GetxService {
     pusher = PusherChannelsClient.websocket(
       options: options,
       connectionErrorHandler: (exception, trace, refresh) {
-        if (kDebugMode) print('[PUSHER] Connection Error: $exception');
-        refresh();
+        if (_reconnectTimer?.isActive ?? false) {
+          return;
+        }
+        final exponent = _reconnectAttempts.clamp(0, 5);
+        final delaySeconds = min(
+          _baseReconnectDelaySeconds * (1 << exponent),
+          _maxReconnectDelaySeconds,
+        );
+        _reconnectAttempts++;
+        if (kDebugMode) {
+          print(
+            '[PUSHER] Connection Error: $exception (retrying in ${delaySeconds}s, attempt $_reconnectAttempts)',
+          );
+        }
+        _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
+          _reconnectTimer = null;
+          refresh();
+        });
       },
     );
 
     pusher.onConnectionEstablished.listen((_) {
+      _reconnectTimer?.cancel();
+      _reconnectTimer = null;
+      _reconnectAttempts = 0;
       socketId = pusher.socketId;
       if (kDebugMode) {
         print('[PUSHER] Connection Established. socketId=$socketId');
@@ -249,4 +276,11 @@ class PusherService extends GetxService {
   }
 
   String? getSocketId() => socketId;
+
+  @override
+  void onClose() {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    super.onClose();
+  }
 }

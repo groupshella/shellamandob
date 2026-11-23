@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/marketer_productivity_model.dart';
@@ -39,8 +39,17 @@ class DailyProductivityView extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // 2. Daily Target Progress Card (Figma 8954:2309 - borderRadius: 18px)
-              _buildDailyTargetCard(data.dailyTarget, cardBg, borderColor, textColor, subTextColor, isDark),
+              // 2. Three Targets Row (الهدف اليومي للزيارات | تارجت التجار شهرياً | تارجت شبكة المسوقين)
+              _buildTargetsRow(
+                dailyTarget: data.dailyTarget,
+                storesTarget: data.monthlyStoresTarget,
+                marketersTarget: data.monthlyMarketersTarget,
+                cardBg: cardBg,
+                borderColor: borderColor,
+                textColor: textColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+              ),
 
               const SizedBox(height: 12),
 
@@ -75,24 +84,9 @@ class DailyProductivityView extends StatelessWidget {
   ) {
     return Column(
       children: [
-        // Row 1: ساعات العمل & الزيارات الناجحة
+        // Row 1 (RTL): ساعات العمل (start/right) & الزيارات الناجحة (end/left)
         Row(
           children: [
-            Expanded(
-              child: _buildIndividualKpiCard(
-                title: 'successful_visits_label'.tr,
-                value: kpis.successfulVisitsText,
-                valueColor: const Color(0xFF30913F),
-                cardBg: cardBg,
-                borderColor: borderColor,
-                subTextColor: subTextColor,
-                isDark: isDark,
-                iconData: IconlyLight.tickSquare,
-                iconColor: const Color(0xFF30913F),
-                iconBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
-              ),
-            ),
-            const SizedBox(width: 8),
             Expanded(
               child: _buildIndividualKpiCard(
                 title: 'work_hours_label'.tr,
@@ -102,7 +96,22 @@ class DailyProductivityView extends StatelessWidget {
                 borderColor: borderColor,
                 subTextColor: subTextColor,
                 isDark: isDark,
-                iconData: IconlyLight.timeCircle,
+                svgAsset: 'assets/image/figma_prod_work_hours.svg',
+                iconColor: const Color(0xFF30913F),
+                iconBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildIndividualKpiCard(
+                title: 'successful_visits_label'.tr,
+                value: kpis.successfulVisitsText,
+                valueColor: const Color(0xFF30913F),
+                cardBg: cardBg,
+                borderColor: borderColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+                svgAsset: 'assets/image/figma_prod_visits.svg',
                 iconColor: const Color(0xFF30913F),
                 iconBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
               ),
@@ -111,24 +120,9 @@ class DailyProductivityView extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // Row 2: الإنذارات & الاتفاقيات الموقعة
+        // Row 2 (RTL): الاتفاقيات الموقعة (start/right) & الإنذارات (end/left)
         Row(
           children: [
-            Expanded(
-              child: _buildIndividualKpiCard(
-                title: 'warnings_label'.tr,
-                value: kpis.warningsText,
-                valueColor: const Color(0xFFDC2626),
-                cardBg: cardBg,
-                borderColor: borderColor,
-                subTextColor: subTextColor,
-                isDark: isDark,
-                iconData: IconlyBold.danger,
-                iconColor: const Color(0xFFDC2626),
-                iconBg: isDark ? const Color(0xFF3B1818) : const Color(0xFFFEE2E2),
-              ),
-            ),
-            const SizedBox(width: 8),
             Expanded(
               child: _buildIndividualKpiCard(
                 title: 'signed_agreements_label'.tr,
@@ -138,9 +132,24 @@ class DailyProductivityView extends StatelessWidget {
                 borderColor: borderColor,
                 subTextColor: subTextColor,
                 isDark: isDark,
-                iconData: IconlyLight.document,
+                svgAsset: 'assets/image/figma_prod_agreements.svg',
                 iconColor: const Color(0xFF7861A6),
                 iconBg: isDark ? const Color(0xFF2C203E) : const Color(0xFFF3E8FF),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildIndividualKpiCard(
+                title: 'warnings_label'.tr,
+                value: kpis.warningsText,
+                valueColor: const Color(0xFFDC2626),
+                cardBg: cardBg,
+                borderColor: borderColor,
+                subTextColor: subTextColor,
+                isDark: isDark,
+                svgAsset: 'assets/image/figma_prod_danger.svg',
+                iconColor: const Color(0xFFDC2626),
+                iconBg: isDark ? const Color(0xFF3B1818) : const Color(0xFFFEE2E2),
               ),
             ),
           ],
@@ -157,13 +166,13 @@ class DailyProductivityView extends StatelessWidget {
     required Color borderColor,
     required Color subTextColor,
     required bool isDark,
-    required IconData iconData,
+    required String svgAsset,
     required Color iconColor,
     required Color iconBg,
   }) {
     return Container(
       height: 68,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(18),
@@ -177,9 +186,24 @@ class DailyProductivityView extends StatelessWidget {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: SvgPicture.asset(
+              svgAsset,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+            ),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,40 +235,96 @@ class DailyProductivityView extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            alignment: Alignment.center,
-            child: Icon(
-              iconData,
-              size: 18,
-              color: iconColor,
-            ),
-          ),
         ],
       ),
     );
   }
 
-  // 2. Daily Target Progress Card (Figma Container 8954:2309 - 18px rounded)
-  Widget _buildDailyTargetCard(
-    DailyTargetInfo target,
-    Color cardBg,
-    Color borderColor,
-    Color textColor,
-    Color subTextColor,
-    bool isDark,
-  ) {
+  // 2. Three Targets Row (Figma: الهدف اليومي للزيارات | تارجت التجار شهرياً | تارجت شبكة المسوقين)
+  Widget _buildTargetsRow({
+    required DailyTargetInfo dailyTarget,
+    required DailyTargetInfo storesTarget,
+    required DailyTargetInfo marketersTarget,
+    required Color cardBg,
+    required Color borderColor,
+    required Color textColor,
+    required Color subTextColor,
+    required bool isDark,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _buildCompactTargetCard(
+            title: 'daily_visits_target_title'.tr,
+            target: dailyTarget,
+            unitText: 'visits_unit'.tr,
+            accentColor: const Color(0xFF30913F),
+            badgeBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
+            cardBg: cardBg,
+            borderColor: borderColor,
+            textColor: textColor,
+            subTextColor: subTextColor,
+            isDark: isDark,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildCompactTargetCard(
+            title: 'monthly_merchants_target_title'.tr,
+            target: storesTarget,
+            unitText: 'contracts_unit'.tr,
+            accentColor: const Color(0xFF30913F),
+            badgeBg: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
+            cardBg: cardBg,
+            borderColor: borderColor,
+            textColor: textColor,
+            subTextColor: subTextColor,
+            isDark: isDark,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildCompactTargetCard(
+            title: 'marketers_network_target_title'.tr,
+            target: marketersTarget,
+            unitText: 'marketers_unit'.tr,
+            accentColor: const Color(0xFF7861A6),
+            progressGradient: const LinearGradient(
+              colors: [Color(0xFF7861A6), Color(0xFFA188D1)],
+            ),
+            badgeBg: isDark ? const Color(0xFF2C203E) : const Color(0xFFF3E8FF),
+            cardBg: cardBg,
+            borderColor: borderColor,
+            textColor: textColor,
+            subTextColor: subTextColor,
+            isDark: isDark,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactTargetCard({
+    required String title,
+    required DailyTargetInfo target,
+    required String unitText,
+    required Color accentColor,
+    Gradient? progressGradient,
+    required Color badgeBg,
+    required Color cardBg,
+    required Color borderColor,
+    required Color textColor,
+    required Color subTextColor,
+    required bool isDark,
+  }) {
     final progress = (target.percentage / 100.0).clamp(0.0, 1.0);
 
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: 0.8),
         boxShadow: [
           BoxShadow(
@@ -254,56 +334,71 @@ class DailyProductivityView extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'daily_target_label'.tr,
-                style: TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                ),
+          SizedBox(
+            height: 34,
+            child: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: textColor,
+                height: 1.3,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF132D1B) : const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  target.targetText,
-                  style: const TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF30913F),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFE5E7EB),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
+          Container(
+            height: 6,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF252B37) : const Color(0xFFE5E7EB),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            alignment: AlignmentDirectional.centerStart,
+            child: FractionallySizedBox(
+              widthFactor: progress,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: progressGradient == null ? accentColor : null,
+                  gradient: progressGradient,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 8),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: badgeBg,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                target.targetText,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: accentColor,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
           Text(
-            target.subtitle,
+            '${'remaining_word'.tr} ${target.remaining} $unitText - ${target.percentage}%',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: 'Tajawal',
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: FontWeight.w500,
               color: subTextColor,
             ),
@@ -548,23 +643,35 @@ class DailyProductivityView extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isGreen
-                            ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
-                            : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        a.status,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: isGreen ? const Color(0xFF16A34A) : const Color(0xFFD97706),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isGreen
+                                ? (isDark ? const Color(0xFF1E3A2B) : const Color(0xFFDCFCE7))
+                                : (isDark ? const Color(0xFF3B2A15) : const Color(0xFFFEF3C7)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            a.status,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: isGreen ? const Color(0xFF16A34A) : const Color(0xFFD97706),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        SvgPicture.asset(
+                          'assets/image/figma_prod_arrow_left.svg',
+                          width: 14,
+                          height: 14,
+                          colorFilter: ColorFilter.mode(subTextColor, BlendMode.srcIn),
+                        ),
+                      ],
                     ),
                   ],
                 );

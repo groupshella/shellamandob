@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import '../../../../common/controllers/theme_controller.dart';
@@ -11,6 +12,7 @@ import '../widgets/cr_scanner_dialog.dart';
 import '../widgets/merchant_promo_library_bottom_sheet.dart';
 import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
+import 'submit_visit_summary_screen.dart';
 import '../widgets/store_visit_embedded_map_widget.dart';
 import '../widgets/decision_maker_card_widget.dart';
 import '../widgets/store_contacts_section_widget.dart';
@@ -118,16 +120,16 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     return GetBuilder<ThemeController>(
       builder: (themeCtrl) {
         final isDark = themeCtrl.darkTheme;
-        final screenBg =
-            isDark ? const Color(0xFF121418) : const Color(0xFFF8F9FA);
+        final isRtl = Directionality.of(context) == TextDirection.rtl;
+        final screenBg = isDark ? const Color(0xFF121418) : Colors.white;
         final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-        final darkText = isDark ? Colors.white : const Color(0xFF111827);
+        final darkText = isDark ? Colors.white : const Color(0xFF111B18);
         final subText =
-            isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+            isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555);
         final inputFill =
-            isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB);
+            isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
         final selectedBg =
-            isDark ? const Color(0xFF163E20) : const Color(0xFFF0FDF4);
+            isDark ? const Color(0xFF163E20) : const Color(0xFFEBFEEB);
         final unselectedBg =
             isDark ? const Color(0xFF252B37) : Colors.white;
         final unselectedBorder =
@@ -150,13 +152,24 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             return Scaffold(
               backgroundColor: screenBg,
               appBar: AppBar(
-                backgroundColor: cardBg,
-                elevation: 0.5,
+                backgroundColor: screenBg,
+                elevation: 0,
+                scrolledUnderElevation: 0,
                 centerTitle: true,
                 leading: IconButton(
-                  icon:
-                      Icon(Icons.arrow_back_ios_new, color: darkText, size: 20),
                   onPressed: () => Get.back(),
+                  icon: Transform.flip(
+                    flipX: !isRtl,
+                    child: SvgPicture.asset(
+                      'assets/image/figma_arrow_right.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        darkText,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
                 ),
                 title: Text(
                   'visit_summary'.tr,
@@ -401,17 +414,18 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(
-                                                  Icons.qr_code_scanner_rounded,
-                                                  size: 15,
-                                                  color: Color(0xFF30913F)),
+                                              SvgPicture.asset(
+                                                'assets/image/figma_summary_scan_barcode.svg',
+                                                width: 16,
+                                                height: 16,
+                                              ),
                                               const SizedBox(width: 4),
                                               Text(
                                                 'cr_scan_ocr_title'.tr,
                                                 style: const TextStyle(
                                                   fontFamily: 'Tajawal',
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
                                                   color: Color(0xFF30913F),
                                                 ),
                                               ),
@@ -802,7 +816,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Merchant Promo Library Interactive Card (Banner matching Figma Node 9710-47944 & 9688-27514)
+                    // Merchant Promo Library Interactive Card (Figma Node 9700:28146)
                     InkWell(
                       onTap: () {
                         MerchantPromoLibraryBottomSheet.show(
@@ -814,57 +828,67 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       },
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                         decoration: BoxDecoration(
-                          color: cardBg,
+                          color: isDark
+                              ? const Color(0xFF15261A)
+                              : const Color(0xFFF9FFF9),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: borderColor,
-                            width: 1.0,
-                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                              blurRadius: 6,
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.2 : 0.05),
+                              blurRadius: 5,
                               offset: const Offset(0, 2),
                             ),
                           ],
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.arrow_back_ios_new, size: 14, color: subText),
-                            const Spacer(),
+                            SvgPicture.asset(
+                              'assets/image/figma_summary_advertising.svg',
+                              width: 24,
+                              height: 24,
+                            ),
+                            const SizedBox(width: 8),
                             Expanded(
-                              flex: 10,
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'ready_offers_for_merchant'.tr,
-                                        style: TextStyle(
-                                          fontFamily: 'Tajawal',
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color: darkText,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Icon(Icons.campaign, color: _primaryGreen, size: 22),
-                                    ],
+                                  Text(
+                                    'ready_offers_for_merchant'.tr,
+                                    style: TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: darkText,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     'instant_promos_enable_desc'.tr,
                                     style: TextStyle(
                                       fontFamily: 'Tajawal',
-                                      fontSize: 11,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
                                       color: subText,
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Transform.flip(
+                              flipX: !isRtl,
+                              child: SvgPicture.asset(
+                                'assets/image/figma_visit_arrow_left.svg',
+                                width: 20,
+                                height: 20,
+                                colorFilter: ColorFilter.mode(
+                                  subText,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ),
                           ],
@@ -986,15 +1010,14 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x06000000),
-            blurRadius: 10,
+            color: Color(0x0D000000),
+            blurRadius: 5,
             offset: Offset(0, 2),
           ),
         ],
@@ -1060,28 +1083,22 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             ),
             filled: true,
             fillColor: readOnly
-                ? (isDark ? const Color(0xFF1E232D) : const Color(0xFFF9FAFB))
+                ? (isDark ? const Color(0xFF1E232D) : const Color(0xFFF6F5F8))
                 : inputFill,
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
-                width: 0.8,
-              ),
+              borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
-                width: 0.8,
-              ),
+              borderSide: BorderSide.none,
             ),
             focusedBorder: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
-              borderSide: BorderSide(color: _primaryGreen, width: 1.5),
+              borderSide: BorderSide(color: _primaryGreen, width: 1.2),
             ),
           ),
         ),
@@ -1581,41 +1598,50 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Action Buttons Row: تقرير سري + تواصل مع الإدارة
+            // Action Buttons Row: تواصل مع الإدارة + التقرير السري للمشرف (Figma 9700:28220)
             Row(
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: 46,
-                    child: OutlinedButton.icon(
+                    height: 50,
+                    child: ElevatedButton.icon(
                       onPressed: () => Get.to(() => const ChatScreen()),
-                      icon: const Icon(Icons.phone_in_talk_rounded,
-                          size: 16, color: _primaryGreen),
+                      icon: SvgPicture.asset(
+                        'assets/image/figma_summary_call.svg',
+                        width: 20,
+                        height: 20,
+                        colorFilter: ColorFilter.mode(
+                          isDark ? Colors.white : const Color(0xFF43474F),
+                          BlendMode.srcIn,
+                        ),
+                      ),
                       label: Text(
                         'chat_with_admin_btn'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: darkText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF43474F),
                         ),
                       ),
-                      style: OutlinedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: isDark
                             ? const Color(0xFF252B37)
-                            : Colors.white,
-                        side: BorderSide(color: borderColor, width: 1),
+                            : const Color(0xFFF6F6F6),
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: SizedBox(
-                    height: 46,
-                    child: OutlinedButton(
+                    height: 50,
+                    child: ElevatedButton(
                       onPressed: () => _showConfidentialReportBottomSheet(
                         context,
                         controller,
@@ -1625,11 +1651,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         darkText: darkText,
                         inputFill: inputFill,
                       ),
-                      style: OutlinedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: isDark
                             ? const Color(0xFF252B37)
-                            : Colors.white,
-                        side: BorderSide(color: borderColor, width: 1),
+                            : const Color(0xFFF6F6F6),
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
@@ -1637,9 +1663,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         'supervisor_confidential_report_btn'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: darkText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF43474F),
                         ),
                       ),
                     ),
@@ -1647,7 +1675,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
             // Frame 2085664369: متابعة لنتيجة الزيارة
             SizedBox(
@@ -1725,8 +1753,19 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                             : controller.reasonDisqualifiedController.text),
                   );
 
+                  final isTerminalNegative =
+                      controller.selectedPipelineStep ==
+                              StorePipelineStep.rejected ||
+                          controller.selectedPipelineStep ==
+                              StorePipelineStep.notQualified;
+
                   if (isContract) {
                     Get.to(() => ContractSigningScreen(visit: updatedVisit));
+                  } else if (isTerminalNegative) {
+                    Get.to(() => SubmitVisitSummaryScreen(
+                          visit: updatedVisit,
+                          cameDirectlyFromSummary: true,
+                        ));
                   } else {
                     Get.to(() => FollowUpTaskScreen(visit: updatedVisit));
                   }
@@ -1735,13 +1774,13 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                   backgroundColor: _primaryGreen,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(8)),
                 ),
                 child: Text(
                   'follow_up_to_visit_result_btn'.tr,
                   style: const TextStyle(
                     fontFamily: 'Tajawal',
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -1989,136 +2028,156 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
     final elapsedSec = controller.elapsedVisitSeconds;
     final progress = (elapsedSec / totalLimitSec).clamp(0.0, 1.0);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isExtended ? _primaryGreen.withValues(alpha: 0.5) : borderColor,
-          width: 1.0,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'visit_timer_title'.tr,
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: darkText,
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+        const SizedBox(height: 10),
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Left Side: Status Badge & Auto Extend Explanatory Subtitle
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Status Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: isCritical
-                        ? (isDark ? const Color(0xFF4C1D24) : const Color(0xFFFDE8E8))
-                        : (isExtended
-                            ? _primaryGreen.withValues(alpha: 0.15)
-                            : (isDark ? const Color(0xFF252B37) : const Color(0xFFEBFDF2))),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    isCritical
-                        ? 'max_visit_time_exceeded'.tr
-                        : (isExtended
-                            ? 'auto_visit_extension_success'.tr
-                            : '${'remaining_visit_time'.tr} $remainingMin ${'minute_unit'.tr}'),
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: isCritical
-                          ? const Color(0xFFE02D3C)
-                          : (isExtended ? _primaryGreen : const Color(0xFF166534)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Hint: يتم تمديد وقت الزيارة تلقائياً 30 دقيقة إضافية عند مرحلة التفاوض أو توقيع العقد
-                Text(
-                  'auto_extension_hint'.tr,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 11.5,
-                    color: subText,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // Right Side: Circular Timer with Elapsed Value & Label
-          SizedBox(
-            width: 72,
-            height: 72,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Background Track
-                SizedBox(
-                  width: 72,
-                  height: 72,
-                  child: CircularProgressIndicator(
-                    value: 1.0,
-                    strokeWidth: 5,
-                    color: isDark ? const Color(0xFF2B3240) : const Color(0xFFF1F3F5),
-                  ),
-                ),
-                // Active Progress Arc
-                SizedBox(
-                  width: 72,
-                  height: 72,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: 5,
-                    color: isCritical
-                        ? const Color(0xFFE02D3C)
-                        : (isExtended ? const Color(0xFF3B82F6) : _primaryGreen),
-                    strokeCap: StrokeCap.round,
-                  ),
-                ),
-                // Center Text (Time & "مضى")
-                Column(
-                  mainAxisSize: MainAxisSize.min,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Circular Timer (100x100) on start/right (Figma 9689:27676)
+              SizedBox(
+                width: 96,
+                height: 96,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Text(
-                      controller.formattedVisitTime,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: darkText,
+                    SizedBox(
+                      width: 96,
+                      height: 96,
+                      child: CircularProgressIndicator(
+                        value: 1.0,
+                        strokeWidth: 7,
+                        color: isDark
+                            ? const Color(0xFF2B3240)
+                            : const Color(0xFFE5E7EB),
                       ),
                     ),
+                    SizedBox(
+                      width: 96,
+                      height: 96,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        strokeWidth: 7,
+                        color: isCritical
+                            ? const Color(0xFFD2272F)
+                            : (isExtended
+                                ? const Color(0xFF3B82F6)
+                                : _primaryGreen),
+                        strokeCap: StrokeCap.round,
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          controller.formattedVisitTime,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: darkText,
+                            height: 1.15,
+                          ),
+                        ),
+                        Text(
+                          'elapsed_label'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 9,
+                            color: isDark
+                                ? const Color(0xFF9CA3AF)
+                                : const Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Status Badge & Auto Extend Subtitle (Figma 9689:27693)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isCritical
+                            ? (isDark
+                                ? const Color(0xFF4C1D24)
+                                : const Color(0xFFFBE3E1))
+                            : (isExtended
+                                ? _primaryGreen.withValues(alpha: 0.15)
+                                : (isDark
+                                    ? const Color(0xFF252B37)
+                                    : const Color(0xFFEBFEEB))),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        isCritical
+                            ? 'max_visit_time_exceeded'.tr
+                            : (isExtended
+                                ? 'auto_visit_extension_success'.tr
+                                : '${'remaining_visit_time'.tr} $remainingMin ${'minute_unit'.tr}'),
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: isCritical
+                              ? const Color(0xFFD2272F)
+                              : (isExtended
+                                  ? _primaryGreen
+                                  : const Color(0xFF30913F)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     Text(
-                      'elapsed_label'.tr,
+                      'auto_extension_hint'.tr,
                       style: TextStyle(
                         fontFamily: 'Tajawal',
-                        fontSize: 9.5,
-                        color: subText,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? const Color(0xFF9CA3AF)
+                            : const Color(0xFF707784),
+                        height: 1.5,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

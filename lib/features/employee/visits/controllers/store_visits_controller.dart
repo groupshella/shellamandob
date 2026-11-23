@@ -56,8 +56,15 @@ class StoreVisitsController extends GetxController {
   List<Map<String, dynamic>> get alertHistory => _alertHistory;
 
   bool isAlertsLogExpanded = false;
+  bool isActiveAlertDismissed = false;
+
   void toggleAlertsLog() {
     isAlertsLogExpanded = !isAlertsLogExpanded;
+    update();
+  }
+
+  void dismissActiveAlert() {
+    isActiveAlertDismissed = true;
     update();
   }
 
@@ -67,6 +74,7 @@ class StoreVisitsController extends GetxController {
       'time': time,
       'level': level,
     });
+    isActiveAlertDismissed = false;
     update();
   }
 
@@ -1104,6 +1112,8 @@ class StoreVisitsController extends GetxController {
             'decision_maker_best_time': updated.decisionMakerBestTime,
             'interviewed_person_role': updated.interviewedPersonRole,
             'pipeline_step': updated.pipelineStep.name,
+            'interest_status': _selectedInterestStatus,
+            'selected_promo': updated.selectedPromo,
             'visit_status': updated.visitStatus == StoreVisitStatus.followUp
                 ? 'follow_up'
                 : (updated.visitStatus == StoreVisitStatus.inProgress ? 'in_progress' : 'completed'),
@@ -1145,6 +1155,51 @@ class StoreVisitsController extends GetxController {
     }
 
     return true;
+  }
+
+  /// Fetch pre-visit details including supervisor recommendations & previous visit outcome
+  Future<Map<String, dynamic>?> fetchVisitDetails(String visitId) async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData(
+          '${AppConstants.marketerVisitsUri}/$visitId/details',
+        );
+        if (res.statusCode == 200 && res.body != null && res.body['data'] is Map) {
+          return Map<String, dynamic>.from(res.body['data']);
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] fetchVisitDetails error: $e');
+    }
+    return null;
+  }
+
+  /// Fetch real AI visit intelligence analysis from backend before final submission
+  Future<Map<String, dynamic>?> analyzeVisitSummary(StoreVisitModel visit) async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().postData(
+          '${AppConstants.marketerVisitsUri}/${visit.id}/analyze',
+          {
+            'pipeline_step': visit.pipelineStep.name,
+            'interest_status': visit.interestStatus ?? _selectedInterestStatus,
+            'obstacles_notes': visit.obstaclesNotes ?? obstaclesController.text.trim(),
+            'next_follow_up_commitments': visit.nextFollowUpCommitments ?? commitmentsController.text.trim(),
+            'selected_promo': visit.selectedPromo ?? '',
+            'closing_reason': visit.closingReason ?? _selectedClosingReason ?? '',
+            'duration_minutes': _elapsedVisitSeconds > 0 ? (_elapsedVisitSeconds / 60).ceil() : visit.durationMinutes,
+            'decision_maker_phone': visit.decisionMakerPhone ?? decisionMakerPhoneController.text.trim(),
+            'phone': visit.phone,
+          },
+        );
+        if (res.statusCode == 200 && res.body != null && res.body['data'] is Map) {
+          return Map<String, dynamic>.from(res.body['data']);
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] analyzeVisitSummary error: $e');
+    }
+    return null;
   }
 
   // =========================================================================
@@ -1229,7 +1284,11 @@ class StoreVisitsController extends GetxController {
     return false;
   }
 
+  bool isInActivationListLoading = false;
+
   Future<void> loadInActivationContracts() async {
+    isInActivationListLoading = true;
+    update();
     try {
       if (Get.isRegistered<ApiClient>()) {
         final res = await Get.find<ApiClient>().getData('${AppConstants.contractActivationUri}/in-activation');
@@ -1237,11 +1296,13 @@ class StoreVisitsController extends GetxController {
           inActivationContracts = (res.body['data'] as List)
               .map((i) => ContractActivationModel.fromJson(Map<String, dynamic>.from(i)))
               .toList();
-          update();
         }
       }
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] loadInActivationContracts error: $e');
+    } finally {
+      isInActivationListLoading = false;
+      update();
     }
   }
 

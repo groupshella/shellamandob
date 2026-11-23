@@ -101,6 +101,8 @@ class StoreVisitModel {
   final int extendedMinutes;
   final DateTime? startedAt;
   final DateTime? completedAt;
+  final String visitType; // 'first_time' | 'follow_up'
+  final String? selectedPromo;
 
   const StoreVisitModel({
     required this.id,
@@ -139,7 +141,11 @@ class StoreVisitModel {
     this.extendedMinutes = 0,
     this.startedAt,
     this.completedAt,
+    this.visitType = 'first_time',
+    this.selectedPromo,
   });
+
+  bool get isFollowUpVisit => visitType == 'follow_up' || visitStatus == StoreVisitStatus.followUp;
 
   StoreVisitModel copyWith({
     String? id,
@@ -178,6 +184,8 @@ class StoreVisitModel {
     int? extendedMinutes,
     DateTime? startedAt,
     DateTime? completedAt,
+    String? visitType,
+    String? selectedPromo,
   }) {
     return StoreVisitModel(
       id: id ?? this.id,
@@ -216,6 +224,8 @@ class StoreVisitModel {
       extendedMinutes: extendedMinutes ?? this.extendedMinutes,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
+      visitType: visitType ?? this.visitType,
+      selectedPromo: selectedPromo ?? this.selectedPromo,
     );
   }
 
@@ -320,6 +330,9 @@ class StoreVisitModel {
               : 0),
       startedAt: json['started_at'] != null ? DateTime.tryParse('${json['started_at']}') : null,
       completedAt: json['completed_at'] != null ? DateTime.tryParse('${json['completed_at']}') : null,
+      visitType: json['visit_type']?.toString() ??
+          (status == StoreVisitStatus.followUp ? 'follow_up' : 'first_time'),
+      selectedPromo: json['selected_promo']?.toString(),
     );
   }
 }

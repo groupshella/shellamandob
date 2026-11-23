@@ -561,4 +561,407 @@ class SkeletonLoadingWidgets {
       ),
     );
   }
+<<<<<<< Updated upstream
+=======
+
+  /// Helper card wrapper for consistent themed shimmer containers
+  static Widget _themedCard({
+    required Widget child,
+    bool isDark = false,
+    double borderRadius = 18,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+    EdgeInsetsGeometry? margin,
+  }) {
+    return Container(
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C2028) : Colors.white,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
+          width: 0.8,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  /// Skeleton for Daily Productivity View (Figma 8949:41979)
+  static Widget productivityDailySkeleton({bool isDark = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 2x2 KPI Grid
+          Row(
+            children: [
+              Expanded(child: shimmerBox(height: 68, borderRadius: 18, isDark: isDark)),
+              const SizedBox(width: 8),
+              Expanded(child: shimmerBox(height: 68, borderRadius: 18, isDark: isDark)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(child: shimmerBox(height: 68, borderRadius: 18, isDark: isDark)),
+              const SizedBox(width: 8),
+              Expanded(child: shimmerBox(height: 68, borderRadius: 18, isDark: isDark)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // 3 Targets Row
+          Row(
+            children: [
+              Expanded(child: shimmerBox(height: 118, borderRadius: 16, isDark: isDark)),
+              const SizedBox(width: 8),
+              Expanded(child: shimmerBox(height: 118, borderRadius: 16, isDark: isDark)),
+              const SizedBox(width: 8),
+              Expanded(child: shimmerBox(height: 118, borderRadius: 16, isDark: isDark)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Timeline Card
+          _themedCard(
+            isDark: isDark,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                shimmerBox(height: 16, width: 110, borderRadius: 6, isDark: isDark),
+                const SizedBox(height: 14),
+                for (int i = 0; i < 3; i++) ...[
+                  Row(
+                    children: [
+                      shimmerBox(height: 10, width: 10, borderRadius: 5, isDark: isDark),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            shimmerBox(height: 10, width: 65, borderRadius: 4, isDark: isDark),
+                            const SizedBox(height: 6),
+                            shimmerBox(height: 14, width: double.infinity, borderRadius: 6, isDark: isDark),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (i < 2) const SizedBox(height: 14),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Signed Agreements Card
+          _themedCard(
+            isDark: isDark,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                shimmerBox(height: 16, width: 130, borderRadius: 6, isDark: isDark),
+                const SizedBox(height: 12),
+                shimmerBox(height: 44, width: double.infinity, borderRadius: 10, isDark: isDark),
+                const SizedBox(height: 8),
+                shimmerBox(height: 44, width: double.infinity, borderRadius: 10, isDark: isDark),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Upcoming Follow-ups Card
+          _themedCard(
+            isDark: isDark,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    shimmerBox(height: 16, width: 120, borderRadius: 6, isDark: isDark),
+                    shimmerBox(height: 14, width: 60, borderRadius: 6, isDark: isDark),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                shimmerBox(height: 68, width: double.infinity, borderRadius: 10, isDark: isDark),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Skeleton for Period Productivity View (Figma 8956:3247)
+  static Widget productivityPeriodSkeleton({bool isDark = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Target Progress + 3 Mini Badges
+          _themedCard(
+            isDark: isDark,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    shimmerBox(height: 16, width: 110, borderRadius: 6, isDark: isDark),
+                    shimmerBox(height: 22, width: 56, borderRadius: 12, isDark: isDark),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                shimmerBox(height: 8, width: double.infinity, borderRadius: 4, isDark: isDark),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(child: shimmerBox(height: 54, borderRadius: 12, isDark: isDark)),
+                    const SizedBox(width: 8),
+                    Expanded(child: shimmerBox(height: 54, borderRadius: 12, isDark: isDark)),
+                    const SizedBox(width: 8),
+                    Expanded(child: shimmerBox(height: 54, borderRadius: 12, isDark: isDark)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Day Accordion Cards
+          for (int i = 0; i < 3; i++) ...[
+            shimmerBox(height: 62, width: double.infinity, borderRadius: 18, isDark: isDark),
+            const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 4),
+          // Signed Agreements & Previous Leaves Cards
+          shimmerBox(height: 120, width: double.infinity, borderRadius: 18, isDark: isDark),
+          const SizedBox(height: 12),
+          shimmerBox(height: 110, width: double.infinity, borderRadius: 18, isDark: isDark),
+          const SizedBox(height: 12),
+          // Period Summary 2x3 Grid
+          _themedCard(
+            isDark: isDark,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                shimmerBox(height: 16, width: 110, borderRadius: 6, isDark: isDark),
+                const SizedBox(height: 12),
+                for (int r = 0; r < 3; r++) ...[
+                  Row(
+                    children: [
+                      Expanded(child: shimmerBox(height: 62, borderRadius: 12, isDark: isDark)),
+                      const SizedBox(width: 10),
+                      Expanded(child: shimmerBox(height: 62, borderRadius: 12, isDark: isDark)),
+                    ],
+                  ),
+                  if (r < 2) const SizedBox(height: 10),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Skeleton for Sub-Marketer Profile Screen
+  static Widget subMarketerProfileSkeleton({bool isDark = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _themedCard(
+            isDark: isDark,
+            child: Row(
+              children: [
+                shimmerBox(height: 56, width: 56, borderRadius: 28, isDark: isDark),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      shimmerBox(height: 16, width: 140, borderRadius: 6, isDark: isDark),
+                      const SizedBox(height: 8),
+                      shimmerBox(height: 12, width: 100, borderRadius: 4, isDark: isDark),
+                    ],
+                  ),
+                ),
+                shimmerBox(height: 26, width: 64, borderRadius: 12, isDark: isDark),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          shimmerBox(height: 116, width: double.infinity, borderRadius: 18, isDark: isDark),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(child: shimmerBox(height: 78, borderRadius: 16, isDark: isDark)),
+              const SizedBox(width: 10),
+              Expanded(child: shimmerBox(height: 78, borderRadius: 16, isDark: isDark)),
+            ],
+          ),
+          const SizedBox(height: 14),
+          for (int i = 0; i < 3; i++) ...[
+            shimmerBox(height: 72, width: double.infinity, borderRadius: 16, isDark: isDark),
+            const SizedBox(height: 10),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Skeleton for Shella Lessons List Screen
+  static Widget lessonsListSkeleton({bool isDark = false}) {
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 5,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (_, __) => _themedCard(
+        isDark: isDark,
+        borderRadius: 16,
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            shimmerBox(height: 68, width: 104, borderRadius: 12, isDark: isDark),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  shimmerBox(height: 15, width: double.infinity, borderRadius: 6, isDark: isDark),
+                  const SizedBox(height: 8),
+                  shimmerBox(height: 12, width: 120, borderRadius: 4, isDark: isDark),
+                  const SizedBox(height: 8),
+                  shimmerBox(height: 11, width: 70, borderRadius: 4, isDark: isDark),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Skeleton for Vacations / Leave Balance Screen
+  static Widget vacationsSkeleton({bool isDark = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(child: shimmerBox(height: 92, borderRadius: 16, isDark: isDark)),
+              const SizedBox(width: 10),
+              Expanded(child: shimmerBox(height: 92, borderRadius: 16, isDark: isDark)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          shimmerBox(height: 48, width: double.infinity, borderRadius: 14, isDark: isDark),
+          const SizedBox(height: 16),
+          for (int i = 0; i < 4; i++) ...[
+            shimmerBox(height: 76, width: double.infinity, borderRadius: 16, isDark: isDark),
+            const SizedBox(height: 10),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Skeleton for Visit Detail / Report / Contract Activation Screen
+  static Widget visitDetailSkeleton({bool isDark = false}) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          shimmerBox(height: 110, width: double.infinity, borderRadius: 18, isDark: isDark),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: shimmerBox(height: 74, borderRadius: 16, isDark: isDark)),
+              const SizedBox(width: 10),
+              Expanded(child: shimmerBox(height: 74, borderRadius: 16, isDark: isDark)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          shimmerBox(height: 140, width: double.infinity, borderRadius: 18, isDark: isDark),
+          const SizedBox(height: 12),
+          shimmerBox(height: 110, width: double.infinity, borderRadius: 18, isDark: isDark),
+        ],
+      ),
+    );
+  }
+
+  /// Skeleton for Generic List Cards (Objections, Zones, Activations, Requests, Stores)
+  static Widget listCardsSkeleton({
+    bool isDark = false,
+    int itemCount = 5,
+    double cardHeight = 86,
+    double borderRadius = 16,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+  }) {
+    return ListView.separated(
+      padding: padding,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: itemCount,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (_, __) => _themedCard(
+        isDark: isDark,
+        borderRadius: borderRadius,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                shimmerBox(height: 15, width: 150, borderRadius: 6, isDark: isDark),
+                shimmerBox(height: 22, width: 64, borderRadius: 10, isDark: isDark),
+              ],
+            ),
+            const SizedBox(height: 10),
+            shimmerBox(height: 12, width: double.infinity, borderRadius: 4, isDark: isDark),
+            if (cardHeight > 78) ...[
+              const SizedBox(height: 6),
+              shimmerBox(height: 12, width: 180, borderRadius: 4, isDark: isDark),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Compact Inline Card Shimmer (e.g., AI Visit Analysis card)
+  static Widget inlineCardSkeleton({bool isDark = false, double height = 110}) {
+    return _themedCard(
+      isDark: isDark,
+      borderRadius: 16,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              shimmerBox(height: 16, width: 140, borderRadius: 6, isDark: isDark),
+              shimmerBox(height: 22, width: 58, borderRadius: 10, isDark: isDark),
+            ],
+          ),
+          const SizedBox(height: 12),
+          shimmerBox(height: 12, width: double.infinity, borderRadius: 4, isDark: isDark),
+          const SizedBox(height: 8),
+          shimmerBox(height: 12, width: 200, borderRadius: 4, isDark: isDark),
+        ],
+      ),
+    );
+  }
+>>>>>>> Stashed changes
 }

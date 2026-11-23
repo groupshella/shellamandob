@@ -5,6 +5,7 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
@@ -20,6 +21,8 @@ import 'package:sixam_mart/features/employee/visits/models/store_visit_model.dar
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'employee_vacations_screen.dart';
+import 'shella_lessons_screen.dart';
+import 'supervisor_recommendations_screen.dart';
 import 'growth_specialist_earnings_screen.dart';
 import '../controllers/monthly_earnings_controller.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_dashboard_screen.dart';
@@ -221,19 +224,7 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
         if (isLoggedIn &&
             profileCtrl.userInfoModel == null &&
             profileCtrl.isLoading) {
-          return Container(
-            height: 92,
-            decoration: BoxDecoration(
-              color: cardBg,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: _primaryGreen,
-                strokeWidth: 2.5,
-              ),
-            ),
-          );
+          return SkeletonLoadingWidgets.inlineCardSkeleton(isDark: isDark, height: 92);
         }
 
         final userInfo = profileCtrl.userInfoModel;
@@ -660,6 +651,44 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen> {
                   subText: subText,
                   arrowColor: arrowColor,
                   onTap: () => Get.to(() => const EmployeeVacationsScreen()),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Lessons & Supervisor Recommendations Card (دروس شلة + توصيات المشرف — per Figma)
+          Container(
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x08000000),
+                  blurRadius: 8.9,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                _buildRowItem(
+                  icon: Icons.play_circle_outline_rounded,
+                  title: 'shella_lessons_title'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () => Get.to(() => const ShellaLessonsScreen()),
+                ),
+                _buildDivider(dividerColor),
+                _buildRowItem(
+                  icon: IconlyLight.document,
+                  title: 'supervisor_recommendations_title'.tr,
+                  darkText: darkText,
+                  subText: subText,
+                  arrowColor: arrowColor,
+                  onTap: () =>
+                      Get.to(() => const SupervisorRecommendationsScreen()),
                 ),
               ],
             ),

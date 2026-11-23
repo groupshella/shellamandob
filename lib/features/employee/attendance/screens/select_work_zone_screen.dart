@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_header.dart';
 import '../controllers/attendance_controller.dart';
 import '../models/work_zone_model.dart';
@@ -44,11 +45,7 @@ class SelectWorkZoneScreen extends StatelessWidget {
               child: GetBuilder<AttendanceController>(
                 builder: (controller) {
                   if (controller.isLoadingZones) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(_primaryGreen),
-                      ),
-                    );
+                    return SkeletonLoadingWidgets.listCardsSkeleton(isDark: isDark, itemCount: 5);
                   }
 
                   return Column(

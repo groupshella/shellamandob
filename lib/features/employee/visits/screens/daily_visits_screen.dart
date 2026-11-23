@@ -7,7 +7,9 @@ import '../../../../core/widgets/skeleton_loading_widgets.dart';
 import '../controllers/store_visits_controller.dart';
 import '../models/store_visit_model.dart';
 import 'visit_summary_screen.dart';
+import 'submit_visit_summary_screen.dart';
 import 'active_store_visit_screen.dart';
+import 'store_visit_detail_screen.dart';
 import 'store_visit_map_screen.dart';
 import 'contract_signing_screen.dart';
 import '../../attendance/screens/select_work_zone_screen.dart';
@@ -397,7 +399,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
               controller.resumeVisit(visit);
               Get.to(() => ContractSigningScreen(visit: visit));
             } else if (visit.visitStatus == StoreVisitStatus.completed) {
-              Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: true));
+              Get.to(() => SubmitVisitSummaryScreen(visit: visit, isReadOnly: true));
             } else if (visit.visitStatus == StoreVisitStatus.followUp) {
               controller.resumeVisit(visit);
               Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: false));
@@ -616,7 +618,7 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
         height: 44,
         child: ElevatedButton(
           onPressed: () {
-            Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: true));
+            Get.to(() => SubmitVisitSummaryScreen(visit: visit, isReadOnly: true));
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: btnGreyBg,
@@ -638,34 +640,6 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
       );
     }
 
-    if (visit.visitStatus == StoreVisitStatus.followUp) {
-      return SizedBox(
-        height: 44,
-        child: ElevatedButton(
-          onPressed: () {
-            controller.resumeVisit(visit);
-            Get.to(() => VisitSummaryScreen(visit: visit, isReadOnly: false));
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _primaryGreen,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: Text(
-            _tr('follow_up_action', 'متابعة المتجر'),
-            style: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      );
-    }
-
     if (visit.visitStatus == StoreVisitStatus.inProgress) {
       return SizedBox(
         height: 44,
@@ -681,57 +655,100 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: Text(
-            _tr('resume_visit', 'متابعة الزيارة'),
-            style: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                _tr('resume_visit', 'متابعة الزيارة'),
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
+            ],
           ),
         ),
       );
     }
 
-    // Scheduled or Follow-up visit
+    // Scheduled or Follow-up visit: Two side-by-side buttons [بدء الزيارة] + [التفاصيل]
     final isGreen = isPrimaryAction;
-    return SizedBox(
-      height: 44,
-      child: ElevatedButton(
-        onPressed: () {
-          if (!controller.canStartVisit(showWarning: true)) {
-            return;
-          }
-          _showStartVisitConfirmationBottomSheet(
-            context,
-            visit,
-            controller,
-            cardBg: cardBg,
-            darkText: darkText,
-            subText: subText,
-            btnGreyBg: btnGreyBg,
-            btnGreyText: btnGreyText,
-            isDark: isDark,
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isGreen ? _primaryGreen : btnGreyBg,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: 44,
+            child: ElevatedButton(
+              onPressed: () {
+                if (!controller.canStartVisit(showWarning: true)) {
+                  return;
+                }
+                _showStartVisitConfirmationBottomSheet(
+                  context,
+                  visit,
+                  controller,
+                  cardBg: cardBg,
+                  darkText: darkText,
+                  subText: subText,
+                  btnGreyBg: btnGreyBg,
+                  btnGreyText: btnGreyText,
+                  isDark: isDark,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isGreen ? _primaryGreen : btnGreyBg,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                _tr('start_visit_action', 'بدء الزيارة'),
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: isGreen ? Colors.white : btnGreyText,
+                ),
+              ),
+            ),
           ),
         ),
-        child: Text(
-          _tr('start_visit_action', 'بدء الزيارة'),
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: isGreen ? Colors.white : btnGreyText,
+        const SizedBox(width: 10),
+        Expanded(
+          child: SizedBox(
+            height: 44,
+            child: OutlinedButton(
+              onPressed: () {
+                Get.to(() => StoreVisitDetailScreen(visit: visit));
+              },
+              style: OutlinedButton.styleFrom(
+                backgroundColor: isDark ? const Color(0xFF252B37) : const Color(0xFFF8F9FA),
+                side: BorderSide(
+                  color: isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB),
+                ),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                _tr('details_btn', 'التفاصيل'),
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: darkText,
+                ),
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -868,36 +885,32 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
         backgroundColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
       );
     }
-    return _getStatusConfig(visit.visitStatus, isDark);
-  }
-
-  _StatusConfig _getStatusConfig(StoreVisitStatus status, bool isDark) {
-    switch (status) {
-      case StoreVisitStatus.scheduled:
-        return _StatusConfig(
-          label: _tr('upcoming_single', 'قادمة'),
-          textColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6),
-          backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
-        );
-      case StoreVisitStatus.inProgress:
-        return _StatusConfig(
-          label: _tr('in_progress_single', 'جارية'),
-          textColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF30913F),
-          backgroundColor: isDark ? const Color(0xFF14532D) : const Color(0xFFECFDF5),
-        );
-      case StoreVisitStatus.completed:
-        return _StatusConfig(
-          label: _tr('completed_single', 'مكتملة'),
-          textColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
-          backgroundColor: isDark ? const Color(0xFF14532D) : const Color(0xFFDCFCE7),
-        );
-      case StoreVisitStatus.followUp:
-        return _StatusConfig(
-          label: _tr('needs_follow_up', 'متابعة مطلوبة'),
-          textColor: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6),
-          backgroundColor: isDark ? const Color(0xFF3B1F56) : const Color(0xFFDFD3F5),
-        );
+    if (visit.visitStatus == StoreVisitStatus.inProgress) {
+      return _StatusConfig(
+        label: _tr('in_progress_single', 'جارية'),
+        textColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF30913F),
+        backgroundColor: isDark ? const Color(0xFF14532D) : const Color(0xFFECFDF5),
+      );
     }
+    if (visit.visitStatus == StoreVisitStatus.completed) {
+      return _StatusConfig(
+        label: _tr('completed_single', 'مكتملة'),
+        textColor: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
+        backgroundColor: isDark ? const Color(0xFF14532D) : const Color(0xFFDCFCE7),
+      );
+    }
+    if (visit.isFollowUpVisit) {
+      return _StatusConfig(
+        label: _tr('follow_up_label', 'متابعة'),
+        textColor: isDark ? const Color(0xFFC084FC) : const Color(0xFF7861A6),
+        backgroundColor: isDark ? const Color(0xFF3B1F56) : const Color(0xFFEDE9FE),
+      );
+    }
+    return _StatusConfig(
+      label: _tr('first_time_badge', 'أول مرة'),
+      textColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6),
+      backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+    );
   }
 }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 
@@ -91,10 +91,11 @@ class ProductivityHeader extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Icon(
-                        IconlyLight.calendar,
-                        size: 20,
-                        color: textColor,
+                      SvgPicture.asset(
+                        'assets/image/figma_prod_calendar.svg',
+                        width: 18,
+                        height: 18,
+                        colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
                       ),
                     ],
                   ),

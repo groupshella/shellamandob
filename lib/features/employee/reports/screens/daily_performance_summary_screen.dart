@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import '../controllers/marketer_productivity_controller.dart';
 import '../widgets/productivity_header.dart';
 import '../widgets/productivity_calendar_picker.dart';
@@ -25,6 +26,8 @@ class DailyPerformanceSummaryScreen extends StatelessWidget {
                 : (controller.periodData?.dateRangeFormatted ?? '');
 
             final canPop = Navigator.canPop(context);
+            final isPeriod = controller.viewMode == ProductivityViewMode.period;
+            final hasActiveData = isPeriod ? controller.periodData != null : controller.dailyData != null;
 
             return Scaffold(
               backgroundColor: scaffoldBg,
@@ -50,29 +53,29 @@ class DailyPerformanceSummaryScreen extends StatelessWidget {
                         onClose: controller.toggleCalendar,
                       ),
 
-                    // Main Content (Daily or Period)
+                    // Main Content (Shimmer while loading, Error Retry, or Real Data)
                     Expanded(
-                      child: controller.isLoading && controller.dailyData == null && controller.periodData == null
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF30913F),
-                              ),
-                            )
-                          : RefreshIndicator(
-                              color: const Color(0xFF30913F),
-                              onRefresh: () => controller.fetchProductivity(),
-                              child: controller.viewMode == ProductivityViewMode.daily
-                                  ? (controller.dailyData != null
-                                      ? DailyProductivityView(data: controller.dailyData!)
-                                      : const SizedBox.shrink())
-                                  : (controller.periodData != null
-                                      ? PeriodProductivityView(
-                                          data: controller.periodData!,
-                                          expandedDayIndex: controller.expandedDayIndex,
-                                          onDayToggle: controller.toggleDayExpanded,
-                                        )
-                                      : const SizedBox.shrink()),
-                            ),
+                      child: controller.isLoading && !hasActiveData
+                          ? (isPeriod
+                              ? SkeletonLoadingWidgets.productivityPeriodSkeleton(isDark: isDark)
+                              : SkeletonLoadingWidgets.productivityDailySkeleton(isDark: isDark))
+                          : (!hasActiveData && controller.hasError)
+                              ? _buildRetryState(controller, isDark)
+                              : RefreshIndicator(
+                                  color: const Color(0xFF30913F),
+                                  onRefresh: () => controller.fetchProductivity(),
+                                  child: isPeriod
+                                      ? (controller.periodData != null
+                                          ? PeriodProductivityView(
+                                              data: controller.periodData!,
+                                              expandedDayIndex: controller.expandedDayIndex,
+                                              onDayToggle: controller.toggleDayExpanded,
+                                            )
+                                          : SkeletonLoadingWidgets.productivityPeriodSkeleton(isDark: isDark))
+                                      : (controller.dailyData != null
+                                          ? DailyProductivityView(data: controller.dailyData!)
+                                          : SkeletonLoadingWidgets.productivityDailySkeleton(isDark: isDark)),
+                                ),
                     ),
                   ],
                 ),
@@ -81,6 +84,51 @@ class DailyPerformanceSummaryScreen extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  Widget _buildRetryState(MarketerProductivityController controller, bool isDark) {
+    final textColor = isDark ? Colors.white : const Color(0xFF111B18);
+    final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_rounded, size: 48, color: subTextColor),
+            const SizedBox(height: 12),
+            Text(
+              'something_went_wrong'.tr,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => controller.fetchProductivity(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF30913F),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                'retry_btn'.tr,
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

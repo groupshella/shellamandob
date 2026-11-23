@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/features/employee/network/controllers/my_network_controller.dart';
 import 'package:sixam_mart/features/employee/network/models/network_models.dart';
 import 'package:sixam_mart/features/employee/network/screens/marketers_list_screen.dart';
+import 'package:sixam_mart/features/employee/network/screens/sub_marketer_profile_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
@@ -671,7 +672,12 @@ class _MyNetworkScreenState extends State<MyNetworkScreen> {
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () {
-        Get.to(() => const MarketersListScreen(initialFilter: 'idle'));
+        Get.to(
+          () => SubMarketerProfileScreen(
+            marketerId: item.marketerId,
+            fallbackName: item.name,
+          ),
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),

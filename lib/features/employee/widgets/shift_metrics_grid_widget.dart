@@ -26,7 +26,11 @@ class ShiftMetricsGridWidget extends StatelessWidget {
     return GetBuilder<EmployeeShiftController>(
       builder: (controller) {
         final model = controller.shiftModel;
-        final bool showValues = controller.status != ShiftStatus.notStarted;
+        final bool hasWorkedToday = model.actualWorkSeconds > 0 ||
+            (model.startTimeText.trim().isNotEmpty &&
+                model.startTimeText.trim() != '--:--');
+        final bool showValues =
+            controller.status != ShiftStatus.notStarted || hasWorkedToday;
         final String currentDate =
             DateFormat('d MMMM y', Get.locale?.languageCode ?? 'ar').format(DateTime.now());
 
@@ -63,7 +67,11 @@ class ShiftMetricsGridWidget extends StatelessWidget {
                       id: EmployeeShiftController.timerClockUpdateId,
                       builder: (timerCtrl) {
                         final currentWorkTime = timerCtrl.shiftModel.localizedWorkedTime;
-                        final currentShowValues = timerCtrl.status != ShiftStatus.notStarted;
+                        final currentShowValues =
+                            timerCtrl.status != ShiftStatus.notStarted ||
+                                timerCtrl.shiftModel.actualWorkSeconds > 0 ||
+                                (timerCtrl.shiftModel.startTimeText.trim().isNotEmpty &&
+                                    timerCtrl.shiftModel.startTimeText.trim() != '--:--');
                         return _buildMetricCard(
                           date: currentDate,
                           title: 'work_time'.tr,

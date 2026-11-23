@@ -234,7 +234,11 @@ class AppConstants {
   static const String marketerLocationPingUri = '/api/v1/customer/marketer/location/ping';
   static const String marketerDashboardUri = '/api/v1/customer/marketer/dashboard';
   static const String marketerApplyUri = '/api/v1/customer/marketer/apply';
+  static const String marketerWithdrawalsUri = '/api/v1/customer/marketer/withdrawals';
+  static const String marketerWithdrawUri = '/api/v1/customer/marketer/withdraw';
   static const String marketerVisitsUri = '/api/v1/customer/marketer/visits';
+  static const String marketerLessonsUri = '/api/v1/customer/marketer/lessons';
+  static const String marketerMerchantObjectionsUri = '/api/v1/customer/marketer/merchant-objections';
   static const String marketerVisitsStoreUri = '/api/v1/customer/marketer/visits/store';
   static const String contractActivationUri = '/api/v1/customer/marketer/contracts';
   static const String marketerProductivityUri = '/api/v1/customer/marketer/productivity';

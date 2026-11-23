@@ -8,6 +8,9 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import '../models/employee_shift_model.dart';
 import '../models/employee_warning_model.dart';
+import '../models/training_lesson_model.dart';
+import '../screens/account_frozen_screen.dart';
+import '../screens/employee_main_screen.dart';
 import '../services/marketer_shift_service.dart';
 import '../visits/controllers/store_visits_controller.dart';
 
@@ -21,6 +24,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
   int? currentShiftId;
   int? currentZoneId;
   bool isLoading = false;
+  bool hasLoadedOnce = false;
 
   Timer? _tickerTimer;
   Timer? _pollingTimer;
@@ -195,6 +199,41 @@ class EmployeeShiftController extends GetxController implements GetxService {
           followUpVisits = int.tryParse('${vs['needs_follow_up'] ?? vs['follow_up']}') ?? 0;
         }
 
+        // 8. Monthly Acquisition Targets (Stores & Marketers)
+        int storesTarget = _shiftModel.storesTarget;
+        int storesAchieved = _shiftModel.storesAchieved;
+        int storesRemaining = _shiftModel.storesRemaining;
+        int storesPercent = _shiftModel.storesPercent;
+        int marketersTarget = _shiftModel.marketersTarget;
+        int marketersAchieved = _shiftModel.marketersAchieved;
+        int marketersRemaining = _shiftModel.marketersRemaining;
+        int marketersPercent = _shiftModel.marketersPercent;
+
+        if (data['targets'] is Map) {
+          final t = data['targets'];
+          if (t['monthly_stores'] is Map) {
+            final ms = t['monthly_stores'];
+            storesTarget = int.tryParse('${ms['target']}') ?? storesTarget;
+            storesAchieved = int.tryParse('${ms['achieved']}') ?? 0;
+            storesRemaining = int.tryParse('${ms['remaining']}') ?? (storesTarget - storesAchieved).clamp(0, storesTarget);
+            storesPercent = int.tryParse('${ms['percentage']}') ?? 0;
+          }
+          if (t['monthly_marketers'] is Map) {
+            final mm = t['monthly_marketers'];
+            marketersTarget = int.tryParse('${mm['target']}') ?? marketersTarget;
+            marketersAchieved = int.tryParse('${mm['achieved']}') ?? 0;
+            marketersRemaining = int.tryParse('${mm['remaining']}') ?? (marketersTarget - marketersAchieved).clamp(0, marketersTarget);
+            marketersPercent = int.tryParse('${mm['percentage']}') ?? 0;
+          }
+        }
+
+        DailyPerformanceReportModel? performanceReport = _shiftModel.performanceReport;
+        if (data['performance_report'] is Map) {
+          performanceReport = DailyPerformanceReportModel.fromJson(
+            Map<String, dynamic>.from(data['performance_report']),
+          );
+        }
+
         _shiftModel = _shiftModel.copyWith(
           status: mappedStatus,
           employeeName: employeeName.isNotEmpty ? employeeName : _shiftModel.employeeName,
@@ -213,7 +252,26 @@ class EmployeeShiftController extends GetxController implements GetxService {
           followUpVisits: followUpVisits,
           warnings: warningsList,
           warningCount: warningCount,
+          storesTarget: storesTarget,
+          storesAchieved: storesAchieved,
+          storesRemaining: storesRemaining,
+          storesPercent: storesPercent,
+          marketersTarget: marketersTarget,
+          marketersAchieved: marketersAchieved,
+          marketersRemaining: marketersRemaining,
+          marketersPercent: marketersPercent,
+          performanceReport: performanceReport,
         );
+
+        if (data['account_frozen'] == true) {
+          final reason = data['freeze_reason']?.toString();
+          if (Get.currentRoute != '/AccountFrozenScreen') {
+            Get.offAll(() => AccountFrozenScreen(freezeReason: reason));
+          }
+          return;
+        } else if (Get.currentRoute == '/AccountFrozenScreen') {
+          Get.offAll(() => const EmployeeMainScreen());
+        }
 
         if (mappedStatus == ShiftStatus.active || mappedStatus == ShiftStatus.onBreak) {
           _startPolling();
@@ -227,6 +285,11 @@ class EmployeeShiftController extends GetxController implements GetxService {
       }
     } catch (e) {
       debugPrint('❌ [EmployeeShiftController] loadCurrentShift error: $e');
+    } finally {
+      if (!hasLoadedOnce) {
+        hasLoadedOnce = true;
+        if (notify) update();
+      }
     }
   }
 

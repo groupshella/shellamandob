@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
+import 'package:sixam_mart/features/employee/screens/account_frozen_screen.dart';
 import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_main_screen.dart';
 import 'package:sixam_mart/features/marketer/screens/marketer_intro_screen.dart';
@@ -55,6 +56,12 @@ class _MarketerScreenState extends State<MarketerScreen> {
               return const EmployeeMainScreen();
             }
             return const MarketerMainScreen();
+          case 'suspended':
+          case 'frozen':
+          case 'deactivate':
+            return AccountFrozenScreen(
+              freezeReason: controller.data?['freeze_reason']?.toString(),
+            );
           case 'pending':
             return const MarketerPendingScreen();
           case 'none':

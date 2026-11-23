@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
 
-/// Bottom Sheet for Pending Balance (Figma 9054:70215 - الرصيد المعلق)
+/// Bottom Sheet for Pending Balance (Figma 9632:35312 - الرصيد المعلق)
 class MarketerPendingBalanceSheet extends StatelessWidget {
   const MarketerPendingBalanceSheet({super.key});
 
   static const Color _primaryGreen = Color(0xFF30913F);
+  static const Color _amberColor = Color(0xFFF5A623);
   static const Color _darkText = Color(0xFF111B18);
 
   static Future<void> show(BuildContext context) {
@@ -23,133 +25,118 @@ class MarketerPendingBalanceSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
-    final boxBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
-    final borderColor = isDark ? const Color(0xFF2C3240) : const Color(0xFFEEEEEE);
+    final headlineColor = isDark ? Colors.white : _darkText;
 
     return GetBuilder<MarketerController>(
       builder: (c) {
-        final pendingAmount = c.pendingBalance > 0
-            ? c.pendingBalance.toStringAsFixed(0)
-            : '450';
+        final pendingAmount = c.pendingBalance.toStringAsFixed(0);
         final remainingDays = c.pendingDays > 0 ? c.pendingDays : 4;
-        
-        // Calculate total commissions or fallback to 1,340
-        double totalComm = c.balance + (c.pendingBalance > 0 ? c.pendingBalance : 450);
-        final totalDisplay = totalComm > 0
-            ? totalComm.toStringAsFixed(0).replaceAllMapped(
-                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')
-            : '1,340';
+
+        final double totalComm = c.lifetimeEarnings > 0
+            ? c.lifetimeEarnings
+            : (c.balance + c.pendingBalance);
+        final totalDisplay = totalComm.toStringAsFixed(0).replaceAllMapped(
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
 
         return Container(
           decoration: BoxDecoration(
             color: cardBg,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           child: SafeArea(
             top: false,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Drag handle
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Header with title and close icon (Figma 9054:70216)
+                // 1. Header: Title centered + Close SVG button (Figma 9632:35313)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'pending_balance_modal_title'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : _darkText,
+                    const SizedBox(width: 28),
+                    Expanded(
+                      child: Text(
+                        'pending_balance_modal_title'.tr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: headlineColor,
+                        ),
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: boxBg,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          size: 18,
-                          color: isDark ? Colors.white70 : const Color(0xFF6B7280),
+                      child: SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: Center(
+                          child: SvgPicture.asset(
+                            'assets/image/figma_bank_close.svg',
+                            width: 25,
+                            height: 25,
+                            colorFilter: isDark
+                                ? const ColorFilter.mode(Colors.white70, BlendMode.srcIn)
+                                : null,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
-                // 2 Stat Boxes (Figma 9054:70221)
+                // 2. Two Stat Boxes (Figma 9632:35318)
+                // In RTL: Right box = إجمالي العمولات (green), Left box = معلّق (amber)
                 Row(
                   children: [
-                    // Box 1: Pending Balance (Figma 9054:70230)
+                    // Right Box in RTL: إجمالي العمولات (Figma 9632:35319)
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                        height: 92,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: boxBg,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: borderColor),
+                          color: isDark ? const Color(0xFF132D1B) : const Color(0xFFEBFEEB),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0x8C3EC856),
+                            width: 0.8,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'filter_pending'.tr,
-                              style: TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SarCurrencyWidget(
-                                  size: 18,
-                                  color: isDark ? Colors.white : _darkText,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  pendingAmount,
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: isDark ? Colors.white : _darkText,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '${'remaining_days'.tr} $remainingDays ${'days'.tr}',
+                              'total_commissions_label'.tr,
                               style: const TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: _primaryGreen,
                               ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  totalDisplay,
+                                  style: const TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w800,
+                                    color: _primaryGreen,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const SarCurrencyWidget(
+                                  size: 22,
+                                  color: _primaryGreen,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -157,54 +144,62 @@ class MarketerPendingBalanceSheet extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
 
-                    // Box 2: Total Commissions (Figma 9054:70222)
+                    // Left Box in RTL: معلّق (Figma 9632:35327)
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                        height: 92,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: boxBg,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: borderColor),
+                          color: isDark
+                              ? const Color(0xFF332512)
+                              : const Color(0x2EF5A623),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0x4DF5A623),
+                            width: 0.8,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'total_commissions_label'.tr,
-                              style: TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SarCurrencyWidget(
-                                  size: 18,
-                                  color: isDark ? Colors.white : _darkText,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  totalDisplay,
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: isDark ? Colors.white : _darkText,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'SAR',
+                              'filter_pending'.tr,
                               style: TextStyle(
                                 fontFamily: 'Tajawal',
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
-                                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9E9E9E),
+                                color: _amberColor.withValues(alpha: 0.85),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  pendingAmount,
+                                  style: const TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w800,
+                                    color: _amberColor,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const SarCurrencyWidget(
+                                  size: 22,
+                                  color: _amberColor,
+                                ),
+                              ],
+                            ),
+                            Text(
+                              '${'remaining_days'.tr} $remainingDays ${'days'.tr}',
+                              style: const TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: _amberColor,
                               ),
                             ),
                           ],
@@ -213,42 +208,23 @@ class MarketerPendingBalanceSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 24),
 
-                // Explanatory note (Figma 9054:70240)
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF132E1B).withValues(alpha: 0.5)
-                        : const Color(0xFFEBFEEB),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.info_outline_rounded,
-                        color: _primaryGreen,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'pending_balance_modal_desc'.tr,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 12,
-                            height: 1.4,
-                            fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF1B6B2B),
-                          ),
-                        ),
-                      ),
-                    ],
+                // 3. Explanatory Note Text (Figma 9632:35337)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    'pending_balance_modal_desc'.tr,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 16,
+                      height: 1.6,
+                      fontWeight: FontWeight.w500,
+                      color: headlineColor,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
               ],
             ),
           ),

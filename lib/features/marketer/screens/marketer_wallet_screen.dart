@@ -1,4 +1,5 @@
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
@@ -58,6 +59,9 @@ class _MarketerWalletScreenState extends State<MarketerWalletScreen> {
           body: SafeArea(
             child: GetBuilder<MarketerController>(
               builder: (c) {
+                if (c.isLoading && c.data == null) {
+                  return SkeletonLoadingWidgets.vacationsSkeleton(isDark: isDark);
+                }
                 final txns = c.transactions;
                 final filtered = txns.where((t) {
                   if (_selectedTabIndex == 0) return true;

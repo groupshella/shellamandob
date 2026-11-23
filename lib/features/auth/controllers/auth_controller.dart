@@ -16,6 +16,8 @@ import 'package:sixam_mart/features/auth/domain/models/signup_body_model.dart';
 import 'package:sixam_mart/features/auth/domain/models/otp_auth_models.dart';
 import 'package:sixam_mart/features/auth/domain/services/auth_service_interface.dart';
 import 'package:sixam_mart/features/verification/screens/verification_screen.dart';
+import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
+import 'package:sixam_mart/features/employee/controllers/employee_navigation_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -288,6 +290,13 @@ class AuthController extends GetxController implements GetxService {
   void _postAuthSuccessSetup() {
     debugPrint('✅ Auth successful - starting guest cart transfer process');
 
+    if (Get.isRegistered<MarketerController>()) {
+      Get.find<MarketerController>().reset();
+    }
+    if (Get.isRegistered<EmployeeNavigationController>()) {
+      Get.find<EmployeeNavigationController>().changeIndex(0);
+    }
+
     // ⚡ PERFORMANCE FIX: Clear loading state immediately for instant UI update
     // Cart transfer will happen in background without blocking navigation
     _isLoading = false;
@@ -408,8 +417,12 @@ class AuthController extends GetxController implements GetxService {
     // setModule(null), and (c) left HomeScreen's "module == null" guard stuck
     // on an infinite loader after login and after any hot-restart-triggered
     // logout. The module stays selected; only auth/session data is cleared.
-
-
+    if (Get.isRegistered<MarketerController>()) {
+      Get.find<MarketerController>().reset();
+    }
+    if (Get.isRegistered<EmployeeNavigationController>()) {
+      Get.find<EmployeeNavigationController>().changeIndex(0);
+    }
 
     return await authServiceInterface.clearSharedData(removeToken: removeToken);
   }

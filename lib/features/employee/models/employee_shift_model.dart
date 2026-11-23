@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'employee_warning_model.dart';
+import 'training_lesson_model.dart';
 
 enum ShiftStatus {
   notStarted, // لم يبدأ الدوام
@@ -25,6 +26,16 @@ class EmployeeShiftModel {
   final int followUpVisits;
   final List<EmployeeWarningModel> warnings;
   final int warningCount;
+  // Monthly acquisition targets (Home screen progress cards)
+  final int storesTarget;
+  final int storesAchieved;
+  final int storesRemaining;
+  final int storesPercent;
+  final int marketersTarget;
+  final int marketersAchieved;
+  final int marketersRemaining;
+  final int marketersPercent;
+  final DailyPerformanceReportModel? performanceReport;
 
   const EmployeeShiftModel({
     this.status = ShiftStatus.notStarted,
@@ -44,6 +55,15 @@ class EmployeeShiftModel {
     this.followUpVisits = 0,
     this.warnings = const [],
     this.warningCount = 0,
+    this.storesTarget = 120,
+    this.storesAchieved = 0,
+    this.storesRemaining = 120,
+    this.storesPercent = 0,
+    this.marketersTarget = 150,
+    this.marketersAchieved = 0,
+    this.marketersRemaining = 150,
+    this.marketersPercent = 0,
+    this.performanceReport,
   });
 
   EmployeeShiftModel copyWith({
@@ -64,6 +84,15 @@ class EmployeeShiftModel {
     int? followUpVisits,
     List<EmployeeWarningModel>? warnings,
     int? warningCount,
+    int? storesTarget,
+    int? storesAchieved,
+    int? storesRemaining,
+    int? storesPercent,
+    int? marketersTarget,
+    int? marketersAchieved,
+    int? marketersRemaining,
+    int? marketersPercent,
+    DailyPerformanceReportModel? performanceReport,
   }) {
     return EmployeeShiftModel(
       status: status ?? this.status,
@@ -83,6 +112,15 @@ class EmployeeShiftModel {
       followUpVisits: followUpVisits ?? this.followUpVisits,
       warnings: warnings ?? this.warnings,
       warningCount: warningCount ?? this.warningCount,
+      storesTarget: storesTarget ?? this.storesTarget,
+      storesAchieved: storesAchieved ?? this.storesAchieved,
+      storesRemaining: storesRemaining ?? this.storesRemaining,
+      storesPercent: storesPercent ?? this.storesPercent,
+      marketersTarget: marketersTarget ?? this.marketersTarget,
+      marketersAchieved: marketersAchieved ?? this.marketersAchieved,
+      marketersRemaining: marketersRemaining ?? this.marketersRemaining,
+      marketersPercent: marketersPercent ?? this.marketersPercent,
+      performanceReport: performanceReport ?? this.performanceReport,
     );
   }
 

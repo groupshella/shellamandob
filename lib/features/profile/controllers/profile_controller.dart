@@ -211,12 +211,11 @@ class ProfileController extends GetxController implements GetxService {
             RouteHelper.getVerificationRoute(null, updateUserModel.email!, '', '', null, '', updateUserModel: updateUserModel));
       }
     } else if (responseModel.isSuccess && responseModel.updateProfileResponseModel == null) {
-      if (Get.isDialogOpen!) {
+      if (Get.isDialogOpen ?? false) {
         Get.back<void>();
       }
-      await getUserInfo();
+      await getUserInfo(forceRefresh: true);
       if (Get.context == null || !ResponsiveHelper.isDesktop(Get.context!)) {
-        Get.back<void>();
         Get.back<void>();
       }
       _pickedFile = null;

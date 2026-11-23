@@ -5,8 +5,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/store_visit_model.dart';
 import '../controllers/store_visits_controller.dart';
-import '../../../../helper/route_helper.dart';
-import '../../controllers/employee_navigation_controller.dart';
+import 'submit_visit_summary_screen.dart';
 
 class FollowUpTaskScreen extends StatefulWidget {
   final StoreVisitModel visit;
@@ -883,23 +882,16 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
       if (_notesController.text.trim().isNotEmpty) {
         controller.obstaclesController.text = _notesController.text.trim();
       }
-      await controller.submitAndFinishVisit(targetVisit: widget.visit);
-      await controller.loadVisits();
     }
 
-    Get.snackbar(
-      'follow_up_scheduled_success'.tr,
-      widget.visit.storeName,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFFECFDF5),
-      colorText: _primaryGreen,
-      margin: const EdgeInsets.all(16),
-      duration: const Duration(seconds: 3),
+    final reviewVisit = widget.visit.copyWith(
+      closingReason: finalReason,
+      nextFollowUpDate: combinedDateTime,
+      obstaclesNotes: _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : widget.visit.obstaclesNotes,
     );
 
-    if (Get.isRegistered<EmployeeNavigationController>()) {
-      Get.find<EmployeeNavigationController>().changeIndex(1);
-    }
-    Get.offAllNamed(RouteHelper.getEmployeeMainRoute());
+    Get.to(() => SubmitVisitSummaryScreen(visit: reviewVisit));
   }
 }

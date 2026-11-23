@@ -21,16 +21,19 @@ class _MarketersListScreenState extends State<MarketersListScreen> {
   @override
   void initState() {
     super.initState();
-    final controller = Get.find<MyNetworkController>();
-    if (widget.initialFilter != 'all') {
-      controller.setFilter(widget.initialFilter);
-    } else {
-      if (controller.selectedFilter != 'all') {
-        controller.setFilter('all');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !Get.isRegistered<MyNetworkController>()) return;
+      final controller = Get.find<MyNetworkController>();
+      if (widget.initialFilter != 'all') {
+        controller.setFilter(widget.initialFilter);
       } else {
-        controller.fetchMarketers();
+        if (controller.selectedFilter != 'all') {
+          controller.setFilter('all');
+        } else {
+          controller.fetchMarketers();
+        }
       }
-    }
+    });
   }
 
   @override

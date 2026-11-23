@@ -1,10 +1,12 @@
 // ignore_for_file: deprecated_member_use
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import '../controllers/store_visits_controller.dart';
 import '../domain/models/contract_activation_model.dart';
 
@@ -43,11 +45,12 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Get.find<ThemeController>().darkTheme;
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final Color screenBg = isDark ? const Color(0xFF111827) : Colors.white;
     final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final Color textDark = isDark ? Colors.white : const Color(0xFF111827);
-    final Color textSub = isDark ? const Color(0xFF94A3B8) : const Color(0xFF6B7280);
-    final Color borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6);
+    final Color textDark = isDark ? Colors.white : const Color(0xFF111B18);
+    final Color textSub = isDark ? const Color(0xFF94A3B8) : const Color(0xFF555555);
+    final Color borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE5E9E5);
 
     return Scaffold(
       backgroundColor: screenBg,
@@ -64,11 +67,17 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
         centerTitle: true,
         backgroundColor: cardBg,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: textDark,
-            size: 18,
+          icon: Transform(
+            alignment: Alignment.center,
+            transform: isRtl ? Matrix4.identity() : Matrix4.rotationY(math.pi),
+            child: SvgPicture.asset(
+              'assets/image/figma_activation_arrow_right.svg',
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(textDark, BlendMode.srcIn),
+            ),
           ),
           onPressed: () => Get.back(),
         ),
@@ -76,9 +85,7 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
       body: GetBuilder<StoreVisitsController>(
         builder: (controller) {
           if (controller.isActivationLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF30913F)),
-            );
+            return SkeletonLoadingWidgets.visitDetailSkeleton(isDark: isDark);
           }
 
           final activation = controller.currentActivation;
@@ -142,18 +149,20 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      constraints: const BoxConstraints(minWidth: 48, minHeight: 32),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF143326) : const Color(0xFFDCFCE7),
+                        color: isDark ? const Color(0xFF143326) : const Color(0xFFDEF4E2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '${activation.completedItems}/${activation.totalItems}',
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D),
+                          color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF247832),
                         ),
                       ),
                     ),
@@ -202,14 +211,16 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08000000),
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
+        border: Border.all(color: borderColor, width: 0.8),
+        boxShadow: isDark
+            ? null
+            : const [
+                BoxShadow(
+                  color: Color(0x0F18361E),
+                  blurRadius: 28,
+                  offset: Offset(0, 8),
+                ),
+              ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -217,24 +228,25 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
         children: [
           // Top White Part: Store Icon + Name + Contract Number (Right) & Status Pill (Left)
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 38,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF143326) : const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(12),
+                    color: isDark ? const Color(0xFF143326) : const Color(0xFFF0FAF2),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
-                    Icons.storefront_outlined,
-                    color: Color(0xFF30913F),
-                    size: 22,
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    'assets/image/figma_activation_shop.svg',
+                    width: 20,
+                    height: 20,
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,21 +255,21 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                         displayStoreName,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: textDark,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         '${'contract_number_label'.tr}  ${activation.contractNumber}',
                         style: TextStyle(
                           fontFamily: 'Tajawal',
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: textSub,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF6F7871),
                         ),
                       ),
                     ],
@@ -265,10 +277,12 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  constraints: const BoxConstraints(minHeight: 28),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF143326) : const Color(0xFFDCFCE7),
-                    borderRadius: BorderRadius.circular(20),
+                    color: isDark ? const Color(0xFF143326) : const Color(0xFFEBFEEB),
+                    borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     'in_activation_badge'.tr,
@@ -276,7 +290,7 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                       fontFamily: 'Tajawal',
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D),
+                      color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF30913F),
                     ),
                   ),
                 ),
@@ -286,109 +300,116 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
 
           // Bottom Light-Green Part: Calendar icon + Remaining Time + Completion Rate + Progress Bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            color: isDark ? const Color(0xFF132A20) : const Color(0xFFECFDF5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: isDark ? const Color(0xFF132A20) : const Color(0xFFF0FAF2),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Right in RTL: White rounded box with Calendar Icon
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        IconlyLight.calendar,
-                        color: Color(0xFF30913F),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
+                // Right in RTL: White rounded box with Calendar Icon
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    'assets/image/figma_activation_calendar_lg.svg',
+                    width: 22,
+                    height: 22,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'remaining_time_for_activation'.tr,
-                                style: TextStyle(
-                                  fontFamily: 'Tajawal',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDark ? Colors.white70 : const Color(0xFF374151),
-                                ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    '${activation.remainingDays}',
-                                    style: const TextStyle(
-                                      fontFamily: 'Tajawal',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFF30913F),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'days_unit'.tr,
-                                    style: const TextStyle(
-                                      fontFamily: 'Tajawal',
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF30913F),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                          Text(
+                            'remaining_time_for_activation'.tr,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              color: isDark ? Colors.white70 : const Color(0xFF111B18),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'completion_rate_label'.tr,
-                                style: TextStyle(
-                                  fontFamily: 'Tajawal',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDark ? Colors.white70 : const Color(0xFF374151),
-                                ),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: 'Tajawal',
+                                color: Color(0xFF247832),
                               ),
-                              Text(
-                                '${activation.progressPercentage}%',
-                                style: const TextStyle(
-                                  fontFamily: 'Tajawal',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF30913F),
+                              children: [
+                                TextSpan(
+                                  text: '${activation.remainingDays}',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.2,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                TextSpan(
+                                  text: ' ${'days_unit'.tr}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: (activation.progressPercentage / 100.0).clamp(0.0, 1.0),
-                    minHeight: 6,
-                    backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE5E7EB),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF30913F)),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'completion_rate_label'.tr,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              color: isDark ? Colors.white70 : const Color(0xFF111B18),
+                            ),
+                          ),
+                          Text(
+                            '${activation.progressPercentage}%',
+                            style: const TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF247832),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 7,
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE8EBE8),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: FractionallySizedBox(
+                          alignment: AlignmentDirectional.centerStart,
+                          widthFactor: (activation.progressPercentage / 100.0).clamp(0.0, 1.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF3EC856), Color(0xFF30913F)],
+                              ),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -562,23 +583,24 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
 
                   // Completed Date Info (for completed steps except stand photo which shows its own green bar)
                   if (isCompleted && item.type != 'camera_photo' && item.updatedAt != null && item.updatedAt!.trim().isNotEmpty) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          IconlyLight.calendar,
-                          size: 13,
-                          color: textSub,
+                        SvgPicture.asset(
+                          'assets/image/figma_activation_calendar_sm.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter: ColorFilter.mode(textSub, BlendMode.srcIn),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 5),
                         Text(
                           '${'completed_on_date'.tr} ${_formatCompletedDate(item.updatedAt!)}',
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
-                            color: textSub,
+                            color: textSub.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -620,16 +642,18 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
   }) {
     if (isCompleted) {
       return Container(
-        width: 26,
-        height: 26,
-        decoration: const BoxDecoration(
-          color: Color(0xFF30913F),
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: const Color(0xFF30913F),
           shape: BoxShape.circle,
+          border: Border.all(color: const Color(0xFF30913F), width: 0.8),
         ),
-        child: const Icon(
-          Icons.check_rounded,
-          color: Colors.white,
-          size: 16,
+        alignment: Alignment.center,
+        child: SvgPicture.asset(
+          'assets/image/figma_activation_check_white.svg',
+          width: 16,
+          height: 16,
         ),
       );
     }
@@ -638,29 +662,30 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
       return Container(
         width: 28,
         height: 28,
-        padding: const EdgeInsets.all(2.5),
         decoration: BoxDecoration(
+          color: const Color(0xFF30913F),
           shape: BoxShape.circle,
           border: Border.all(
-            color: const Color(0xFF30913F),
-            width: 1.5,
+            color: isDark ? const Color(0xFF143326) : const Color(0xFFDEF4E2),
+            width: 4,
           ),
-        ),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF30913F),
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            '$stepNumber',
-            style: const TextStyle(
-              fontFamily: 'Tajawal',
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              height: 1.1,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0xFF30913F),
+              spreadRadius: 1,
+              blurRadius: 0,
             ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          '$stepNumber',
+          style: const TextStyle(
+            fontFamily: 'Tajawal',
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            height: 1.1,
           ),
         ),
       );
@@ -729,10 +754,10 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
     // State B (Figma 9781-57295): Uploaded confirmation bar with retake icon
     if (hasUploadedPhoto) {
       return Container(
-        height: 40,
+        height: 38,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF143326) : const Color(0xFFECFDF5),
+          color: isDark ? const Color(0xFF143326) : const Color(0xFFF0FAF2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -742,19 +767,19 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.check_rounded,
-                  size: 16,
-                  color: Color(0xFF30913F),
+                SvgPicture.asset(
+                  'assets/image/figma_activation_check_green.svg',
+                  width: 18,
+                  height: 18,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
                 Text(
                   'stand_photo_attached_success'.tr,
                   style: TextStyle(
                     fontFamily: 'Tajawal',
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF30913F),
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF247832),
                   ),
                 ),
               ],
@@ -765,10 +790,13 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
               onTap: pickAndUploadPhoto,
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: Icon(
-                  Icons.refresh_rounded,
-                  size: 18,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF6B7280),
+                child: SvgPicture.asset(
+                  'assets/image/figma_activation_refresh.svg',
+                  width: 12,
+                  height: 12,
+                  colorFilter: isDark
+                      ? const ColorFilter.mode(Color(0xFF94A3B8), BlendMode.srcIn)
+                      : null,
                 ),
               ),
             ),
@@ -779,27 +807,27 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
 
     // State A (Figma 9779-56448): Dashed Green Border Button "إرفاق صورة الستاند"
     return InkWell(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(12),
       onTap: pickAndUploadPhoto,
       child: CustomPaint(
         painter: _DashedBorderPainter(
-          color: const Color(0xFF30913F).withValues(alpha: 0.6),
-          strokeWidth: 1.2,
-          radius: 10,
+          color: const Color(0xFF30913F),
+          strokeWidth: 0.8,
+          radius: 12,
         ),
         child: Container(
-          height: 42,
+          height: 40,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF132A20) : const Color(0xFFF0FDF4),
-            borderRadius: BorderRadius.circular(10),
+            color: isDark ? const Color(0xFF132A20) : const Color(0xFFF0FAF2),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                IconlyLight.image,
-                size: 18,
-                color: Color(0xFF30913F),
+              SvgPicture.asset(
+                'assets/image/figma_activation_gallery.svg',
+                width: 16,
+                height: 16,
               ),
               const SizedBox(width: 8),
               Text(
@@ -808,7 +836,7 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                   fontFamily: 'Tajawal',
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF30913F),
+                  color: Color(0xFF247832),
                 ),
               ),
             ],

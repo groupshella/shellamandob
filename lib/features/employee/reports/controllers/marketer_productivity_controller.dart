@@ -8,7 +8,8 @@ import '../models/marketer_productivity_model.dart';
 enum ProductivityViewMode { daily, period }
 
 class MarketerProductivityController extends GetxController {
-  bool isLoading = false;
+  bool isLoading = true;
+  bool hasError = false;
   ProductivityViewMode viewMode = ProductivityViewMode.daily;
 
   DateTime selectedDate = DateTime.now();
@@ -49,6 +50,7 @@ class MarketerProductivityController extends GetxController {
     selectedDate = date;
     viewMode = ProductivityViewMode.daily;
     isCalendarOpen = false;
+    dailyData = null;
     update();
     fetchProductivity();
   }
@@ -58,12 +60,14 @@ class MarketerProductivityController extends GetxController {
     rangeEndDate = end;
     viewMode = ProductivityViewMode.period;
     isCalendarOpen = false;
+    periodData = null;
     update();
     fetchProductivity();
   }
 
   Future<void> fetchProductivity({bool notify = true}) async {
     isLoading = true;
+    hasError = false;
     if (notify) update();
 
     final dateFormat = DateFormat('yyyy-MM-dd');
@@ -85,80 +89,18 @@ class MarketerProductivityController extends GetxController {
             dailyData = DailyProductivityModel.fromJson(data);
           }
           isLoading = false;
+          hasError = false;
           if (notify) update();
           return;
         }
       }
+      hasError = true;
     } catch (e) {
       debugPrint('❌ [MarketerProductivityController] error: $e');
+      hasError = true;
     }
 
-    // Genuine empty state when server has no visits or shifts yet
-    _initEmptyData();
     isLoading = false;
     if (notify) update();
-  }
-
-  void _initEmptyData() {
-    final dateFormat = DateFormat('yyyy-MM-dd');
-    final formattedDate = DateFormat('EEEE ، d MMMM y', 'ar').format(selectedDate);
-    if (viewMode == ProductivityViewMode.daily) {
-      dailyData = DailyProductivityModel(
-        date: dateFormat.format(selectedDate),
-        dateFormatted: formattedDate,
-        kpis: ProductivityKpis(
-          successfulVisits: 0,
-          successfulVisitsText: '0 زيارة',
-          workHours: '00:00',
-          workSeconds: 0,
-          warningsCount: 0,
-          warningsText: '0 إنذار',
-          signedContracts: 0,
-          signedContractsText: '0 اتفاقية',
-        ),
-        dailyTarget: DailyTargetInfo(
-          target: 16,
-          achieved: 0,
-          targetText: '0 / 16',
-          remaining: 16,
-          percentage: 0,
-          subtitle: 'متبقي 16 زيارات — 0%',
-        ),
-        timeline: [],
-        signedAgreements: [],
-        upcomingFollowUps: [],
-      );
-    } else {
-      periodData = PeriodProductivityModel(
-        startDate: dateFormat.format(rangeStartDate),
-        endDate: dateFormat.format(rangeEndDate),
-        dateRangeFormatted: '${dateFormat.format(rangeStartDate)} - ${dateFormat.format(rangeEndDate)}',
-        targetProgress: DailyTargetInfo(
-          target: 16,
-          achieved: 0,
-          targetText: '0 / 16',
-          remaining: 16,
-          percentage: 0,
-          subtitle: '0%',
-        ),
-        kpis: PeriodKpis(
-          warningsCount: 0,
-          warningsText: '0 إنذار',
-          workHours: '00:00',
-          signedContracts: 0,
-          signedContractsText: '0 اتفاقية',
-        ),
-        days: [],
-        signedAgreements: [],
-        periodSummary: PeriodSummaryInfo(
-          totalWorkHours: '00:00',
-          totalVisits: 0,
-          totalSignedContracts: 0,
-          totalWarnings: 0,
-          totalDistanceKm: '0 كم',
-          totalScheduledFollowups: 0,
-        ),
-      );
-    }
   }
 }

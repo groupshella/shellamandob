@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/features/employee/visits/controllers/store_visits_controller.dart';
 import 'package:sixam_mart/features/employee/visits/domain/models/contract_activation_model.dart';
 import 'package:sixam_mart/features/employee/visits/screens/contract_activation_screen.dart';
@@ -82,7 +83,16 @@ class _StoresInActivationListScreenState extends State<StoresInActivationListScr
                 ),
 
                 // Stores List
-                if (contracts.isEmpty)
+                if (controller.isInActivationListLoading && contracts.isEmpty)
+                  SliverToBoxAdapter(
+                    child: SkeletonLoadingWidgets.listCardsSkeleton(
+                      isDark: isDark,
+                      itemCount: 4,
+                      cardHeight: 110,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  )
+                else if (contracts.isEmpty)
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),

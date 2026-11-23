@@ -3,8 +3,8 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:sixam_mart/features/employee/network/models/network_models.dart';
-import 'package:sixam_mart/features/employee/network/controllers/my_network_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/features/employee/network/screens/sub_marketer_profile_screen.dart';
 
 class SupervisedMarketerCard extends StatelessWidget {
   final SupervisedMarketerModel marketer;
@@ -38,8 +38,18 @@ class SupervisedMarketerCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Get.to(
+            () => SubMarketerProfileScreen(
+              marketerId: marketer.marketerId,
+              fallbackName: marketer.name,
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -249,12 +259,19 @@ class SupervisedMarketerCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
 
-                // Left in RTL: زيارة تنشيط (Soft Neutral Gray Button)
+                // Left in RTL: زيارة تنشيط (Soft Neutral Gray Button) -> opens SubMarketerProfileScreen
                 Expanded(
                   child: SizedBox(
                     height: 40,
                     child: ElevatedButton.icon(
-                      onPressed: () => _showScheduleModal(context, marketer),
+                      onPressed: () {
+                        Get.to(
+                          () => SubMarketerProfileScreen(
+                            marketerId: marketer.marketerId,
+                            fallbackName: marketer.name,
+                          ),
+                        );
+                      },
                       icon: Icon(
                         IconlyLight.calendar,
                         size: 16,
@@ -281,6 +298,7 @@ class SupervisedMarketerCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -467,165 +485,5 @@ class SupervisedMarketerCard extends StatelessWidget {
     if (await canLaunchUrlString(url)) {
       await launchUrlString(url);
     }
-  }
-
-  void _showScheduleModal(BuildContext context, SupervisedMarketerModel m) {
-    final noteController = TextEditingController();
-    DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) {
-          final isDark = Theme.of(ctx).brightness == Brightness.dark;
-          final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-          final darkText = isDark ? Colors.white : const Color(0xFF111827);
-
-          return Container(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 16,
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-            ),
-            decoration: BoxDecoration(
-              color: cardBg,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[700] : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  '${'schedule_visit_for'.tr} ${m.name}',
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: darkText,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF9FAFB),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(IconlyBold.calendar, color: Color(0xFF30913F)),
-                    title: Text(
-                      '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontWeight: FontWeight.w700,
-                        color: darkText,
-                      ),
-                    ),
-                    trailing: TextButton(
-                      onPressed: () async {
-                        final picked = await showDatePicker(
-                          context: ctx,
-                          initialDate: selectedDate,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(const Duration(days: 60)),
-                        );
-                        if (picked != null) {
-                          setModalState(() {
-                            selectedDate = picked;
-                          });
-                        }
-                      },
-                      child: Text(
-                        'change_date'.tr,
-                        style: const TextStyle(
-                          fontFamily: 'Tajawal',
-                          color: Color(0xFF30913F),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: noteController,
-                  maxLines: 2,
-                  decoration: InputDecoration(
-                    hintText: 'visit_notes_hint'.tr,
-                    hintStyle: const TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 13,
-                      color: Colors.grey,
-                    ),
-                    filled: true,
-                    fillColor: isDark ? const Color(0xFF334155) : const Color(0xFFF9FAFB),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                GetBuilder<MyNetworkController>(
-                  builder: (networkCtrl) => SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: networkCtrl.isScheduling
-                          ? null
-                          : () async {
-                              final navigator = Navigator.of(ctx);
-                              final success = await networkCtrl.scheduleActivationVisit(
-                                subMarketerId: m.marketerId,
-                                date: selectedDate,
-                                notes: noteController.text.trim(),
-                              );
-                              if (success && ctx.mounted) {
-                                navigator.pop();
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF30913F),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                      ),
-                      child: networkCtrl.isScheduling
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : Text(
-                              'confirm_schedule_visit'.tr,
-                              style: const TextStyle(
-                                fontFamily: 'Tajawal',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
   }
 }
