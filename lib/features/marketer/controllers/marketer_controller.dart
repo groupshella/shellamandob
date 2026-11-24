@@ -104,6 +104,18 @@ class MarketerController extends GetxController implements GetxService {
   int get hesitantCustomers => int.tryParse('${_data?['hesitant_customers'] ?? 0}') ?? 0;
   int get kpiGrowthPct => int.tryParse('${_data?['kpi_growth_pct'] ?? 12}') ?? 12;
 
+  // Freelance wallet earnings cards (Figma 10055:44761)
+  double get directEarnings => double.tryParse('${_data?['direct_earnings'] ?? 0}') ?? 0.0;
+  int get directCustomersCount => int.tryParse('${_data?['direct_customers_count'] ?? 0}') ?? 0;
+  double get directRate => double.tryParse('${_data?['direct_marketers_rate'] ?? 0.5}') ?? 0.5;
+  double get teamEarnings => double.tryParse('${_data?['team_earnings'] ?? 0}') ?? 0.0;
+  int get teamCustomersCount => int.tryParse('${_data?['team_customers_count'] ?? 0}') ?? 0;
+  double get teamRate => double.tryParse('${_data?['team_customers_rate'] ?? 0.25}') ?? 0.25;
+  List<Map<String, dynamic>> get recentCommissions => ((_data?['recent_commissions'] as List?) ?? [])
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
+
   String get appliedAt {
     final raw = (_data?['applied_at'] ?? '').toString();
     if (raw.isNotEmpty) {

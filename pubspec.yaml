@@ -97,6 +97,10 @@ flutter:
   assets:
     - assets/
     - assets/image/
+    - assets/image/figma_r15_r16/
+    - assets/image/figma_activation_preview/
+    - assets/image/figma_visit_summary/
+    - assets/image/figma_freelance_marketer/
     - assets/language/
     - assets/map/
     - assets/json/

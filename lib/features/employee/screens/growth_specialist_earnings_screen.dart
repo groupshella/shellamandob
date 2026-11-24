@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import 'package:sixam_mart/features/employee/controllers/monthly_earnings_controller.dart';
 import 'package:sixam_mart/features/employee/models/monthly_earnings_model.dart';
+import 'monthly_scorecard_screen.dart';
+import 'transactions_history_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
 
 class GrowthSpecialistEarningsScreen extends StatefulWidget {
@@ -29,16 +32,18 @@ class _GrowthSpecialistEarningsScreenState extends State<GrowthSpecialistEarning
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Get.find<ThemeController>().darkTheme;
-    final Color bgColor = isDark ? const Color(0xFF121418) : Colors.white;
-    final Color gridContainerBg = isDark ? const Color(0xFF181C23) : const Color(0xFFF3F4F6);
-    final Color cardBg = isDark ? const Color(0xFF1E232C) : Colors.white;
-    final Color textColor = isDark ? Colors.white : const Color(0xFF111827);
-    final Color subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final Color borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-    final Color innerBoxBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF5F6F8);
+    return GetBuilder<ThemeController>(
+      builder: (themeCtrl) {
+        final bool isDark = themeCtrl.darkTheme;
+        final Color bgColor = isDark ? const Color(0xFF121418) : Colors.white;
+        final Color gridContainerBg = isDark ? const Color(0xFF181C23) : const Color(0xFFF3F4F6);
+        final Color cardBg = isDark ? const Color(0xFF1E232C) : Colors.white;
+        final Color textColor = isDark ? Colors.white : const Color(0xFF111827);
+        final Color subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final Color borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
+        final Color innerBoxBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF5F6F8);
 
-    return Scaffold(
+        return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
         title: Text(
@@ -121,8 +126,80 @@ class _GrowthSpecialistEarningsScreenState extends State<GrowthSpecialistEarning
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 1. Total Net Monthly Earnings Card (Figma 9727-24487 / 9721-23186 / 9727-24756)
-                  _buildTotalEarningsCard(data, isDark),
+                  // 1. Hero Wallet & Withdrawable Balance Card (Figma 10033:51112 / 9727:24487)
+                  _buildFigmaHeroWalletCard(controller, isDark),
+                  const SizedBox(height: 14),
+
+                  // 2. Quick Access Banner to Monthly Performance & KPI Card (Figma 10033:52131)
+                  InkWell(
+                    onTap: () => Get.to(() => const MonthlyScorecardScreen()),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E232C) : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.06),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF142A1B) : const Color(0xFFEBFEEB),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/image/figma_r15_r16/trend_up.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(_primaryGreen, BlendMode.srcIn),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'my_monthly_kpi_card_title'.tr,
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'my_monthly_kpi_card_subtitle'.tr,
+                                  style: TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 11,
+                                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF555555),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_left_rounded,
+                            color: isDark ? Colors.white70 : const Color(0xFF111B18),
+                            size: 22,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 16),
 
                   // 2. Gray Rounded Container holding the 2x2 Grid with Protruding Top Circle Icons
@@ -202,6 +279,10 @@ class _GrowthSpecialistEarningsScreenState extends State<GrowthSpecialistEarning
                             ],
                           ),
                         ),
+                        const SizedBox(height: 16),
+
+                        // 3. Transactions History Preview Card (Figma 10033:52059) inside the gray container
+                        _buildTransactionsPreviewCard(controller, isDark, cardBg, textColor, subTextColor),
                       ],
                     ),
                   ),
@@ -215,121 +296,423 @@ class _GrowthSpecialistEarningsScreenState extends State<GrowthSpecialistEarning
         },
       ),
     );
+      },
+    );
   }
 
-  /// Top Gradient Card with Decorative Translucent Circles & SarCurrencyWidget matching Figma 1:1
-  Widget _buildTotalEarningsCard(MonthlyEarningsModel data, bool isDark) {
-    String formattedDate = data.calculatedAt;
-    try {
-      final parsed = DateTime.tryParse(data.calculatedAt);
-      if (parsed != null) {
-        formattedDate = DateFormat('dd-MM-yyyy').format(parsed);
-      }
-    } catch (_) {}
-
-    final String formattedTotal = data.summary.totalMonthlyEarnings.toStringAsFixed(2);
+  /// Hero Green Gradient Wallet Card matching Figma 10033:51112 (9727:24487 / 9721:23186 / 9727:24756)
+  Widget _buildFigmaHeroWalletCard(MonthlyEarningsController controller, bool isDark) {
+    final bool canWithdraw = controller.withdrawableBalance >= controller.minWithdrawalAmount;
 
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF1F7A36),
-            Color(0xFF31A64D),
+            Color(0xFF1E7A2C),
+            Color(0xFF30913F),
+            Color(0xFF3EC856),
           ],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
+          stops: [0.0, 0.45, 1.0],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x1F30913F),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            color: Color(0x26000000),
+            blurRadius: 9.6,
+            offset: Offset(0, 1),
           ),
         ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          // Decorative Soft Translucent Circles on the left side matching Figma
           Positioned(
-            left: -25,
-            top: -25,
+            left: -30,
+            top: -64,
             child: Container(
-              width: 130,
-              height: 130,
+              width: 140,
+              height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.07),
+                color: Colors.white.withValues(alpha: 0.06),
               ),
             ),
           ),
           Positioned(
-            left: 35,
-            bottom: -45,
+            right: -30,
+            bottom: -60,
             child: Container(
-              width: 120,
-              height: 120,
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.04),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 20,
+            top: -4,
+            child: Container(
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.05),
               ),
             ),
           ),
-
-          // Main Foreground Content
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'total_net_monthly_earnings'.tr,
-                  style: const TextStyle(
-                    fontFamily: 'Tajawal',
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Directionality(
-                  textDirection: TextDirection.ltr,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SarCurrencyWidget(
-                        size: 26,
-                        color: Colors.white,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Right side in RTL: Withdrawable Balance
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'available_for_withdrawal'.tr,
+                            style: const TextStyle(
+                              fontFamily: 'Tajawal',
+                              color: Color(0xFFCBE4CF),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SarCurrencyWidget(size: 24, color: Colors.white),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    controller.withdrawableBalance.toStringAsFixed(2),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontFamily: 'Tajawal',
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        formattedTotal,
-                        style: const TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1.1,
-                        ),
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Left side in RTL: Reserved / Under Processing Box
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
-                  ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'under_processing_review'.tr,
+                            style: const TextStyle(
+                              fontFamily: 'Tajawal',
+                              color: Color(0xFFCBE4CF),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SarCurrencyWidget(size: 15, color: Colors.white),
+                                const SizedBox(width: 4),
+                                Text(
+                                  controller.reservedBalance.toStringAsFixed(2),
+                                  style: const TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  'last_calculation'.trParams({'date': formattedDate}),
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontWeight: FontWeight.w500,
+                const SizedBox(height: 14),
+
+                // Soft Mint Action Button (Figma 10033:51132) with Dark Mode adaptation
+                SizedBox(
+                  height: 46,
+                  child: Material(
+                    color: isDark ? const Color(0xFF193521) : const Color(0xFFCFEBD3),
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: canWithdraw
+                          ? () => _showWithdrawalSheet(context, controller, isDark)
+                          : () {
+                              Get.snackbar(
+                                'min_withdrawal_toast_title'.tr,
+                                'min_withdrawal_toast_body'.trParams({
+                                  'amount': controller.minWithdrawalAmount.toStringAsFixed(0),
+                                }),
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: const Color(0xFF1F2937),
+                                colorText: Colors.white,
+                                duration: const Duration(seconds: 3),
+                              );
+                            },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/image/figma_r15_r16/withdraw_icon.svg',
+                            width: 20,
+                            height: 20,
+                            colorFilter: ColorFilter.mode(
+                              isDark ? const Color(0xFF86EFAC) : _primaryGreen,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            canWithdraw
+                                ? 'request_withdrawal_with_min'.trParams({
+                                    'amount': controller.minWithdrawalAmount.toStringAsFixed(0),
+                                  })
+                                : '${'min_withdrawal_prefix'.tr} ( ${controller.minWithdrawalAmount.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: isDark ? const Color(0xFF86EFAC) : _primaryGreen,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          SarCurrencyWidget(
+                            size: 14,
+                            color: isDark ? const Color(0xFF86EFAC) : _primaryGreen,
+                          ),
+                          Text(
+                            ' )',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: isDark ? const Color(0xFF86EFAC) : _primaryGreen,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  /// Transactions History Preview Card inside gray container (Figma 10033:52059)
+  Widget _buildTransactionsPreviewCard(
+    MonthlyEarningsController controller,
+    bool isDark,
+    Color cardBg,
+    Color textColor,
+    Color subTextColor,
+  ) {
+    final allTx = SpecialistTransactionItem.fromController(controller);
+    final previewItems = allTx.take(3).toList();
+    final dividerColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE8ECEF);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.16 : 0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'transactions_history_title'.tr,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                ),
+              ),
+              InkWell(
+                onTap: () => Get.to(() => const TransactionsHistoryScreen()),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'view_all_label'.tr,
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: _primaryGreen,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          if (previewItems.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: Text(
+                  'no_transactions_yet'.tr,
+                  style: TextStyle(
+                    fontFamily: 'Tajawal',
+                    fontSize: 12,
+                    color: subTextColor,
+                  ),
+                ),
+              ),
+            )
+          else
+            ...previewItems.asMap().entries.map((entry) {
+              final tx = entry.value;
+              final isLast = entry.key == previewItems.length - 1;
+              final amountColor = tx.isWithdrawal ? const Color(0xFFEC9C18) : _primaryGreen;
+              final iconBg = tx.isWithdrawal
+                  ? (isDark ? const Color(0xFF332611) : const Color(0xFFFEF3DC))
+                  : (isDark ? const Color(0xFF142A1B) : const Color(0xFFF0FDF4));
+
+              final locale = Get.locale?.languageCode ?? 'ar';
+              String timeStr;
+              try {
+                timeStr = DateFormat('h:mm a - dd/MM', locale).format(tx.date);
+              } catch (_) {
+                timeStr = DateFormat('HH:mm - dd/MM').format(tx.date);
+              }
+
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: isLast
+                    ? null
+                    : BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: dividerColor, width: 0.8),
+                        ),
+                      ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: iconBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          tx.isWithdrawal
+                              ? 'assets/image/figma_r15_r16/send_withdraw.svg'
+                              : 'assets/image/figma_r15_r16/received_deposit.svg',
+                          width: 18,
+                          height: 18,
+                          colorFilter: ColorFilter.mode(amountColor, BlendMode.srcIn),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            tx.localizedTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: textColor,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            timeStr,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 11,
+                              color: subTextColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SarCurrencyWidget(size: 16, color: amountColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${tx.amount.toStringAsFixed(1)} ${tx.isWithdrawal ? '-' : '+'}',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: amountColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
         ],
       ),
     );
@@ -866,6 +1249,228 @@ class _GrowthSpecialistEarningsScreenState extends State<GrowthSpecialistEarning
           ),
         ],
       ),
+    );
+  }
+
+  /// R15: Modal Bottom Sheet for Withdrawal Request with Full Validation
+  void _showWithdrawalSheet(BuildContext context, MonthlyEarningsController controller, bool isDark) {
+    final formKey = GlobalKey<FormState>();
+    final amountCtrl = TextEditingController(text: controller.withdrawableBalance.toStringAsFixed(0));
+    final ibanCtrl = TextEditingController(text: controller.savedBankInfo?['iban']?.toString() ?? '');
+    final nameCtrl = TextEditingController(text: controller.savedBankInfo?['beneficiary_name']?.toString() ?? '');
+    final bankCtrl = TextEditingController(text: controller.savedBankInfo?['bank_name']?.toString() ?? '');
+
+    final sheetBg = isDark ? const Color(0xFF1E232C) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF111827);
+    final subTextColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final fieldBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF8FAFC);
+    final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE2E8F0);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+            decoration: BoxDecoration(
+              color: sheetBg,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: borderColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'request_payout_dialog_title'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${'processing_expected_duration'.tr}: ${controller.processingDurationLabel}',
+                      style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: subTextColor),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Amount Field
+                    _buildTextField(
+                      controller: amountCtrl,
+                      label: 'withdraw_amount_label'.tr,
+                      hint: '0.00',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      fieldBg: fieldBg,
+                      textColor: textColor,
+                      borderColor: borderColor,
+                      validator: (v) {
+                        final val = double.tryParse(v ?? '');
+                        if (val == null || val <= 0) return 'enter_valid_amount'.tr;
+                        if (val < controller.minWithdrawalAmount) {
+                          return '${'min_withdraw_limit'.tr}: ${controller.minWithdrawalAmount.toStringAsFixed(0)} ${'sar'.tr}';
+                        }
+                        if (val > controller.withdrawableBalance) {
+                          return 'insufficient_withdrawable_balance'.tr;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // IBAN Field
+                    _buildTextField(
+                      controller: ibanCtrl,
+                      label: 'iban_number_label'.tr,
+                      hint: 'SA0000000000000000000000',
+                      fieldBg: fieldBg,
+                      textColor: textColor,
+                      borderColor: borderColor,
+                      validator: (v) {
+                        final trimmed = (v ?? '').trim();
+                        if (trimmed.isEmpty) return 'iban_required'.tr;
+                        if (!trimmed.toUpperCase().startsWith('SA') || trimmed.length < 15) {
+                          return 'invalid_iban_format'.tr;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Beneficiary Name
+                    _buildTextField(
+                      controller: nameCtrl,
+                      label: 'account_holder_name_label'.tr,
+                      hint: 'beneficiary_name_hint'.tr,
+                      fieldBg: fieldBg,
+                      textColor: textColor,
+                      borderColor: borderColor,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'beneficiary_name_required'.tr : null,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Bank Name
+                    _buildTextField(
+                      controller: bankCtrl,
+                      label: 'bank_name_label'.tr,
+                      hint: 'bank_name_hint'.tr,
+                      fieldBg: fieldBg,
+                      textColor: textColor,
+                      borderColor: borderColor,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'bank_name_required'.tr : null,
+                    ),
+                    const SizedBox(height: 22),
+
+                    // Submit Button with double-click prevention
+                    GetBuilder<MonthlyEarningsController>(
+                      builder: (c) => SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: c.isSubmittingWithdrawal
+                              ? null
+                              : () async {
+                                  if (formKey.currentState?.validate() ?? false) {
+                                    final amt = double.parse(amountCtrl.text.trim());
+                                    final ok = await c.submitWithdrawalRequest(
+                                      amount: amt,
+                                      iban: ibanCtrl.text.trim().toUpperCase(),
+                                      beneficiaryName: nameCtrl.text.trim(),
+                                      bankName: bankCtrl.text.trim(),
+                                    );
+                                    if (ok && ctx.mounted) {
+                                      Navigator.of(ctx).pop();
+                                    }
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _primaryGreen,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: c.isSubmittingWithdrawal
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2),
+                                )
+                              : Text(
+                                  'confirm_and_submit_payout'.tr,
+                                  style: const TextStyle(
+                                    fontFamily: 'Tajawal',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Helper TextField for bottom sheet
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required Color fieldBg,
+    required Color textColor,
+    required Color borderColor,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontFamily: 'Tajawal', fontSize: 12, fontWeight: FontWeight.w600, color: textColor),
+        ),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          validator: validator,
+          style: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: textColor),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(fontFamily: 'Tajawal', fontSize: 12, color: Color(0xFF94A3B8)),
+            filled: true,
+            fillColor: fieldBg,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: borderColor)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: _primaryGreen, width: 1.5)),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,12 +1,11 @@
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/features/marketer/controllers/marketer_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/profile/screens/language_select_screen.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -58,7 +57,7 @@ class MarketerProfileScreen extends StatelessWidget {
                     ),
                   ),
             title: Text(
-              'profile_and_settings'.tr,
+              'my_account_title'.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
                 fontSize: 18,
@@ -69,166 +68,92 @@ class MarketerProfileScreen extends StatelessWidget {
           ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Marketer Info Card
-              GetBuilder<MarketerController>(
-                builder: (c) {
-                  return GetBuilder<ProfileController>(
-                    builder: (profileController) {
-                      final user = profileController.userInfoModel;
-                      final name = user != null
-                          ? '${user.fName ?? ''} ${user.lName ?? ''}'.trim()
-                          : 'voucher_marketer'.tr;
-                      final phone = user?.phone ?? '';
+              // 1. Marketer User Card (Figma 10055:45426)
+              GetBuilder<ProfileController>(
+                builder: (profileController) {
+                  final user = profileController.userInfoModel;
+                  final name = user != null
+                      ? '${user.fName ?? ''} ${user.lName ?? ''}'.trim()
+                      : '';
+                  final phone = user?.phone ?? '';
 
-                      return Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1C2028) : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1C2028) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 56,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Center(
-                                    child: Icon(IconlyLight.profile, color: _primaryGreen, size: 28),
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            name.isNotEmpty ? name : 'voucher_marketer'.tr,
-                                            style: TextStyle(
-                                              fontFamily: 'Tajawal',
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: isDark ? Colors.white : _darkText,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFF0FDF4),
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              'verified_approved'.tr,
-                                              style: TextStyle(
-                                                fontFamily: 'Tajawal',
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w700,
-                                                color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      if (phone.isNotEmpty)
-                                        Text(
-                                          phone,
-                                          style: TextStyle(
-                                            fontFamily: 'Tajawal',
-                                            fontSize: 13,
-                                            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: _primaryGreen.withValues(alpha: 0.4), width: 1.5),
+                          ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              'assets/image/figma_freelance_marketer/pf_setting.svg',
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(_primaryGreen, BlendMode.srcIn),
                             ),
-                            const SizedBox(height: 14),
-                            Divider(height: 1, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
-                            const SizedBox(height: 12),
-                            // Referral Code Box
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF252B37) : const Color(0xFFF9FAFB),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(IconlyLight.discount, size: 18, color: _primaryGreen),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '${'marketer_code_label'.tr}: ${c.code}',
-                                        style: TextStyle(
-                                          fontFamily: 'Tajawal',
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                          color: isDark ? Colors.white : _darkText,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Clipboard.setData(ClipboardData(text: c.code));
-                                      showCustomSnackBar('code_copied'.tr, isError: false);
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: isDark ? const Color(0xFF1C2028) : Colors.white,
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(
-                                            color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
-                                      ),
-                                      child: Text(
-                                        'copy'.tr,
-                                        style: const TextStyle(
-                                          fontFamily: 'Tajawal',
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: _primaryGreen,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      );
-                    },
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name.isNotEmpty ? '${'welcome_greeting'.tr} $name' : 'voucher_marketer'.tr,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark ? Colors.white : _darkText,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                phone.isNotEmpty ? phone : 'account_settings_label'.tr,
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 12,
+                                  color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          locCtrl.isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2,
+                          size: 18,
+                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // 2. Marketer Actions Section
+              // 2. Shella Lessons & Supervisor Recommendations Card
               Container(
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF1C2028) : Colors.white,
@@ -238,52 +163,174 @@ class MarketerProfileScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildSettingsTile(
-                      icon: IconlyLight.chat,
-                      title: 'marketer_support_desk'.tr,
-                      subtitle: 'marketer_support_subtitle'.tr,
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_video_square.svg',
+                      title: 'shella_lessons_title'.tr,
                       isDark: isDark,
-                      onTap: () => _openWhatsAppSupport(),
+                      onTap: () => _openLessonsDialog(context, isDark),
                     ),
                     Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
-                    _buildSettingsTile(
-                      icon: IconlyLight.document,
-                      title: 'commission_terms_policy'.tr,
-                      subtitle: 'commission_terms_subtitle'.tr,
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_document_like.svg',
+                      title: 'supervisor_recommendations_title'.tr,
                       isDark: isDark,
-                      onTap: () => _showTermsDialog(context, isDark),
-                    ),
-                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
-                    _buildSettingsTile(
-                      icon: Icons.language,
-                      title: 'app_language'.tr,
-                      subtitle: _getLanguageName(locCtrl.locale.languageCode),
-                      isDark: isDark,
-                      onTap: () => Get.to(() => const LanguageSelectScreen()),
+                      onTap: () => _openRecommendationsDialog(context, isDark),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
 
-              // 3. Logout Button
-              OutlinedButton.icon(
-                onPressed: () => _showLogoutConfirmDialog(context, isDark),
-                icon: const Icon(IconlyLight.logout, color: Color(0xFFDC2626), size: 20),
-                label: Text(
-                  'sign_out'.tr,
-                  style: const TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFDC2626),
-                  ),
+              // 3. Location, Language & Dark Mode Card
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C2028) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
                 ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFCA5A5)),
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  backgroundColor: isDark ? const Color(0xFF2A1515) : Colors.white,
+                child: Column(
+                  children: [
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_location.svg',
+                      title: 'geo_location_title'.tr,
+                      trailingText: 'riyadh_central_zone'.tr,
+                      isDark: isDark,
+                      onTap: () {},
+                    ),
+                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_language_square.svg',
+                      title: 'app_language'.tr,
+                      trailingText: _getLanguageName(locCtrl.locale.languageCode),
+                      isDark: isDark,
+                      onTap: () => Get.to(() => const LanguageSelectScreen()),
+                    ),
+                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
+                    // Dark Mode Reactive Switch Tile
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/image/figma_freelance_marketer/pf_devices.svg',
+                                width: 20,
+                                height: 20,
+                                colorFilter: const ColorFilter.mode(_primaryGreen, BlendMode.srcIn),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              'dark_mode_setting'.tr,
+                              style: TextStyle(
+                                fontFamily: 'Tajawal',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white : _darkText,
+                              ),
+                            ),
+                          ),
+                          Switch(
+                            value: isDark,
+                            activeThumbColor: _primaryGreen,
+                            onChanged: (val) {
+                              themeCtrl.toggleTheme();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // 4. Support, Privacy & Terms Card
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C2028) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
+                ),
+                child: Column(
+                  children: [
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_headset_help.svg',
+                      title: 'marketer_support_desk'.tr,
+                      isDark: isDark,
+                      onTap: () => _openWhatsAppSupport(),
+                    ),
+                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_security_safe.svg',
+                      title: 'privacy_policy_title'.tr,
+                      isDark: isDark,
+                      onTap: () => _showTermsDialog(context, isDark),
+                    ),
+                    Divider(height: 1, indent: 54, color: isDark ? const Color(0xFF2C3240) : const Color(0xFFF3F4F6)),
+                    _buildFigmaSettingsTile(
+                      svgAsset: 'assets/image/figma_freelance_marketer/pf_folder.svg',
+                      title: 'commission_terms_policy'.tr,
+                      isDark: isDark,
+                      onTap: () => _showTermsDialog(context, isDark),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // 5. Logout Card
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C2028) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB)),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF3B1D1D) : const Color(0xFFFEE2E2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/image/figma_freelance_marketer/pf_logout.svg',
+                        width: 20,
+                        height: 20,
+                        colorFilter: const ColorFilter.mode(Color(0xFFDC2626), BlendMode.srcIn),
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    'sign_out'.tr,
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFDC2626),
+                    ),
+                  ),
+                  trailing: Icon(
+                    locCtrl.isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2,
+                    size: 16,
+                    color: const Color(0xFFDC2626),
+                  ),
+                  onTap: () => _showLogoutConfirmDialog(context, isDark),
                 ),
               ),
               SizedBox(height: isRoot ? 90 : 20),
@@ -298,43 +345,144 @@ class MarketerProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsTile({
-    required IconData icon,
+  Widget _buildFigmaSettingsTile({
+    required String svgAsset,
     required String title,
-    required String subtitle,
+    String? trailingText,
     required VoidCallback onTap,
     required bool isDark,
   }) {
     final isLtr = Get.find<LocalizationController>().isLtr;
     return ListTile(
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onTap: onTap,
       leading: Container(
-        width: 38,
-        height: 38,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: _primaryGreen, size: 20),
+        child: Center(
+          child: SvgPicture.asset(
+            svgAsset,
+            width: 20,
+            height: 20,
+            colorFilter: const ColorFilter.mode(_primaryGreen, BlendMode.srcIn),
+          ),
+        ),
       ),
       title: Text(
         title,
         style: TextStyle(
           fontFamily: 'Tajawal',
           fontSize: 14,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
           color: isDark ? Colors.white : _darkText,
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontFamily: 'Tajawal',
-          fontSize: 11,
-          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-        ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (trailingText != null) ...[
+            Text(
+              trailingText,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 12,
+                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
+          Icon(
+            isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2,
+            size: 16,
+            color: const Color(0xFF9CA3AF),
+          ),
+        ],
       ),
-      trailing: Icon(isLtr ? IconlyLight.arrowRight2 : IconlyLight.arrowLeft2, size: 16, color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF)),
+    );
+  }
+
+  void _openLessonsDialog(BuildContext context, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'shella_lessons_title'.tr,
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'shella_lessons_info'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                height: 1.5,
+                color: isDark ? const Color(0xFFE5E7EB) : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('close'.tr, style: const TextStyle(fontFamily: 'Tajawal', color: _primaryGreen)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openRecommendationsDialog(BuildContext context, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C2028) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'supervisor_recommendations_title'.tr,
+          style: TextStyle(
+            fontFamily: 'Tajawal',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'supervisor_recommendations_info'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 13,
+                height: 1.5,
+                color: isDark ? const Color(0xFFE5E7EB) : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('close'.tr, style: const TextStyle(fontFamily: 'Tajawal', color: _primaryGreen)),
+          ),
+        ],
+      ),
     );
   }
 

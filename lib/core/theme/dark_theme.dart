@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sixam_mart/core/theme/app_color_tokens.dart';
 import 'package:sixam_mart/core/theme/light_theme.dart';
 import 'package:sixam_mart/util/app_constants.dart';
@@ -36,6 +37,18 @@ ThemeData dark({Color color = const Color(0xFF31A342)}) => ThemeData(
       dividerTheme:
           const DividerThemeData(thickness: 0.5, color: Color(0xFFA0A4A8)),
       tabBarTheme: const TabBarThemeData(dividerColor: Colors.transparent),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+          systemNavigationBarColor: Color(0xFF121418),
+          systemNavigationBarIconBrightness: Brightness.light,
+        ),
+      ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: color,
         selectionColor: color.withValues(alpha: 0.3),

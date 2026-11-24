@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sixam_mart/core/theme/app_color_tokens.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
@@ -32,6 +33,18 @@ ThemeData light({Color color = const Color(0xFF31A342)}) => ThemeData(
       dividerTheme:
           const DividerThemeData(thickness: 0.2, color: Color(0xFFA0A4A8)),
       tabBarTheme: const TabBarThemeData(dividerColor: Colors.transparent),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      ),
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: Colors.black87),
       ),

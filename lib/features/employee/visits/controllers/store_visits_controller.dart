@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,10 +11,15 @@ import '../models/store_visit_model.dart';
 import '../models/store_contact_model.dart';
 import '../models/merchant_promo_model.dart';
 import '../models/not_closing_reason.dart';
+import '../models/dynamic_not_closing_reason.dart';
+import '../models/visit_branch_model.dart';
 import '../domain/models/contract_activation_model.dart';
+import '../domain/models/store_preview_model.dart';
 import '../../controllers/employee_shift_controller.dart';
 import '../../models/employee_shift_model.dart';
 import '../../alerts/controllers/anti_fraud_alerts_controller.dart';
+import '../../services/offline_visit_storage_service.dart';
+import '../../services/offline_visit_sync_manager.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 
 class StoreVisitsController extends GetxController {
@@ -88,6 +95,7 @@ class StoreVisitsController extends GetxController {
   final TextEditingController commitmentsController = TextEditingController();
   final TextEditingController obstaclesController = TextEditingController();
   final TextEditingController otherReasonController = TextEditingController();
+  final TextEditingController exclusiveCompetitorAppController = TextEditingController();
   final TextEditingController confidentialNotesController = TextEditingController();
 
   // R02: Decision Maker fields ('العامل موجود والمالك غائب')
@@ -130,6 +138,109 @@ class StoreVisitsController extends GetxController {
 
   NotClosingReason? _selectedNotClosingReason;
   NotClosingReason? get selectedNotClosingReason => _selectedNotClosingReason;
+
+  List<DynamicNotClosingReason> _dynamicNotClosingReasons = [];
+  List<DynamicNotClosingReason> get dynamicNotClosingReasons =>
+      _dynamicNotClosingReasons.isNotEmpty
+          ? _dynamicNotClosingReasons
+          : DynamicNotClosingReason.fallbackList();
+
+  Future<void> loadNotClosingReasons() async {
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData(
+          AppConstants.marketerNotClosingReasonsUri,
+          handleError: false,
+        );
+        if (res.statusCode == 200 && res.body is Map && res.body['data'] is Map) {
+          final raw = res.body['data']['reasons'] as List? ?? [];
+          final parsed = raw
+              .whereType<Map>()
+              .map((e) => DynamicNotClosingReason.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
+          if (parsed.isNotEmpty) {
+            _dynamicNotClosingReasons = parsed;
+            update();
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] loadNotClosingReasons error: $e');
+    }
+  }
+
+  void setSelectedDynamicReason(DynamicNotClosingReason reason) {
+    _selectedClosingReason = reason.code;
+    _selectedNotClosingReason = NotClosingReason.fromKey(reason.code);
+    _selectedObstacle = reason.titleAr;
+    if (reason.code == 'other') {
+      obstaclesController.text = otherReasonController.text;
+    } else {
+      obstaclesController.text = reason.titleAr;
+    }
+    registerActivity();
+    update();
+  }
+
+  DynamicNotClosingReason? get activeDynamicReason {
+    final code = _selectedClosingReason ?? _selectedNotClosingReason?.key;
+    if (code == null || code.isEmpty) return null;
+    for (final r in dynamicNotClosingReasons) {
+      if (r.code == code) return r;
+    }
+    return null;
+  }
+
+  // [R10] Multi-Branch Merchant State
+  final List<VisitBranchModel> visitBranches = [];
+
+  void addVisitBranch() {
+    visitBranches.add(VisitBranchModel());
+    registerActivity();
+    update();
+  }
+
+  void removeVisitBranch(int index) {
+    if (index >= 0 && index < visitBranches.length) {
+      visitBranches.removeAt(index);
+      registerActivity();
+      update();
+    }
+  }
+
+  Future<void> setBranchLocationAndCheckZone(
+    int index,
+    double lat,
+    double lng,
+  ) async {
+    if (index < 0 || index >= visitBranches.length) return;
+    final branch = visitBranches[index];
+    branch.latitude = lat;
+    branch.longitude = lng;
+    branch.isCheckingZone = true;
+    update();
+
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().postData(
+          AppConstants.marketerBranchCheckZoneUri,
+          {'latitude': lat, 'longitude': lng},
+          handleError: false,
+        );
+        if (res.statusCode == 200 && res.body is Map && res.body['data'] is Map) {
+          final d = Map<String, dynamic>.from(res.body['data'] as Map);
+          branch.detectedZoneId = (d['detected_zone_id'] as num?)?.toInt();
+          branch.detectedZoneName = d['detected_zone_name']?.toString();
+          branch.isInSpecialistZone = d['is_in_specialist_zone'] == true;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] setBranchLocationAndCheckZone error: $e');
+    } finally {
+      branch.isCheckingZone = false;
+      update();
+    }
+  }
 
   void setSelectedNotClosingReason(NotClosingReason reason) {
     _selectedNotClosingReason = reason;
@@ -198,6 +309,15 @@ class StoreVisitsController extends GetxController {
       _selectedNotClosingReason = matched;
       _selectedClosingReason = matched.key;
     }
+    registerActivity();
+    update();
+  }
+
+  DateTime? _exclusiveContractEndsAt;
+  DateTime? get exclusiveContractEndsAt => _exclusiveContractEndsAt;
+
+  void setExclusiveContractEndsAt(DateTime? date) {
+    _exclusiveContractEndsAt = date;
     registerActivity();
     update();
   }
@@ -300,13 +420,21 @@ class StoreVisitsController extends GetxController {
         return true;
       }
     } catch (e) {
+      debugPrint('⚠️ [StoreVisitsController] verifyCommercialRegister offline/network error: $e');
+      // In offline mode (no internet), permit the specialist to continue,
+      // and server will validate CR uniqueness upon background sync.
       crVerificationResult = {
-        'is_valid': false,
+        'is_valid': true,
         'is_already_registered': false,
-        'message': 'تعذر التحقق من السجل التجاري في الوقت الحالي',
+        'is_offline_bypass': true,
+        'message': 'تم حفظ السجل التجاري محلياً (سيتم التدقيق النهائي عند المزامنة)',
       };
-      showCustomSnackBar('cr_verification_failed_try_later'.tr, isError: true);
-      return false;
+      showCustomSnackBar(
+        'تم قبول السجل محلياً في وضع عدم الاتصال (سيتم التدقيق عند عودة الشبكة)',
+        isError: false,
+        showDuration: 3,
+      );
+      return true;
     } finally {
       isVerifyingCr = false;
       update();
@@ -475,6 +603,7 @@ class StoreVisitsController extends GetxController {
     commitmentsController.dispose();
     obstaclesController.dispose();
     otherReasonController.dispose();
+    exclusiveCompetitorAppController.dispose();
     confidentialNotesController.dispose();
     reasonNotMetController.dispose();
     reasonRejectedController.dispose();
@@ -1092,6 +1221,8 @@ class StoreVisitsController extends GetxController {
     }
 
     final finishedVisitId = updated.id;
+    final frontPath = updated.frontImagePath?.trim() ?? '';
+    final insidePath = updated.insideImagePath?.trim() ?? '';
     _visitTimer?.cancel();
     _activeVisit = null;
     update();
@@ -1099,39 +1230,73 @@ class StoreVisitsController extends GetxController {
     // Call backend API and await
     try {
       if (Get.isRegistered<ApiClient>()) {
-        final res = await Get.find<ApiClient>().postData(
-          '${AppConstants.marketerVisitsUri}/$finishedVisitId/complete',
-          {
-            'store_name': updated.storeName,
-            'manager_name': updated.managerName,
-            'phone': updated.phone,
-            'openings_count': updated.openingsCount,
-            'cr_number': updated.crNumber,
-            'decision_maker_name': updated.decisionMakerName,
-            'decision_maker_phone': updated.decisionMakerPhone,
-            'decision_maker_best_time': updated.decisionMakerBestTime,
-            'interviewed_person_role': updated.interviewedPersonRole,
-            'pipeline_step': updated.pipelineStep.name,
-            'interest_status': _selectedInterestStatus,
-            'selected_promo': updated.selectedPromo,
-            'visit_status': updated.visitStatus == StoreVisitStatus.followUp
-                ? 'follow_up'
-                : (updated.visitStatus == StoreVisitStatus.inProgress ? 'in_progress' : 'completed'),
-            'obstacles_notes': updated.obstaclesNotes,
-            'closing_reason': updated.closingReason,
-            'closing_reason_other_details': updated.closingReasonOtherDetails,
-            'confidential_notes': updated.confidentialNotes,
-            'front_image': updated.frontImagePath,
-            'inside_image': updated.insideImagePath,
-            'is_qualified': updated.isQualifiedOutcome,
-            'is_extended': updated.isExtended,
-            'extended_minutes': updated.extendedMinutes,
-            if (isFollowUpNeeded && updated.nextFollowUpDate != null)
-              'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
-            if (isFollowUpNeeded)
-              'next_follow_up_commitments': updated.nextFollowUpCommitments,
+        final uri = '${AppConstants.marketerVisitsUri}/$finishedVisitId/complete';
+        final List<MultipartBody> multipartFiles = [];
+        if (frontPath.isNotEmpty && !frontPath.startsWith('http') && File(frontPath).existsSync()) {
+          multipartFiles.add(MultipartBody('front_image', XFile(frontPath)));
+        }
+        if (insidePath.isNotEmpty && !insidePath.startsWith('http') && File(insidePath).existsSync()) {
+          multipartFiles.add(MultipartBody('inside_image', XFile(insidePath)));
+        }
+
+        final Map<String, dynamic> payload = {
+          'store_name': updated.storeName,
+          'manager_name': updated.managerName,
+          'phone': updated.phone,
+          'openings_count': updated.openingsCount,
+          'cr_number': updated.crNumber,
+          'decision_maker_name': updated.decisionMakerName,
+          'decision_maker_phone': updated.decisionMakerPhone,
+          'decision_maker_best_time': updated.decisionMakerBestTime,
+          'interviewed_person_role': updated.interviewedPersonRole,
+          'pipeline_step': updated.pipelineStep.name,
+          'interest_status': _selectedInterestStatus,
+          'selected_promo': updated.selectedPromo,
+          'visit_status': updated.visitStatus == StoreVisitStatus.followUp
+              ? 'follow_up'
+              : (updated.visitStatus == StoreVisitStatus.inProgress ? 'in_progress' : 'completed'),
+          'obstacles_notes': updated.obstaclesNotes,
+          'closing_reason': updated.closingReason,
+          'closing_reason_other_details': updated.closingReasonOtherDetails,
+          if (updated.closingReason == NotClosingReason.exclusiveOtherApp.key) ...{
+            if (exclusiveCompetitorAppController.text.trim().isNotEmpty)
+              'exclusive_competitor_app': exclusiveCompetitorAppController.text.trim(),
+            if (_exclusiveContractEndsAt != null)
+              'exclusive_contract_ends_at': DateFormat('yyyy-MM-dd').format(_exclusiveContractEndsAt!),
           },
-        );
+          'confidential_notes': updated.confidentialNotes,
+          if (frontPath.startsWith('http')) 'front_image': frontPath,
+          if (insidePath.startsWith('http')) 'inside_image': insidePath,
+          'is_qualified': updated.isQualifiedOutcome,
+          'is_extended': updated.isExtended,
+          'extended_minutes': updated.extendedMinutes,
+          if (isFollowUpNeeded && updated.nextFollowUpDate != null)
+            'next_follow_up_date': updated.nextFollowUpDate!.toIso8601String(),
+          if (isFollowUpNeeded)
+            'next_follow_up_commitments': updated.nextFollowUpCommitments,
+          if (visitBranches.isNotEmpty)
+            'branches': visitBranches
+                .where((b) => b.branchName.trim().isNotEmpty)
+                .map((b) => b.toJson())
+                .toList(),
+        };
+
+        final Response res;
+        if (multipartFiles.isNotEmpty) {
+          final Map<String, String> fields = {};
+          payload.forEach((k, v) {
+            if (v != null) {
+              if (v is List || v is Map) {
+                fields[k] = jsonEncode(v);
+              } else {
+                fields[k] = v is bool ? (v ? '1' : '0') : v.toString();
+              }
+            }
+          });
+          res = await Get.find<ApiClient>().postMultipartData(uri, fields, multipartFiles);
+        } else {
+          res = await Get.find<ApiClient>().postData(uri, payload);
+        }
 
         if (res.statusCode == 200) {
           showCustomSnackBar(
@@ -1146,7 +1311,56 @@ class StoreVisitsController extends GetxController {
       }
     } catch (e) {
       debugPrint('❌ [StoreVisitsController] completeVisit api error: $e');
-      showCustomSnackBar('server_connection_failed_saved_locally'.tr, isError: true);
+      
+      // R17: Save complete visit locally for background sync
+      try {
+        final clientUuid = 'visit_${updated.id}_${DateTime.now().millisecondsSinceEpoch}';
+        final offlineItem = OfflineVisitItem(
+          clientUuid: clientUuid,
+          visitId: updated.id,
+          storeName: updated.storeName,
+          managerName: updated.managerName,
+          decisionMakerName: updated.decisionMakerName,
+          decisionMakerPhone: updated.decisionMakerPhone,
+          decisionMakerBestTime: updated.decisionMakerBestTime,
+          interviewedPersonRole: updated.interviewedPersonRole,
+          phone: updated.phone,
+          address: updated.address,
+          category: updated.category,
+          latitude: updated.latitude,
+          longitude: updated.longitude,
+          pipelineStep: updated.pipelineStep.name,
+          interestStatus: updated.interestStatus,
+          selectedPromo: updated.selectedPromo,
+          visitStatus: updated.visitStatus.name,
+          isQualified: updated.isQualifiedOutcome,
+          openingsCount: updated.openingsCount,
+          crNumber: updated.crNumber,
+          frontImagePath: frontPath.startsWith('http') ? null : frontPath,
+          insideImagePath: insidePath.startsWith('http') ? null : insidePath,
+          contractSignaturePath: updated.contractSignaturePath,
+          nextFollowUpDate: updated.nextFollowUpDate?.toIso8601String(),
+          nextFollowUpCommitments: updated.nextFollowUpCommitments,
+          obstaclesNotes: updated.obstaclesNotes,
+          closingReason: updated.closingReason,
+          closingReasonOtherDetails: updated.closingReasonOtherDetails,
+          confidentialNotes: updated.confidentialNotes,
+          durationMinutes: updated.durationMinutes,
+          isExtended: updated.isExtended,
+          extendedMinutes: updated.extendedMinutes,
+          offlineCreatedAt: DateTime.now(),
+          branches: visitBranches.map((b) => b.toJson()).toList(),
+          syncStatus: 'pending',
+        );
+        await OfflineVisitStorageService.saveVisit(offlineItem);
+        if (Get.isRegistered<OfflineVisitSyncManager>()) {
+          Get.find<OfflineVisitSyncManager>().refreshPendingCount();
+        }
+      } catch (storageErr) {
+        debugPrint('❌ [StoreVisitsController] Error saving offline visit: $storageErr');
+      }
+
+      showCustomSnackBar('تم حفظ الزيارة محلياً بنجاح، وستتم مزامنتها تلقائياً فور عودة الاتصال', isError: false, showDuration: 4);
     }
 
     // Update main shift metrics only if visit is truly completed
@@ -1208,6 +1422,35 @@ class StoreVisitsController extends GetxController {
   ContractActivationModel? currentActivation;
   bool isActivationLoading = false;
   List<ContractActivationModel> inActivationContracts = [];
+
+  // Store Customer Preview State (R08)
+  StorePreviewModel? currentStorePreview;
+  bool isStorePreviewLoading = false;
+  String? storePreviewError;
+
+  Future<void> loadStorePreview(int storeId) async {
+    isStorePreviewLoading = true;
+    storePreviewError = null;
+    update();
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData(AppConstants.marketerStorePreviewUri(storeId));
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          currentStorePreview = StorePreviewModel.fromJson(
+            Map<String, dynamic>.from(res.body['data'] as Map),
+          );
+        } else {
+          storePreviewError = res.statusText ?? 'preview_load_failed'.tr;
+        }
+      }
+    } catch (e) {
+      storePreviewError = 'preview_load_failed'.tr;
+      debugPrint('❌ [StoreVisitsController] loadStorePreview error: $e');
+    } finally {
+      isStorePreviewLoading = false;
+      update();
+    }
+  }
 
   Future<void> loadContractActivation(int storeId, {String? contractNumber}) async {
     isActivationLoading = true;
@@ -1282,6 +1525,63 @@ class StoreVisitsController extends GetxController {
       debugPrint('❌ [StoreVisitsController] reportContractActivationIssue error: $e');
     }
     return false;
+  }
+
+  // =========================================================================
+  // [R13] First-Order Status & Live Evaluation
+  // =========================================================================
+  bool isFirstOrderLoading = false;
+  Map<String, dynamic>? firstOrderTrackingData;
+
+  Future<void> checkFirstOrderStatus(int storeId) async {
+    isFirstOrderLoading = true;
+    update();
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().getData(
+          '${AppConstants.contractActivationUri}/$storeId/first-order-status',
+        );
+        if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+          firstOrderTrackingData = Map<String, dynamic>.from(res.body['data']);
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] checkFirstOrderStatus error: $e');
+    } finally {
+      isFirstOrderLoading = false;
+      update();
+    }
+  }
+
+  Future<void> evaluateFirstOrder(int storeId) async {
+    isFirstOrderLoading = true;
+    update();
+    try {
+      if (Get.isRegistered<ApiClient>()) {
+        final res = await Get.find<ApiClient>().postData(
+          '${AppConstants.contractActivationUri}/$storeId/evaluate-first-order',
+          {},
+        );
+        if (res.statusCode == 200 && res.body != null) {
+          if (res.body['data'] != null) {
+            firstOrderTrackingData = Map<String, dynamic>.from(res.body['data']);
+          }
+          final msg = res.body['message'] ?? 'first_order_evaluated_success'.tr;
+          showCustomSnackBar(msg.toString(), isError: false);
+          // Reload main activation model to update checklist status
+          await loadContractActivation(storeId);
+        } else {
+          final msg = res.body?['message'] ?? 'first_order_evaluation_failed'.tr;
+          showCustomSnackBar(msg.toString(), isError: true);
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ [StoreVisitsController] evaluateFirstOrder error: $e');
+      showCustomSnackBar('server_connection_failed'.tr, isError: true);
+    } finally {
+      isFirstOrderLoading = false;
+      update();
+    }
   }
 
   bool isInActivationListLoading = false;

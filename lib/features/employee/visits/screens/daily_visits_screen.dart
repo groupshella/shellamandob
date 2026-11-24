@@ -15,6 +15,7 @@ import 'contract_signing_screen.dart';
 import '../../attendance/screens/select_work_zone_screen.dart';
 import '../../../../helper/route_helper.dart';
 import '../../controllers/employee_navigation_controller.dart';
+import '../../widgets/offline_sync_banner_widget.dart';
 
 class DailyVisitsScreen extends StatefulWidget {
   const DailyVisitsScreen({super.key});
@@ -137,6 +138,11 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                 slivers: [
+                  // R17: Offline visits sync pending banner
+                  const SliverToBoxAdapter(
+                    child: OfflineSyncBannerWidget(),
+                  ),
+
                   // 1. Top Summary Header Card (Figma Container 8903:32637)
                   SliverToBoxAdapter(
                     child: Container(

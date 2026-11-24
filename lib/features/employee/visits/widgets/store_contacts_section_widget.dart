@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/store_visits_controller.dart';
@@ -42,21 +43,40 @@ class StoreContactsSectionWidget extends StatelessWidget {
     }
   }
 
-  String _getLanguageFlag(String lang) {
+  String _getLanguageCodeBadge(String lang) {
     switch (lang.toLowerCase()) {
       case 'ar':
-        return '🇸🇦';
+        return 'AR';
       case 'en':
-        return '🇬🇧';
+        return 'EN';
       case 'ur':
-        return '🇵🇰';
+        return 'UR';
       case 'bn':
-        return '🇧🇩';
+        return 'BN';
       case 'tl':
-        return '🇵🇭';
+        return 'TL';
       default:
-        return '🌐';
+        return lang.toUpperCase();
     }
+  }
+
+  Widget _buildLangBadgeChip(String langCode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF252B37) : const Color(0xFFF0FAF2),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        _getLanguageCodeBadge(langCode),
+        style: TextStyle(
+          fontFamily: 'Tajawal',
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: isDark ? const Color(0xFF4ADE80) : _primaryGreen,
+        ),
+      ),
+    );
   }
 
   IconData _getRoleIcon(String role) {
@@ -131,10 +151,7 @@ class StoreContactsSectionWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              _getLanguageFlag(contact.preferredLanguage),
-                              style: const TextStyle(fontSize: 14),
-                            ),
+                            _buildLangBadgeChip(contact.preferredLanguage),
                           ],
                         ),
                         const SizedBox(height: 2),
@@ -219,13 +236,13 @@ class StoreContactsSectionWidget extends StatelessWidget {
       {'key': 'worker', 'label': 'role_worker'.tr},
     ];
 
-    // Figma Languages: 🇸🇦 العربية, 🇬🇧 English, 🇵🇰 اردو (Urdu), 🇧🇩 বাংলা (Bengali), 🇵🇭 Tagalog
+    // Languages with vector code badges (no emoji flags)
     final languages = [
-      {'key': 'ar', 'label': 'العربية', 'flag': '🇸🇦'},
-      {'key': 'en', 'label': 'English', 'flag': '🇬🇧'},
-      {'key': 'ur', 'label': 'اردو (Urdu)', 'flag': '🇵🇰'},
-      {'key': 'tl', 'label': 'Tagalog', 'flag': '🇵🇭'},
-      {'key': 'bn', 'label': 'বাংলা (Bengali)', 'flag': '🇧🇩'},
+      {'key': 'ar', 'label': 'العربية', 'code': 'AR'},
+      {'key': 'en', 'label': 'English', 'code': 'EN'},
+      {'key': 'ur', 'label': 'اردو (Urdu)', 'code': 'UR'},
+      {'key': 'tl', 'label': 'Tagalog', 'code': 'TL'},
+      {'key': 'bn', 'label': 'বাংলা (Bengali)', 'code': 'BN'},
     ];
 
     final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
@@ -478,10 +495,7 @@ class StoreContactsSectionWidget extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  lang['flag']!,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
+                                _buildLangBadgeChip(lang['code']!),
                               ],
                             ),
                           ),
@@ -613,151 +627,139 @@ class StoreContactsSectionWidget extends StatelessWidget {
     final contacts = controller.storeContacts;
     final cardBg = isDark ? const Color(0xFF1C2028) : Colors.white;
     final borderColor = isDark ? const Color(0xFF2B3240) : const Color(0xFFE5E7EB);
-    final darkText = isDark ? Colors.white : const Color(0xFF111827);
+    final darkText = isDark ? Colors.white : const Color(0xFF111B18);
     final subText = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final pillBg = isDark ? const Color(0xFF252B37) : const Color(0xFFF6F5F8);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 16),
-        // Header Row: العنوان + زر إضافة شخص
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // Figma 9694:35150: Compact white card with title inside + إضافة شخص pill button
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0D000000),
+              blurRadius: 5,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'store_contacts_and_training'.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: darkText,
               ),
             ),
-            if (!readOnly)
+            if (!readOnly) ...[
+              const SizedBox(height: 8),
               InkWell(
                 onTap: () => _showAddContactModal(context),
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  height: 39,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF252B37) : const Color(0xFFF3F4F6),
+                    color: pillBg,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                      color: isDark ? borderColor : const Color(0xFFF6F5F8),
+                      width: 0.8,
                     ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      SvgPicture.asset(
+                        'assets/image/figma_visit_summary/profile_add.svg',
+                        width: 20,
+                        height: 20,
+                        colorFilter: ColorFilter.mode(darkText, BlendMode.srcIn),
+                      ),
+                      const SizedBox(width: 8),
                       Text(
                         'add_person_btn'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                           color: darkText,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.person_add_outlined, size: 16, color: darkText),
                     ],
                   ),
                 ),
               ),
+            ],
+            if (contacts.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Divider(color: borderColor, height: 1),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contacts.length,
+                separatorBuilder: (_, __) => Divider(color: borderColor, height: 1),
+                itemBuilder: (ctx, index) {
+                  final c = contacts[index];
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _primaryGreen.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_getRoleIcon(c.role), color: _primaryGreen, size: 19),
+                    ),
+                    title: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            c.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: darkText,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        _buildLangBadgeChip(c.preferredLanguage),
+                      ],
+                    ),
+                    subtitle: Text(
+                      '${'role_${c.role}'.tr} • ${c.phone}',
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 12,
+                        color: subText,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.more_vert, size: 20, color: subText),
+                      onPressed: () => _showContactActionModal(context, c),
+                    ),
+                    onTap: () => _showContactActionModal(context, c),
+                  );
+                },
+              ),
+            ],
           ],
         ),
-        const SizedBox(height: 10),
-
-        // Contacts List or Empty State Card
-        if (contacts.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            decoration: BoxDecoration(
-              color: cardBg,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: borderColor, width: 1),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.contacts_outlined,
-                  size: 32,
-                  color: isDark ? const Color(0xFF4B5563) : const Color(0xFF9CA3AF),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'no_contacts_recorded_yet'.tr,
-                  style: TextStyle(
-                    fontFamily: 'Tajawal',
-                    fontSize: 12.5,
-                    color: subText,
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          Container(
-            decoration: BoxDecoration(
-              color: cardBg,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: borderColor, width: 1),
-            ),
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contacts.length,
-              separatorBuilder: (_, __) => Divider(color: borderColor, height: 1),
-              itemBuilder: (ctx, index) {
-                final c = contacts[index];
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  leading: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: _primaryGreen.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(_getRoleIcon(c.role), color: _primaryGreen, size: 20),
-                  ),
-                  title: Row(
-                    children: [
-                      Text(
-                        c.name,
-                        style: TextStyle(
-                          fontFamily: 'Tajawal',
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          color: darkText,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _getLanguageFlag(c.preferredLanguage),
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  subtitle: Text(
-                    '${'role_${c.role}'.tr} • ${c.phone}',
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 12,
-                      color: subText,
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.more_vert, size: 20),
-                    onPressed: () => _showContactActionModal(context, c),
-                  ),
-                  onTap: () => _showContactActionModal(context, c),
-                );
-              },
-            ),
-          ),
-      ],
+      ),
     );
   }
 }

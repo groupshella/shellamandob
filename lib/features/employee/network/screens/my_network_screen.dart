@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/features/employee/network/controllers/my_network_controller.dart';
 import 'package:sixam_mart/features/employee/network/models/network_models.dart';
 import 'package:sixam_mart/features/employee/network/screens/marketers_list_screen.dart';
+import 'add_driver_lead_screen.dart';
 import 'package:sixam_mart/features/employee/network/screens/sub_marketer_profile_screen.dart';
 import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
@@ -631,30 +632,64 @@ class _MyNetworkScreenState extends State<MyNetworkScreen> {
 
           const SizedBox(height: 14),
 
-          // Bottom Main Button "عرض كل المسوّقين"
-          SizedBox(
-            height: 46,
-            child: ElevatedButton(
-              onPressed: () {
-                Get.to(() => const MarketersListScreen(initialFilter: 'all'));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF30913F),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          // Bottom Main Button "عرض كل المسوّقين" + "إضافة سائق (R11)"
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 46,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => const MarketersListScreen(initialFilter: 'all'));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF30913F),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'view_all_marketers'.tr,
+                      style: const TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              child: Text(
-                'view_all_marketers'.tr,
-                style: const TextStyle(
-                  fontFamily: 'Tajawal',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 46,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Get.to(() => const AddDriverLeadScreen());
+                    },
+                    icon: const Icon(Icons.person_add_alt_1_outlined, size: 18, color: Color(0xFF30913F)),
+                    label: Text(
+                      'add_driver_title'.tr,
+                      style: const TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF30913F),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF30913F)),
+                      backgroundColor: isDark ? const Color(0xFF143326) : const Color(0xFFE9F5EB),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),

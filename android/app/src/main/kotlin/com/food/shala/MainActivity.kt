@@ -13,10 +13,8 @@ class MainActivity: FlutterActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Enable edge-to-edge for Android 15+ compatibility
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-        }
+        // Enable edge-to-edge support across all supported Android versions
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
     
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -32,14 +30,8 @@ class MainActivity: FlutterActivity() {
             when (call.method) {
                 "enableEdgeToEdge" -> {
                     try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                            WindowCompat.setDecorFitsSystemWindows(window, false)
-                            result.success(true)
-                        } else {
-                            // Keep the legacy behavior for pre-Android 15 devices
-                            WindowCompat.setDecorFitsSystemWindows(window, true)
-                            result.success(false)
-                        }
+                        WindowCompat.setDecorFitsSystemWindows(window, false)
+                        result.success(true)
                     } catch (e: Exception) {
                         result.error("EDGE_TO_EDGE_ERROR", "Failed to enable edge-to-edge", e.message)
                     }

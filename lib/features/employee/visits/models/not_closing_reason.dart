@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+
 enum NotClosingReason {
   needsTime('needs_time', 'reason_needs_time'),
   differentOffer('different_offer', 'reason_custom_offer'),
@@ -5,6 +7,9 @@ enum NotClosingReason {
   needsMoreDetails('needs_more_details', 'reason_more_details'),
   unsureAboutService('unsure_about_service', 'reason_unsure_service'),
   currentlyBusy('currently_busy', 'reason_currently_busy'),
+  exclusiveOtherApp('exclusive_other_app', 'reason_exclusive_other_app'),
+  otpNafathFear('otp_nafath_fear', 'reason_otp_nafath_fear'),
+  noCreditSales('no_credit_sales', 'reason_no_credit_sales'),
   other('other', 'reason_other');
 
   final String key;
@@ -12,24 +17,7 @@ enum NotClosingReason {
 
   const NotClosingReason(this.key, this.translationKey);
 
-  String get label {
-    switch (this) {
-      case NotClosingReason.needsTime:
-        return 'يحتاج وقت للتفكير';
-      case NotClosingReason.differentOffer:
-        return 'طلب عرض مختلف';
-      case NotClosingReason.waitingOwnerApproval:
-        return 'بانتظار موافقة المالك';
-      case NotClosingReason.needsMoreDetails:
-        return 'يحتاج تفاصيل إضافية';
-      case NotClosingReason.unsureAboutService:
-        return 'غير متأكد من الخدمة';
-      case NotClosingReason.currentlyBusy:
-        return 'مشغول حالياً';
-      case NotClosingReason.other:
-        return 'سبب آخر';
-    }
-  }
+  String get label => translationKey.tr;
 
   static NotClosingReason fromKey(String? key) {
     if (key == null || key.isEmpty) return NotClosingReason.needsTime;
@@ -43,6 +31,9 @@ enum NotClosingReason {
     if (key.contains('تفاصيل')) return NotClosingReason.needsMoreDetails;
     if (key.contains('خدمة') || key.contains('متأكد') || key.contains('متاكد')) return NotClosingReason.unsureAboutService;
     if (key.contains('مشغول')) return NotClosingReason.currentlyBusy;
+    if (key.contains('حصري')) return NotClosingReason.exclusiveOtherApp;
+    if (key.contains('نفاذ') || key.contains('تحقق')) return NotClosingReason.otpNafathFear;
+    if (key.contains('آجل') || key.contains('اجل') || key.contains('قيدها')) return NotClosingReason.noCreditSales;
     return NotClosingReason.other;
   }
 }

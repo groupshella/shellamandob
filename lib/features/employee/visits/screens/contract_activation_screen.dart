@@ -1,14 +1,18 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/core/widgets/skeleton_loading_widgets.dart';
 import '../controllers/store_visits_controller.dart';
 import '../domain/models/contract_activation_model.dart';
+import 'store_customer_preview_screen.dart';
 
 class ContractActivationScreen extends StatefulWidget {
   final int storeId;
@@ -34,162 +38,168 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.isRegistered<StoreVisitsController>()) {
-        Get.find<StoreVisitsController>().loadContractActivation(
+        final ctrl = Get.find<StoreVisitsController>();
+        ctrl.loadContractActivation(
           widget.storeId,
           contractNumber: widget.contractNumber,
         );
+        ctrl.checkFirstOrderStatus(widget.storeId);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Get.find<ThemeController>().darkTheme;
-    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
-    final Color screenBg = isDark ? const Color(0xFF111827) : Colors.white;
-    final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final Color textDark = isDark ? Colors.white : const Color(0xFF111B18);
-    final Color textSub = isDark ? const Color(0xFF94A3B8) : const Color(0xFF555555);
-    final Color borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE5E9E5);
+    return GetBuilder<ThemeController>(
+      builder: (themeController) {
+        final bool isDark = themeController.darkTheme;
+        final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+        final Color screenBg = isDark ? const Color(0xFF111827) : Colors.white;
+        final Color cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+        final Color textDark = isDark ? Colors.white : const Color(0xFF111B18);
+        final Color textSub = isDark ? const Color(0xFF94A3B8) : const Color(0xFF555555);
+        final Color borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE5E9E5);
 
-    return Scaffold(
-      backgroundColor: screenBg,
-      appBar: AppBar(
-        title: Text(
-          'store_activation_details_title'.tr,
-          style: TextStyle(
-            fontFamily: 'Tajawal',
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: textDark,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: cardBg,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Transform(
-            alignment: Alignment.center,
-            transform: isRtl ? Matrix4.identity() : Matrix4.rotationY(math.pi),
-            child: SvgPicture.asset(
-              'assets/image/figma_activation_arrow_right.svg',
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(textDark, BlendMode.srcIn),
+        return Scaffold(
+          backgroundColor: screenBg,
+          appBar: AppBar(
+            title: Text(
+              'store_activation_details_title'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: textDark,
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: cardBg,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            leading: IconButton(
+              icon: Transform(
+                alignment: Alignment.center,
+                transform: isRtl ? Matrix4.identity() : Matrix4.rotationY(math.pi),
+                child: SvgPicture.asset(
+                  'assets/image/figma_activation_arrow_right.svg',
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(textDark, BlendMode.srcIn),
+                ),
+              ),
+              onPressed: () => Get.back(),
             ),
           ),
-          onPressed: () => Get.back(),
-        ),
-      ),
-      body: GetBuilder<StoreVisitsController>(
-        builder: (controller) {
-          if (controller.isActivationLoading) {
-            return SkeletonLoadingWidgets.visitDetailSkeleton(isDark: isDark);
-          }
+          body: GetBuilder<StoreVisitsController>(
+            builder: (controller) {
+              if (controller.isActivationLoading) {
+                return SkeletonLoadingWidgets.visitDetailSkeleton(isDark: isDark);
+              }
 
-          final activation = controller.currentActivation;
-          if (activation == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.inventory_2_outlined, size: 64, color: textSub),
-                  const SizedBox(height: 16),
-                  Text(
-                    'no_activation_data'.tr,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      color: textSub,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => controller.loadContractActivation(
-                      widget.storeId,
-                      contractNumber: widget.contractNumber,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF30913F),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    child: Text(
-                      'retry'.tr,
-                      style: const TextStyle(fontFamily: 'Tajawal', color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. Top Store Summary & Countdown Card (Figma 9779-56448 / 9781-57295)
-                _buildHeaderCard(activation, isDark, cardBg, textDark, textSub, borderColor),
-                const SizedBox(height: 20),
-
-                // 2. Section Header: Right = خطوات التفعيل | Left = 3/7 badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'activation_steps_title'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: textDark,
-                      ),
-                    ),
-                    Container(
-                      constraints: const BoxConstraints(minWidth: 48, minHeight: 32),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF143326) : const Color(0xFFDEF4E2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '${activation.completedItems}/${activation.totalItems}',
+              final activation = controller.currentActivation;
+              if (activation == null) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.inventory_2_outlined, size: 64, color: textSub),
+                      const SizedBox(height: 16),
+                      Text(
+                        'no_activation_data'.tr,
                         style: TextStyle(
                           fontFamily: 'Tajawal',
+                          color: textSub,
                           fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF247832),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => controller.loadContractActivation(
+                          widget.storeId,
+                          contractNumber: widget.contractNumber,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF30913F),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text(
+                          'retry'.tr,
+                          style: const TextStyle(fontFamily: 'Tajawal', color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 1. Top Store Summary & Countdown Card (Figma 9779-56448 / 9781-57295)
+                    _buildHeaderCard(activation, isDark, cardBg, textDark, textSub, borderColor),
+                    const SizedBox(height: 20),
+
+                    // 2. Section Header: Right = خطوات التفعيل | Left = 3/7 badge
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'activation_steps_title'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: textDark,
+                          ),
+                        ),
+                        Container(
+                          constraints: const BoxConstraints(minWidth: 48, minHeight: 32),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF143326) : const Color(0xFFDEF4E2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '${activation.completedItems}/${activation.totalItems}',
+                            style: TextStyle(
+                              fontFamily: 'Tajawal',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF247832),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 12),
+
+                    // 3. Unified Timeline Stepper Card containing all 7 steps
+                    _buildTimelineStepperCard(
+                      activation,
+                      controller,
+                      isDark,
+                      cardBg,
+                      textDark,
+                      textSub,
+                      borderColor,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // 4. Bottom Action Buttons (Figma 9779-56448)
+                    _buildActionButtons(controller, isDark, textDark),
+                    const SizedBox(height: 28),
                   ],
                 ),
-                const SizedBox(height: 12),
-
-                // 3. Unified Timeline Stepper Card containing all 7 steps
-                _buildTimelineStepperCard(
-                  activation,
-                  controller,
-                  isDark,
-                  cardBg,
-                  textDark,
-                  textSub,
-                  borderColor,
-                ),
-                const SizedBox(height: 20),
-
-                // 4. Bottom Action Buttons (جدولة متابعة تفعيل & الإبلاغ عن عائق تقني)
-                _buildActionButtons(controller, isDark, textDark),
-                const SizedBox(height: 28),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -624,6 +634,12 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                     const SizedBox(height: 10),
                     _buildManualStepActionButtons(item, controller, isInProgress, isDark),
                   ],
+
+                  // [R13] Step 7: First Real Order Live Tracking & Actions
+                  if (item.key == 'first_real_order' || (item.isReadonly && index == 6)) ...[
+                    const SizedBox(height: 10),
+                    _buildFirstOrderTrackingSection(controller, isCompleted, isDark, textDark, textSub),
+                  ],
                 ],
               ),
             ),
@@ -713,6 +729,105 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
           height: 1.1,
         ),
       ),
+    );
+  }
+
+  // =========================================================================
+  // [R13] First Real Order Step Actions (Matching Figma Steps 5 & 6 exactly)
+  // =========================================================================
+  Widget _buildFirstOrderTrackingSection(
+    StoreVisitsController controller,
+    bool isCompleted,
+    bool isDark,
+    Color textDark,
+    Color textSub,
+  ) {
+    if (isCompleted) {
+      return const SizedBox.shrink();
+    }
+
+    final tracking = controller.firstOrderTrackingData;
+    final String shareUrl = tracking?['share_url']?.toString() ?? 'https://shellafood.com/store/${widget.storeId}';
+    final shareMsg = '${'share_store_first_order_text'.tr}\n$shareUrl';
+
+    final Color greenBtnBg = isDark ? const Color(0xFF143326) : const Color(0xFFECFDF5);
+    final Color greenBtnText = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
+    final Color grayBtnBg = isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+    final Color grayBtnText = isDark ? const Color(0xFF94A3B8) : const Color(0xFF475467);
+
+    return Row(
+      children: [
+        // Right button: تحديث حالة الطلب (نفس ستايل مكتمل باللون الأخضر الفاتح المريح)
+        Expanded(
+          child: SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: controller.isFirstOrderLoading
+                  ? null
+                  : () => controller.evaluateFirstOrder(widget.storeId),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: greenBtnBg,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: controller.isFirstOrderLoading
+                  ? SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(color: greenBtnText, strokeWidth: 2),
+                    )
+                  : Text(
+                      'check_order_status_btn'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: greenBtnText,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        // Left button: مشاركة رابط المتجر (نفس ستايل قيد التنفيذ بالرمادي الهادئ الموحد)
+        Expanded(
+          child: SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: () async {
+                // 1. Copy directly to clipboard immediately
+                await Clipboard.setData(ClipboardData(text: shareMsg));
+                showCustomSnackBar('store_link_copied_success'.tr, isError: false);
+
+                // 2. Try launching share or whatsapp if supported
+                try {
+                  final waUri = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(shareMsg)}');
+                  if (await canLaunchUrl(waUri)) {
+                    await launchUrl(waUri, mode: LaunchMode.externalApplication);
+                  } else {
+                    await Share.share(shareMsg, subject: widget.storeName);
+                  }
+                } catch (_) {}
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: grayBtnBg,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(
+                'share_store_link'.tr,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: grayBtnText,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -887,10 +1002,10 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
     // When not_started (Figma 9779-56448 Step 5 & 6): Two equal buttons (Right = مكتمل | Left = قيد التنفيذ)
     return Row(
       children: [
-        // Right in RTL: مكتمل (Light green)
+        // Right in RTL: مكتمل (Figma #EBFEEB bg, #30913F text)
         Expanded(
           child: SizedBox(
-            height: 36,
+            height: 32,
             child: ElevatedButton(
               onPressed: () => controller.updateContractActivationItem(
                 widget.storeId,
@@ -898,8 +1013,9 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                 'completed',
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? const Color(0xFF143326) : const Color(0xFFECFDF5),
+                backgroundColor: isDark ? const Color(0xFF143326) : const Color(0xFFEBFEEB),
                 elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text(
@@ -908,17 +1024,17 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                   fontFamily: 'Tajawal',
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D),
+                  color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF30913F),
                 ),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        // Left in RTL: قيد التنفيذ (Soft neutral gray)
+        const SizedBox(width: 6),
+        // Left in RTL: قيد التنفيذ (Figma #F6F6F6 bg, #343434 text)
         Expanded(
           child: SizedBox(
-            height: 36,
+            height: 32,
             child: ElevatedButton(
               onPressed: () => controller.updateContractActivationItem(
                 widget.storeId,
@@ -926,8 +1042,9 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                 'in_progress',
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
+                backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF6F6F6),
                 elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text(
@@ -936,7 +1053,7 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
                   fontFamily: 'Tajawal',
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF1F2937),
+                  color: isDark ? Colors.white : const Color(0xFF343434),
                 ),
               ),
             ),
@@ -1018,17 +1135,20 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
   }
 
   // =========================================================================
-  // Bottom Action Buttons (Figma 9779-56448 & 9781-57295)
+  // Bottom Action Buttons (Figma 9779-56448 exact order & styling)
   // =========================================================================
   Widget _buildActionButtons(
     StoreVisitsController controller,
     bool isDark,
     Color textDark,
   ) {
+    final Color secondaryBtnBg = isDark ? const Color(0xFF1E293B) : const Color(0xFFF6F6F6);
+    final Color secondaryBtnText = isDark ? Colors.white : const Color(0xFF343434);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // 1. جدولة متابعة تفعيل (Solid Primary Green Button)
+        // 1. جدولة متابعة تفعيل (Solid Primary Green Button — Figma #30913F)
         SizedBox(
           height: 48,
           child: ElevatedButton(
@@ -1036,37 +1156,66 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF30913F),
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
               'schedule_follow_up_activation'.tr,
               style: const TextStyle(
                 fontFamily: 'Tajawal',
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 10),
-        // 2. الإبلاغ عن عائق تقني (Soft Neutral Gray Button matching Figma)
+        const SizedBox(height: 11),
+        // 2. معاينة المتجر للتحقق من الجاهزية (Soft Neutral Gray Button — Figma #F6F6F6)
+        SizedBox(
+          height: 48,
+          child: ElevatedButton(
+            onPressed: () {
+              Get.to(
+                () => StoreCustomerPreviewScreen(
+                  storeId: widget.storeId,
+                  storeName: widget.storeName,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryBtnBg,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(
+              'preview_store_readiness_btn'.tr,
+              style: TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: secondaryBtnText,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 11),
+        // 3. الإبلاغ عن عائق تقني (Soft Neutral Gray Button — Figma #F6F6F6)
         SizedBox(
           height: 48,
           child: ElevatedButton(
             onPressed: () => _showReportIssueDialog(context, controller),
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF3F4F6),
+              backgroundColor: secondaryBtnBg,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
               'report_technical_obstacle'.tr,
               style: TextStyle(
                 fontFamily: 'Tajawal',
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: textDark,
+                color: secondaryBtnText,
               ),
             ),
           ),
@@ -1098,21 +1247,8 @@ class _ContractActivationScreenState extends State<ContractActivationScreen> {
   String _formatCompletedDate(String rawDate) {
     try {
       final dt = DateTime.parse(rawDate);
-      const months = [
-        'يناير',
-        'فبراير',
-        'مارس',
-        'أبريل',
-        'مايو',
-        'يونيو',
-        'يوليو',
-        'أغسطس',
-        'سبتمبر',
-        'أكتوبر',
-        'نوفمبر',
-        'ديسمبر',
-      ];
-      return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+      final String monthKey = 'month_${dt.month}';
+      return '${dt.day} ${monthKey.tr} ${dt.year}';
     } catch (_) {
       return rawDate;
     }

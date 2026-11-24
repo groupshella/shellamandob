@@ -16,20 +16,22 @@ class EdgeToEdgeService {
 
   /// Set system UI overlay style for proper edge-to-edge display
   static void setSystemUIOverlayStyle({
+    bool? isDark,
     SystemUiOverlayStyle? statusBarStyle,
     SystemUiOverlayStyle? navigationBarStyle,
   }) {
+    final bool dark = isDark ?? false;
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            statusBarStyle?.statusBarIconBrightness ?? Brightness.dark,
-        statusBarBrightness:
-            statusBarStyle?.statusBarBrightness ?? Brightness.light,
+        statusBarIconBrightness: statusBarStyle?.statusBarIconBrightness ??
+            (dark ? Brightness.light : Brightness.dark),
+        statusBarBrightness: statusBarStyle?.statusBarBrightness ??
+            (dark ? Brightness.dark : Brightness.light),
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarIconBrightness:
             navigationBarStyle?.systemNavigationBarIconBrightness ??
-                Brightness.dark,
+                (dark ? Brightness.light : Brightness.dark),
         systemNavigationBarDividerColor: Colors.transparent,
       ),
     );

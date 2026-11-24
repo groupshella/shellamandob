@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -264,13 +265,23 @@ class _FloatingNavItemWidget extends StatelessWidget {
 
     Widget iconWidget;
     if (item.activeAsset != null && item.inactiveAsset != null) {
-      iconWidget = Image.asset(
-        isSelected ? item.activeAsset! : item.inactiveAsset!,
-        key: ValueKey<String>('${isSelected ? item.activeAsset : item.inactiveAsset}_$isSelected'),
-        width: 24,
-        height: 24,
-        color: isSelected ? activeColor : inactiveColor,
-      );
+      final String asset = isSelected ? item.activeAsset! : item.inactiveAsset!;
+      final Color tint = isSelected ? activeColor : inactiveColor;
+      iconWidget = asset.toLowerCase().endsWith('.svg')
+          ? SvgPicture.asset(
+              asset,
+              key: ValueKey<String>('${asset}_$isSelected'),
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(tint, BlendMode.srcIn),
+            )
+          : Image.asset(
+              asset,
+              key: ValueKey<String>('${asset}_$isSelected'),
+              width: 24,
+              height: 24,
+              color: tint,
+            );
     } else if (item.activeIcon != null && item.inactiveIcon != null) {
       iconWidget = Icon(
         isSelected ? item.activeIcon : item.inactiveIcon,

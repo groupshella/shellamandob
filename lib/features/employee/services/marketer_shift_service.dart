@@ -198,6 +198,19 @@ class MarketerShiftService {
     }
   }
 
+  /// GET /api/v1/customer/marketer/shift/alerts
+  Future<Response> getDailyShiftAlerts() async {
+    try {
+      return await apiClient.getData(
+        AppConstants.marketerShiftAlertsUri,
+        useEtag: false,
+      );
+    } catch (e) {
+      debugPrint('❌ [MarketerShiftService] getDailyShiftAlerts error: $e');
+      return Response(statusCode: 500, statusText: e.toString());
+    }
+  }
+
   /// GET /api/v1/customer/marketer/shift/history
   Future<Response> getShiftHistory() async {
     try {

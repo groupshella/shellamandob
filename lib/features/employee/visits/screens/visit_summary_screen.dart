@@ -6,6 +6,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import '../../../../common/controllers/theme_controller.dart';
 import '../../../../common/widgets/custom_snackbar.dart';
 import '../controllers/store_visits_controller.dart';
+import 'branch_location_picker_screen.dart';
 import '../models/not_closing_reason.dart';
 import '../models/store_visit_model.dart';
 import '../widgets/cr_scanner_dialog.dart';
@@ -13,7 +14,6 @@ import '../widgets/merchant_promo_library_bottom_sheet.dart';
 import 'contract_signing_screen.dart';
 import 'follow_up_task_screen.dart';
 import 'submit_visit_summary_screen.dart';
-import '../widgets/store_visit_embedded_map_widget.dart';
 import '../widgets/decision_maker_card_widget.dart';
 import '../widgets/store_contacts_section_widget.dart';
 import '../../../chat/screens/chat_screen.dart';
@@ -63,6 +63,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
         widget.visit.visitStatus == StoreVisitStatus.followUp;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.isRegistered<StoreVisitsController>()) {
+        Get.find<StoreVisitsController>().loadNotClosingReasons();
         final controller = Get.find<StoreVisitsController>();
         controller.storeNameController.text = widget.visit.storeName;
         controller.managerNameController.text = widget.visit.managerName;
@@ -278,7 +279,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               ),
               body: SingleChildScrollView(
                 padding:
-                    const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
+                    const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -295,41 +296,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                         subText: subText,
                       ),
 
-                    // موقع المتجر على الخريطة
-                    _buildSectionHeader('store_location_and_address'.tr, darkText),
-                    const SizedBox(height: 8),
-                    _buildCardContainer(
-                      cardBg: cardBg,
-                      borderColor: borderColor,
-                      children: [
-                        if (currentVisit.address.isNotEmpty) ...[
-                          Row(
-                            children: [
-                              const Icon(IconlyLight.location,
-                                  size: 16, color: _primaryGreen),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  currentVisit.address,
-                                  style: TextStyle(
-                                    fontFamily: 'Tajawal',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: darkText,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                        StoreVisitEmbeddedMapWidget(
-                            visit: currentVisit, height: 160),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-
-                    // 1. بيانات المحل (Figma Container 8915:35142)
+                    // 1. بيانات المحل (Figma 9688:27521)
                     _buildSectionHeader('store_data'.tr, darkText),
                     const SizedBox(height: 8),
                     _buildCardContainer(
@@ -343,11 +310,392 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                           keyboardType: TextInputType.number,
                           readOnly: !_isEditable,
                           initialValue: currentVisit.openingsCount.toString(),
-                          onChanged: (_) => _syncInputsToController(controller),
+                          onChanged: (val) {
+                            final parsed = int.tryParse(val.trim()) ?? 1;
+                            if (parsed > 1 && controller.visitBranches.isEmpty) {
+                              controller.addVisitBranch();
+                            }
+                            setState(() {});
+                            _syncInputsToController(controller);
+                          },
                           darkText: darkText,
                           inputFill: inputFill,
                           isDark: isDark,
                         ),
+                        // [R10] Multi-Branch Section matching Figma 9688:27514 (node 10045:30300)
+                        if ((int.tryParse(controller.openingsController.text.trim()) ??
+                                currentVisit.openingsCount) >
+                            1) ...[
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: isDark
+                                    ? borderColor
+                                    : const Color(0xFFF6F5F8),
+                                width: 2,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Header: الفروع (التاجر متعدد الفروع) | + إضافة فرع
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        'branches_section_title'.tr,
+                                        style: TextStyle(
+                                          fontFamily: 'Tajawal',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: darkText,
+                                        ),
+                                      ),
+                                    ),
+                                    if (_isEditable)
+                                      InkWell(
+                                        onTap: controller.addVisitBranch,
+                                        borderRadius: BorderRadius.circular(24),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(24),
+                                            border: Border.all(
+                                              color: _primaryGreen,
+                                              width: 0.8,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SvgPicture.asset(
+                                                'assets/image/figma_visit_summary/add_circle.svg',
+                                                width: 16,
+                                                height: 16,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                'add_branch_btn'.tr,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Tajawal',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: _primaryGreen,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                if (controller.visitBranches.isEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Builder(
+                                    builder: (_) {
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        if (controller.visitBranches.isEmpty) {
+                                          controller.addVisitBranch();
+                                        }
+                                      });
+                                      return const SizedBox.shrink();
+                                    },
+                                  ),
+                                ],
+                                ...controller.visitBranches.asMap().entries.map((entry) {
+                                  final idx = entry.key;
+                                  final branch = entry.value;
+                                  final hasCoords = branch.latitude != null &&
+                                      branch.longitude != null;
+                                  final inZone = branch.isInSpecialistZone;
+
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      top: idx == 0 ? 10 : 14,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        if (idx > 0) ...[
+                                          Divider(color: borderColor, height: 16),
+                                        ],
+                                        // Label: اسم الفرع 2 (branch #1 is the main visited store)
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '${'branch_name_label'.tr}  ${idx + 2}',
+                                              style: TextStyle(
+                                                fontFamily: 'Tajawal',
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: darkText,
+                                              ),
+                                            ),
+                                            if (_isEditable &&
+                                                controller.visitBranches.length > 1)
+                                              InkWell(
+                                                onTap: () => controller
+                                                    .removeVisitBranch(idx),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(4),
+                                                  child: const Icon(
+                                                    Icons.delete_outline,
+                                                    color: Color(0xFFDC2626),
+                                                    size: 18,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Container(
+                                          height: 52,
+                                          decoration: BoxDecoration(
+                                            color: inputFill,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12),
+                                          alignment: Alignment.center,
+                                          child: TextFormField(
+                                            initialValue: branch.branchName,
+                                            readOnly: !_isEditable,
+                                            onChanged: (val) =>
+                                                branch.branchName = val,
+                                            style: TextStyle(
+                                              fontFamily: 'Tajawal',
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                              color: darkText,
+                                            ),
+                                            decoration: InputDecoration(
+                                              hintText: 'branch_name_hint'.tr,
+                                              hintStyle: TextStyle(
+                                                fontFamily: 'Tajawal',
+                                                fontSize: 13,
+                                                color: isDark
+                                                    ? const Color(0xFF6B7280)
+                                                    : const Color(0xFF9CA3AF),
+                                              ),
+                                              border: InputBorder.none,
+                                              isDense: true,
+                                              contentPadding: EdgeInsets.zero,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        // Figma 10043:30298: الفرع تحت إشراف نفس المتجر
+                                        InkWell(
+                                          onTap: !_isEditable
+                                              ? null
+                                              : () {
+                                                  setState(() {
+                                                    branch.underSameStoreSupervision =
+                                                        !branch
+                                                            .underSameStoreSupervision;
+                                                  });
+                                                  _syncInputsToController(
+                                                      controller);
+                                                },
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'branch_same_store_supervision'
+                                                        .tr,
+                                                    style: TextStyle(
+                                                      fontFamily: 'Tajawal',
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: darkText,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: branch
+                                                              .underSameStoreSupervision
+                                                          ? darkText
+                                                          : (isDark
+                                                              ? const Color(
+                                                                  0xFF6B7280)
+                                                              : const Color(
+                                                                  0xFF9CA3AF)),
+                                                      width: branch
+                                                              .underSameStoreSupervision
+                                                          ? 5.5
+                                                          : 1.8,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        // Figma 10043:8896: حدد موقع المتجر (Solid Green Button)
+                                        if (_isEditable)
+                                          SizedBox(
+                                            height: 42,
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                final res = await Get.to<
+                                                    Map<String, dynamic>>(
+                                                  () => BranchLocationPickerScreen(
+                                                    initialLat: branch.latitude ??
+                                                        currentVisit.latitude ??
+                                                        24.7136,
+                                                    initialLng: branch.longitude ??
+                                                        currentVisit.longitude ??
+                                                        46.6753,
+                                                  ),
+                                                );
+                                                if (res != null &&
+                                                    res['latitude'] != null &&
+                                                    res['longitude'] != null) {
+                                                  await controller
+                                                      .setBranchLocationAndCheckZone(
+                                                    idx,
+                                                    (res['latitude'] as num)
+                                                        .toDouble(),
+                                                    (res['longitude'] as num)
+                                                        .toDouble(),
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: _primaryGreen,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  SvgPicture.asset(
+                                                    'assets/image/figma_visit_summary/location_white.svg',
+                                                    width: 22,
+                                                    height: 22,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Flexible(
+                                                    child: Text(
+                                                      hasCoords
+                                                          ? '${'branch_change_location_btn'.tr} (${branch.latitude!.toStringAsFixed(4)}, ${branch.longitude!.toStringAsFixed(4)})'
+                                                          : 'pick_store_location_btn'
+                                                              .tr,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Tajawal',
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        if (branch.isCheckingZone) ...[
+                                          const SizedBox(height: 6),
+                                          const LinearProgressIndicator(
+                                            color: _primaryGreen,
+                                            minHeight: 2,
+                                          ),
+                                        ] else if (inZone != null) ...[
+                                          const SizedBox(height: 8),
+                                          Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 7,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: inZone
+                                                  ? (isDark
+                                                      ? const Color(0xFF143326)
+                                                      : const Color(0xFFE9F5EB))
+                                                  : (isDark
+                                                      ? const Color(0xFF2D2111)
+                                                      : const Color(0xFFFFFBEB)),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  inZone
+                                                      ? Icons.check_circle_outline
+                                                      : Icons.alt_route_rounded,
+                                                  size: 15,
+                                                  color: inZone
+                                                      ? _primaryGreen
+                                                      : const Color(0xFFD97706),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Expanded(
+                                                  child: Text(
+                                                    inZone
+                                                        ? 'branch_in_zone_badge'.tr
+                                                        : '${'branch_out_zone_badge'.tr}${branch.detectedZoneName != null ? ' (${branch.detectedZoneName})' : ''}',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Tajawal',
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: inZone
+                                                          ? (isDark
+                                                              ? const Color(
+                                                                  0xFF4ADE80)
+                                                              : const Color(
+                                                                  0xFF1E5E2A))
+                                                          : (isDark
+                                                              ? const Color(
+                                                                  0xFFFBBF24)
+                                                              : const Color(
+                                                                  0xFFB45309)),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 12),
                         // CR Number with Unified OCR Scanner suffix & label
                         Column(
@@ -591,13 +939,21 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
 
                     const SizedBox(height: 16),
 
-                    // 3. حالة الاهتمام (Figma Node 8937:108427, 8942:1746, 8945:23023)
-                    _buildSectionHeader('interest_status_title'.tr, darkText),
-                    const SizedBox(height: 8),
+                    // 3. حالة الاهتمام (Figma 9688:27551 — title inside card)
                     _buildCardContainer(
                       cardBg: cardBg,
                       borderColor: borderColor,
                       children: [
+                        Text(
+                          'interest_status_title'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: darkText,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -655,23 +1011,30 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
 
                     const SizedBox(height: 16),
 
-                    // 4. مرحلة البيع (Figma Node 8937:108427, 8942:1746, 8945:23023)
-                    _buildSectionHeader('sales_stage_title'.tr, darkText),
-                    const SizedBox(height: 4),
-                    Text(
-                      'sales_stage_subtitle'.tr,
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 13,
-                        color: subText,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
+                    // 4. مرحلة البيع (Figma 9688:27566 — title & subtitle inside card)
                     _buildCardContainer(
                       cardBg: cardBg,
                       borderColor: borderColor,
                       children: [
+                        Text(
+                          'sales_stage_title'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: darkText,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'sales_stage_subtitle'.tr,
+                          style: TextStyle(
+                            fontFamily: 'Tajawal',
+                            fontSize: 11,
+                            color: subText,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
                         _buildSalesStageGrid(
                           controller,
                           !_isEditable,
@@ -968,21 +1331,23 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
+
+                    // 6. Bottom Action Buttons in scroll content (Figma 9713:48210)
+                    _buildBottomBar(
+                      context,
+                      controller,
+                      currentVisit,
+                      isContract,
+                      isDark: isDark,
+                      cardBg: cardBg,
+                      borderColor: borderColor,
+                      darkText: darkText,
+                      subText: subText,
+                      inputFill: inputFill,
+                    ),
                   ],
                 ),
-              ),
-              bottomNavigationBar: _buildBottomBar(
-                context,
-                controller,
-                currentVisit,
-                isContract,
-                isDark: isDark,
-                cardBg: cardBg,
-                borderColor: borderColor,
-                darkText: darkText,
-                subText: subText,
-                inputFill: inputFill,
               ),
             );
           },
@@ -1210,12 +1575,17 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(
-                  _isObstaclesDropdownOpen
-                      ? Icons.keyboard_arrow_up_rounded
-                      : Icons.keyboard_arrow_down_rounded,
-                  color: const Color(0xFF6B7280),
-                  size: 22,
+                Transform.rotate(
+                  angle: _isObstaclesDropdownOpen ? 0 : 3.14159265,
+                  child: SvgPicture.asset(
+                    'assets/image/figma_visit_summary/arrow_up.svg',
+                    width: 16,
+                    height: 16,
+                    colorFilter: ColorFilter.mode(
+                      isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1244,22 +1614,24 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
               ],
             ),
             child: Column(
-              children: NotClosingReason.values.map((reason) {
+              children: controller.dynamicNotClosingReasons.map((reason) {
+                final isEn = (Get.locale?.languageCode ?? 'ar') == 'en';
+                final reasonTitle = reason.localizedTitle(isEn);
                 final isCurrent =
-                    controller.selectedNotClosingReason == reason ||
-                        controller.selectedClosingReason == reason.key ||
-                        selected == reason.label;
-                final isLast = reason == NotClosingReason.values.last;
+                    controller.selectedClosingReason == reason.code ||
+                        selected == reasonTitle ||
+                        selected == reason.titleAr;
+                final isLast = reason.code == controller.dynamicNotClosingReasons.last.code;
                 return InkWell(
                   onTap: () {
                     setState(() {
-                      controller.setSelectedNotClosingReason(reason);
+                      controller.setSelectedDynamicReason(reason);
                       _isObstaclesDropdownOpen = false;
                     });
                     _syncInputsToController(controller);
                   },
                   borderRadius: BorderRadius.vertical(
-                    top: reason == NotClosingReason.values.first
+                    top: reason.code == controller.dynamicNotClosingReasons.first.code
                         ? const Radius.circular(12)
                         : Radius.zero,
                     bottom: isLast ? const Radius.circular(12) : Radius.zero,
@@ -1290,7 +1662,7 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            reason.label,
+                            reasonTitle,
                             style: TextStyle(
                               fontFamily: 'Tajawal',
                               fontSize: 13,
@@ -1312,6 +1684,63 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
           ),
         ],
 
+        // Dynamic Admin Helper Headline Card
+        if (controller.activeDynamicReason != null &&
+            controller.activeDynamicReason!.localizedHeadline(
+                    (Get.locale?.languageCode ?? 'ar') == 'en') !=
+                null) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2D2111) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF5C4018) : const Color(0xFFFDE68A),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.lightbulb_outline_rounded,
+                  size: 18,
+                  color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'reason_helper_headline_title'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        controller.activeDynamicReason!.localizedHeadline(
+                                (Get.locale?.languageCode ?? 'ar') == 'en') ??
+                            '',
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         // Additional Input Field only when "سبب آخر" (other) is Selected (Figma Node 9137:91112)
         if (controller.selectedNotClosingReason == NotClosingReason.other ||
             controller.selectedClosingReason == 'other' ||
@@ -1329,6 +1758,198 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             darkText: darkText,
             inputFill: inputFill,
             isDark: isDark,
+          ),
+        ],
+
+        // [R09] Exclusive contract with competitor app: optional app name + expiry date + auto follow-up note
+        if (controller.selectedNotClosingReason == NotClosingReason.exclusiveOtherApp ||
+            controller.selectedClosingReason == 'exclusive_other_app') ...[
+          const SizedBox(height: 12),
+          _buildInputField(
+            label: 'exclusive_competitor_app_label'.tr,
+            controller: controller.exclusiveCompetitorAppController,
+            hintText: 'exclusive_competitor_app_hint'.tr,
+            readOnly: !_isEditable,
+            onChanged: (_) => _syncInputsToController(controller),
+            darkText: darkText,
+            inputFill: inputFill,
+            isDark: isDark,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'exclusive_contract_ends_at_label'.tr,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: darkText,
+            ),
+          ),
+          const SizedBox(height: 6),
+          InkWell(
+            onTap: !_isEditable
+                ? null
+                : () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: controller.exclusiveContractEndsAt ??
+                          now.add(const Duration(days: 60)),
+                      firstDate: now,
+                      lastDate: now.add(const Duration(days: 365 * 5)),
+                    );
+                    if (picked != null) {
+                      controller.setExclusiveContractEndsAt(picked);
+                    }
+                  },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: inputFill,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE5E9E5),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    controller.exclusiveContractEndsAt != null
+                        ? '${controller.exclusiveContractEndsAt!.year}-${controller.exclusiveContractEndsAt!.month.toString().padLeft(2, '0')}-${controller.exclusiveContractEndsAt!.day.toString().padLeft(2, '0')}'
+                        : 'exclusive_contract_ends_at_hint'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 13,
+                      color: controller.exclusiveContractEndsAt != null
+                          ? darkText
+                          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF9CA3AF)),
+                    ),
+                  ),
+                  Icon(
+                    Icons.calendar_today_outlined,
+                    size: 16,
+                    color: _primaryGreen,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF143326) : const Color(0xFFE9F5EB),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.event_available_outlined, size: 16, color: _primaryGreen),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'exclusive_auto_followup_note'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFFBBF7D0) : const Color(0xFF1E5E2A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // [R09] OTP / Nafath fear: suggest showing visual explanation (R23)
+        if (controller.selectedNotClosingReason == NotClosingReason.otpNafathFear ||
+            controller.selectedClosingReason == 'otp_nafath_fear') ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF172554) : const Color(0xFFEFF6FF),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF1E40AF) : const Color(0xFFBFDBFE),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.verified_user_outlined,
+                  size: 18,
+                  color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'otp_nafath_visual_tip_title'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E40AF),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'otp_nafath_visual_tip_body'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 11,
+                          color: isDark ? const Color(0xFFBFDBFE) : const Color(0xFF1D4ED8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // [R09] No credit sales: clarify Qidha vs Shella distinction
+        if (controller.selectedNotClosingReason == NotClosingReason.noCreditSales ||
+            controller.selectedClosingReason == 'no_credit_sales') ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2D2111) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? const Color(0xFF5C4018) : const Color(0xFFFDE6B8),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'no_credit_sales_note'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ],
@@ -1397,57 +2018,20 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
                 width: isSelected ? 1.4 : 1.0,
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    step.localizedLabel,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Tajawal',
-                      fontSize: 11.5,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: textCol,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Text(
+                step.localizedLabel,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                  color: textCol,
                 ),
-                if (step == StorePipelineStep.negotiating ||
-                    step == StorePipelineStep.contractSigned) ...[
-                  const SizedBox(width: 3),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (isDark
-                              ? const Color(0xFF163E20)
-                              : const Color(0xFFD1FAE5))
-                          : (isDark
-                              ? const Color(0xFF252B37)
-                              : const Color(0xFFE2E8F0)),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      '+30${'minutes_short'.tr}',
-                      style: TextStyle(
-                        fontFamily: 'Tajawal',
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected
-                            ? _primaryGreen
-                            : (isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B)),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ),
@@ -1590,14 +2174,11 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
       );
     }
 
-    return Container(
-      color: Colors.transparent,
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 6),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
             // Action Buttons Row: تواصل مع الإدارة + التقرير السري للمشرف (Figma 9700:28220)
             Row(
               children: [
@@ -1789,9 +2370,8 @@ class _VisitSummaryScreenState extends State<VisitSummaryScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
+      );
+    }
 
   // Figma Frame 8937:108513: تقرير سري BottomSheet
   void _showConfidentialReportBottomSheet(

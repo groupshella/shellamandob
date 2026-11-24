@@ -9,7 +9,11 @@ class NetworkOverviewModel {
   final int directCustomersCount;
   final double teamEarnings;
   final int teamCustomersCount;
+  final int growthSpecialistsCount;
+  final int freelanceMarketersCount;
+  final int driversCount;
   final List<IdleMarketerSummaryModel> idleMarketers;
+  final List<DriverLeadSummaryModel> addedDrivers;
 
   NetworkOverviewModel({
     required this.totalSubMarketers,
@@ -22,11 +26,16 @@ class NetworkOverviewModel {
     this.directCustomersCount = 0,
     this.teamEarnings = 0.0,
     this.teamCustomersCount = 0,
+    this.growthSpecialistsCount = 0,
+    this.freelanceMarketersCount = 0,
+    this.driversCount = 0,
     this.idleMarketers = const [],
+    this.addedDrivers = const [],
   });
 
   factory NetworkOverviewModel.fromJson(Map<String, dynamic> json) {
     var rawIdle = json['idle_marketers'] as List<dynamic>? ?? [];
+    var rawDrivers = json['added_drivers'] as List<dynamic>? ?? [];
     return NetworkOverviewModel(
       totalSubMarketers: json['total_sub_marketers'] as int? ?? 0,
       activeMarketersCount: json['active_marketers_count'] as int? ?? 0,
@@ -38,7 +47,46 @@ class NetworkOverviewModel {
       directCustomersCount: json['direct_customers_count'] as int? ?? 0,
       teamEarnings: (json['team_earnings'] as num?)?.toDouble() ?? 0.0,
       teamCustomersCount: json['team_customers_count'] as int? ?? 0,
+      growthSpecialistsCount: json['growth_specialists_count'] as int? ?? 0,
+      freelanceMarketersCount: json['freelance_marketers_count'] as int? ?? 0,
+      driversCount: json['drivers_count'] as int? ?? 0,
       idleMarketers: rawIdle.map((e) => IdleMarketerSummaryModel.fromJson(e)).toList(),
+      addedDrivers: rawDrivers.map((e) => DriverLeadSummaryModel.fromJson(e)).toList(),
+    );
+  }
+}
+
+class DriverLeadSummaryModel {
+  final int id;
+  final String name;
+  final String phone;
+  final String vehicleType;
+  final String? joinedAtText;
+  final int customersCount;
+  final double returnAmount;
+  final String? avatar;
+
+  DriverLeadSummaryModel({
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.vehicleType,
+    this.joinedAtText,
+    this.customersCount = 0,
+    this.returnAmount = 0.0,
+    this.avatar,
+  });
+
+  factory DriverLeadSummaryModel.fromJson(Map<String, dynamic> json) {
+    return DriverLeadSummaryModel(
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      vehicleType: json['vehicle_type'] as String? ?? 'motorcycle',
+      joinedAtText: json['joined_at_text'] as String?,
+      customersCount: json['customers_count'] as int? ?? 0,
+      returnAmount: (json['return_amount'] as num?)?.toDouble() ?? 0.0,
+      avatar: json['avatar'] as String?,
     );
   }
 }

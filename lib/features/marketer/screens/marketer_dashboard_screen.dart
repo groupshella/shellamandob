@@ -14,6 +14,8 @@ import 'package:sixam_mart/features/marketer/widgets/sar_currency_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sixam_mart/features/employee/screens/employee_main_screen.dart';
 import 'package:sixam_mart/features/employee/screens/employee_profile_screen.dart';
+import 'package:sixam_mart/features/employee/network/screens/add_driver_lead_screen.dart';
+import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_bank_transfer_sheet.dart';
 import 'package:sixam_mart/features/marketer/widgets/marketer_pending_balance_sheet.dart';
 
@@ -72,23 +74,13 @@ class MarketerDashboardScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            MarketerHeader(
-              title: 'voucher_marketer'.tr,
-              showBackButton: !isRoot,
-              trailing: isRoot
-                  ? IconButton(
-                      onPressed: () => Get.to(() => const EmployeeProfileScreen(isRoot: false)),
-                      icon: Icon(
-                        IconlyLight.profile,
-                        size: 22,
-                        color: isDark ? Colors.white : _darkText,
-                      ),
-                      splashRadius: 22,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                    )
-                  : null,
-            ),
+            if (isRoot)
+              _buildHomeHeader(context, isDark)
+            else
+              MarketerHeader(
+                title: 'voucher_marketer'.tr,
+                showBackButton: true,
+              ),
             Expanded(
               child: GetBuilder<MarketerController>(
                 builder: (c) {
@@ -103,21 +95,29 @@ class MarketerDashboardScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // 1. Hero Gradient Balance Card (Figma 9632:34988)
-                          _buildHeroBalanceCard(context, c, isDark),
-                          const SizedBox(height: 16),
+                          if (!isRoot) ...[
+                            // 1. Hero Gradient Balance Card
+                            _buildHeroBalanceCard(context, c, isDark),
+                            const SizedBox(height: 16),
+                          ],
 
-                          // 2. Personal QR Code Card (Figma 9632:35023)
+                          // 2. Personal QR Code Card (Figma 10055:48695)
                           _buildQRCard(context, c, isDark),
                           const SizedBox(height: 16),
 
-                          // 3. KPI Cards (Figma 9632:35055 & 9632:35069)
+                          // 3. Add Driver Banner Card (Figma 10055:48711)
+                          _buildAddDriverCard(context, isDark),
+                          const SizedBox(height: 16),
+
+                          // 4. KPI Cards (Figma 10055:48718 & 10055:48726)
                           _buildKPICards(c, isDark),
                           const SizedBox(height: 16),
 
-                          // 4. Recent Commissions Card (Figma 9632:35129)
-                          _buildRecentCommissionsCard(c, isDark),
-                          const SizedBox(height: 24),
+                          if (!isRoot) ...[
+                            // 5. Recent Commissions Card
+                            _buildRecentCommissionsCard(c, isDark),
+                            const SizedBox(height: 24),
+                          ],
                         ],
                       ),
                     ),
@@ -130,6 +130,153 @@ class MarketerDashboardScreen extends StatelessWidget {
       ),
     );
       },
+    );
+  }
+
+  Widget _buildHomeHeader(BuildContext context, bool isDark) {
+    return GetBuilder<ProfileController>(
+      builder: (profileController) {
+        final user = profileController.userInfoModel;
+        final name = user != null
+            ? '${user.fName ?? ''} ${user.lName ?? ''}'.trim()
+            : '';
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: isDark ? const Color(0xFF121418) : Colors.white,
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB),
+                  border: Border.all(
+                    color: _primaryGreen.withValues(alpha: 0.3),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(
+                    IconlyLight.profile,
+                    color: _primaryGreen,
+                    size: 22,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      name.isNotEmpty ? '${'welcome_greeting'.tr} $name' : 'voucher_marketer'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : _darkText,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'ready_to_start_day'.tr,
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: () => Get.to(() => const EmployeeProfileScreen(isRoot: false)),
+                icon: Icon(
+                  IconlyLight.notification,
+                  size: 24,
+                  color: isDark ? Colors.white : _darkText,
+                ),
+                splashRadius: 22,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAddDriverCard(BuildContext context, bool isDark) {
+    return GestureDetector(
+      onTap: () => Get.to(() => const AddDriverLeadScreen()),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C2028) : const Color(0xFFF6F5F8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? const Color(0xFF2C3240) : const Color(0xFFE5E7EB),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E3A24) : const Color(0xFFEBFEEB),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.all(10),
+              child: SvgPicture.asset(
+                'assets/image/figma_freelance_marketer/truck_driver.svg',
+                colorFilter: const ColorFilter.mode(_primaryGreen, BlendMode.srcIn),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'add_new_driver_title'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : _darkText,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'add_new_driver_desc'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SvgPicture.asset(
+              'assets/image/figma_freelance_marketer/arrow_left.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(_primaryGreen, BlendMode.srcIn),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

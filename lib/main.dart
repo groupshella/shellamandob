@@ -509,15 +509,28 @@ class _MyAppState extends State<MyApp> {
         final TextDirection textDirection =
             localizeController.isLtr ? TextDirection.ltr : TextDirection.rtl;
         final Widget navigatorChild = child ?? const SizedBox.shrink();
-        return Directionality(
-          textDirection: textDirection,
-          child: MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(1),
-            ),
-            child: Material(
-              color: themeController.darkTheme ? const Color(0xFF121418) : Colors.white,
-              child: navigatorChild,
+        final bool isDark = themeController.darkTheme;
+        final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: isDark ? const Color(0xFF121418) : Colors.white,
+          systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          systemNavigationBarDividerColor: Colors.transparent,
+        );
+
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: overlayStyle,
+          child: Directionality(
+            textDirection: textDirection,
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: const TextScaler.linear(1),
+              ),
+              child: Material(
+                color: isDark ? const Color(0xFF121418) : Colors.white,
+                child: navigatorChild,
+              ),
             ),
           ),
         );

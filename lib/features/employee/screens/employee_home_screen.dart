@@ -12,6 +12,7 @@ import '../widgets/shift_metrics_grid_widget.dart';
 import '../widgets/employee_quick_actions_widget.dart';
 import '../widgets/supervisor_recommendations_banner.dart';
 import '../widgets/employee_warnings_banner.dart';
+import '../widgets/shift_smart_alerts_banner.dart';
 import '../widgets/today_visits_summary_widget.dart';
 import '../widgets/acquisition_targets_cards_widget.dart';
 import '../widgets/performance_report_card_widget.dart';
@@ -110,6 +111,9 @@ class EmployeeHomeScreen extends StatelessWidget {
 
                         // 7. شريط الإنذارات (يظهر عند وجود إنذارات)
                         EmployeeWarningsBanner(isDark: isDark),
+
+                        // 7.1 شريط التنبيهات الذكية للشفت والمتابعات المعلقة (R14)
+                        ShiftSmartAlertsBanner(isDark: isDark),
 
                         // 8. ملخص زيارات اليوم
                         TodayVisitsSummaryWidget(

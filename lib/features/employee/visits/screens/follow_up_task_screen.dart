@@ -4,6 +4,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import '../models/store_visit_model.dart';
+import '../models/dynamic_not_closing_reason.dart';
 import '../controllers/store_visits_controller.dart';
 import 'submit_visit_summary_screen.dart';
 
@@ -22,19 +23,21 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
   // Step 1 = Reason, Step 2 = Schedule
   int _currentStep = 1;
 
-  // Selected Reason Key
-  String _selectedReasonKey = 'reason_needs_time';
+  // Selected Reason Code
+  String _selectedReasonCode = 'needs_time';
   final TextEditingController _customReasonController = TextEditingController();
+  final TextEditingController _exclusiveAppController = TextEditingController();
+  DateTime? _exclusiveContractEndsAt;
 
-  final List<String> _reasonsKeys = [
-    'reason_needs_time',
-    'reason_custom_offer',
-    'reason_waiting_owner',
-    'reason_more_details',
-    'reason_unsure_service',
-    'reason_currently_busy',
-    'reason_other',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<StoreVisitsController>()) {
+        Get.find<StoreVisitsController>().loadNotClosingReasons();
+      }
+    });
+  }
 
   // Schedule Fields
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 2));
@@ -44,6 +47,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
   @override
   void dispose() {
     _customReasonController.dispose();
+    _exclusiveAppController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -144,50 +148,118 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Reasons List
-              Column(
-                children: _reasonsKeys.map((reasonKey) {
-                  final isSelected = _selectedReasonKey == reasonKey;
-                  final isLast = reasonKey == _reasonsKeys.last;
+              // Dynamic Reasons List
+              GetBuilder<StoreVisitsController>(
+                builder: (visitsCtrl) {
+                  final reasons = visitsCtrl.dynamicNotClosingReasons;
+                  final isEn = (Get.locale?.languageCode ?? 'ar') == 'en';
+                  DynamicNotClosingReason? selectedItem;
+                  for (final r in reasons) {
+                    if (r.code == _selectedReasonCode) {
+                      selectedItem = r;
+                      break;
+                    }
+                  }
+                  final helperHeadline = selectedItem?.localizedHeadline(isEn);
 
-                  return Container(
-                    margin: EdgeInsets.only(bottom: isLast ? 0 : 8),
-                    child: InkWell(
-                      onTap: () => setState(() => _selectedReasonKey = reasonKey),
-                      borderRadius: BorderRadius.circular(14),
-                      child: Container(
-                        width: double.infinity,
-                        height: 49,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        alignment: AlignmentDirectional.centerStart,
-                        decoration: BoxDecoration(
-                          color: isSelected ? itemSelectedBg : itemBg,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isSelected ? _primaryGreen : borderColor,
-                            width: 0.8,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...reasons.map((reason) {
+                        final isSelected = _selectedReasonCode == reason.code;
+                        final isLast = reason.code == reasons.last.code;
+
+                        return Container(
+                          margin: EdgeInsets.only(bottom: isLast ? 0 : 8),
+                          child: InkWell(
+                            onTap: () => setState(() => _selectedReasonCode = reason.code),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              width: double.infinity,
+                              height: 49,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              alignment: AlignmentDirectional.centerStart,
+                              decoration: BoxDecoration(
+                                color: isSelected ? itemSelectedBg : itemBg,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isSelected ? _primaryGreen : borderColor,
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                reason.localizedTitle(isEn),
+                                style: TextStyle(
+                                  fontFamily: 'Tajawal',
+                                  fontSize: 14,
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? _primaryGreen : darkText,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                      if (helperHeadline != null) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF2D2111) : const Color(0xFFFFFBEB),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF5C4018) : const Color(0xFFFDE68A),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.lightbulb_outline_rounded,
+                                size: 18,
+                                color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'reason_helper_headline_title'.tr,
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w800,
+                                        color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      helperHeadline,
+                                      style: TextStyle(
+                                        fontFamily: 'Tajawal',
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Text(
-                          reasonKey.tr,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 14,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected ? _primaryGreen : darkText,
-                          ),
-                        ),
-                      ),
-                    ),
+                      ],
+                    ],
                   );
-                }).toList(),
+                },
               ),
             ],
           ),
         ),
 
-        // Custom Reason Input when 'reason_other' is selected
-        if (_selectedReasonKey == 'reason_other') ...[
+        // Custom Reason Input when 'other' is selected
+        if (_selectedReasonCode == 'other') ...[
           const SizedBox(height: 16),
           Text(
             'write_custom_reason'.tr,
@@ -227,6 +299,207 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.all(12),
               ),
+            ),
+          ),
+        ],
+
+        // [R09] Exclusive contract with competitor app
+        if (_selectedReasonCode == 'exclusive_other_app') ...[
+          const SizedBox(height: 16),
+          Text(
+            'exclusive_competitor_app_label'.tr,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: darkText,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: inputFill,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor),
+            ),
+            child: TextField(
+              controller: _exclusiveAppController,
+              style: TextStyle(fontFamily: 'Tajawal', fontSize: 14, color: darkText),
+              decoration: InputDecoration(
+                hintText: 'exclusive_competitor_app_hint'.tr,
+                hintStyle: TextStyle(fontFamily: 'Tajawal', fontSize: 13, color: subText),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'exclusive_contract_ends_at_label'.tr,
+            style: TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: darkText,
+            ),
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              final now = DateTime.now();
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _exclusiveContractEndsAt ?? now.add(const Duration(days: 60)),
+                firstDate: now,
+                lastDate: now.add(const Duration(days: 365 * 5)),
+              );
+              if (picked != null) {
+                final oneMonthBefore = DateTime(picked.year, picked.month - 1, picked.day);
+                setState(() {
+                  _exclusiveContractEndsAt = picked;
+                  _selectedDate = oneMonthBefore.isAfter(now)
+                      ? oneMonthBefore
+                      : now.add(const Duration(days: 1));
+                });
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              decoration: BoxDecoration(
+                color: inputFill,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _exclusiveContractEndsAt != null
+                        ? '${_exclusiveContractEndsAt!.year}-${_exclusiveContractEndsAt!.month.toString().padLeft(2, '0')}-${_exclusiveContractEndsAt!.day.toString().padLeft(2, '0')}'
+                        : 'exclusive_contract_ends_at_hint'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 13,
+                      color: _exclusiveContractEndsAt != null ? darkText : subText,
+                    ),
+                  ),
+                  const Icon(Icons.calendar_today_outlined, size: 16, color: _primaryGreen),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF143326) : const Color(0xFFE9F5EB),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.event_available_outlined, size: 16, color: _primaryGreen),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'exclusive_auto_followup_note'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFFBBF7D0) : const Color(0xFF1E5E2A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // [R09] OTP / Nafath fear tip (R23)
+        if (_selectedReasonCode == 'otp_nafath_fear') ...[
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF172554) : const Color(0xFFEFF6FF),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF1E40AF) : const Color(0xFFBFDBFE),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.verified_user_outlined,
+                  size: 18,
+                  color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'otp_nafath_visual_tip_title'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? const Color(0xFFDBEAFE) : const Color(0xFF1E40AF),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'otp_nafath_visual_tip_body'.tr,
+                        style: TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 11,
+                          color: isDark ? const Color(0xFFBFDBFE) : const Color(0xFF1D4ED8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // [R09] No credit sales distinction note
+        if (_selectedReasonCode == 'no_credit_sales') ...[
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2D2111) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isDark ? const Color(0xFF5C4018) : const Color(0xFFFDE6B8),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'no_credit_sales_note'.tr,
+                    style: TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -812,7 +1085,7 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
   }
 
   Widget _buildBottomBar(bool isDark) {
-    final bool canProceedStep1 = _selectedReasonKey != 'reason_other' ||
+    final bool canProceedStep1 = _selectedReasonCode != 'other' ||
         _customReasonController.text.trim().isNotEmpty;
     final bool isButtonActive = _currentStep == 1 ? canProceedStep1 : true;
     final bottomBg = isDark ? const Color(0xFF1C2028) : Colors.white;
@@ -862,9 +1135,9 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
   }
 
   Future<void> _submitFollowUp() async {
-    final finalReason = _selectedReasonKey == 'reason_other' && _customReasonController.text.trim().isNotEmpty
+    final finalReason = _selectedReasonCode == 'other' && _customReasonController.text.trim().isNotEmpty
         ? _customReasonController.text.trim()
-        : _selectedReasonKey.tr;
+        : _selectedReasonCode;
 
     final combinedDateTime = DateTime(
       _selectedDate.year,
@@ -877,6 +1150,8 @@ class _FollowUpTaskScreenState extends State<FollowUpTaskScreen> {
     if (Get.isRegistered<StoreVisitsController>()) {
       final controller = Get.find<StoreVisitsController>();
       controller.setClosingReason(finalReason);
+      controller.exclusiveCompetitorAppController.text = _exclusiveAppController.text.trim();
+      controller.setExclusiveContractEndsAt(_exclusiveContractEndsAt);
       controller.setFollowUpDate(combinedDateTime);
       controller.setFollowUpTime(_selectedTime);
       if (_notesController.text.trim().isNotEmpty) {

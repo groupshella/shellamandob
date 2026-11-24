@@ -26,6 +26,9 @@ class EmployeeShiftController extends GetxController implements GetxService {
   bool isLoading = false;
   bool hasLoadedOnce = false;
 
+  Map<String, dynamic>? shiftAlertsData;
+  bool isAlertsLoading = false;
+
   Timer? _tickerTimer;
   Timer? _pollingTimer;
   Timer? _locationPingTimer;
@@ -41,6 +44,7 @@ class EmployeeShiftController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     loadCurrentShift();
+    loadShiftAlerts();
     // Ping as soon as the app is open, regardless of shift state, so the
     // admin dashboard can show every marketer who has the app open right
     // now (colored red/"stopped" until they actually start a shift).
@@ -529,6 +533,24 @@ class EmployeeShiftController extends GetxController implements GetxService {
     final int m = (sec % 3600) ~/ 60;
     final int s = sec % 60;
     return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  /// GET /api/v1/customer/marketer/shift/alerts
+  Future<void> loadShiftAlerts({bool notify = true}) async {
+    try {
+      isAlertsLoading = true;
+      if (notify) update();
+
+      final res = await _service.getDailyShiftAlerts();
+      if (res.statusCode == 200 && res.body != null && res.body['data'] != null) {
+        shiftAlertsData = Map<String, dynamic>.from(res.body['data']);
+      }
+    } catch (e) {
+      debugPrint('❌ [EmployeeShiftController] loadShiftAlerts error: $e');
+    } finally {
+      isAlertsLoading = false;
+      if (notify) update();
+    }
   }
 
   /// Format hours to "HH:mm hrs"

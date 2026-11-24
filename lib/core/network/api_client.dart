@@ -408,6 +408,9 @@ class ApiClient extends GetxService {
       }
     }
 
+    // Add X-Device-Id fingerprint header for anti-fraud contract activation (R06)
+    header['X-Device-Id'] = _resolveDeviceId();
+
     // Add X-Response-Mode header if responseMode is provided
     if (responseMode != null && responseMode.isNotEmpty) {
       header[AppConstants.responseModeHeader] = responseMode;
@@ -437,6 +440,19 @@ class ApiClient extends GetxService {
       header[AppConstants.zoneId] = zoneValue!;
       header['zone-id'] = zoneValue;
     }
+  }
+
+  static const String _deviceIdPrefKey = 'shella_device_fingerprint_id';
+
+  String _resolveDeviceId() {
+    final existing = sharedPreferences.getString(_deviceIdPrefKey);
+    if (existing != null && existing.length >= 8) {
+      return existing;
+    }
+    final generated =
+        'SHD-${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}-${appBaseUrl.hashCode.abs().toRadixString(36)}';
+    sharedPreferences.setString(_deviceIdPrefKey, generated);
+    return generated;
   }
 
   Map<String, String> getHeader() => _mainHeaders;
