@@ -11,6 +11,7 @@ import 'submit_visit_summary_screen.dart';
 import 'active_store_visit_screen.dart';
 import 'store_visit_detail_screen.dart';
 import 'store_visit_map_screen.dart';
+import 'zone_stores_demand_screen.dart';
 import 'contract_signing_screen.dart';
 import '../../attendance/screens/select_work_zone_screen.dart';
 import '../../../../helper/route_helper.dart';
@@ -112,6 +113,11 @@ class _DailyVisitsScreenState extends State<DailyVisitsScreen> {
             scrolledUnderElevation: 0,
             centerTitle: true,
             actions: [
+              IconButton(
+                tooltip: 'stores_list_title'.tr,
+                onPressed: () => Get.to(() => const ZoneStoresDemandScreen()),
+                icon: const Icon(Icons.storefront_outlined, color: _primaryGreen),
+              ),
               IconButton(
                 tooltip: 'عرض الخريطة التفاعلية للزيارات',
                 onPressed: () {
