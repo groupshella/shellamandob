@@ -189,11 +189,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = ResponsiveHelper.isDesktop(context);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color pageBg = isDark ? const Color(0xFF121418) : Theme.of(context).cardColor;
+    final Color boxFill = isDark ? const Color(0xFF1C2028) : Theme.of(context).cardColor;
+    final Color headlineColor = isDark ? Colors.white : _kHeadlineColor;
+    final Color subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF545454);
+    final Color inactiveBorder = isDark
+        ? const Color(0xFF334155)
+        : Theme.of(context).disabledColor.withValues(alpha: 0.5);
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: pageBg,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).cardColor,
+        backgroundColor: pageBg,
         automaticallyImplyLeading: false,
         leadingWidth: 0,
         leading: const SizedBox.shrink(),
@@ -205,7 +213,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               onPressed: () => Get.back(),
               icon: Icon(Icons.arrow_back_ios_new,
                   size: 20,
-                  color: Theme.of(context).textTheme.bodyLarge!.color),
+                  color: headlineColor),
             ),
           ),
         ],
@@ -231,7 +239,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               fontSize: 28,
                               fontWeight: FontWeight.w700,
                               height: 1.2,
-                              color: _kHeadlineColor,
+                              color: headlineColor,
                             )),
                         const SizedBox(height: Dimensions.paddingSizeDefault),
                         Builder(builder: (context) {
@@ -240,7 +248,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16,
                                   height: 1.6,
-                                  color: const Color(0xFF545454));
+                                  color: subtitleColor);
                           // Phone flows at the end of the sentence and renders
                           // left-to-right (so +966… is not reversed by RTL).
                           return Text.rich(
@@ -279,7 +287,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 fontSize: 20,
                                 color: _hasError
                                     ? _kErrorColor
-                                    : _kHeadlineColor),
+                                    : headlineColor),
                             pinTheme: PinTheme(
                               shape: PinCodeFieldShape.box,
                               fieldHeight: 50,
@@ -291,17 +299,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               selectedColor: _hasError
                                   ? _kErrorColor
                                   : Theme.of(context).primaryColor,
-                              selectedFillColor: Theme.of(context).cardColor,
-                              inactiveFillColor: Theme.of(context).cardColor,
+                              selectedFillColor: boxFill,
+                              inactiveFillColor: boxFill,
                               inactiveColor: _hasError
                                   ? _kErrorColor
-                                  : Theme.of(context)
-                                      .disabledColor
-                                      .withValues(alpha: 0.5),
+                                  : inactiveBorder,
                               activeColor: _hasError
                                   ? _kErrorColor
                                   : Theme.of(context).primaryColor,
-                              activeFillColor: Theme.of(context).cardColor,
+                              activeFillColor: boxFill,
                             ),
                             animationDuration:
                                 const Duration(milliseconds: 250),
@@ -361,7 +367,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           Text('resend_code_again'.tr,
                               style: tajawalRegular.copyWith(
                                   fontSize: 14,
-                                  color: const Color(0xFF545454))),
+                                  color: subtitleColor)),
                           const SizedBox(width: Dimensions.paddingSizeSmall),
                           Text(_formattedTime,
                               style: tajawalMedium.copyWith(
@@ -377,7 +383,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             text: '${'didnt_receive_code'.tr} ',
                             style: tajawalRegular.copyWith(
                                 fontSize: 14,
-                                color: const Color(0xFF545454))),
+                                color: subtitleColor)),
                         TextSpan(
                             text: 'resend_action'.tr,
                             style: tajawalMedium.copyWith(
