@@ -90,6 +90,9 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   /// same field, so it always reads as ONE field (never two boxes).
   Widget _buildPhoneField(BuildContext context) {
     final theme = Theme.of(context);
+    final bool isDark = theme.brightness == Brightness.dark;
+    final Color headlineColor = isDark ? Colors.white : _kHeadlineColor;
+    final Color borderColor = isDark ? const Color(0xFF334155) : theme.disabledColor;
     OutlineInputBorder borderWith(Color color, double width) =>
         OutlineInputBorder(
           borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
@@ -110,14 +113,15 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
             fontWeight: FontWeight.w400,
             fontSize: 16,
             height: 1.6,
-            color: _kHeadlineColor),
+            color: headlineColor),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp('[0-9]')),
           LengthLimitingTextInputFormatter(_kPhoneMaxDigits),
         ],
         decoration: InputDecoration(
           isDense: true,
-          filled: false,
+          filled: isDark,
+          fillColor: isDark ? const Color(0xFF1C2028) : null,
           contentPadding: const EdgeInsets.symmetric(
               horizontal: Dimensions.paddingSizeDefault,
               vertical: Dimensions.paddingSizeLarge),
@@ -126,10 +130,10 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
               fontWeight: FontWeight.w400,
               fontSize: 16,
               height: 1.6,
-              color: theme.hintColor),
-          enabledBorder: borderWith(theme.disabledColor, 0.5),
+              color: isDark ? const Color(0xFF94A3B8) : theme.hintColor),
+          enabledBorder: borderWith(borderColor, isDark ? 1.0 : 0.5),
           focusedBorder: borderWith(theme.primaryColor, 1.2),
-          border: borderWith(theme.disabledColor, 0.5),
+          border: borderWith(borderColor, isDark ? 1.0 : 0.5),
           // Country code lives inside the same field as a prefix.
           prefixIconConstraints:
               const BoxConstraints(minWidth: 0, minHeight: 0),
@@ -154,10 +158,10 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                       true,
                   dialogBackgroundColor: theme.cardColor,
                   textStyle: tajawalRegular.copyWith(
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     fontSize: 14,
                     height: 1.6,
-                    color: _kHeadlineColor,
+                    color: headlineColor,
                   ),
                 ),
                 const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -165,7 +169,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                 Container(
                     width: 1,
                     height: 22,
-                    color: theme.disabledColor.withValues(alpha: 0.5)),
+                    color: borderColor.withValues(alpha: isDark ? 0.9 : 0.5)),
               ],
             ),
           ),
@@ -180,11 +184,15 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDesktop = ResponsiveHelper.isDesktop(context);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color pageBg = isDark ? const Color(0xFF121418) : Theme.of(context).cardColor;
+    final Color headlineColor = isDark ? Colors.white : _kHeadlineColor;
+    final Color subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF545454);
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: pageBg,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).cardColor,
+        backgroundColor: pageBg,
         automaticallyImplyLeading: false,
         leadingWidth: 0,
         leading: const SizedBox.shrink(),
@@ -196,7 +204,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
               onPressed: () => Get.back(),
               icon: Icon(Icons.arrow_back_ios_new,
                   size: 20,
-                  color: Theme.of(context).textTheme.bodyLarge!.color),
+                  color: headlineColor),
             ),
           ),
         ],
@@ -229,7 +237,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                 fontWeight: FontWeight.w700,
                                 height: 41 / 34,
                                 letterSpacing: 0.4,
-                                color: _kHeadlineColor,
+                                color: headlineColor,
                               ),
                             ),
                           ),
@@ -244,7 +252,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     height: 1.6,
-                                    color: _kHeadlineColor)),
+                                    color: headlineColor)),
                           ),
                           _buildPhoneField(context),
                           const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -255,7 +263,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                                 height: 1.6,
-                                color: const Color(0xFF545454)),
+                                color: subtitleColor),
                           ),
                         ],
                       ),

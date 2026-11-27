@@ -771,8 +771,8 @@ class MarketerDashboardScreen extends StatelessWidget {
                 // Code Text (Right in RTL)
                 Text(
                   c.code,
-                  style: const TextStyle(
-                    color: Color(0xFF1A1A2E),
+                  style: TextStyle(
+                    color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                     fontSize: 14,
                     fontFamily: 'Tajawal',
                     fontWeight: FontWeight.w700,
